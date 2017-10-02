@@ -91,10 +91,10 @@ end
     PhiC,T,Tn,Vapp,Vbi,cn,cp, deltat, edge, Efnside, Efpside,ep,epoints,epp0,eppp,eppi,eppn,...
     et,etln0,etlp0,fastrec,figson,G0, htln0,htlp0, kB,kext, klin, klincon, krad,kradetl, kradhtl,m,mobset,...
     mobseti, mue_p,muh_p, mue_i, muh_i, mue_n, muh_n, mui, ni, ntetl, nthtl,OC, OM, pepe, pedge,...
-    pii, pinter, pn, pp, ptetl, pthtl, pulseint, pulselen, pulseon, pulsestart, q,se,sn, sp, side, etlsn, etlsp,...
-    htlsn, htlsp, taun_etl, taun_htl, taup_etl, taup_htl, te, ti, tinter, tp, tn, t0,taun,...
-    taup,tmax, tmesh_type,tpoints, Vend, Vstart, v, varlist, varstr, wn, wp, wscr, x0,xmax,xmesh_type,...
-    xpoints]  = deal(0);
+    pii, pint, pn, pp, pscr, ptetl, pthtl, pulseint, pulselen, pulseon, pulsestart, q,se,sn, sp, side, etlsn, etlsp,...
+    htlsn, htlsp, taun_etl, taun_htl, taup_etl, taup_htl, te, ti, tint, tp, tn, t0,taun,...
+    taup,tmax, tmesh_type,tpoints, tscr, Vend, Vstart, v, varlist, varstr, wn, wp, wscr, x0,xmax,xmesh_type,...
+    xpoints] = deal(0);
 
 % Unpacks params structure for use in current workspace 
 v2struct(params);
@@ -158,11 +158,7 @@ elseif OM == 2 && Int ~= 0;
 end
 
 % SOLVER OPTIONS  - limit maximum time step size during integration.
-options = odeset('MaxStep',t0/100);
-options = odeset('MaxOrder',5);
-options = odeset('NonNegative', 1);
-options = odeset('NonNegative', 2);
-options = odeset('NonNegative', 3);
+options = odeset('MaxOrder',5, 'NonNegative', [1, 1, 1, 0]);
 
 % Call solver - inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
@@ -235,15 +231,27 @@ c = [1
      0];
 
 % p-type
-if x < tp
+if x >= 0 && x <= tp - tscr
     
  f = [(mue_p*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
      (muh_p*(u(2)*DuDx(4)+kB*T*DuDx(2)));     
      0;
      DuDx(4);];                                  
 
- s = [ - kradhtl*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
-       - kradhtl*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
+ s = [ - kradhtl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
+       - kradhtl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
+      0;
+      (q/eppp)*(-u(1)+u(2)-NA);];%+pthtl-nthtl);];
+  
+elseif x > tp - tscr && x <= tp
+    
+ f = [(mue_p*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
+     (muh_p*(u(2)*DuDx(4)+kB*T*DuDx(2)));     
+     0;
+     DuDx(4);];                                  
+
+ s = [ - kradhtl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
+       - kradhtl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
       0;
       (q/eppp)*(-u(1)+u(2)+u(3)-NI-NA);];%+pthtl-nthtl);];
 
@@ -261,15 +269,15 @@ if x < tp
 %       (q/eppp)*(-u(1)+u(2)-NA+pthtl-nthtl);];
  
 % Intrinsic
-elseif x >= tp && x <= tp + ti
+elseif x > tp && x < tp + ti
     
    f = [(mue_i*(u(1)*-DuDx(4)+kB*T*DuDx(1)));       % Current terms for electrons
      (muh_i*(u(2)*DuDx(4)+kB*T*DuDx(2)));           % Current terms for holes
      (mui*(u(3)*DuDx(4)+kB*T*DuDx(3)));             % Current terms for ions
      DuDx(4);];                                     % Electric field
 
- s = [g - krad*((u(1)*u(2))-(ni^2)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+ptrap)) + (taup_htl*(u(1)+ntrap))));
-      g - krad*((u(1)*u(2))-(ni^2)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+ptrap)) + (taup_htl*(u(1)+ntrap))));
+ s = [g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+ptrap)) + (taup_htl*(u(1)+ntrap))));
+      g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+ptrap)) + (taup_htl*(u(1)+ntrap))));
       0;
       (q/eppi)*(-u(1)+u(2)+u(3)-NI);]; 
 
@@ -288,18 +296,31 @@ elseif x >= tp && x <= tp + ti
 
 
 % n-type
-elseif x > tp + ti && x <= xmax
+elseif x >= tp + ti && x < tp + ti + tscr
   
  f = [(mue_n*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
      (muh_n*(u(2)*DuDx(4)+kB*T*DuDx(2)));      
      0;
      DuDx(4)];                                      
 
-s = [ - kradetl*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
-      - kradetl*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
+s = [ - kradetl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
+      - kradetl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
       0;
-      (q/eppn)*(-u(1)+u(2)+u(3)-NI+ND);];%+ptetl-ntetl)];
-      
+      (q/eppn)*(-u(1)+u(2)+u(3)-NI+ND);];%+ptetl-ntetl)];3
+
+  % n-type
+elseif x >= tp + ti + tscr && x <= xmax
+  
+ f = [(mue_n*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
+     (muh_n*(u(2)*DuDx(4)+kB*T*DuDx(2)));      
+     0;
+     DuDx(4)];                                      
+
+s = [ - kradetl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
+      - kradetl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
+      0;
+      (q/eppn)*(-u(1)+u(2)+ND);];%+ptetl-ntetl)];
+
 end
 
 end
@@ -385,7 +406,7 @@ end
 % coefficient.
 function [pl,ql,pr,qr] = pdex4bc(xl,ul,xr,ur,t)
 
-if JV == 1;
+if JV == 1
         
     Vapp = Vstart + ((Vend-Vstart)*t*(1/tmax));
     
@@ -540,13 +561,13 @@ end
 if OC == 1  && pulseon == 1                 % AC coupled mode
    
     Voc = Voc - Voc(1, :);                  % Removes baseline from TPV
-    t = (t-(pulsestart+pulselen));          % Zero point adjustment                               
+    t = t-(pulsestart+pulselen);          % Zero point adjustment                               
 end
 
 % TPC
 if OC == 0 && pulseon == 1 
 
-    t = (t-pulsestart);                     % TPC Zero point adjustment   
+    t = t-(pulsestart+pulselen);                     % TPC Zero point adjustment   
 
 end
 
@@ -634,10 +655,10 @@ if calcJ == 2
 
         for j=1:length(t)
 
-            [nloc,dnlocdx] = pdeval(0,x,n(j,:),x(round(xpoints/2)));    
-            [ploc,dplocdx] = pdeval(0,x,p(j,:),x(round(xpoints/2)));
-            [iloc,dilocdx] = pdeval(0,x,a(j,:),x(round(xpoints/2)));
-            [Vloc, Floc] = pdeval(0,x,V(j,:),x(round(xpoints/2)));
+            [nloc,dnlocdx] = pdeval(0,x,n(j,:),x(end));    
+            [ploc,dplocdx] = pdeval(0,x,p(j,:),x(end));
+            [iloc,dilocdx] = pdeval(0,x,a(j,:),x(end));
+            [Vloc, Floc] = pdeval(0,x,V(j,:),x(end));
 
             % Particle currents
             Jndiff(j) = (mue_n*kB*T*dnlocdx)*(1000*e);
@@ -658,7 +679,7 @@ if calcJ == 2
         end
 
     % Currents at the boundaries
-    Jpartr = Jpart';
+    Jpartr = -Jpart';
 
     %Jpartr = -(sn*n(:, end) - ni) %Check when surface recombination is used
 
@@ -670,7 +691,7 @@ if calcJ == 2
 
     if pulseon == 1
 
-        Jtotr = Jtotr - Jtotr(end);    % remove baseline
+        Jtotr = Jtotr - Jtotr(1);    % remove baseline
 
     end
 
@@ -725,9 +746,9 @@ else
 end
 
 % Band Diagram
-FH1 = figure(1)
+FH1 = figure(1);
 %set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
-PH1 = subplot(3,1,1)
+PH1 = subplot(3,1,1);
 plot (xnm, Efn(end,:), '--', xnm, Efp(end,:), '--', xnm, Ecb(end, :), xnm, Evb(end ,:));
 %legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
 set(legend,'FontSize',12);
@@ -743,7 +764,7 @@ grid off;
 PH2 = subplot(3,1,2);
 semilogy(xnm, (sol(end,:,1)), xnm, (sol(end,:,2)));
 ylabel('{\itn, p} [cm^{-3}]')
-legend('\itn', '\itp')
+%legend('\itn', '\itp')
 %xlabel('Position [nm]')
 xlim([0, xnmend]);
 ylim([1e0, 1e20]);
@@ -752,7 +773,7 @@ set(legend,'EdgeColor',[1 1 1]);
 grid off
 
 % Ionic charge density
-PH3 = subplot(3,1,3)
+PH3 = subplot(3,1,3);
 plot(xnm, a(end,:)/1e19, 'black');
 ylabel('{\ita} [x10^{19} cm^{-3}]')
 xlabel('Position [nm]')
@@ -889,7 +910,7 @@ end
 
 if calcJ ~= 0
 
-solstruct.Jtotr = Jtotr; solstruct.Jpartr = Jpartr; solstruct.Jdispr = Jdispr,  
+solstruct.Jtotr = Jtotr; solstruct.Jpartr = Jpartr; solstruct.Jdispr = Jdispr;  
 
 end
 

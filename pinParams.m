@@ -15,15 +15,17 @@ ti = 400e-7;         % Intrinsic layer thickness
 pii = 200;           % Intrinsic points
 tn = 200e-7;         % n-type thickness
 pn = 100;             % n-type points
-tinter = 40e-7;      % 0.5x Interfacial region thickness (x_mesh_type = 3)
-pinter = 80;         % 0.5x Interfacial points (x_mesh_type = 3)
+tint = 5e-7;      % 0.5x Interfacial region thickness (x_mesh_type = 3)
+pint = 40;         % 0.5x Interfacial points (x_mesh_type = 3)
+tscr = 50e-7;
+pscr = 100;
 pepe = 20;           % electrode interface points
 te = 10e-7;          % electrode interface thickness
-deltax = tinter/pinter;    % spacing in the interfacial region- requires for mesh generation
+deltax = tint/pint;    % spacing in the interfacial region- requires for mesh generation
 
 % Parameters for spatial mesh of solution points - see meshgen_x for
 % xmesh_type specification
-xmesh_type = 3; 
+xmesh_type = 4; 
 xmax = tp + ti + tn;      % cm
 
 if xmesh_type == 1 || xmesh_type == 5
@@ -37,19 +39,19 @@ else
 end
 
 % General Parameters
-OC = 0;                % Closed circuit = 0, Open Circuit = 1 
-Int = 1;               % Bias Light intensity (Suns Eq.)
+OC = 1;                % Closed circuit = 0, Open Circuit = 1 
+Int = 1;             % Bias Light intensity (Suns Eq.)
 G0 = 2.5e21;           % Uniform generation rate @ 1 Sun
-tmax = 1e-3;           % Time
-pulseon = 0;           % Switch pulse on TPC or TPV
-Vapp = 0;           % Applied bias
+tmax = 1e0;         % Time
+pulseon = 1;           % Switch pulse on TPC or TPV
+Vapp = 0;              % Applied bias
 BC = 1;                % Boundary Conditions. Must be set to one for first solution
 figson = 1;            % Toggle figures on/off 
 side = 1;              % illumination side 1 = EE, 2 = SE
-calcJ = 2;             % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position, calcJ = 2, calculates DD at boundary.
+calcJ = 0;             % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position, calcJ = 2, calculates DD at boundary.
 mobset = 1;            % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
-mobseti = 1;           % Switch on/off ion mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
-JV = 1;
+mobseti = 0;           % Switch on/off ion mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
+JV = 0;
 
 % OM = Optical Model 
 % 0 = Uniform Generation 
@@ -67,10 +69,10 @@ deltat = tmax/(1e6*tpoints);
 if pulseon == 1 && OC == 1        % Record length for TPV
     
     pulselen = 1e-6;       % Transient pulse length
-    pulseint = 2;          % Transient pulse intensity- for BL and TM models, 100 mW/cm2 assumed
+    pulseint = 1e6;          % Transient pulse intensity- for BL and TM models, 100 mW/cm2 assumed
     pulsestart = 1e-7;     % Time before pulse- required for baseline
     tmesh_type = 3;
-    tmax = 100e-6;
+    tmax = 1000e-6;
     t0 = 0;
     tpoints = 400;
     deltat = tmax/(1e4*tpoints);
@@ -79,22 +81,22 @@ end
 
 if pulseon == 1 && OC == 0        % Record length for TPC
     
-    pulselen = 10e-6;       % Transient pulse length
+    pulselen = 1e-6;       % Transient pulse length
     pulseint = 0.2;            % Transient pulse intensity- for BL and TM models, 100 mW/cm2 assumed
-    pulsestart = 1e-6;
-    tmesh_type = 1;
-    tmax = 40e-6;  
+    pulsestart = 1e-7;
+    tmesh_type = 3;
+    tmax = 100e-6;  
     t0 = 0;%tmax/1000;
     tpoints = 400;
     deltat = tmax/(1e4*tpoints);
-    calcJ = 1;
+    calcJ = 2;
     
 end 
 
 %%%%%%%%%% CURRENT VOLTAGE SCAN %%%%%%%%%%%%
 % NOT 100% reliable- requires further development and investigation
-Vstart = 1.1;
-Vend = 0;
+Vstart = 0;
+Vend = 1.2;
 JVscan_pnts = 1000;
 
 %%%%%%%%%%% MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
@@ -109,7 +111,7 @@ if mobset == 0
     
 else
     
-    mue_i = 20;          % electron mobility
+    mue_i = 1;          % electron mobility
     muh_i = mue_i;      % hole mobility
     mue_p = mue_i;
     muh_p = mue_i;
@@ -169,13 +171,13 @@ klin = 0;               % Coefficients for linear recombination
 klincon = 0;
 
 % Radiative recombanation, U = k(np - ni^2)
-krad = 1e-10;           % [cm3 s-1] Bulk Radiative Recombination coefficient [nominally 1e-10]
+krad = 1e-6;           % [cm3 s-1] Bulk Radiative Recombination coefficient [nominally 1e-10]
 kradetl = krad;         % [cm3 s-1] ETL Radiative Recombination coefficient 
 kradhtl = krad;         % [cm3 s-1] HTL Radiative Recombination coefficient
 
 % SRH recmobination in the contact regions, 
 % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-taun_etl = 1e6;%2e-15;         % [s] SRH time constant for electrons
+taun_etl = 1e6;         % [s] SRH time constant for electrons
 taup_etl = taun_etl;    % [s] SRH time constant for holes
 taun_htl = taun_etl;        %%%% USE a high value of (e.g.) 1 to switch off
 taup_htl = taun_htl;    %%%% NOT 0- these variables are in the denominator
@@ -185,8 +187,8 @@ sp = 0;%sn;             % [cm s-1] hole surface recombination velocity (rate con
 % SRH parameters
 % se = 1e-15;             % [cm^2] Electron capture cross-section
 % v = 1e9;               % [cm/s] Carrier group velocity. Estimates from: http://www.tf.uni-kiel.de/matwis/amat/semi_en/kap_2/advanced/t2_3_1.html
-Etetl = -0.2;            % ((EA-IP)/2+IP)-0.2;      % Deep trap energy- currently a guess!
-Ethtl = -1.4;
+Etetl = -0.8;            % ((EA-IP)/2+IP)-0.2;      % Deep trap energy- currently a guess!
+Ethtl = -0.8;
 ntetl = ni*exp((Etetl-Ei)/(kB*T));     % Density of CB electrons when Fermi level at trap state energy
 ptetl = ni*exp((Ei-Etetl)/(kB*T));     % Density of VB holes when Fermi level at trap state energy
 nthtl = ni*exp((Ethtl-Ei)/(kB*T));     % Density of CB electrons when Fermi level at trap state energy

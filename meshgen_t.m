@@ -18,7 +18,11 @@ elseif tmesh_type == 2
     % switches to log
 elseif tmesh_type == 3
     
-    t = [linspace(0, pulsestart+pulselen, 0.2*tpoints), pulsestart + pulselen + logspace(log10(deltat), log10(tmax- pulsestart- pulselen), 0.8*tpoints)];
+    t = [linspace(0, pulsestart+pulselen, 0.2*tpoints), pulsestart + pulselen + logspace(log10(pulselen/(0.8*tpoints*1e3)), log10(tmax- pulsestart- pulselen), 0.8*tpoints)];
+   
+elseif tmesh_type == 4
+    
+    t = [linspace(0, pulsestart, 0.1*tpoints), pulsestart+ logspace(log10((pulselen/(0.7*tpoints*1e3))), log10(pulselen), 0.2*tpoints), pulsestart + pulselen + logspace(log10(pulselen/(0.7*tpoints*1e3)), log10(tmax- pulsestart- pulselen), 0.8*tpoints)];
     
 end
 
@@ -31,8 +35,8 @@ if meshfigon == 1
     
     figure(200);
     plot(tmir, ptmir, '.');
-    xlabel('Position');
-    ylabel('Time');
+    xlabel('Time');
+    ylabel('Point');
 
 end
 
