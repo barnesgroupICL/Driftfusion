@@ -522,6 +522,26 @@ p = sol(:,:,2);
 a = sol(:,:,3);
 V = sol(:,:,4);
 
+function verify_stabilization(matrix2d, time_index, log) % verify if the tmax provided was enough
+    profile_at_time=matrix2d(time_index,:); % take profile of values at a certain time of evolution
+    profile_end=matrix2d(end,:); % take profile of values at the end of time
+    if log % for variables ranging on huge scales comparing the log values makes more sense
+        profile_at_time=log10(profile_at_time);
+        profile_end=log10(profile_end);
+    end
+    difference=sum(abs(profile_end-profile_at_time)); % sum up all the differences between the profiles
+    threshold=1e-4*sum(abs(profile_end-mean(profile_end))); % sum up absolute values, ignore constant bias
+    if difference > threshold
+        warning(['A tmax of ' num2str(params.tmax) ' s has not been enough for the ' inputname(1) ' distribution to reach stability, in terms of moving charges and ions. Consider trying with a greater tmax.']);
+    end
+end
+
+[~,time_index]=min(abs(t-(params.tmax*0.75))); % get time mesh index at 3/4 of tmax
+verify_stabilization(n, time_index, true) % verify if electrons reached stability
+verify_stabilization(p, time_index, true) % verify if holes reached stability
+verify_stabilization(a, time_index, false) % verify if ions reached stability
+verify_stabilization(V, time_index, false) % verify if potential reached stability
+
 % Calculate energy levels and chemical potential         
 V = V - EA;                                % Electric potential
 Ecb = EA-V-EA;                             % Conduction band potential
@@ -541,6 +561,8 @@ nBM = ones(length(t), xpoints)*diag(x > tp + ti);
 
 nstat = zeros(1, xpoints);                                  % Static charge array
 nstat = (-NA-NI)*pBM + (-NI*iBM) + (ND-NI)*nBM; %(-NA+pthtl-nthtl-NI)*pBM + (-NI*iBM) + (ND+ptetl-ntetl-NI)*nBM;   
+
+
 rhoc = (-n + p + a + nstat);     % Net charge density calculated from adding individual charge densities
 
 % Remove static ionic charge from contacts for plotting
@@ -932,11 +954,11 @@ solstruct.params = params;
 
 if (OC ==0)
     
-    assignin('base', 'sol', solstruct)
+    assignin('base', 'sol', solstruct);
 
 elseif (OC ==1)
     
-    assignin('base', 'ssol', solstruct)
+    assignin('base', 'ssol', solstruct);
 
 end
 
