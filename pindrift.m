@@ -536,11 +536,11 @@ function verify_stabilization(matrix2d, time_index, log) % verify if the tmax pr
     end
 end
 
-[~,time_index]=min(abs(t-(params.tmax*0.75))); % get time mesh index at 3/4 of tmax
-verify_stabilization(n, time_index, true) % verify if electrons reached stability
-verify_stabilization(p, time_index, true) % verify if holes reached stability
-verify_stabilization(a, time_index, false) % verify if ions reached stability
-verify_stabilization(V, time_index, false) % verify if potential reached stability
+[~,time_index]=min(abs(t-0.75*t(length(sol(:,1,1))))); % get time mesh index at 3/4 of maximum time reached
+verify_stabilization(n, time_index, true); % verify if electrons reached stability
+verify_stabilization(p, time_index, true); % verify if holes reached stability
+verify_stabilization(a, time_index, false); % verify if ions reached stability
+verify_stabilization(V, time_index, false); % verify if potential reached stability
 
 % Calculate energy levels and chemical potential         
 V = V - EA;                                % Electric potential
