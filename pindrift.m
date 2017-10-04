@@ -1,4 +1,4 @@
-function solstruct = pindrift(varargin);
+function solstruct = pindrift(varargin)
 
 %%%%%%% REQUIREMENTS %%%%%%%%%%%%
 % Requires v2struct toolbox for unpacking parameters structure
@@ -67,7 +67,7 @@ elseif length(varargin) == 2
     
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
         
-        params = varargin{1, 1}.params
+        params = varargin{1, 1}.params;
         icsol = varargin{1, 1}.sol;
         icx = varargin{1, 1}.x;
     
@@ -149,7 +149,7 @@ if OM == 1 && Int ~= 0 %OM = Optical Model
     GxLas = evalin('base', 'BL638');
     GxLas = GxLas';
    
-elseif OM == 2 && Int ~= 0;
+elseif OM == 2 && Int ~= 0
     % Call Transfer Matrix code: [Gx1, Gx2] = TMPC1(layers, thicknesses, activeLayer1, activeLayer2)
     [Gx1S, GxLas] = TMPC1({'SiO2', 'TiO2', 'MAPICl', 'Spiro'}, [1e-4 pp 3 pn], 3, 3);
     Gx1S = Gx1S';
@@ -166,7 +166,7 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 
 % --------------------------------------------------------------------------
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
-function [c,f,s,iterations] = pdex4pde(x,t,u,DuDx)
+function [c,f,s] = pdex4pde(x,t,u,DuDx)
 
 % Open circuit condition- symmetric model
 if (OC ==1)
@@ -654,8 +654,8 @@ for j=1:length(t)
 end
 
 % Currents at the boundaries (should be the same)
-Jpartl = Jpart(:,1)
-Jpartr = Jpart(:,round(xpoints/2))
+Jpartl = Jpart(:,1);
+Jpartr = Jpart(:,round(xpoints/2));
 
 % Displacement Current at right hand side
 Fend = (Floct(:, end));
@@ -745,7 +745,7 @@ end
 %%%%% GRAPHING %%%%%%%%
 
 %Figures
-if figson == 1;
+if figson == 1
     
     % Open circuit voltage
       if OC == 1
