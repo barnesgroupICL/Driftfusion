@@ -736,7 +736,7 @@ if calcJ == 3
     Jpart =  mue_i*n.*dEfndx*(1000*e) +  muh_i*p.*dEfpdx*(1000*e);
 
     Jdispr = (e*1000)*eppn*gradient(Floct, t);
-    Jpartr = Jpart(:,pe+0.2*pp);
+    Jpartr = Jpart(:,pepe+0.2*pp);
     Jtotr = Jpartr + Jdispr;
     Jdispr = 0;
 
