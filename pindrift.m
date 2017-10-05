@@ -586,6 +586,14 @@ if OC == 1
     
 end
 
+if OC == 0
+    
+    Voc = Efn(:, end) - Efp(:, 1);                    % Open Circuit Voltage
+    Voc_chem = Phin(:, end) - Phip(:, 1);              % Chemical componenet
+    Voc_V = V(:, end) - V(:, 1);
+    
+end
+
 % TPV
 if OC == 1  && pulseon == 1                 % AC coupled mode
    
@@ -755,14 +763,16 @@ end
 if figson == 1
     
     % Open circuit voltage
-      if OC == 1
+%       if OC == 1
         
         figure(7);
         plot (t, Voc);
         xlabel('Time [s]');   
         ylabel('Voltage [V]');
 
-      end
+%       end
+      
+      
 
 % Defines end points for the graphing
 if OC == 1
