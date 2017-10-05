@@ -94,7 +94,7 @@ end
     pii, pint, pn, pp, pscr, ptetl, pthtl, pulseint, pulselen, pulseon, pulsestart, q,se,sn, sp, side, etlsn, etlsp,...
     htlsn, htlsp, taun_etl, taun_htl, taup_etl, taup_htl, te, ti, tint, tp, tn, t0,taun,...
     taup,tmax, tmesh_type,tpoints, tscr, Vend, Vstart, v, varlist, varstr, wn, wp, wscr, x0,xmax,xmesh_type,...
-    xpoints] = deal(0);
+    xpoints, k_extr_ce, Rs, area, t_npoints_V_step,asd, t_V_step] = deal(0);
 
 % Unpacks params structure for use in current workspace 
 v2struct(params);
@@ -155,6 +155,10 @@ elseif OM == 2 && Int ~= 0
     Gx1S = Gx1S';
     GxLas = GxLas';
   
+end
+
+if JV == 2
+    t_V_step=t(t_npoints_V_step);
 end
 
 % SOLVER OPTIONS  - limit maximum time step size during integration.
@@ -410,6 +414,9 @@ if JV == 1
         
     Vapp = Vstart + ((Vend-Vstart)*t*(1/tmax));
     
+elseif JV == 2 % for sudden change in voltage
+    Vapp = Vstart + ((Vend-Vstart)*t/t_V_step);
+    Vapp(xor(Vapp<Vstart, Vapp>Vend)) = Vend;
 end
 
 % Open circuit condition- symmetric model
@@ -532,7 +539,7 @@ function verify_stabilization(matrix2d, time_index, log) % verify if the tmax pr
     difference=sum(abs(profile_end-profile_at_time)); % sum up all the differences between the profiles
     threshold=1e-4*sum(abs(profile_end-mean(profile_end))); % sum up absolute values, ignore constant bias
     if difference > threshold
-        warning(['A tmax of ' num2str(params.tmax) ' s has not been enough for the ' inputname(1) ' distribution to reach stability, in terms of moving charges and ions. Consider trying with a greater tmax.']);
+        warning(['A tmax of ' num2str(params.tmax) ' s has not been enough for the ' inputname(1) ' distribution to reach stability. Consider trying with a greater tmax.']);
     end
 end
 
