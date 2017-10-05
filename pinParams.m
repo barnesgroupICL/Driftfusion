@@ -96,7 +96,7 @@ end
 %%%%%%%%%% CURRENT VOLTAGE SCAN %%%%%%%%%%%%
 % NOT 100% reliable- requires further development and investigation
 Vstart = 0;
-Vend = 1.2;
+Vend = 1.1;
 JVscan_pnts = 1000;
 
 %%%%%%%%%%% MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
@@ -220,6 +220,11 @@ if JV == 1
     
 end
 
+% Parameters for adding and external resistance in series, like in CE
+k_extr_ce=1e30; % big value, non physical
+Rs=50; % resistance
+area=1; % active area of the device
+t_npoints_V_step=10; % how fast voltage drops in CE, in time points
 
 % Pack parameters in to structure 'params'
 varlist = who('*')';
