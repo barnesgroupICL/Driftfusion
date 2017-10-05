@@ -43,7 +43,7 @@ OC = 1;                % Closed circuit = 0, Open Circuit = 1
 Int = 1;             % Bias Light intensity (Suns Eq.)
 G0 = 2.5e21;           % Uniform generation rate @ 1 Sun
 tmax = 1e0;         % Time
-pulseon = 1;           % Switch pulse on TPC or TPV
+pulseon = 0;           % Switch pulse on TPC or TPV
 Vapp = 0;              % Applied bias
 BC = 1;                % Boundary Conditions. Must be set to one for first solution
 figson = 1;            % Toggle figures on/off 
