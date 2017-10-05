@@ -4,10 +4,10 @@ function symsol = symmetricize(sol)
 
 xp = length(sol.x);
 
-x = sol.x
-n = sol.n
-p = sol.p
-V = sol.V
+x = sol.x;
+n = sol.n;
+p = sol.p;
+V = sol.V;
 
 % First copy solution
 symsol = sol;
@@ -22,7 +22,7 @@ symsol.sol = [sol1, sol2];              % Concatenate
 x1 = x;
 x2 = 2*x(end) - fliplr(x);
 x2 = x2(2:end);    
-symsol.x = [x1, x2]
+symsol.x = [x1, x2];
 
 % symsol.n(end, 1:xp) = sol.n;
 % symsol.n(end, xp+1:2*xp) = fliplr(sol.n(end, :));
