@@ -9,8 +9,8 @@ function solstruct = pindrift(varargin)
 
 %%%%%%% GENERAL NOTES %%%%%%%%%%%%
 % A routine to test solving the diffusion and drift equations using the
-% matlab pdepe solver. 
-% 
+% matlab pdepe solver.
+%
 % The solution from the solver is a 3D matrix, u:
 % rows = time
 % columns = space
@@ -30,10 +30,10 @@ function solstruct = pindrift(varargin)
 % assume that first is the previous solution, and the
 % second is a parameters structure. If the IC sol = 0, default conditions
 % are used, but parameters can still be input. If the second argument is
-% any character e.g. 'params', then the parameters from the previous solution 
+% any character e.g. 'params', then the parameters from the previous solution
 % are used and any changes in the parameters function pinParams are
 % ignored.
-%  
+%
 % AUTHORS
 % Piers Barnes last modified (09/01/2016)
 % Phil Calado last modified (14/07/2017)
@@ -49,36 +49,36 @@ set(0,'DefaultTextColor', [0, 0, 0]);
 
 % Input arguments are dealt with here
 if isempty(varargin)
-
+    
     params = pinParams;      % Calls Function pinParams and stores in sturcture 'params'
-
+    
 elseif length(varargin) == 1
     
     % Call input parameters function
     icsol = varargin{1, 1}.sol;
     icx = varargin{1, 1}.x;
     params = pinParams;
-
-elseif length(varargin) == 2 
-
-    if max(max(max(varargin{1, 1}.sol))) == 0
-
-       params = varargin{2};
     
+elseif length(varargin) == 2
+    
+    if max(max(max(varargin{1, 1}.sol))) == 0
+        
+        params = varargin{2};
+        
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
         
         params = varargin{1, 1}.params;
         icsol = varargin{1, 1}.sol;
         icx = varargin{1, 1}.x;
-    
+        
     else
-    
+        
         icsol = varargin{1, 1}.sol;
         icx = varargin{1, 1}.x;
         params = varargin{2};
-    
+        
     end
-
+    
 end
 
 % Declare Variables
@@ -96,7 +96,7 @@ end
     taup,tmax, tmesh_type,tpoints, tscr, Vend, Vstart, v, varlist, varstr, wn, wp, wscr, x0,xmax,xmesh_type,...
     xpoints, k_extr_ce, Rs, area, t_npoints_V_step,asd, t_V_step] = deal(0);
 
-% Unpacks params structure for use in current workspace 
+% Unpacks params structure for use in current workspace
 v2struct(params);
 
 % Currently have to repack params since values change after unpacking- unsure as to what's happening there
@@ -112,7 +112,7 @@ if isempty(varargin) || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol)
     % Edit meshes in mesh gen
     x = meshgen_x(params);
     
-        if OC == 1
+    if OC == 1
         
         % Mirror the mesh for symmetric model - symmetry point is an additional
         % point at device length + 1e-7
@@ -121,25 +121,25 @@ if isempty(varargin) || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol)
         x2 = x2(2:end);                 % Delete initial point to ensure symmetry
         x = [x1, x2];
         
-        end
-        
+    end
+    
     icx = x;
     
 else
-          
-        x = icx;
-
+    
+    x = icx;
+    
 end
 
 xpoints = length(x);
 xmax = x(end);
-xnm = x*1e7;        
+xnm = x*1e7;
 
 %%%%%% Time mesh %%%%%%%%%
 t = meshgen_t(params);
 
 %%%%%% Generation %%%%%%%%%%
-genspace = linspace(0,ti,pii);  %
+genspace = linspace(0,ti,pii);
 
 if OM == 1 && Int ~= 0 %OM = Optical Model
     
@@ -148,13 +148,13 @@ if OM == 1 && Int ~= 0 %OM = Optical Model
     Gx1S = Gx1S';
     GxLas = evalin('base', 'BL638');
     GxLas = GxLas';
-   
+    
 elseif OM == 2 && Int ~= 0
     % Call Transfer Matrix code: [Gx1, Gx2] = TMPC1(layers, thicknesses, activeLayer1, activeLayer2)
     [Gx1S, GxLas] = TMPC1({'SiO2', 'TiO2', 'MAPICl', 'Spiro'}, [1e-4 pp 3 pn], 3, 3);
     Gx1S = Gx1S';
     GxLas = GxLas';
-  
+    
 end
 
 if JV == 2
@@ -170,206 +170,206 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 
 % --------------------------------------------------------------------------
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
-function [c,f,s] = pdex4pde(x,t,u,DuDx)
-
-% Open circuit condition- symmetric model
-if (OC ==1)
-    
-    if x > xmax/2
-
-        x = xmax - x;
-
-    end
-    
-end
-     
-% Beer Lambert or Transfer Matrix 1 Sun
-if Int ~= 0 && OM ==1 || Int ~= 0 && OM == 2
-     
-      if x > tp && x < (tp+ti) 
-          g = Int*interp1(genspace, Gx1S, (x-tp));
-      else
-          g = 0;
-      end
- 
-    % Add pulse
-    if pulseon == 1
-        if  t >= 10e-6 && t < pulselen + 10e-6
-           if x > tp && x < (tp+ti)
-                lasg = pulseint*interp1(genspace, GxLas, (x-tp));
-                g = g + lasg;
-           end
-        end
-    end
-  
-% Uniform Generation
-elseif OM == 0
-      
-      if Int ~= 0 && x > tp && x < (tp+ti)    
-           g = Int*G0;
-      else
-           g = 0;
-      end
+    function [c,f,s] = pdex4pde(x,t,u,DuDx)
         
-        % Add pulse
-        if pulseon == 1
-            if  t >= pulsestart && t < pulselen + pulsestart
-                
-                g = g+(pulseint*1e21);
+        % Open circuit condition- symmetric model
+        if (OC ==1)
             
+            if x > xmax/2
+                
+                x = xmax - x;
+                
             end
+            
         end
         
-else
-        g = 0;
+        % Beer Lambert or Transfer Matrix 1 Sun
+        if Int ~= 0 && OM ==1 || Int ~= 0 && OM == 2
+            
+            if x > tp && x < (tp+ti)
+                g = Int*interp1(genspace, Gx1S, (x-tp));
+            else
+                g = 0;
+            end
+            
+            % Add pulse
+            if pulseon == 1
+                if  t >= 10e-6 && t < pulselen + 10e-6
+                    if x > tp && x < (tp+ti)
+                        lasg = pulseint*interp1(genspace, GxLas, (x-tp));
+                        g = g + lasg;
+                    end
+                end
+            end
+            
+            % Uniform Generation
+        elseif OM == 0
+            
+            if Int ~= 0 && x > tp && x < (tp+ti)
+                g = Int*G0;
+            else
+                g = 0;
+            end
+            
+            % Add pulse
+            if pulseon == 1
+                if  t >= pulsestart && t < pulselen + pulsestart
+                    
+                    g = g+(pulseint*1e21);
+                    
+                end
+            end
+            
+        else
+            g = 0;
+            
+        end
         
-end
-
-% Prefactors set to 1 for time dependent components - can add other
-% functions if you want to include the multiple trapping model
-c = [1
-     1
-     1
-     0];
-
-% p-type
-if x >= 0 && x <= tp - tscr
-    
- f = [(mue_p*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
-     (muh_p*(u(2)*DuDx(4)+kB*T*DuDx(2)));     
-     0;
-     DuDx(4);];                                  
-
- s = [ - kradhtl*((u(1)*u(2))-(ni^2));
-       - kradhtl*((u(1)*u(2))-(ni^2));
-      0;
-      (q/eppp)*(-u(1)+u(2)-NA);];
-  
-elseif x > tp - tscr && x <= tp
-    
- f = [(mue_p*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
-     (muh_p*(u(2)*DuDx(4)+kB*T*DuDx(2)));     
-     0;
-     DuDx(4);];                                  
-
- s = [ - kradhtl*((u(1)*u(2))-(ni^2));
-       - kradhtl*((u(1)*u(2))-(ni^2));
-      0;
-      (q/eppp)*(-u(1)+u(2)+u(3)-NI-NA);];
- 
-% Intrinsic
-elseif x > tp && x < tp + ti
-    
-   f = [(mue_i*(u(1)*-DuDx(4)+kB*T*DuDx(1)));       % Current terms for electrons
-     (muh_i*(u(2)*DuDx(4)+kB*T*DuDx(2)));           % Current terms for holes
-     (mui*(u(3)*DuDx(4)+kB*T*DuDx(3)));             % Current terms for ions
-     DuDx(4);];                                     % Electric field
-
- s = [g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
-      g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
-      0;
-      (q/eppi)*(-u(1)+u(2)+u(3)-NI);]; 
-
-% n-type
-elseif x >= tp + ti && x < tp + ti + tscr
-  
- f = [(mue_n*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
-     (muh_n*(u(2)*DuDx(4)+kB*T*DuDx(2)));      
-     0;
-     DuDx(4)];                                      
-
-s = [ - kradetl*((u(1)*u(2))-(ni^2));
-      - kradetl*((u(1)*u(2))-(ni^2));
-      0;
-      (q/eppn)*(-u(1)+u(2)+u(3)-NI+ND);];
-
-  % n-type
-elseif x >= tp + ti + tscr && x <= xmax
-  
- f = [(mue_n*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
-     (muh_n*(u(2)*DuDx(4)+kB*T*DuDx(2)));      
-     0;
-     DuDx(4)];                                      
-
-s = [ - kradetl*((u(1)*u(2))-(ni^2));
-      - kradetl*((u(1)*u(2))-(ni^2));
-      0;
-      (q/eppn)*(-u(1)+u(2)+ND);];
-
-end
-
-end
+        % Prefactors set to 1 for time dependent components - can add other
+        % functions if you want to include the multiple trapping model
+        c = [1
+            1
+            1
+            0];
+        
+        % p-type
+        if x >= 0 && x <= tp - tscr
+            
+            f = [(mue_p*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
+                (muh_p*(u(2)*DuDx(4)+kB*T*DuDx(2)));
+                0;
+                DuDx(4);];
+            
+            s = [ - kradhtl*((u(1)*u(2))-(ni^2));
+                - kradhtl*((u(1)*u(2))-(ni^2));
+                0;
+                (q/eppp)*(-u(1)+u(2)-NA);];
+            
+        elseif x > tp - tscr && x <= tp
+            
+            f = [(mue_p*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
+                (muh_p*(u(2)*DuDx(4)+kB*T*DuDx(2)));
+                0;
+                DuDx(4);];
+            
+            s = [ - kradhtl*((u(1)*u(2))-(ni^2));
+                - kradhtl*((u(1)*u(2))-(ni^2));
+                0;
+                (q/eppp)*(-u(1)+u(2)+u(3)-NI-NA);];
+            
+            % Intrinsic
+        elseif x > tp && x < tp + ti
+            
+            f = [(mue_i*(u(1)*-DuDx(4)+kB*T*DuDx(1)));       % Current terms for electrons
+                (muh_i*(u(2)*DuDx(4)+kB*T*DuDx(2)));           % Current terms for holes
+                (mui*(u(3)*DuDx(4)+kB*T*DuDx(3)));             % Current terms for ions
+                DuDx(4);];                                     % Electric field
+            
+            s = [g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
+                g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
+                0;
+                (q/eppi)*(-u(1)+u(2)+u(3)-NI);];
+            
+            % n-type
+        elseif x >= tp + ti && x < tp + ti + tscr
+            
+            f = [(mue_n*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
+                (muh_n*(u(2)*DuDx(4)+kB*T*DuDx(2)));
+                0;
+                DuDx(4)];
+            
+            s = [ - kradetl*((u(1)*u(2))-(ni^2));
+                - kradetl*((u(1)*u(2))-(ni^2));
+                0;
+                (q/eppn)*(-u(1)+u(2)+u(3)-NI+ND);];
+            
+            % n-type
+        elseif x >= tp + ti + tscr && x <= xmax
+            
+            f = [(mue_n*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
+                (muh_n*(u(2)*DuDx(4)+kB*T*DuDx(2)));
+                0;
+                DuDx(4)];
+            
+            s = [ - kradetl*((u(1)*u(2))-(ni^2));
+                - kradetl*((u(1)*u(2))-(ni^2));
+                0;
+                (q/eppn)*(-u(1)+u(2)+ND);];
+            
+        end
+        
+    end
 
 % --------------------------------------------------------------------------
 
 % Define initial conditions.
-function u0 = pdex4ic(x)
-
-% Open circuit condition- symmetric model
-if (OC ==1)
-    
-    if x >= xmax/2
-
-        x = xmax - x;
-
+    function u0 = pdex4ic(x)
+        
+        % Open circuit condition- symmetric model
+        if (OC ==1)
+            
+            if x >= xmax/2
+                
+                x = xmax - x;
+                
+            end
+            
+        end
+        
+        if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) == 0
+            
+            % p-type
+            if x < (tp - wp)
+                
+                u0 = [htln0;
+                    htlp0;
+                    NI;
+                    0];
+                
+                % p-type SCR
+            elseif  x >= (tp - wp) && x < tp
+                
+                u0 = [N0*exp(q*(Efnside + EA + q*((((q*NA)/(2*eppi))*(x-tp+wp)^2)))/(kB*T));
+                    N0*exp(-q*(q*((((q*NA)/(2*eppi))*(x-tp+wp)^2)) + EA + Eg + Efpside)/(kB*T)) ;
+                    NI;
+                    (((q*NA)/(2*eppi))*(x-tp+wp)^2)];
+                
+                % Intrinsic
+                
+            elseif x >= tp && x <= tp+ ti
+                
+                u0 =  [N0*exp(q*(Efnside + EA + q*(((x - tp)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*eppi)) - ((q*ND*wn^2)/(2*eppi))))) + ((q*NA*wp^2)/(2*eppi))))/(kB*T));
+                    N0*exp(-q*(q*(((x - tp)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*eppi)) - ((q*ND*wn^2)/(2*eppi))))) + ((q*NA*wp^2)/(2*eppi))) + EA + Eg + Efpside)/(kB*T));
+                    NI;
+                    ((x - tp)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*eppi)) - ((q*ND*wn^2)/(2*eppi))))) + ((q*NA*wp^2)/(2*eppi)) ;];
+                
+                % n-type SCR
+            elseif  x > (tp+ti) && x <= (tp + ti + wn)
+                
+                u0 = [N0*exp(q*(Efnside + EA + q*((((-(q*ND)/(2*eppi))*(x-ti-tp-wn)^2) + Vbi)))/(kB*T));
+                    N0*exp(-q*(q*((((-(q*ND)/(2*eppi))*(x-ti-tp-wn)^2) + Vbi)) + EA + Eg + Efpside)/(kB*T));
+                    NI;
+                    (((-(q*ND)/(2*eppi))*(x-tp - ti -wn)^2) + Vbi)];
+                
+                % n-type
+            elseif x > (tp + ti + wn) && x <= xmax
+                
+                u0 = [etln0;
+                    etlp0;
+                    NI;
+                    Vbi];
+            end
+            
+        elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) ~= 0
+            % insert previous solution and interpolate the x points
+            u0 = [interp1(icx,icsol(end,:,1),x)
+                interp1(icx,icsol(end,:,2),x)
+                interp1(icx,icsol(end,:,3),x)
+                interp1(icx,icsol(end,:,4),x)];
+            
+        end
+        
     end
-    
-end
-
-if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) == 0
-    
-    % p-type
-    if x < (tp - wp)
-    
-       u0 = [htln0;
-             htlp0;
-              NI;
-              0];  
-
-    % p-type SCR    
-    elseif  x >= (tp - wp) && x < tp
-
-        u0 = [N0*exp(q*(Efnside + EA + q*((((q*NA)/(2*eppi))*(x-tp+wp)^2)))/(kB*T));
-              N0*exp(-q*(q*((((q*NA)/(2*eppi))*(x-tp+wp)^2)) + EA + Eg + Efpside)/(kB*T)) ;
-              NI;
-              (((q*NA)/(2*eppi))*(x-tp+wp)^2)];
-
-    % Intrinsic
-
-    elseif x >= tp && x <= tp+ ti
-
-        u0 =  [N0*exp(q*(Efnside + EA + q*(((x - tp)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*eppi)) - ((q*ND*wn^2)/(2*eppi))))) + ((q*NA*wp^2)/(2*eppi))))/(kB*T));
-                N0*exp(-q*(q*(((x - tp)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*eppi)) - ((q*ND*wn^2)/(2*eppi))))) + ((q*NA*wp^2)/(2*eppi))) + EA + Eg + Efpside)/(kB*T));
-                NI;
-                ((x - tp)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*eppi)) - ((q*ND*wn^2)/(2*eppi))))) + ((q*NA*wp^2)/(2*eppi)) ;];
-
-    % n-type SCR    
-    elseif  x > (tp+ti) && x <= (tp + ti + wn)
-
-        u0 = [N0*exp(q*(Efnside + EA + q*((((-(q*ND)/(2*eppi))*(x-ti-tp-wn)^2) + Vbi)))/(kB*T));
-              N0*exp(-q*(q*((((-(q*ND)/(2*eppi))*(x-ti-tp-wn)^2) + Vbi)) + EA + Eg + Efpside)/(kB*T));
-              NI;
-              (((-(q*ND)/(2*eppi))*(x-tp - ti -wn)^2) + Vbi)]; 
-
-    % n-type
-    elseif x > (tp + ti + wn) && x <= xmax
-
-         u0 = [etln0;
-               etlp0;
-               NI;
-               Vbi];
-    end
-     
-elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) ~= 0
-    % insert previous solution and interpolate the x points
-    u0 = [interp1(icx,icsol(end,:,1),x)
-          interp1(icx,icsol(end,:,2),x)
-          interp1(icx,icsol(end,:,3),x)
-          interp1(icx,icsol(end,:,4),x)];
-
-end
-
-end
 
 % --------------------------------------------------------------------------
 
@@ -378,117 +378,165 @@ end
 % in this example I am controlling the flux through the boundaries using
 % the difference in concentration from equilibrium and the extraction
 % coefficient.
-function [pl,ql,pr,qr] = pdex4bc(xl,ul,xr,ur,t)
-
-if JV == 1
+    function [pl,ql,pr,qr] = pdex4bc(xl,ul,xr,ur,t)
         
-    Vapp = Vstart + ((Vend-Vstart)*t*(1/tmax));
-    
-elseif JV == 2 % for sudden change in voltage
-    Vapp = Vstart + ((Vend-Vstart)*t/t_V_step);
-    Vapp(xor(Vapp<Vstart, Vapp>Vend)) = Vend;
-end
-
-% Open circuit condition- symmetric model
-if OC == 1
-      
-    pl = [0;
-          0;
-          0;
-          -ul(4)];
-
-    ql = [1; 
-          1;
-          1;
-          0];
-
-    pr = [0;
-          0;
-          0;
-          -ur(4)];  
-
-    qr = [1; 
-          1;
-          1;
-          0];
-
-else
-    
-    % Zero current
-    if BC == 0
+        if JV == 1
+            
+            Vapp = Vstart + ((Vend-Vstart)*t*(1/tmax));
+            
+        elseif JV == 2 % for sudden change in voltage
+            Vapp = Vstart + ((Vend-Vstart)*t/t_V_step);
+            Vapp(xor(Vapp<Vstart, Vapp>Vend)) = Vend;
+        end
         
-        pl = [0;
-            0;
-            0;
-            -ul(4)];
+        % Open circuit condition- symmetric model
+        if OC == 1
+            
+            pl = [0;
+                0;
+                0;
+                -ul(4)];
+            
+            ql = [1;
+                1;
+                1;
+                0];
+            
+            pr = [0;
+                0;
+                0;
+                -ur(4)];
+            
+            qr = [1;
+                1;
+                1;
+                0];
+            
+        else
+            
+            % Zero current
+            if BC == 0
+                
+                pl = [0;
+                    0;
+                    0;
+                    -ul(4)];
+                
+                ql = [1;
+                    1;
+                    1;
+                    0];
+                
+                pr = [0;
+                    0;
+                    0;
+                    -ur(4) + Vbi - Vapp;];
+                
+                qr = [1;
+                    1;
+                    1;
+                    0];
+                
+                % Fixed charge at the boundaries- contact in equilibrium with etl and htl
+                % Blocking electrode
+            elseif BC == 1
+                
+                pl = [0;
+                    (ul(2)-htlp0);
+                    0;
+                    -ul(4);];
+                
+                ql = [1;
+                    0;
+                    1;
+                    0];
+                
+                pr = [(ur(1)-etln0);
+                    0;
+                    0;
+                    -ur(4)+Vbi-Vapp;];
+                
+                qr = [0;
+                    1;
+                    1;
+                    0];
+                
+                % Non- selective contacts - equivalent to infinite surface recombination
+                % velocity for minority carriers
+            elseif BC == 2
+                
+                pl = [ul(1) - htln0;
+                    ul(2) - htlp0;
+                    0;
+                    -ul(4);];
+                
+                ql = [0;
+                    0;
+                    1;
+                    0];
+                
+                pr = [ur(1) - etln0;
+                    ur(2) - etlp0;
+                    0;
+                    -ur(4)+Vbi-Vapp;];
+                
+                qr = [0;
+                    0;
+                    1;
+                    0];
+                
+                % Like BC 1, perfectly blocking contacts, but with Vapp simulating a
+                % short circuiting resistance
+            elseif BC == 3
+                
+                pl = [0;
+                    (ul(2)-htlp0)*k_extr_ce;
+                    0;
+                    -ul(4);];
+                
+                ql = [1;
+                    1;
+                    1;
+                    0];
+                
+                pr = [(ur(1)-etln0)*k_extr_ce;
+                    0;
+                    0;
+                    -ur(4)+Vbi+(ur(1)-etln0)*k_extr_ce*e*1000*Rs*area;];
+                
+                qr = [1;
+                    1;
+                    1;
+                    0];
+                
+                % Like BC 1, perfectly blocking contacts, but with Vapp simulating a
+                % short circuiting resistance
+            elseif BC == 4
+                
+                pl = [0;
+                    (ul(2)-htlp0);
+                    0;
+                    -ul(4);];
+                
+                ql = [1;
+                    0;
+                    1;
+                    0];
+                
+                pr = [(ur(1)-etln0);
+                    0;
+                    0;
+                    -ur(4)+Vbi-Vapp*t;];
+                
+                qr = [0;
+                    1;
+                    1;
+                    0];
+                
+            end
+        end
         
-        ql = [1;
-            1;
-            1;
-            0];
-        
-        pr = [0;
-            0;
-            0;
-            -ur(4) + Vbi - Vapp;];
-        
-        qr = [1;
-            1;
-            1;
-            0];
-        
-    % Fixed charge at the boundaries- contact in equilibrium with etl and htl
-    % Blocking electrode
-    elseif BC == 1
-        
-        pl = [0;
-            (ul(2)-htlp0);
-            0;
-            -ul(4);];
-        
-        ql = [1;
-            0;
-            1;
-            0];
-        
-        pr = [(ur(1)-etln0);
-            0;
-            0;
-            -ur(4)+Vbi-Vapp;];
-        
-        qr = [0;
-            1;
-            1;
-            0];
-        
-        % Non- selective contacts - equivalent to infinite surface recombination
-        % velocity for minority carriers
-    elseif BC == 2
-        
-        pl = [ul(1) - htln0;
-            ul(2) - htlp0;
-            0;
-            -ul(4);];
-        
-        ql = [0;
-            0;
-            1;
-            0];
-        
-        pr = [ur(1) - etln0;
-            ur(2) - etlp0;
-            0;
-            -ur(4)+Vbi-Vapp;];
-        
-        qr = [0;
-            0;
-            1;
-            0];
-    
     end
-end
-
-end
 
 
 %%%%% Analysis %%%%%
@@ -499,19 +547,19 @@ p = sol(:,:,2);
 a = sol(:,:,3);
 V = sol(:,:,4);
 
-function verify_stabilization(matrix2d, time_index, log) % verify if the tmax provided was enough
-    profile_at_time=matrix2d(time_index,:); % take profile of values at a certain time of evolution
-    profile_end=matrix2d(end,:); % take profile of values at the end of time
-    if log % for variables ranging on huge scales comparing the log values makes more sense
-        profile_at_time=log10(profile_at_time);
-        profile_end=log10(profile_end);
+    function verify_stabilization(matrix2d, time_index, log) % verify if the tmax provided was enough
+        profile_at_time=matrix2d(time_index,:); % take profile of values at a certain time of evolution
+        profile_end=matrix2d(end,:); % take profile of values at the end of time
+        if log % for variables ranging on huge scales comparing the log values makes more sense
+            profile_at_time=log10(profile_at_time);
+            profile_end=log10(profile_end);
+        end
+        difference=sum(abs(profile_end-profile_at_time)); % sum up all the differences between the profiles
+        threshold=1e-4*sum(abs(profile_end-mean(profile_end))); % sum up absolute values, ignore constant bias
+        if difference > threshold
+            warning(['A tmax of ' num2str(params.tmax) ' s has not been enough for the ' inputname(1) ' distribution to reach stability. Consider trying with a greater tmax.']);
+        end
     end
-    difference=sum(abs(profile_end-profile_at_time)); % sum up all the differences between the profiles
-    threshold=1e-4*sum(abs(profile_end-mean(profile_end))); % sum up absolute values, ignore constant bias
-    if difference > threshold
-        warning(['A tmax of ' num2str(params.tmax) ' s has not been enough for the ' inputname(1) ' distribution to reach stability. Consider trying with a greater tmax.']);
-    end
-end
 
 [~,time_index]=min(abs(t-0.75*t(length(sol(:,1,1))))); % get time mesh index at 3/4 of maximum time reached
 verify_stabilization(n, time_index, true); % verify if electrons reached stability
@@ -519,11 +567,11 @@ verify_stabilization(p, time_index, true); % verify if holes reached stability
 verify_stabilization(a, time_index, false); % verify if ions reached stability
 verify_stabilization(V, time_index, false); % verify if potential reached stability
 
-% Calculate energy levels and chemical potential         
+% Calculate energy levels and chemical potential
 V = V - EA;                                % Electric potential
 Ecb = EA-V-EA;                             % Conduction band potential
 Evb = IP-V-EA;                             % Valence band potential
-Efn = real(-V+Ei+(kB*T/q)*log(n/ni));      % Electron quasi-Fermi level 
+Efn = real(-V+Ei+(kB*T/q)*log(n/ni));      % Electron quasi-Fermi level
 Efp = real(-V+Ei-(kB*T/q)*log(p/ni));      % Hole quasi-Fermi level
 Phin = real(Ei+(kB*T/q)*log(n/ni)-EA);     % Chemical Potential electron
 Phip = real(Ei-(kB*T/q)*log(p/ni)-EA);
@@ -539,6 +587,14 @@ nBM = ones(length(t), xpoints)*diag(x > tp + ti);
 nstat = zeros(1, xpoints);                                  % Static charge array
 nstat = (-NA-NI)*pBM + (-NI*iBM) + (ND-NI)*nBM;
 
+% size(n)
+% size(p)
+% size(a)
+% size(nstat)
+% assignin('base', 'n', n)
+% assignin('base', 'p', p)
+% assignin('base', 'a', a)
+% assignin('base', 'nstat', nstat)
 
 rhoc = (-n + p + a + nstat);     % Net charge density calculated from adding individual charge densities
 
@@ -566,22 +622,22 @@ end
 
 % TPV
 if OC == 1  && pulseon == 1                 % AC coupled mode
-   
+    
     Voc = Voc - Voc(1, :);                  % Removes baseline from TPV
-    t = t-(pulsestart+pulselen);          % Zero point adjustment                               
+    t = t-(pulsestart+pulselen);          % Zero point adjustment
 end
 
 % TPC
-if OC == 0 && pulseon == 1 
-
-    t = t-(pulsestart+pulselen);                     % TPC Zero point adjustment   
-
+if OC == 0 && pulseon == 1
+    
+    t = t-(pulsestart+pulselen);                     % TPC Zero point adjustment
+    
 end
 
 for i=1:length(t)
-
+    
     Fp(i,:) = -gradient(V(i, :), x);       % Electric field calculated from V
-
+    
 end
 
 Potp = V(end, :);
@@ -591,7 +647,7 @@ rhoctot = trapz(x, rhoc, 2)/xmax;   % Net charge
 rho_a = a - NI;                  % Net ionic charge
 rho_a_tot = trapz(x, rho_a, 2)/xmax;   % Total Net ion charge
 
-ntot = trapz(x, n, 2);     % Total 
+ntot = trapz(x, n, 2);     % Total
 ptot = trapz(x, p, 2);
 
 if JV == 1
@@ -602,52 +658,52 @@ end
 
 % Calculates current at every point and all times
 if calcJ == 1
-
-% find the internal current density in the device
-Jndiff = zeros(length(t), length(x));
-Jndrift = zeros(length(t), length(x));
-Jpdiff = zeros(length(t), length(x));
-Jpdrift= zeros(length(t), length(x));
-Jpart = zeros(length(t), length(x));
-Jtot = zeros(length(t));   
     
-for j=1:length(t)
+    % find the internal current density in the device
+    Jndiff = zeros(length(t), length(x));
+    Jndrift = zeros(length(t), length(x));
+    Jpdiff = zeros(length(t), length(x));
+    Jpdrift= zeros(length(t), length(x));
+    Jpart = zeros(length(t), length(x));
+    Jtot = zeros(length(t));
     
-    tj = t(j);
+    for j=1:length(t)
+        
+        tj = t(j);
+        
+        [nloc,dnlocdx] = pdeval(0,x,n(j,:),x);
+        [ploc,dplocdx] = pdeval(0,x,p(j,:),x);
+        [iloc,dilocdx] = pdeval(0,x,a(j,:),x);
+        [Vloc, Floc] = pdeval(0,x,V(j,:),x);
+        
+        % Particle currents
+        Jndiff(j,:) = (mue_i*kB*T*dnlocdx)*(1000*e);
+        Jndrift(j,:) = (-mue_i*nloc.*Floc)*(1000*e);
+        
+        Jpdiff(j,:) = (-muh_i*kB*T*dplocdx)*(1000*e);
+        Jpdrift(j,:) = (-muh_i*ploc.*Floc)*(1000*e);
+        
+        Jidiff(j,:) = (-mui*kB*T*dilocdx)*(1000*e);
+        Jidrift(j,:) = (-mui*iloc.*Floc)*(1000*e);
+        
+        % Particle current
+        Jpart(j,:) = Jndiff(j,:) + Jndrift(j,:) + Jpdiff(j,:) + Jpdrift(j,:) + Jidiff(j,:) + Jidrift(j,:);
+        
+        % Electric Field
+        Floct(j,:) = Floc;
+        
+    end
     
-    [nloc,dnlocdx] = pdeval(0,x,n(j,:),x);    
-    [ploc,dplocdx] = pdeval(0,x,p(j,:),x);
-    [iloc,dilocdx] = pdeval(0,x,a(j,:),x);
-    [Vloc, Floc] = pdeval(0,x,V(j,:),x);
+    % Currents at the boundaries (should be the same)
+    Jpartl = Jpart(:,1);
+    Jpartr = Jpart(:,round(xpoints/2));
     
-    % Particle currents
-    Jndiff(j,:) = (mue_i*kB*T*dnlocdx)*(1000*e);
-    Jndrift(j,:) = (-mue_i*nloc.*Floc)*(1000*e);
-   
-    Jpdiff(j,:) = (-muh_i*kB*T*dplocdx)*(1000*e);
-    Jpdrift(j,:) = (-muh_i*ploc.*Floc)*(1000*e);
+    % Displacement Current at right hand side
+    Fend = (Floct(:, end));
+    Jdispr = -(e*1000)*eppn*gradient(Floct(:, end), t);
     
-    Jidiff(j,:) = (-mui*kB*T*dilocdx)*(1000*e);
-    Jidrift(j,:) = (-mui*iloc.*Floc)*(1000*e);
-
-    % Particle current
-    Jpart(j,:) = Jndiff(j,:) + Jndrift(j,:) + Jpdiff(j,:) + Jpdrift(j,:) + Jidiff(j,:) + Jidrift(j,:);   
+    Jtotr = Jpartr + Jdispr;
     
-    % Electric Field
-    Floct(j,:) = Floc;
-    
-end
-
-% Currents at the boundaries (should be the same)
-Jpartl = Jpart(:,1);
-Jpartr = Jpart(:,round(xpoints/2));
-
-% Displacement Current at right hand side
-Fend = (Floct(:, end));
-Jdispr = -(e*1000)*eppn*gradient(Floct(:, end), t);
-
-Jtotr = Jpartr + Jdispr;    
-
 end
 
 % Calculates currents only for right hand x points at all times
@@ -659,72 +715,72 @@ if calcJ == 2
     Jpdiff = zeros(length(t), 1);
     Jpdrift= zeros(length(t), 1);
     Jpart = zeros(length(t), 1);
-
-        for j=1:length(t)
-
-            [nloc,dnlocdx] = pdeval(0,x,n(j,:),x(end));    
-            [ploc,dplocdx] = pdeval(0,x,p(j,:),x(end));
-            [iloc,dilocdx] = pdeval(0,x,a(j,:),x(end));
-            [Vloc, Floc] = pdeval(0,x,V(j,:),x(end));
-
-            % Particle currents
-            Jndiff(j) = (mue_n*kB*T*dnlocdx)*(1000*e);
-            Jndrift(j) = (-mue_n*nloc.*Floc)*(1000*e);
-
-            Jpdiff(j) = (-muh_n*kB*T*dplocdx)*(1000*e);
-            Jpdrift(j) = (-muh_n*ploc.*Floc)*(1000*e);
-
-            Jidiff(j) = (-mui*kB*T*dilocdx)*(1000*e);
-            Jidrift(j) = (-mui*iloc.*Floc)*(1000*e);
-
-            % Particle current
-            Jpart(j) = Jndiff(j) + Jndrift(j) + Jpdiff(j) + Jpdrift(j) + Jidiff(j) + Jidrift(j);   
-
-            % Electric Field
-            Floct(j) = Floc;
-
-        end
-
+    
+    for j=1:length(t)
+        
+        [nloc,dnlocdx] = pdeval(0,x,n(j,:),x(end));
+        [ploc,dplocdx] = pdeval(0,x,p(j,:),x(end));
+        [iloc,dilocdx] = pdeval(0,x,a(j,:),x(end));
+        [Vloc, Floc] = pdeval(0,x,V(j,:),x(end));
+        
+        % Particle currents
+        Jndiff(j) = (mue_n*kB*T*dnlocdx)*(1000*e);
+        Jndrift(j) = (-mue_n*nloc.*Floc)*(1000*e);
+        
+        Jpdiff(j) = (-muh_n*kB*T*dplocdx)*(1000*e);
+        Jpdrift(j) = (-muh_n*ploc.*Floc)*(1000*e);
+        
+        Jidiff(j) = (-mui*kB*T*dilocdx)*(1000*e);
+        Jidrift(j) = (-mui*iloc.*Floc)*(1000*e);
+        
+        % Particle current
+        Jpart(j) = Jndiff(j) + Jndrift(j) + Jpdiff(j) + Jpdrift(j) + Jidiff(j) + Jidrift(j);
+        
+        % Electric Field
+        Floct(j) = Floc;
+        
+    end
+    
     % Currents at the boundaries
     Jpartr = -Jpart';
-
+    
     %Jpartr = -(sn*n(:, end) - ni) %Check when surface recombination is used
-
+    
     % Displacement Current at right hand side
-
+    
     Jdispr = (e*1000)*eppn*gradient(Floct, t);
-
-    Jtotr = Jpartr + Jdispr;     
-
+    
+    Jtotr = Jpartr + Jdispr;
+    
     if pulseon == 1
-
+        
         Jtotr = Jtotr - Jtotr(1);    % remove baseline
-
+        
     end
-
+    
 end
 
 % Current calculated from QFL
 if calcJ == 3
-
-        for j=1:length(t)
-
-            dEfndx(j,:) = gradient(Efn(j, :), x);
-            dEfpdx(j,:) = gradient(Efp(j, :), x);
-
-            [Vloc, Floc] = pdeval(0,x,V(j,:),x(end));
-             % Electric Field
-            Floct(j) = Floc;
-
-        end
-
+    
+    for j=1:length(t)
+        
+        dEfndx(j,:) = gradient(Efn(j, :), x);
+        dEfpdx(j,:) = gradient(Efp(j, :), x);
+        
+        [Vloc, Floc] = pdeval(0,x,V(j,:),x(end));
+        % Electric Field
+        Floct(j) = Floc;
+        
+    end
+    
     Jpart =  mue_i*n.*dEfndx*(1000*e) +  muh_i*p.*dEfpdx*(1000*e);
-
+    
     Jdispr = (e*1000)*eppn*gradient(Floct, t);
     Jpartr = Jpart(:,pepe+0.2*pp);
     Jtotr = Jpartr + Jdispr;
     Jdispr = 0;
-
+    
 end
 
 %%%%% GRAPHING %%%%%%%%
@@ -732,119 +788,119 @@ end
 %Figures
 if figson == 1
     
-    % Open circuit voltage        
-        figure(7);
-        plot (t, Voc);
-        xlabel('Time [s]');   
-        ylabel('Voltage [V]');
-
-% Defines end points for the graphing
-if OC == 1
-    
-    xnmend = round(xnm(end)/2);
-    
-else
-    
-    xnmend = xnm(end);
-end
-
-% Band Diagram
-FH1 = figure(1);
-PH1 = subplot(3,1,1);
-plot (xnm, Efn(end,:), '--', xnm, Efp(end,:), '--', xnm, Ecb(end, :), xnm, Evb(end ,:));
-set(legend,'FontSize',12);
-ylabel('Energy [eV]'); 
-xlim([0, xnmend]);
-ylim([-3, 0.5]);
-set(legend,'FontSize',12);
-set(legend,'EdgeColor',[1 1 1]);
-grid off;
-
-% Electronic Charge Densities
-PH2 = subplot(3,1,2);
-semilogy(xnm, (sol(end,:,1)), xnm, (sol(end,:,2)));
-ylabel('{\itn, p} [cm^{-3}]')
-xlim([0, xnmend]);
-ylim([1e0, 1e20]);
-set(legend,'FontSize',12);
-set(legend,'EdgeColor',[1 1 1]);
-grid off
-
-% Ionic charge density
-PH3 = subplot(3,1,3);
-plot(xnm, a(end,:)/1e19, 'black');
-ylabel('{\ita} [x10^{19} cm^{-3}]')
-xlabel('Position [nm]')
-xlim([0, xnmend]);
-ylim([0, 1.1*(max(sol(end,:,3))/1e19)]);
-set(legend,'FontSize',12);
-set(legend,'EdgeColor',[1 1 1]);
-grid off
-
-% Net charge
-figure(5)
-plot(xnm, rhoc(end, :))
-ylabel('Net Charge Density [cm^{-3}]')
-xlabel('Position [nm]')
-xlim([0, xnmend]);
-set(legend,'FontSize',14);
-set(legend,'EdgeColor',[1 1 1]);
-grid off
-
-if OM == 1 && Int~=0 || OM == 2 && Int~=0
-
-    genspacenm = genspace * 1e7;
-
+    % Open circuit voltage
     figure(7);
-    plot(genspacenm, Gx1S, genspacenm, GxLas)
-    ylabel('Generation Rate [cm^{3}s^{-1}]');
-    xlabel('Position [nm]');
-    legend('1 Sun', '638 nm');
-    xlim([0, genspacenm(end)]);
-    grid off
-
-end
-
-if calcJ == 1
-
-    figure(8);
-    plot(xnm,Jndiff(end, :),xnm,Jndrift(end, :),xnm,Jpdiff(end, :),xnm,Jpdrift(end, :),xnm,Jidiff(end, :),xnm,Jidrift(end, :),xnm,Jpart(end, :));
-    legend('Jn diff','Jn drift','Jp diff','Jp drift','Ji diff','Ji drift','Total J');
-    xlabel('Position [nm]');
-    ylabel('Current Density [mA cm^-2]');
+    plot (t, Voc);
+    xlabel('Time [s]');
+    ylabel('Voltage [V]');
+    
+    % Defines end points for the graphing
+    if OC == 1
+        
+        xnmend = round(xnm(end)/2);
+        
+    else
+        
+        xnmend = xnm(end);
+    end
+    
+    % Band Diagram
+    FH1 = figure(1);
+    PH1 = subplot(3,1,1);
+    plot (xnm, Efn(end,:), '--', xnm, Efp(end,:), '--', xnm, Ecb(end, :), xnm, Evb(end ,:));
+    set(legend,'FontSize',12);
+    ylabel('Energy [eV]');
+    xlim([0, xnmend]);
+    ylim([-3, 0.5]);
     set(legend,'FontSize',12);
     set(legend,'EdgeColor',[1 1 1]);
-    xlim([0, xnmend]);
     grid off;
-    drawnow;
-
-end
-
-if calcJ == 1 || calcJ == 2 || calcJ == 3
-
-% Particle and displacement currents as a function of time
-figure(10);
-plot(t, Jtotr, t, Jpartr, t, Jdispr);
-legend('Jtotal', 'Jparticle', 'Jdisp')
-xlabel('time [s]');
-ylabel('J [mA cm^{-2}]');
-set(legend,'FontSize',16);
-set(legend,'EdgeColor',[1 1 1]);
-grid off;
-drawnow;
-
-    if JV == 1
-        figure(11)
-        plot(Vapp_arr, Jtotr)
-        xlabel('V_{app} [V]')
-        ylabel('Current Density [mA cm^-2]');
-        grid off;
+    
+    % Electronic Charge Densities
+    PH2 = subplot(3,1,2);
+    semilogy(xnm, (sol(end,:,1)), xnm, (sol(end,:,2)));
+    ylabel('{\itn, p} [cm^{-3}]')
+    xlim([0, xnmend]);
+    ylim([1e0, 1e20]);
+    set(legend,'FontSize',12);
+    set(legend,'EdgeColor',[1 1 1]);
+    grid off
+    
+    % Ionic charge density
+    PH3 = subplot(3,1,3);
+    plot(xnm, a(end,:)/1e19, 'black');
+    ylabel('{\ita} [x10^{19} cm^{-3}]')
+    xlabel('Position [nm]')
+    xlim([0, xnmend]);
+    ylim([0, 1.1*(max(sol(end,:,3))/1e19)]);
+    set(legend,'FontSize',12);
+    set(legend,'EdgeColor',[1 1 1]);
+    grid off
+    
+    % Net charge
+    figure(5)
+    plot(xnm, rhoc(end, :))
+    ylabel('Net Charge Density [cm^{-3}]')
+    xlabel('Position [nm]')
+    xlim([0, xnmend]);
+    set(legend,'FontSize',14);
+    set(legend,'EdgeColor',[1 1 1]);
+    grid off
+    
+    if OM == 1 && Int~=0 || OM == 2 && Int~=0
+        
+        genspacenm = genspace * 1e7;
+        
+        figure(7);
+        plot(genspacenm, Gx1S, genspacenm, GxLas)
+        ylabel('Generation Rate [cm^{3}s^{-1}]');
+        xlabel('Position [nm]');
+        legend('1 Sun', '638 nm');
+        xlim([0, genspacenm(end)]);
+        grid off
+        
     end
-
-end
-
-drawnow
-
+    
+    if calcJ == 1
+        
+        figure(8);
+        plot(xnm,Jndiff(end, :),xnm,Jndrift(end, :),xnm,Jpdiff(end, :),xnm,Jpdrift(end, :),xnm,Jidiff(end, :),xnm,Jidrift(end, :),xnm,Jpart(end, :));
+        legend('Jn diff','Jn drift','Jp diff','Jp drift','Ji diff','Ji drift','Total J');
+        xlabel('Position [nm]');
+        ylabel('Current Density [mA cm^-2]');
+        set(legend,'FontSize',12);
+        set(legend,'EdgeColor',[1 1 1]);
+        xlim([0, xnmend]);
+        grid off;
+        drawnow;
+        
+    end
+    
+    if calcJ == 1 || calcJ == 2 || calcJ == 3
+        
+        % Particle and displacement currents as a function of time
+        figure(10);
+        plot(t, Jtotr, t, Jpartr, t, Jdispr);
+        legend('Jtotal', 'Jparticle', 'Jdisp')
+        xlabel('time [s]');
+        ylabel('J [mA cm^{-2}]');
+        set(legend,'FontSize',16);
+        set(legend,'EdgeColor',[1 1 1]);
+        grid off;
+        drawnow;
+        
+        if JV == 1
+            figure(11)
+            plot(Vapp_arr, Jtotr)
+            xlabel('V_{app} [V]')
+            ylabel('Current Density [mA cm^-2]');
+            grid off;
+        end
+        
+    end
+    
+    drawnow
+    
 end
 
 
@@ -852,9 +908,9 @@ end
 
 % Readout solutions to structure
 solstruct.sol = sol; solstruct.n = n(end, :)'; solstruct.p = p(end, :)'; solstruct.a = a(end, :)';...
-solstruct.V = V(end, :)'; solstruct.x = x; solstruct.t = t; solstruct.Urec = Urec; 
+    solstruct.V = V(end, :)'; solstruct.x = x; solstruct.t = t; solstruct.Urec = Urec;
 solstruct.Ecb = Ecb(end, :)'; solstruct.Evb = Evb(end, :)'; solstruct.Efn = Efn(end, :)'; solstruct.Efp = Efp(end, :)';...
-solstruct.xnm = xnm';
+    solstruct.xnm = xnm';
 
 if OC == 1
     
@@ -864,9 +920,9 @@ if OC == 1
 end
 
 if calcJ ~= 0
-
-solstruct.Jtotr = Jtotr; solstruct.Jpartr = Jpartr; solstruct.Jdispr = Jdispr;  
-
+    
+    solstruct.Jtotr = Jtotr; solstruct.Jpartr = Jpartr; solstruct.Jdispr = Jdispr;
+    
 end
 
 if isempty(varargin) || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
@@ -877,22 +933,22 @@ if isempty(varargin) || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol)
 else
     
     params = rmfield(params, 'icsol');
-    params = rmfield(params, 'icx');  
+    params = rmfield(params, 'icx');
     params = rmfield(params, 'params');
     params = rmfield(params, 'varargin');
     
 end
 % Store params
-solstruct.params = params;        
+solstruct.params = params;
 
 if (OC ==0)
     
     assignin('base', 'sol', solstruct);
-
+    
 elseif (OC ==1)
     
     assignin('base', 'ssol', solstruct);
-
+    
 end
 
 end
