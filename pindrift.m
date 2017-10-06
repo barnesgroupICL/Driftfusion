@@ -182,8 +182,6 @@ if (OC ==1)
     end
     
 end
-
-%if side == 1
      
 % Beer Lambert or Transfer Matrix 1 Sun
 if Int ~= 0 && OM ==1 || Int ~= 0 && OM == 2
@@ -242,10 +240,10 @@ if x >= 0 && x <= tp - tscr
      0;
      DuDx(4);];                                  
 
- s = [ - kradhtl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
-       - kradhtl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
+ s = [ - kradhtl*((u(1)*u(2))-(ni^2));
+       - kradhtl*((u(1)*u(2))-(ni^2));
       0;
-      (q/eppp)*(-u(1)+u(2)-NA);];%+pthtl-nthtl);];
+      (q/eppp)*(-u(1)+u(2)-NA);];
   
 elseif x > tp - tscr && x <= tp
     
@@ -254,23 +252,10 @@ elseif x > tp - tscr && x <= tp
      0;
      DuDx(4);];                                  
 
- s = [ - kradhtl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
-       - kradhtl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
+ s = [ - kradhtl*((u(1)*u(2))-(ni^2));
+       - kradhtl*((u(1)*u(2))-(ni^2));
       0;
-      (q/eppp)*(-u(1)+u(2)+u(3)-NI-NA);];%+pthtl-nthtl);];
-
-% % p-type/perovskite interface
-% elseif x > tp - te && x <= tp
-% 
-%        f = [(mue_p*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
-%      (muh_p*(u(2)*DuDx(4)+kB*T*DuDx(2)));     
-%      0;
-%      DuDx(4);];                                  
-% 
-%  s = [- kradhtl*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
-%       - kradhtl*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
-%       0;
-%       (q/eppp)*(-u(1)+u(2)-NA+pthtl-nthtl);];
+      (q/eppp)*(-u(1)+u(2)+u(3)-NI-NA);];
  
 % Intrinsic
 elseif x > tp && x < tp + ti
@@ -280,24 +265,10 @@ elseif x > tp && x < tp + ti
      (mui*(u(3)*DuDx(4)+kB*T*DuDx(3)));             % Current terms for ions
      DuDx(4);];                                     % Electric field
 
- s = [g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+ptrap)) + (taup_htl*(u(1)+ntrap))));
-      g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl)))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+ptrap)) + (taup_htl*(u(1)+ntrap))));
+ s = [g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
+      g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
       0;
       (q/eppi)*(-u(1)+u(2)+u(3)-NI);]; 
-
-% % perovskite/n-type interface  
-% elseif x >= tp + ti && x < tp + ti + te
-%     
-%      f = [(mue_n*(u(1)*-DuDx(4)+kB*T*DuDx(1)));
-%      (muh_n*(u(2)*DuDx(4)+kB*T*DuDx(2)));      
-%      0;
-%      DuDx(4)];                                      
-% 
-%  s = [- kradetl*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
-%       - kradetl*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
-%       0;
-%       (q/eppn)*(-u(1)+u(2)+ND+ptetl-ntetl)];
-
 
 % n-type
 elseif x >= tp + ti && x < tp + ti + tscr
@@ -307,10 +278,10 @@ elseif x >= tp + ti && x < tp + ti + tscr
      0;
      DuDx(4)];                                      
 
-s = [ - kradetl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
-      - kradetl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
+s = [ - kradetl*((u(1)*u(2))-(ni^2));
+      - kradetl*((u(1)*u(2))-(ni^2));
       0;
-      (q/eppn)*(-u(1)+u(2)+u(3)-NI+ND);];%+ptetl-ntetl)];3
+      (q/eppn)*(-u(1)+u(2)+u(3)-NI+ND);];
 
   % n-type
 elseif x >= tp + ti + tscr && x <= xmax
@@ -320,10 +291,10 @@ elseif x >= tp + ti + tscr && x <= xmax
      0;
      DuDx(4)];                                      
 
-s = [ - kradetl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
-      - kradetl*((u(1)*u(2))-(ni^2));% - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
+s = [ - kradetl*((u(1)*u(2))-(ni^2));
+      - kradetl*((u(1)*u(2))-(ni^2));
       0;
-      (q/eppn)*(-u(1)+u(2)+ND);];%+ptetl-ntetl)];
+      (q/eppn)*(-u(1)+u(2)+ND);];
 
 end
 
@@ -358,7 +329,7 @@ if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol)
     % p-type SCR    
     elseif  x >= (tp - wp) && x < tp
 
-        u0 = [N0*exp(q*(Efnside + EA + q*((((q*NA)/(2*eppi))*(x-tp+wp)^2)))/(kB*T));                            %ni*exp((Efnside - (-q*((((q*NA)/(2*eppp))*(x-tp+wp)^2))))/(kB*T));
+        u0 = [N0*exp(q*(Efnside + EA + q*((((q*NA)/(2*eppi))*(x-tp+wp)^2)))/(kB*T));
               N0*exp(-q*(q*((((q*NA)/(2*eppi))*(x-tp+wp)^2)) + EA + Eg + Efpside)/(kB*T)) ;
               NI;
               (((q*NA)/(2*eppi))*(x-tp+wp)^2)];
@@ -368,7 +339,7 @@ if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol)
     elseif x >= tp && x <= tp+ ti
 
         u0 =  [N0*exp(q*(Efnside + EA + q*(((x - tp)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*eppi)) - ((q*ND*wn^2)/(2*eppi))))) + ((q*NA*wp^2)/(2*eppi))))/(kB*T));
-                N0*exp(-q*(q*(((x - tp)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*eppi)) - ((q*ND*wn^2)/(2*eppi))))) + ((q*NA*wp^2)/(2*eppi))) + EA + Eg + Efpside)/(kB*T)) ;
+                N0*exp(-q*(q*(((x - tp)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*eppi)) - ((q*ND*wn^2)/(2*eppi))))) + ((q*NA*wp^2)/(2*eppi))) + EA + Eg + Efpside)/(kB*T));
                 NI;
                 ((x - tp)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*eppi)) - ((q*ND*wn^2)/(2*eppi))))) + ((q*NA*wp^2)/(2*eppi)) ;];
 
@@ -387,8 +358,7 @@ if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol)
                etlp0;
                NI;
                Vbi];
-    end      
-    %}
+    end
      
 elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) ~= 0
     % insert previous solution and interpolate the x points
@@ -567,7 +537,7 @@ iBM = ones(length(t), xpoints)*diag(x >= tp & x <= (tp + ti));
 nBM = ones(length(t), xpoints)*diag(x > tp + ti);
 
 nstat = zeros(1, xpoints);                                  % Static charge array
-nstat = (-NA-NI)*pBM + (-NI*iBM) + (ND-NI)*nBM; %(-NA+pthtl-nthtl-NI)*pBM + (-NI*iBM) + (ND+ptetl-ntetl-NI)*nBM;   
+nstat = (-NA-NI)*pBM + (-NI*iBM) + (ND-NI)*nBM;
 
 
 rhoc = (-n + p + a + nstat);     % Net charge density calculated from adding individual charge densities
@@ -762,17 +732,11 @@ end
 %Figures
 if figson == 1
     
-    % Open circuit voltage
-%       if OC == 1
-        
+    % Open circuit voltage        
         figure(7);
         plot (t, Voc);
         xlabel('Time [s]');   
         ylabel('Voltage [V]');
-
-%       end
-      
-      
 
 % Defines end points for the graphing
 if OC == 1
@@ -786,12 +750,9 @@ end
 
 % Band Diagram
 FH1 = figure(1);
-%set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
 PH1 = subplot(3,1,1);
 plot (xnm, Efn(end,:), '--', xnm, Efp(end,:), '--', xnm, Ecb(end, :), xnm, Evb(end ,:));
-%legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
 set(legend,'FontSize',12);
-%xlabel('Position [nm]');
 ylabel('Energy [eV]'); 
 xlim([0, xnmend]);
 ylim([-3, 0.5]);
@@ -803,8 +764,6 @@ grid off;
 PH2 = subplot(3,1,2);
 semilogy(xnm, (sol(end,:,1)), xnm, (sol(end,:,2)));
 ylabel('{\itn, p} [cm^{-3}]')
-%legend('\itn', '\itp')
-%xlabel('Position [nm]')
 xlim([0, xnmend]);
 ylim([1e0, 1e20]);
 set(legend,'FontSize',12);
@@ -822,28 +781,6 @@ set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
 grid off
 
-%{
-% Ion charge
-figure(3)
-%set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
-plot(xnm, Irho (end,:))
-legend('Ions')
-set(legend,'FontSize',16);
-xlabel('Position [nm]');
-ylabel('Density [cm^{-3}]');
-xlim([0, xnmend]);
-set(legend,'FontSize',14);
-set(legend,'EdgeColor',[1 1 1]);
-grid off;
-drawnow;
-
-figure(4);
-surf(x,t,V);
-title('Electric Potential (x,t)');
-xlabel('Distance x');
-ylabel('time');
-%}
-
 % Net charge
 figure(5)
 plot(xnm, rhoc(end, :))
@@ -853,17 +790,6 @@ xlim([0, xnmend]);
 set(legend,'FontSize',14);
 set(legend,'EdgeColor',[1 1 1]);
 grid off
-%{
-
-figure(6)
-plot(t, ntot, t, ptot)
-ylabel('Charge Density [cm^{-3}]')
-xlabel('time [s]')
-legend('electrons', 'holes')
-set(legend,'FontSize',14);
-set(legend,'EdgeColor',[1 1 1]);
-grid off
-%}
 
 if OM == 1 && Int~=0 || OM == 2 && Int~=0
 
@@ -892,15 +818,6 @@ if calcJ == 1
     grid off;
     drawnow;
 
-%{
-% Electric Field
-figure(9);
-surf(xnm, t, Floct);
-xlabel('Position [m]');
-ylabel('time [s]');
-title('Electric Field');
-%}
-
 end
 
 if calcJ == 1 || calcJ == 2 || calcJ == 3
@@ -917,7 +834,6 @@ grid off;
 drawnow;
 
     if JV == 1
-        %JV
         figure(11)
         plot(Vapp_arr, Jtotr)
         xlabel('V_{app} [V]')
@@ -979,114 +895,5 @@ elseif (OC ==1)
 
 end
 
-
-
-
 end
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Unused figures
-
-%{
-figure(1);
-surf(x,t,n);
-set(gca, 'ZScale', 'log')
-%semilogy(x,n(end,:));
-title('n(x,t)');
-xlabel('Distance x');
-ylabel('time');
-
-figure(2);
-surf(x,t,p);
-set(gca, 'ZScale', 'log')
-title('p(x,t)');
-xlabel('Distance x');
-ylabel('time');
-
-figure(3);
-surf(x,t,a);
-title('ion(x,t)');
-xlabel('Distance x');
-ylabel('time');
-
-figure(11)
-plot(xnm, Fc, xnm, Fp);
-xlim([0, (xnmend/2)]);
-legend('from charge', 'from pot')
-ylabel('E Field [V/cm]');
-grid off;
-
-% Electric Field vs Position
-figure(6);
-plot(xnm, Fp(end, :));
-xlabel('Position [nm]');
-ylabel('Electric Field [Vcm^{-1}]');
-grid off;
-
-%}
-
-%{
-figure(3)
-%set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
-[Ax1, h1, h2] = plotyy(xnm, rhoc(end, :), xnm, Urec(end, :));
-linkaxes(Ax1,'x');
-set(gca,'xlim',[0, (xnmend/2)]);
-ylabel(Ax1(1),'Net Charge Density [cm^{-3}]') % left y-axis
-ylabel(Ax1(2),{'Recombination';'Rate [cm^{-3}s^{-1}]'}) % right y-axis
-%set(Ax1(2),'YScale','log')
-set(Ax1(1),'Position', [0.1 0.11 0.7 0.8]);
-set(Ax1(2),'Position', [0.1 0.11 0.7 0.8]);
-set(Ax1(1),'ycolor',[0.1, 0.1, 0.1]) 
-set(Ax1(2),'ycolor',[0, 0.4470, 0.7410])
-set(h1,'color',[0.1, 0.1, 0.1])
-set(h2, 'color',[0, 0.4470, 0.7410])
-grid off;
-
-figure(4)
-plot(xnm, g);
-grid off
-
-% Electric and Checmial Potential components
-figure(4)
-%set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
-[Ax2, h3, h4] = plotyy(xnm, Potp, xnm, Phi(end,:));
-linkaxes(Ax2,'x');
-set(gca,'xlim',[0, (xnmend/2)]);
-ylabel(Ax2(1),'Electric Potential [V]') % left y-axis
-ylabel(Ax2(2),'Chemical Potential [V]') % right y-axis
-% get current (active) axes property
-set(Ax2(1),'Position', [0.13 0.11 0.775-.08 0.815]);
-set(Ax2(2),'Position', [0.13 0.11 0.775-.08 0.815]);
-set(Ax2(1),'ycolor',[0.1, 0.1, 0.1]) 
-set(Ax2(2),'ycolor',[0.8500, 0.3250, 0.0980])
-set(h3,'color',[0.1, 0.1, 0.1])
-grid off;
-
-
-
-% figure(200)
-% [AX,H1,H2] = plotyy(xnm, [Jidiff(end, :).', Jidrift(end, :).'], xnm, (sol(end,:,3)));
-% legend('Ion diffusion', 'Ion drift', 'a')
-% xlabel('Position [nm]');
-% ylabel('Density [cm^{-3}]/Current Density');
-% set(AX(2),'Yscale','linear');
-% set(legend,'FontSize',20);
-% set(legend,'EdgeColor',[1 1 1]);
-% set(AX(1), 'Position',[0.18 0.18 0.7 0.70]);     % left, bottom, width, height       
-% set(AX(2), 'Position',[0.18 0.18 0.7 0.70]);
-% box on
-% set(AX(1), 'YMinorTick','on');     % left, bottom, width, height       
-% set(AX(2), 'XMinorTick','on','YMinorTick','on');
-% set(AX(1),'xlim',[190 250]);
-% set(AX(2),'xlim',[190 250]);
-% %set(AX(1),'ylim',[1e6 1e18]);
-% set(AX(2),'ycolor',[0.9290    0.6940    0.1250]);
-% set(H2,'color',[0.9290    0.6940    0.1250]);
-% set(legend,'FontSize',12);
-% set(legend,'EdgeColor',[1 1 1]);
-% grid off;
-
-%}
-
 
