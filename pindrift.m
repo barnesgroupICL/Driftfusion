@@ -107,7 +107,7 @@ varcell = ['fieldnames', varcell];      % adhere to syntax for v2struct
 params = v2struct(varcell);
 
 %%%% Spatial mesh %%%%
-if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
+if isempty(varargin) || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
     
     % Edit meshes in mesh gen
     x = meshgen_x(params);
@@ -345,7 +345,7 @@ if (OC ==1)
     
 end
 
-if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) == 0
+if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) == 0
     
     % p-type
     if x < (tp - wp)
@@ -953,7 +953,7 @@ solstruct.Jtotr = Jtotr; solstruct.Jpartr = Jpartr; solstruct.Jdispr = Jdispr;
 
 end
 
-if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
+if isempty(varargin) || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
     
     params = rmfield(params, 'params');
     params = rmfield(params, 'varargin');
