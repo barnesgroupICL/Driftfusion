@@ -547,25 +547,7 @@ p = sol(:,:,2);
 a = sol(:,:,3);
 V = sol(:,:,4);
 
-    function verify_stabilization(matrix2d, time_index, log) % verify if the tmax provided was enough
-        profile_at_time=matrix2d(time_index,:); % take profile of values at a certain time of evolution
-        profile_end=matrix2d(end,:); % take profile of values at the end of time
-        if log % for variables ranging on huge scales comparing the log values makes more sense
-            profile_at_time=log10(profile_at_time);
-            profile_end=log10(profile_end);
-        end
-        difference=sum(abs(profile_end-profile_at_time)); % sum up all the differences between the profiles
-        threshold=1e-4*sum(abs(profile_end-mean(profile_end))); % sum up absolute values, ignore constant bias
-        if difference > threshold
-            warning(['A tmax of ' num2str(params.tmax) ' s has not been enough for the ' inputname(1) ' distribution to reach stability. Consider trying with a greater tmax.']);
-        end
-    end
-
-[~,time_index]=min(abs(t-0.75*t(length(sol(:,1,1))))); % get time mesh index at 3/4 of maximum time reached
-verify_stabilization(n, time_index, true); % verify if electrons reached stability
-verify_stabilization(p, time_index, true); % verify if holes reached stability
-verify_stabilization(a, time_index, false); % verify if ions reached stability
-verify_stabilization(V, time_index, false); % verify if potential reached stability
+verifyStabilization(sol, t, 0.75); % verify if electrons, holes, ions and potential reached stability
 
 % Calculate energy levels and chemical potential
 V = V - EA;                                % Electric potential
