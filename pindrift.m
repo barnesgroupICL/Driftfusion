@@ -490,30 +490,6 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
             elseif BC == 3
                 
                 pl = [0;
-                    (ul(2)-htlp0)*k_extr_ce;
-                    0;
-                    -ul(4);];
-                
-                ql = [1;
-                    1;
-                    1;
-                    0];
-                
-                pr = [(ur(1)-etln0)*k_extr_ce;
-                    0;
-                    0;
-                    -ur(4)+Vbi+(ur(1)-etln0)*k_extr_ce*e*1000*Rs*area;];
-                
-                qr = [1;
-                    1;
-                    1;
-                    0];
-                
-                % Like BC 1, perfectly blocking contacts, but with Vapp simulating a
-                % short circuiting resistance
-            elseif BC == 4
-                
-                pl = [0;
                     (ul(2)-htlp0);
                     0;
                     -ul(4);];
@@ -522,13 +498,39 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                     0;
                     1;
                     0];
-                
-                pr = [(ur(1)-etln0);
+                         
+                delta_nk=(ur(1)-etln0)*k_extr_ce;
+
+                pr = [delta_nk;
                     0;
                     0;
-                    -ur(4)+Vbi-Vapp*t;];
+                    -ur(4)+Vbi-Vapp+(delta_nk)*e*Rs*area;];
                 
-                qr = [0;
+                qr = [1;
+                    1;
+                    1;
+                    0];
+                
+                % Like BC 2, perfectly blocking contacts, but with Vapp simulating a
+                % short circuiting resistance
+            elseif BC == 4
+                
+                pl = [ul(1) - htln0;
+                    ul(2) - htlp0;
+                    0;
+                    -ul(4);];
+                
+                ql = [0;
+                    0;
+                    1;
+                    0];
+                
+                pr = [(ur(1) - etln0)*k_extr_ce;
+                    (ur(2) - etlp0)*k_extr_ce;
+                    0;
+                    -ur(4)+Vbi-Vapp+((ur(1)-etln0)+(ur(2) - etlp0))*k_extr_ce*e*Rs*area;];
+                
+                qr = [1;
                     1;
                     1;
                     0];
