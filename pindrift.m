@@ -240,10 +240,10 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 0;
                 DuDx(4);];
             
-            s = [ - kradhtl*((u(1)*u(2))-(ni^2));
-                - kradhtl*((u(1)*u(2))-(ni^2));
+            s = [ - kradhtl*((u(1)*u(2))-(ni^2))-(((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl))+(taup_htl*(u(1)+nthtl))));
+                - kradhtl*((u(1)*u(2))-(ni^2))-(((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl))+(taup_htl*(u(1)+nthtl))));
                 0;
-                (q/eppp)*(-u(1)+u(2)-NA);];
+                (q/eppp)*(-u(1)+u(2)-NA+u(3)-NI);];
             
         elseif x > tp - tscr && x <= tp
             
@@ -252,8 +252,8 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 0;
                 DuDx(4);];
             
-            s = [ - kradhtl*((u(1)*u(2))-(ni^2));
-                - kradhtl*((u(1)*u(2))-(ni^2));
+            s = [ - kradhtl*((u(1)*u(2))-(ni^2))-(((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl))+(taup_htl*(u(1)+nthtl))));
+                - kradhtl*((u(1)*u(2))-(ni^2))-(((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl))+(taup_htl*(u(1)+nthtl))));
                 0;
                 (q/eppp)*(-u(1)+u(2)+u(3)-NI-NA);];
             
@@ -265,8 +265,8 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 (mui*(u(3)*DuDx(4)+kB*T*DuDx(3)));             % Current terms for ions
                 DuDx(4);];                                     % Electric field
             
-            s = [g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
-                g - krad*((u(1)*u(2))-(ni^2)) - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
+            s = [g - krad*((u(1)*u(2))-(ni^2)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
+                g - krad*((u(1)*u(2))-(ni^2)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
                 0;
                 (q/eppi)*(-u(1)+u(2)+u(3)-NI);];
             
@@ -278,8 +278,8 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 0;
                 DuDx(4)];
             
-            s = [ - kradetl*((u(1)*u(2))-(ni^2));
-                - kradetl*((u(1)*u(2))-(ni^2));
+            s = [ - kradetl*((u(1)*u(2))-(ni^2))-(((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl))+(taup_etl*(u(1)+ntetl))));
+                - kradetl*((u(1)*u(2))-(ni^2))-(((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl))+(taup_etl*(u(1)+ntetl))));
                 0;
                 (q/eppn)*(-u(1)+u(2)+u(3)-NI+ND);];
             
@@ -291,10 +291,10 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 0;
                 DuDx(4)];
             
-            s = [ - kradetl*((u(1)*u(2))-(ni^2));
-                - kradetl*((u(1)*u(2))-(ni^2));
+            s = [ - kradetl*((u(1)*u(2))-(ni^2))-(((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl))+(taup_etl*(u(1)+ntetl))));
+                - kradetl*((u(1)*u(2))-(ni^2))-(((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl))+(taup_etl*(u(1)+ntetl))));
                 0;
-                (q/eppn)*(-u(1)+u(2)+ND);];
+                (q/eppn)*(-u(1)+u(2)+ND+u(3)-NI);];
             
         end
         
