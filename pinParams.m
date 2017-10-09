@@ -171,13 +171,13 @@ klin = 0;               % Coefficients for linear recombination
 klincon = 0;
 
 % Radiative recombanation, U = k(np - ni^2)
-krad = 1e-6;           % [cm3 s-1] Bulk Radiative Recombination coefficient [nominally 1e-10]
+krad = 1e-12;           % [cm3 s-1] Bulk Radiative Recombination coefficient [nominally 1e-10]
 kradetl = krad;         % [cm3 s-1] ETL Radiative Recombination coefficient 
 kradhtl = krad;         % [cm3 s-1] HTL Radiative Recombination coefficient
 
 % SRH recmobination in the contact regions, 
 % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-taun_etl = 1e6;         % [s] SRH time constant for electrons
+taun_etl = 1e-9;         % [s] SRH time constant for electrons
 taup_etl = taun_etl;    % [s] SRH time constant for holes
 taun_htl = taun_etl;        %%%% USE a high value of (e.g.) 1 to switch off
 taup_htl = taun_htl;    %%%% NOT 0- these variables are in the denominator
