@@ -1,6 +1,6 @@
 function all_stable = verifyStabilization(sol_matrix, t, time_percentage) % verify if the tmax provided was enough
 
-    names = ['electrons', 'holes', 'ions', 'potential'];
+    names = ["electrons", "holes", "ions", "potential"];
     log = [true, true, false, false]; % which values to check when representing in log10 form or not
     all_stable = true;
     
@@ -21,7 +21,7 @@ function all_stable = verifyStabilization(sol_matrix, t, time_percentage) % veri
         stable = difference <= threshold;
 
         if ~stable
-            warning(['A tmax of ' num2str(t(end)) ' s has not been enough for the ' names(i) ' distribution to reach stability. Consider trying with a greater tmax.']);
+            warning('pindrift:verifyStabilization','A tmax of %s s has not been enough for the %s distribution to reach stability. Consider trying with a greater tmax.', num2str(t(end)), names(i));
         end
         all_stable = all_stable && stable;
     end
