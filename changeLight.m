@@ -3,15 +3,12 @@ function sol_Int = changeLight(sol, newInt)
 p = sol.params;
 p.pulseon = 0;
 
-warning('off','pindrift:verifyStabilization');
-if newInt ~= p.Int % verify that the solution is not already at that light intensity
-    disp(['changeLight - Go to new light intensity: ' num2str(newInt)])
-    p.Int = newInt; % set new light intensity
-    sol_Int = pindrift(sol, p); % stabilize at new light intensity
-else
-    disp('changeLight - Already at requested light intensity')
-    sol_Int = sol; % otherwise just answer the input solution
-end
+warning('off','pindrift:verifyStabilization'); % warnings about stability are not needed here
+% even if the solution is already at the requested light intensity,
+% stabilize it again
+disp(['changeLight - Go from light intensity ' num2str(p.Int) ' to ' num2str(newInt)])
+p.Int = newInt; % set new light intensity
+sol_Int = pindrift(sol, p); % stabilize at new light intensity
 
 while ~verifyStabilization(sol_Int.sol, sol_Int.t, 0.01) % check in a strict way
     disp(['changeLight - Stabilizing over ' num2str(p.tmax) ' s']);
