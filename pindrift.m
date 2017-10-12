@@ -549,7 +549,7 @@ p = sol(:,:,2);
 a = sol(:,:,3);
 V = sol(:,:,4);
 
-verifyStabilization(sol, t, 0.75); % verify if electrons, holes, ions and potential reached stability
+verifyStabilization(sol, t, 0.5); % verify if electrons, holes, ions and potential reached stability
 
 % Calculate energy levels and chemical potential
 V = V - EA;                                % Electric potential
