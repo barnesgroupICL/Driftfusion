@@ -1,9 +1,11 @@
-function sol_Int = changeLight(sol, newInt)
+function sol_Int = changeLight(sol, newInt, tmax)
 % stabilize at a new light intensity
 p = sol.params;
 p.pulseon = 0;
 p.tmesh_type = 2;
-p.tmax = 50; % forcing 5 s time for being sure that things have time to move
+p.tmax = tmax;
+p.t0 = p.tmax / 1e11;
+p.tpoints = 100;
 
 warning('off','pindrift:verifyStabilization'); % warnings about stability are not needed here
 % even if the solution is already at the requested light intensity,
@@ -19,5 +21,5 @@ while ~verifyStabilization(sol_Int.sol, sol_Int.t, 0.000001) % check stability i
 end
 warning('on','pindrift:verifyStabilization');
 
-
-%sol_Int.params.tmax = previous_tmax; % restore tmax to original value
+% just repeat the last one, for sake of paranoia yeee
+sol_Int = pindrift(sol_Int, sol_Int.params);
