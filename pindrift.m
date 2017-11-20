@@ -94,7 +94,7 @@ end
     pii, pint, pn, pp, pscr, ptetl, pthtl, pulseint, pulselen, pulseon, pulsestart, q,se,sn, sp, side, etlsn, etlsp,...
     htlsn, htlsp, taun_etl, taun_htl, taup_etl, taup_htl, te, ti, tint, tp, tn, t0,taun,...
     taup,tmax, tmesh_type,tpoints, tscr, Vend, Vstart, v, varlist, varstr, wn, wp, wscr, x0,xmax,xmesh_type,...
-    xpoints, k_extr_ce, Rs, area, t_npoints_V_step,asd, t_V_step, Jpoints] = deal(0);
+    xpoints, k_extr_ce, Rs, area, t_npoints_V_step, asd, t_V_step, Jpoints, Vapp_func] = deal(0);
 
 % Unpacks params structure for use in current workspace
 v2struct(params);
@@ -380,13 +380,14 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 % coefficient.
     function [pl,ql,pr,qr] = pdex4bc(xl,ul,xr,ur,t)
         
-        if JV == 1
-            
-            Vapp = Vstart + ((Vend-Vstart)*t*(1/tmax));
-            
-        elseif JV == 2 % for sudden change in voltage
-            Vapp = Vstart + ((Vend-Vstart)*t/t_V_step);
-            Vapp(xor(Vapp<Vstart, Vapp>Vend)) = Vend;
+        switch JV
+            case 1 % for normal JV scan
+                Vapp = Vstart + ((Vend-Vstart)*t*(1/tmax));
+            case 2 % for sudden change in voltage
+                Vapp = Vstart + ((Vend-Vstart)*t/t_V_step);
+                Vapp(xor(Vapp<Vstart, Vapp>Vend)) = Vend;
+            case 3 % for custom profile of voltage
+                Vapp = Vapp_func(t);    
         end
         
         % Open circuit condition- symmetric model
@@ -634,10 +635,14 @@ rho_a_tot = trapz(x, rho_a, 2)/xmax;   % Total Net ion charge
 ntot = trapz(x, n, 2);     % Total
 ptot = trapz(x, p, 2);
 
-if JV == 1
-    
-    Vapp_arr = Vstart + ((Vend-Vstart)*t*(1/tmax));
-    
+switch JV
+    case 1 % for normal JV scan
+        Vapp_arr = Vstart + ((Vend-Vstart)*t*(1/tmax));
+    case 2 % for sudden change in voltage
+        Vapp_arr = Vstart + ((Vend-Vstart)*t/t_V_step);
+        Vapp_arr(xor(Vapp<Vstart, Vapp>Vend)) = Vend;
+    case 3 % for custom profile of voltage
+        Vapp = Vapp_func(t);  
 end
 
 % Calculates current at every point and all times
