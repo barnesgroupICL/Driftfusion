@@ -94,7 +94,7 @@ end
     pii, pint, pn, pp, pscr, ptetl, pthtl, pulseint, pulselen, pulseon, pulsestart, q,se,sn, sp, side, etlsn, etlsp,...
     htlsn, htlsp, taun_etl, taun_htl, taup_etl, taup_htl, te, ti, tint, tp, tn, t0,taun,...
     taup,tmax, tmesh_type,tpoints, tscr, Vend, Vstart, v, varlist, varstr, wn, wp, wscr, x0,xmax,xmesh_type,...
-    xpoints, k_extr_ce, Rs, area, t_npoints_V_step,asd, t_V_step] = deal(0);
+    xpoints, k_extr_ce, Rs, area, t_npoints_V_step,asd, t_V_step, Jpoints] = deal(0);
 
 % Unpacks params structure for use in current workspace
 v2struct(params);
@@ -641,14 +641,16 @@ if JV == 1
 end
 
 % Calculates current at every point and all times
-if calcJ == 1
+if calcJ == 1 || calcJ == 4
     
     % find the internal current density in the device
     Jndiff = zeros(length(t), length(x));
-    Jndrift = zeros(length(t), length(x));
-    Jpdiff = zeros(length(t), length(x));
-    Jpdrift= zeros(length(t), length(x));
-    Jpart = zeros(length(t), length(x));
+    Jndrift = Jndiff;
+    Jpdiff = Jndiff;
+    Jpdrift= Jndiff;
+    Jidiff = Jndiff;
+    Jidrift= Jndiff;
+    Jpart = Jndiff;
     Jtot = zeros(length(t));
     
     for j=1:length(t)
@@ -678,13 +680,23 @@ if calcJ == 1
         
     end
     
-    % Currents at the boundaries (should be the same)
-    Jpartl = Jpart(:,1);
-    Jpartr = Jpart(:,round(xpoints/2));
+    % Currents at the boundary
+    % Jpartl = Jpart(:,1);
+    Jpartr = -Jpart(:, end);
     
-    % Displacement Current at right hand side
-    Fend = (Floct(:, end));
-    Jdispr = -(e*1000)*eppn*gradient(Floct(:, end), t);
+    if calcJ == 4
+        Jndiff_points = -Jndiff(:, Jpoints);
+        Jndrift_points = -Jndrift(:, Jpoints);
+        Jpdiff_points = -Jpdiff(:, Jpoints);
+        Jpdrift_points = -Jpdrift(:, Jpoints);
+        Jidiff_points = -Jidiff(:, Jpoints);
+        Jidrift_points = -Jidrift(:, Jpoints);
+        Jpart_points = Jpart(:, Jpoints);
+    end
+    
+    % Displacement Current at specified point
+    %Fend = (Floct(:, Jpoints));
+    Jdispr = (e*1000)*eppn*gradient(Floct(:, end), t);
     
     Jtotr = Jpartr + Jdispr;
     
@@ -845,7 +857,7 @@ if figson == 1
         
     end
     
-    if calcJ == 1
+    if calcJ == 1 || calcJ ==4
         
         figure(8);
         plot(xnm,Jndiff(end, :),xnm,Jndrift(end, :),xnm,Jpdiff(end, :),xnm,Jpdrift(end, :),xnm,Jidiff(end, :),xnm,Jidrift(end, :),xnm,Jpart(end, :));
@@ -860,7 +872,7 @@ if figson == 1
         
     end
     
-    if calcJ == 1 || calcJ == 2 || calcJ == 3
+    if calcJ
         
         % Particle and displacement currents as a function of time
         figure(10);
@@ -904,9 +916,14 @@ if OC == 1
 end
 
 if calcJ ~= 0
-    
     solstruct.Jtotr = Jtotr; solstruct.Jpartr = Jpartr; solstruct.Jdispr = Jdispr;
-    
+end
+
+if calcJ == 4
+    solstruct.Jndiff_points = Jndiff_points; solstruct.Jndrift_points = Jndrift_points;
+    solstruct.Jpdiff_points = Jpdiff_points; solstruct.Jpdrift_points = Jpdrift_points; 
+    solstruct.Jidiff_points = Jidiff_points; solstruct.Jidrift_points = Jidrift_points;
+    solstruct.Jpart_points = Jpart_points;
 end
 
 if isempty(varargin) || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
