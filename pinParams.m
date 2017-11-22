@@ -48,9 +48,9 @@ Vapp = 0;              % Applied bias
 BC = 1;                % Boundary Conditions. Must be set to one for first solution
 figson = 1;            % Toggle figures on/off 
 side = 1;              % illumination side 1 = EE, 2 = SE
-calcJ = 0;             % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position, calcJ = 2, calculates DD at boundary.
+calcJ = 0;             % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position, calcJ = 2, calculates DD at boundary, calcJ = 4 calculates DD currents at points specified by Jpoints array.
 mobset = 1;            % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
-mobseti = 0;           % Switch on/off ion mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
+mobseti = 1;           % Switch on/off ion mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
 JV = 0;
 
 % OM = Optical Model 
@@ -111,8 +111,8 @@ if mobset == 0
     
 else
     
-    mue_i = 1;          % electron mobility
-    muh_i = mue_i;      % hole mobility
+    mue_i = 1;          % electron mobility in intrinsic
+    muh_i = mue_i;      % hole mobility in intrinsic
     mue_p = mue_i;
     muh_p = mue_i;
     mue_n = mue_i;
@@ -151,7 +151,7 @@ NI = 1e19;                      % [cm-3]
 Ei = 0.5*((EA+IP)+kB*T*log(N0/N0));
 
 % Charge Densities
-ni = N0*(exp(-Eg/(2*kB*T)));          % Intrinsic carrier density
+ni = N0*(exp(-Eg/(2*kB*T)));          % Intrinsic carrier density, equals 3635718
 etln0 = N0*exp((PhiC-EA)/(kB*T));     % Background density electrons in etl/n-type
 etlp0 = N0*exp((IP-PhiC)/(kB*T));     % Background density holes in etl/n-type
 htln0 = N0*exp((PhiA-EA)/(kB*T));     % Background density electrons in htl/p-type
