@@ -12,7 +12,7 @@ Voc = ssol.Voc(end);
 p.Vapp = Voc; % use potential value in the middle as new applied voltage, this is needed for BC 0
 disp(['asymmetricize - Symmetric solution voltage was ' num2str(Voc)])
 
-p.calcJ = 2; % verify that we're at open circuit equivalent conditions
+% p.calcJ = 2; % verify that we're at open circuit equivalent conditions, looking at the current
 
 % halve the solution
 centerIndex = ceil(length(ssol.x) / 2); % get the index of the middle of the x mesh
