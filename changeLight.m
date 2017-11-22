@@ -1,24 +1,39 @@
-function sol_Int = changeLight(sol, newInt, tmax)
+ function sol_Int = changeLight(sol, newInt, tmax)
 % stabilize at a new light intensity
+
 p = sol.params;
 p.pulseon = 0;
 p.tmesh_type = 2;
 p.tmax = tmax;
-p.t0 = p.tmax / 1e11;
-p.tpoints = 100;
+p.t0 = 1e-10;
+p.tpoints = 30;
+sol_Int = sol;
 
-warning('off','pindrift:verifyStabilization'); % warnings about stability are not needed here
-% even if the solution is already at the requested light intensity,
-% stabilize it again
-disp(['changeLight - Go from light intensity ' num2str(p.Int) ' to ' num2str(newInt)])
-p.Int = newInt; % set new light intensity
-sol_Int = pindrift(sol, p); % stabilize at new light intensity
+% warnings about stability are not needed in the first steps
+warning('off','pindrift:verifyStabilization'); 
 
-while ~verifyStabilization(sol_Int.sol, sol_Int.t, 0.000001) % check stability in a strict way
+% change light intensity in small steps
+steps = 1 + ceil(abs(log10(newInt/p.Int)));
+
+% if the step is just one, then newInt is the output of logspace function
+Int_array = logspace(log10(p.Int), log10(newInt), steps); 
+
+% change light in steps, not needed to reach a good stabilized solution in
+% each step, so stabilization is not verified here
+% skip first value in the array as is the initial Int
+for i = 2:length(Int_array)
+    disp(['changeLight - Go from light intensity ' num2str(p.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(tmax) ' s'])
+    p.Int = Int_array(i); % set new light intensity
+    sol_Int = pindrift(sol_Int, p);
+end
+
+while ~verifyStabilization(sol_Int.sol, sol_Int.t, 1e-8) % check stability in a strict way
     disp(['changeLight - Stabilizing over ' num2str(p.tmax) ' s']);
     sol_Int = pindrift(sol_Int, p);
-    p.tmax = p.tmax * 10; % this new value doesn't get saved in sol_Int.params.tmax unless an additional pindrift is run
+    p.tmax = p.tmax * 10; % this change gets saved in sol_Int only if another cycle is performed
 end
+
+% warnings about stability can be useful again
 warning('on','pindrift:verifyStabilization');
 
 % just repeat the last one, for sake of paranoia yeee
