@@ -4,10 +4,20 @@
 p = sol.params;
 p.pulseon = 0;
 p.tmesh_type = 2;
-p.tmax = tmax;
 p.t0 = 1e-10;
 p.tpoints = 30;
 sol_Int = sol;
+
+% set an initial time for stabilization tmax
+if tmax
+    p.tmax = tmax;
+else
+    if p.mui
+        p.tmax = 2^(-log10(p.mui)) / 10;
+    else
+        p.tmax = 2^(-log10(p.mue_i));
+    end
+end
 
 % warnings about stability are not needed in the first steps
 warning('off','pindrift:verifyStabilization'); 
@@ -22,7 +32,7 @@ Int_array = logspace(log10(p.Int), log10(newInt), steps);
 % each step, so stabilization is not verified here
 % skip first value in the array as is the initial Int
 for i = 2:length(Int_array)
-    disp(['changeLight - Go from light intensity ' num2str(p.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(tmax) ' s'])
+    disp(['changeLight - Go from light intensity ' num2str(p.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(p.tmax) ' s'])
     p.Int = Int_array(i); % set new light intensity
     sol_Int = pindrift(sol_Int, p);
 end
