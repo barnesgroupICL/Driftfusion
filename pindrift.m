@@ -94,7 +94,7 @@ end
     pii, pint, pn, pp, pscr, ptetl, pthtl, pulseint, pulselen, pulseon, pulsestart, q,se,sn, sp, side, etlsn, etlsp,...
     htlsn, htlsp, taun_etl, taun_htl, taup_etl, taup_htl, te, ti, tint, tp, tn, t0,taun,...
     taup,tmax, tmesh_type,tpoints, tscr, Vend, Vstart, v, varlist, varstr, wn, wp, wscr, x0,xmax,xmesh_type,...
-    xpoints, k_extr_ce, Rs, area, t_npoints_V_step, asd, t_V_step, Jpoints, Vapp_func] = deal(0);
+    xpoints, k_extr_ce, Rs, area, t_npoints_V_step, asd, t_V_step, Jpoints, Vapp_func, Vapp_params] = deal(0);
 
 % Unpacks params structure for use in current workspace
 v2struct(params);
@@ -387,7 +387,7 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 Vapp = Vstart + ((Vend-Vstart)*t/t_V_step);
                 Vapp(xor(Vapp<Vstart, Vapp>Vend)) = Vend;
             case 3 % for custom profile of voltage
-                Vapp = Vapp_func(t);    
+                Vapp = Vapp_func(Vapp_params, t);
         end
         
         % Open circuit condition- symmetric model
@@ -642,7 +642,7 @@ switch JV
         Vapp_arr = Vstart + ((Vend-Vstart)*t/t_V_step);
         Vapp_arr(xor(Vapp<Vstart, Vapp>Vend)) = Vend;
     case 3 % for custom profile of voltage
-        Vapp = Vapp_func(t);  
+        Vapp = Vapp_func(Vapp_params, t);
 end
 
 % Calculates current at every point and all times
