@@ -51,7 +51,7 @@ tmax_matrix = zeros(length(Int_array), length(Freq_array));
 J_bias = tmax_matrix;
 J_amp = tmax_matrix;
 J_phase = tmax_matrix;
-J_ion_bias = tmax_matrix;
+J_idrift_bias = tmax_matrix;
 J_idrift_amp = tmax_matrix;
 J_idrift_phase = tmax_matrix;
 
