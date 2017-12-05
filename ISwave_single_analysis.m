@@ -14,7 +14,7 @@ Vapp = s.params.Vapp_func(s.params.Vapp_params, s.t);
 periods = round(s.params.tmax * s.params.Vapp_params(4) / (2 * pi));
 % this works if, as now is, the frequency is constant internally each solution
 % round should not be needed here
-fit_t_index = round((s.params.tpoints - 1) * (periods - 1) / periods);
+fit_t_index = round((s.params.tpoints - 1) * round(periods * 0.5) / periods);
 fit_t = s.t(fit_t_index:end);
 fit_J = s.Jtotr(fit_t_index:end) / 1000; % in Ampere
 fit_Jidrift = s.Jidrift_points(fit_t_index:end, end) / 1000; % in Ampere
