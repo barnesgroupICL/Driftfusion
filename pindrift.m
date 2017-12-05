@@ -94,7 +94,7 @@ end
     pii, pint, pn, pp, pscr, ptetl, pthtl, pulseint, pulselen, pulseon, pulsestart, q,se,sn, sp, side, etlsn, etlsp,...
     htlsn, htlsp, taun_etl, taun_htl, taup_etl, taup_htl, te, ti, tint, tp, tn, t0,taun,...
     taup,tmax, tmesh_type,tpoints, tscr, Vend, Vstart, v, varlist, varstr, wn, wp, wscr, x0,xmax,xmesh_type,...
-    xpoints, k_extr_ce, Rs, area, t_npoints_V_step, asd, t_V_step, Jpoints, Vapp_func, Vapp_params] = deal(0);
+    xpoints, k_extr_ce, Rs, area, t_npoints_V_step, asd, t_V_step, Jpoints, Vapp_func, deltaV, Vapp_params, J_func, RelTol] = deal(0);
 
 % Unpacks params structure for use in current workspace
 v2struct(params);
@@ -162,7 +162,7 @@ if JV == 2
 end
 
 % SOLVER OPTIONS  - limit maximum time step size during integration.
-options = odeset('MaxOrder',5, 'NonNegative', [1, 1, 1, 0]);
+options = odeset('MaxOrder', 5, 'NonNegative', [1, 1, 1, 0], 'RelTol', RelTol);
 
 % Call solver - inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
