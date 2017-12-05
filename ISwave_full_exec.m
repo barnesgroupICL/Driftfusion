@@ -83,7 +83,7 @@ for i = 1:length(Int_array)
     sol_i_Int.params.mui = new_mui; % if frozen_ions, freezing ions
     parfor (j = 1:length(Freq_array), parforArg)
         sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, BetterRelTol); % do IS
-        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave); % extract parameters and do plot
+        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave); % extract parameters and do plot
         % if phase is small or negative, double check increasing accuracy of the solver
 %         if RelTol ~= BetterRelTol && fit_coeff(3) < 0.05
 %             disp('ISwave_full_exec - Fitted phase is very small or negative, double checking with higher solver accuracy')
@@ -125,10 +125,16 @@ Freq_matrix = repmat(Freq_array, length(Int_array), 1);
 % as the current of MPP is defined as positive in the model, we expect that
 % with a positive deltaV we have a negative J_amp (J_amp is forced to be negative actually)
 
+% the absolute value of impedance has to be taken from the absolute values
+% of oscillation of voltage and of current
 impedance = -deltaV ./ J_amp; % J_amp is in amperes
+% the components of the impedance gets calculated with the phase from the
+% current-voltage "delay"
 impedance_re = impedance .* cos(J_phase); % this is the resistance
 impedance_im = impedance .* sin(J_phase);
 pulsatance_matrix = 2 * pi * repmat(Freq_array, length(Int_array), 1);
+% the capacitance is the imaginary part of 1/(pulsatance*complex_impedance)
+% or can be obtained in the same way with Joutphase/(pulsatance*deltaV)
 cap = sin(J_phase) ./ (pulsatance_matrix .* impedance);
 
 impedance_idrift = -deltaV ./ J_idrift_amp; % J_amp is in amperes
