@@ -1,11 +1,11 @@
-function [fit_coeff, fit_idrift_coeff, subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_single_analysis(sol_i_Int_ISwave)
+function [fit_coeff, fit_idrift_coeff, subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t, Ji_disp] = ISwave_single_analysis(sol_i_Int_ISwave)
 % calculate impedance (reactance and resistance) and phase by impedance
 % spectroscopy with oscillating voltage
 
 % evil shortcut
 s = sol_i_Int_ISwave;
 
-[subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(sol_i_Int_ISwave);
+[subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t, Ji_disp] = ISwave_subtracting_analysis(sol_i_Int_ISwave);
 
 Vapp = s.params.Vapp_func(s.params.Vapp_params, s.t);
 
@@ -53,9 +53,10 @@ figure('Name', ['Single ISwave, Int ' num2str(s.params.Int) ' Freq ' num2str(s.p
     plot(s.t(2:end), subtracting_n_contacts_t);
     plot(s.t(2:end), subtracting_i_abs_t);
     plot(s.t(2:end), subtracting_i_t);
+    plot(s.t, Ji_disp);
     plot(fit_t, s.params.J_func(fit_coeff, fit_t), 'g')
     plot(fit_t, J_outphase, 'r')
-    legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Displaced ions abs", "Displaced ions" , "Fit", "Out of Phase Current"];
+    legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Displaced ions abs", "Displaced ions", "Disp Curr Ions", "Fit", "Out of Phase Current"];
     if isfield(s.params, 'Jpoints')
 %         plot(s.t, s.Jidiff_points(:,end), 'k');
         plot(s.t, s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
