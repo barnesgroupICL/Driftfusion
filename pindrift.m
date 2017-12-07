@@ -50,24 +50,24 @@ set(0,'DefaultTextColor', [0, 0, 0]);
 % Input arguments are dealt with here
 if isempty(varargin)
     
-    params = pinParams;      % Calls Function pinParams and stores in sturcture 'params'
+    par = pinParams;      % Calls Function pinParams and stores in sturcture 'params'
     
 elseif length(varargin) == 1
     
     % Call input parameters function
     icsol = varargin{1, 1}.sol;
     icx = varargin{1, 1}.x;
-    params = pinParams;
+    par = pinParams;
     
 elseif length(varargin) == 2
     
     if max(max(max(varargin{1, 1}.sol))) == 0
         
-        params = varargin{2};
+        par = varargin{2};
         
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
         
-        params = varargin{1, 1}.params;
+        par = varargin{1, 1}.params;
         icsol = varargin{1, 1}.sol;
         icx = varargin{1, 1}.x;
         
@@ -75,7 +75,7 @@ elseif length(varargin) == 2
         
         icsol = varargin{1, 1}.sol;
         icx = varargin{1, 1}.x;
-        params = varargin{2};
+        par = varargin{2};
         
     end
     
@@ -87,30 +87,33 @@ end
 % Rememeber to add new variables here if adding to parameters list- might
 % be a better way of doing this.
 
-[BL,BC, Bn ,calcJ, deltax, e, EA,Eg,Ei,Etetl, Ethtl, IP,IC,ilt, Int, JV, JVscan_pnts, N0,NA,ND,NI,PhiA,...
-    PhiC,T,Tn,Vapp,Vbi,cn,cp, deltat, edge, Efnside, Efpside,ep,epoints,epp0,eppp,eppi,eppn,...
-    et,etln0,etlp0,fastrec,figson,G0, htln0,htlp0, kB,kext, klin, klincon, krad,kradetl, kradhtl,m,mobset,...
-    mobseti, mue_p,muh_p, mue_i, muh_i, mue_n, muh_n, mui, ni, ntetl, nthtl,OC, OM, pepe, pedge,...
-    pii, pint, pn, pp, pscr, ptetl, pthtl, pulseint, pulselen, pulseon, pulsestart, q,se,sn, sp, side, etlsn, etlsp,...
-    htlsn, htlsp, taun_etl, taun_htl, taup_etl, taup_htl, te, ti, tint, tp, tn, t0,taun,...
-    taup,tmax, tmesh_type,tpoints, tscr, Vend, Vstart, v, varlist, varstr, wn, wp, wscr, x0,xmax,xmesh_type,...
-    xpoints, k_extr_ce, Rs, area, t_npoints_V_step, asd, t_V_step, Jpoints, Vapp_func, deltaV, Vapp_params, J_func, RelTol] = deal(0);
+[BC, calcJ, e, EA, Eg, Ei, IP, Int, JV, N0, NA, ND, NI,...
+    T, Vapp, Vbi, Efnside, Efpside, eppp, eppi, eppn,...
+    etln0, etlp0, figson, G0, htln0, htlp0, kB, krad, kradetl, kradhtl, m,...
+    mue_p, muh_p, mue_i, muh_i, mue_n, muh_n, mui, ni, ntetl, nthtl, OC, OM, pepe,...
+    pii, pn, pp, ptetl, pthtl, pulseint, pulselen, pulseon, pulsestart, q,...
+    taun_etl, taun_htl, taup_etl, taup_htl, ti, tp,...
+    tmax, tscr, Vend, Vstart, wn, wp, xmax,...
+    k_extr_ce, Rs, area, t_npoints_V_step, t_V_step, Jpoints, Vapp_func,...
+    Vapp_params, RelTol, Etetl, Ethtl, JVscan_pnts, PhiA, PhiC, deltax,...
+    epp0, pint, pscr, t0, te, tint, tmesh_type, tn, tpoints, xmesh_type,...
+    J_func] = deal(0);
 
 % Unpacks params structure for use in current workspace
-v2struct(params);
+v2struct(par);
 
 % Currently have to repack params since values change after unpacking- unsure as to what's happening there
 % Pack parameters in to structure 'params'
 varcell = who('*')';                    % Store variables names in cell array
 varcell = ['fieldnames', varcell];      % adhere to syntax for v2struct
 
-params = v2struct(varcell);
+par = v2struct(varcell);
 
 %%%% Spatial mesh %%%%
 if isempty(varargin) || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
     
     % Edit meshes in mesh gen
-    x = meshgen_x(params);
+    x = meshgen_x(par);
     
     if OC == 1
         
@@ -136,7 +139,7 @@ xmax = x(end);
 xnm = x*1e7;
 
 %%%%%% Time mesh %%%%%%%%%
-t = meshgen_t(params);
+t = meshgen_t(par);
 
 %%%%%% Generation %%%%%%%%%%
 genspace = linspace(0,ti,pii);
@@ -378,7 +381,7 @@ sol = pdepe(m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 % in this example I am controlling the flux through the boundaries using
 % the difference in concentration from equilibrium and the extraction
 % coefficient.
-    function [pl,ql,pr,qr] = pdex4bc(xl,ul,xr,ur,t)
+    function [pl,ql,pr,qr] = pdex4bc(~,ul,~,ur,t)
         
         switch JV
             case 1 % for normal JV scan
@@ -560,7 +563,7 @@ Efn = real(-V+Ei+(kB*T/q)*log(n/ni));      % Electron quasi-Fermi level
 Efp = real(-V+Ei-(kB*T/q)*log(p/ni));      % Hole quasi-Fermi level
 Phin = real(Ei+(kB*T/q)*log(n/ni)-EA);     % Chemical Potential electron
 Phip = real(Ei-(kB*T/q)*log(p/ni)-EA);
-Phi = Phin - Phip;
+% Phi = Phin - Phip;
 
 % p-type binary matrix
 pBM = ones(length(t), xpoints)*diag(x < tp);
@@ -569,17 +572,8 @@ iBM = ones(length(t), xpoints)*diag(x >= tp & x <= (tp + ti));
 % n-type binary matrix
 nBM = ones(length(t), xpoints)*diag(x > tp + ti);
 
-nstat = zeros(1, xpoints);                                  % Static charge array
-nstat = (-NA-NI)*pBM + (-NI*iBM) + (ND-NI)*nBM;
-
-% size(n)
-% size(p)
-% size(a)
-% size(nstat)
-% assignin('base', 'n', n)
-% assignin('base', 'p', p)
-% assignin('base', 'a', a)
-% assignin('base', 'nstat', nstat)
+% nstat = zeros(1, xpoints);                                 
+nstat = (-NA-NI)*pBM + (-NI*iBM) + (ND-NI)*nBM; % Static charge array
 
 rhoc = (-n + p + a + nstat);     % Net charge density calculated from adding individual charge densities
 
@@ -589,51 +583,40 @@ a = a - (NI*pBM + NI*nBM);
 % Recomination Rate - NEEDS SORTING 24/03/2016
 Urec = 0;% (krad((n*p)-ni^2) + sn*(n-htln0)).*nBM + (krad((n*p)-ni^2)+ sp*(p-etlp0)).*pBM;
 
-if OC == 1
-    
+if OC
     Voc = Efn(:, round(xpoints/2)) - Efp(:, 1);                    % Open Circuit Voltage
     Voc_chem = Phin(:, round(xpoints/2)) - Phip(:, 1);              % Chemical componenet
     Voc_V = V(:, round(xpoints/2)) - V(:, 1);
-    
-end
-
-if OC == 0
-    
+else
     Voc = Efn(:, end) - Efp(:, 1);                    % Open Circuit Voltage
     Voc_chem = Phin(:, end) - Phip(:, 1);              % Chemical componenet
     Voc_V = V(:, end) - V(:, 1);
-    
 end
 
 % TPV
-if OC == 1  && pulseon == 1                 % AC coupled mode
-    
+if OC && pulseon                 % AC coupled mode
     Voc = Voc - Voc(1, :);                  % Removes baseline from TPV
     t = t-(pulsestart+pulselen);          % Zero point adjustment
 end
 
 % TPC
-if OC == 0 && pulseon == 1
-    
+if ~OC && pulseon
     t = t-(pulsestart+pulselen);                     % TPC Zero point adjustment
-    
 end
 
-for i=1:length(t)
-    
-    Fp(i,:) = -gradient(V(i, :), x);       % Electric field calculated from V
-    
-end
+% for i=1:length(t)
+%     Fp(i,:) = -gradient(V(i, :), x);       % Electric field calculated from V
+% end
 
-Potp = V(end, :);
+% Potp = V(end, :);
 
-rhoctot = trapz(x, rhoc, 2)/xmax;   % Net charge
+% rhoctot = trapz(x, rhoc, 2)/xmax;   % Net charge
 
-rho_a = a - NI;                  % Net ionic charge
-rho_a_tot = trapz(x, rho_a, 2)/xmax;   % Total Net ion charge
+% rho_a = a - NI;                  % Net ionic charge
+% rho_a_tot = trapz(x, rho_a, 2)/xmax;   % Total Net ion charge
 
-ntot = trapz(x, n, 2);     % Total
-ptot = trapz(x, p, 2);
+% ntot = trapz(x, n, 2);     % Total
+% ptot = trapz(x, p, 2);
 
 switch JV
     case 1 % for normal JV scan
@@ -656,16 +639,17 @@ if calcJ == 1 || calcJ == 4
     Jidiff = Jndiff;
     Jidrift= Jndiff;
     Jpart = Jndiff;
-    Jtot = zeros(length(t));
+    Floct = Jndiff;
+%     Jtot = zeros(length(t));
     
     for j=1:length(t)
         
-        tj = t(j);
+%         tj = t(j);
         
         [nloc,dnlocdx] = pdeval(0,x,n(j,:),x);
         [ploc,dplocdx] = pdeval(0,x,p(j,:),x);
         [iloc,dilocdx] = pdeval(0,x,a(j,:),x);
-        [Vloc, Floc] = pdeval(0,x,V(j,:),x);
+        [~, Floc] = pdeval(0,x,V(j,:),x);
         
         % Particle currents
         Jndiff(j,:) = (mue_i*kB*T*dnlocdx)*(1000*e);
@@ -722,7 +706,7 @@ if calcJ == 2
         [nloc,dnlocdx] = pdeval(0,x,n(j,:),x(end));
         [ploc,dplocdx] = pdeval(0,x,p(j,:),x(end));
         [iloc,dilocdx] = pdeval(0,x,a(j,:),x(end));
-        [Vloc, Floc] = pdeval(0,x,V(j,:),x(end));
+        [~, Floc] = pdeval(0,x,V(j,:),x(end));
         
         % Particle currents
         Jndiff(j) = (mue_n*kB*T*dnlocdx)*(1000*e);
@@ -763,13 +747,15 @@ end
 
 % Current calculated from QFL
 if calcJ == 3
+    dEfndx = zeros(length(t), length(x));
+    dEfpdx = dEfndx;
     
     for j=1:length(t)
         
         dEfndx(j,:) = gradient(Efn(j, :), x);
         dEfpdx(j,:) = gradient(Efp(j, :), x);
         
-        [Vloc, Floc] = pdeval(0,x,V(j,:),x(end));
+        [~, Floc] = pdeval(0,x,V(j,:),x(end));
         % Electric Field
         Floct(j) = Floc;
         
@@ -806,8 +792,8 @@ if figson == 1
     end
     
     % Band Diagram
-    FH1 = figure(1);
-    PH1 = subplot(3,1,1);
+    figure(1);
+    subplot(3,1,1);
     plot (xnm, Efn(end,:), '--', xnm, Efp(end,:), '--', xnm, Ecb(end, :), xnm, Evb(end ,:));
     set(legend,'FontSize',12);
     ylabel('Energy [eV]');
@@ -818,7 +804,7 @@ if figson == 1
     grid off;
     
     % Electronic Charge Densities
-    PH2 = subplot(3,1,2);
+    subplot(3,1,2);
     semilogy(xnm, (sol(end,:,1)), xnm, (sol(end,:,2)));
     ylabel('{\itn, p} [cm^{-3}]')
     xlim([0, xnmend]);
@@ -828,7 +814,7 @@ if figson == 1
     grid off
     
     % Ionic charge density
-    PH3 = subplot(3,1,3);
+    subplot(3,1,3);
     plot(xnm, a(end,:)/1e19, 'black');
     ylabel('{\ita} [x10^{19} cm^{-3}]')
     xlabel('Position [nm]')
@@ -933,29 +919,19 @@ end
 
 if isempty(varargin) || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
     
-    params = rmfield(params, 'params');
-    params = rmfield(params, 'varargin');
+    par = rmfield(par, 'par');
+    par = rmfield(par, 'varargin');
     
 else
     
-    params = rmfield(params, 'icsol');
-    params = rmfield(params, 'icx');
-    params = rmfield(params, 'params');
-    params = rmfield(params, 'varargin');
+    par = rmfield(par, 'icsol');
+    par = rmfield(par, 'icx');
+    par = rmfield(par, 'par');
+    par = rmfield(par, 'varargin');
     
 end
 % Store params
-solstruct.params = params;
-
-if (OC ==0)
-    
-    assignin('base', 'sol', solstruct);
-    
-elseif (OC ==1)
-    
-    assignin('base', 'ssol', solstruct);
-    
-end
+solstruct.params = par;
 
 end
 

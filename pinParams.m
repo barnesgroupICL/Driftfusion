@@ -28,16 +28,6 @@ deltax = tint/pint;    % spacing in the interfacial region- requires for mesh ge
 xmesh_type = 4; 
 xmax = tp + ti + tn;      % cm
 
-if xmesh_type == 1 || xmesh_type == 5
-
-    x0 = 0;
-
-else
-    
-    x0 = xmax/1e3;
-
-end
-
 % General Parameters
 OC = 1;                % Closed circuit = 0, Open Circuit = 1 
 Int = 1;             % Bias Light intensity (Suns Eq.)
@@ -47,10 +37,7 @@ pulseon = 0;           % Switch pulse on TPC or TPV
 Vapp = 0;              % Applied bias
 BC = 1;                % Boundary Conditions. Must be set to one for first solution
 figson = 1;            % Toggle figures on/off 
-side = 1;              % illumination side 1 = EE, 2 = SE
 calcJ = 0;             % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position, calcJ = 2, calculates DD at boundary, calcJ = 4 calculates DD currents at points specified by Jpoints array.
-mobset = 1;            % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
-mobseti = 1;           % Switch on/off ion mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
 JV = 0;
 
 % OM = Optical Model 
@@ -63,7 +50,6 @@ OM  = 0;
 tpoints = 200;              % Number of time points
 tmesh_type = 2;             % Mesh type- for use with meshgen_t
 t0 = tmax/1e4;
-deltat = tmax/(1e6*tpoints);
 
 %%%%%%%% TRANSIENT SETTINGS %%%%%%%%
 if pulseon == 1 && OC == 1        % Record length for TPV
@@ -75,7 +61,6 @@ if pulseon == 1 && OC == 1        % Record length for TPV
     tmax = 1000e-6;
     t0 = 0;
     tpoints = 400;
-    deltat = tmax/(1e4*tpoints);
 
 end    
 
@@ -88,7 +73,6 @@ if pulseon == 1 && OC == 0        % Record length for TPC
     tmax = 100e-6;  
     t0 = 0;%tmax/1000;
     tpoints = 400;
-    deltat = tmax/(1e4*tpoints);
     calcJ = 2;
     
 end 
@@ -100,33 +84,17 @@ Vend = 1.1;
 JVscan_pnts = 1000;
 
 %%%%%%%%%%% MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
-if mobset == 0
-   
-    mue_i = 0;     % [Vcm-2s-1] electron mobility
-    muh_i = 0;     % hole mobility
-    mue_p = 0;
-    muh_p = 0;
-    mue_n = 0;
-    muh_n = 0;
-    
-else
-    
-    mue_i = 1;          % electron mobility in intrinsic
-    muh_i = mue_i;      % hole mobility in intrinsic
-    mue_p = mue_i;
-    muh_p = mue_i;
-    mue_n = mue_i;
-    muh_n = mue_i;
-    
-end
 
-if mobseti == 0
-        
-    mui = 0;    % ion mobility
-else 
-        
-    mui = 1e-8;    % ion mobility
-end
+% Ion mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
+mui = 1e-8;
+
+% Electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
+mue_i = 1;          % electron mobility in intrinsic
+muh_i = mue_i;      % hole mobility in intrinsic
+mue_p = mue_i;
+muh_p = mue_i;
+mue_n = mue_i;
+muh_n = mue_i;
 
 eppp = 20*epp0;         % Dielectric constant p-type
 eppi = 20*epp0;         % Dielectric constant intrinsic
@@ -165,10 +133,6 @@ Vbi = (kB*T/q)*log((ND*NA)/ni^2);
 % density... Not sure what the problem is here...
 
 %%%%%%% RECOMBINATION %%%%%%%%%%%
-% Linear recombination, U = k(n- ni)
-% NOT BASED ON A PHYSICAL MODEL- USED FOR CHECKING TPV COEFFICIENTS
-klin = 0;               % Coefficients for linear recombination
-klincon = 0;
 
 % Radiative recombanation, U = k(np - ni^2)
 krad = 1e-12;           % [cm3 s-1] Bulk Radiative Recombination coefficient [nominally 1e-10]
@@ -181,8 +145,8 @@ taun_etl = 1e-10;         % [s] SRH time constant for electrons
 taup_etl = taun_etl;    % [s] SRH time constant for holes
 taun_htl = taun_etl;        %%%% USE a high value of (e.g.) 1 to switch off
 taup_htl = taun_htl;    %%%% NOT 0- these variables are in the denominator
-sn = 0;%1e7;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
-sp = 0;%sn;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
+% sn = 0;%1e7;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
+% sp = 0;%sn;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
 
 % SRH parameters
 % se = 1e-15;             % [cm^2] Electron capture cross-section
@@ -203,8 +167,6 @@ m = 0;
 wp = 25e-7;  %((-ti*NA*q) + ((NA^0.5)*(q^0.5)*(((ti^2)*NA*q) + (4*eppi*Vbi))^0.5))/(2*NA*q);
 wn = wp;
 
-wscr = wp + ti + wn;    % width of space charge region
-
 % Doped region Fermi levels
 Efnside = - Vbi - EA + ((kB*T)/q) * log(ND/N0);
 Efpside = - EA - Eg - ((kB*T)/q) * log(NA/N0);
@@ -221,14 +183,14 @@ if JV == 1
 end
 
 % Parameters for adding and external resistance in series, like in CE
-k_extr_ce=1e30; % big value, non physical
-Rs=50; % resistance
-area=1; % active area of the device
+% k_extr_ce=1e30; % big value, non physical
+% Rs=50; % resistance
+% area=1; % active area of the device
 t_npoints_V_step=10; % how fast voltage drops in CE, in time points
 
 % Pack parameters in to structure 'params'
-varlist = who('*')';
-varstr = strjoin(varlist, ',');
+% varlist = who('*')';
+% varstr = strjoin(varlist, ',');
 
 varcell = who('*')';                    % Store variables names in cell array
 varcell = ['fieldnames', varcell];      % adhere to syntax for v2struct

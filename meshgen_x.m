@@ -49,8 +49,6 @@ elseif xmesh_type == 4
     
 end 
 
-px = length(x);
-
 if meshfigon == 1
 
     xmir = x;
