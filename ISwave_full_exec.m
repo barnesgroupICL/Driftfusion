@@ -22,9 +22,9 @@ periods = 10; % the current looks reproducible already after few oscillations, t
 % number of tpoints which is 1 + a multiple of 4 * periods
 tpoints = 1 + 10 * 4 * periods; % gets redefined by changeLight, so re-setting is needed
 
-% default pdepe tolerance is 1e-3, in case of small phase, BetterRelTol is
+% default pdepe tolerance is 1e-3, in case of small phase, RelTol is
 % used instead
-BetterRelTol = 1e-5;
+RelTol = 1e-4;
 
 % define light intensity values, always decreasing
 Int_array = logspace(log10(startInt), log10(endInt), Int_points);
@@ -66,7 +66,6 @@ changeLight_tmax = 0;
 
 tic
 for i = 1:length(Int_array)
-%     RelTol = 1e-3; % reset default value
     if frozen_ions
         ssol_i_Int.params.mui = original_p.mui; % reset default value of ion mobility in case frozen_ions option was used
     end
@@ -97,31 +96,34 @@ for i = 1:length(Int_array)
         sol_i_Int.params.muh_n = 0;
     end 
     parfor (j = 1:length(Freq_array), parforArg)
-        sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, BetterRelTol); % do IS
-        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave); % extract parameters and do plot
+        sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, RelTol); % do IS
+        if save_solutions && ~parallelize
+            sol_i_Int_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
+            sol_name = matlab.lang.makeValidName([output_name '_Int_' num2str(Int_array(i)) '_Freq_' num2str(Freq_array(j)) '_ISwave']);
+            assignin('base', sol_name, sol_i_Int_ISwave);
+        end
+        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave, parallelize); % extract parameters and do plot
         % if phase is small or negative, double check increasing accuracy of the solver
-%         if RelTol ~= BetterRelTol && fit_coeff(3) < 0.05
-%             disp('ISwave_full_exec - Fitted phase is very small or negative, double checking with higher solver accuracy')
-%             RelTol = BetterRelTol; % this stays set until a new light intensity is tested
-%             % here I start from the oscillating solution sol_i_Int_ISwave, 
-%             % which is more risky, beware
-%             sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tpoints, calcJi, RelTol); % do IS
-%             [fit_coeff, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave); % repeat analysis on new solution
-%         end
-%         if RelTol == BetterRelTol && fit_coeff(3) > 0.05
-%             disp('ISwave_full_exec - Fitted phase is not small anymore, decreasing solver accuracy')
-%             RelTol = 1e-3; % reset default value if the phase is not small anymore
-%         end
+        if fit_coeff(3) < 0.03
+            disp('ISwave_full_exec - Fitted phase is very small or negative, double checking with higher solver accuracy')
+            newRelTol = RelTol / 100;
+            sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, newRelTol); % do IS
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave, parallelize); % repeat analysis on new solution
+        end
+        % if the phase is negative even with the new accuracy, check again
+        if fit_coeff(3) < 0.003
+            disp('ISwave_full_exec - Fitted phase is extremely small, increasing solver accuracy again')
+            newRelTol = newRelTol / 100;
+            sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, newRelTol); % do IS
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave, parallelize); % repeat analysis on new solution
+        end
         J_bias(i, j) = fit_coeff(1); % not really that useful
         J_amp(i, j) = fit_coeff(2);
         J_phase(i, j) = fit_coeff(3);
         J_idrift_bias(i, j) = fit_idrift_coeff(1);
         J_idrift_amp(i, j) = fit_idrift_coeff(2);
         J_idrift_phase(i, j) = fit_idrift_coeff(3);
-        if save_solutions && ~parallelize
-            sol_name = matlab.lang.makeValidName([output_name '_Int_' num2str(Int_array(i)) '_Freq_' num2str(Freq_array(j)) '_ISwave']);
-            assignin('base', sol_name, sol_i_Int_ISwave);
-        end
+
         % as the number of periods is fixed, there's no need for tmax to be
         % a matrix, but this could change, so it's a matrix
         tmax_matrix(i,j) = sol_i_Int_ISwave.params.tmax;
