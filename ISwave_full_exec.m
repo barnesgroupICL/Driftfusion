@@ -46,9 +46,9 @@ tmax_matrix = zeros(length(Int_array), length(Freq_array));
 J_bias = tmax_matrix;
 J_amp = tmax_matrix;
 J_phase = tmax_matrix;
-J_idrift_bias = tmax_matrix;
-J_idrift_amp = tmax_matrix;
-J_idrift_phase = tmax_matrix;
+J_i_bias = tmax_matrix;
+J_i_amp = tmax_matrix;
+J_i_phase = tmax_matrix;
 
 % switch on or off the parallelization calculation of solution, when true
 % less pictures gets created and the solutions does not get saved in main
@@ -121,9 +121,9 @@ for i = 1:length(Int_array)
         J_bias(i, j) = fit_coeff(1); % not really that useful
         J_amp(i, j) = fit_coeff(2);
         J_phase(i, j) = fit_coeff(3);
-        J_idrift_bias(i, j) = fit_idrift_coeff(1);
-        J_idrift_amp(i, j) = fit_idrift_coeff(2);
-        J_idrift_phase(i, j) = fit_idrift_coeff(3);
+        J_i_bias(i, j) = fit_idrift_coeff(1);
+        J_i_amp(i, j) = fit_idrift_coeff(2);
+        J_i_phase(i, j) = fit_idrift_coeff(3);
 
         % as the number of periods is fixed, there's no need for tmax to be
         % a matrix, but this could change, so it's a matrix
@@ -145,20 +145,20 @@ Freq_matrix = repmat(Freq_array, length(Int_array), 1);
 
 % the absolute value of impedance has to be taken from the absolute values
 % of oscillation of voltage and of current
-impedance = -deltaV ./ J_amp; % J_amp is in amperes
+impedance_abs = -deltaV ./ J_amp; % J_amp is in amperes
 % the components of the impedance gets calculated with the phase from the
 % current-voltage "delay"
-impedance_re = impedance .* cos(J_phase); % this is the resistance
-impedance_im = impedance .* sin(J_phase);
+impedance_re = impedance_abs .* cos(J_phase); % this is the resistance
+impedance_im = impedance_abs .* sin(J_phase);
 pulsatance_matrix = 2 * pi * repmat(Freq_array, length(Int_array), 1);
 % the capacitance is the imaginary part of 1/(pulsatance*complex_impedance)
 % or can be obtained in the same way with Joutphase/(pulsatance*deltaV)
-cap = sin(J_phase) ./ (pulsatance_matrix .* impedance);
+cap = sin(J_phase) ./ (pulsatance_matrix .* impedance_abs);
 
-impedance_idrift = -deltaV ./ J_idrift_amp; % J_amp is in amperes
-impedance_idrift_re = impedance_idrift .* cos(J_idrift_phase); % this is the resistance
-impedance_idrift_im = impedance_idrift .* sin(J_idrift_phase);
-cap_idrift = sin(J_idrift_phase) ./ (pulsatance_matrix .* impedance_idrift);
+impedance_i_abs = -deltaV ./ J_i_amp; % J_amp is in amperes
+impedance_i_re = impedance_i_abs .* cos(J_i_phase); % this is the resistance
+impedance_i_im = impedance_i_abs .* sin(J_i_phase);
+cap_idrift = sin(J_i_phase) ./ (pulsatance_matrix .* impedance_i_abs);
 
 % save results, this struct is similar to ISstep_struct in terms of fields,
 % but the columns and rows in the fields can be different
@@ -176,15 +176,17 @@ ISwave_struct.sun_index = sun_index;
 ISwave_struct.J_bias = J_bias;
 ISwave_struct.J_amp = J_amp;
 ISwave_struct.J_phase = J_phase;
-ISwave_struct.J_idrift_bias = J_idrift_bias;
-ISwave_struct.J_idrift_amp = J_idrift_amp;
-ISwave_struct.J_idrift_phase = J_idrift_phase;
+ISwave_struct.J_i_bias = J_i_bias;
+ISwave_struct.J_i_amp = J_i_amp;
+ISwave_struct.J_i_phase = J_i_phase;
 ISwave_struct.cap = cap;
+ISwave_struct.impedance_abs = impedance_abs;
 ISwave_struct.impedance_im = impedance_im;
 ISwave_struct.impedance_re = impedance_re;
 ISwave_struct.cap_idrift = cap_idrift;
-ISwave_struct.impedance_idrift_im = impedance_idrift_im;
-ISwave_struct.impedance_idrift_re = impedance_idrift_re;
+ISwave_struct.impedance_i_abs = impedance_i_abs;
+ISwave_struct.impedance_i_im = impedance_i_im;
+ISwave_struct.impedance_i_re = impedance_i_re;
 if save_result
     assignin('base', ['ISwave_' output_name], ISwave_struct);
 end
