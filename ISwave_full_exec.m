@@ -34,8 +34,8 @@ Int_array = logspace(log10(startInt), log10(endInt), Int_points);
 Int_array = [Int_array, 0];
 % anyway dark gives strange results
 
-% Int_array = unique(Int_array); % remove duplicates
-% Int_array = sort(Int_array, 'descend'); % from high intensity to low
+Int_array = unique(Int_array); % remove duplicates, useful just in case dark is selected as the only illumination condition from input options
+Int_array = sort(Int_array, 'descend'); % from high intensity to low, needed by changelight in case also dark is included, otherwise logspace from zero to something breaks
 
 % define frequency values
 Freq_array = logspace(log10(startFreq), log10(endFreq), Freq_points);
