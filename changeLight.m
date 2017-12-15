@@ -13,7 +13,8 @@ if tmax
     p.tmax = tmax;
 else
     if p.mui
-        p.tmax = 2^(-log10(p.mui)) / 10;
+        p.tmax = 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i));
+
     else
         p.tmax = 2^(-log10(p.mue_i));
     end
