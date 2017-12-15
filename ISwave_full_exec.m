@@ -94,6 +94,7 @@ for i = 1:length(Int_array)
         sol_i_Int.params.muh_p = 0;
         sol_i_Int.params.mue_n = 0;
         sol_i_Int.params.muh_n = 0;
+        sol_i_Int.params.Int = 0;
     end 
     parfor (j = 1:length(Freq_array), parforArg)
         sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, RelTol); % do IS
