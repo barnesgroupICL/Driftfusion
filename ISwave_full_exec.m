@@ -1,4 +1,4 @@
-function ISwave_struct = ISwave_full_exec(ssol_i_eq, ssol_i_light, startInt, endInt, Int_points, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, frozen_freecharges, calcJi, parallelize, save_solutions, save_results)
+function ISwave_struct = ISwave_full_exec(ssol_i_eq, ssol_i_light, startInt, endInt, Int_points, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, frozen_freecharges, calcJi, parallelize, save_solutions, save_result)
 % do Impedance Spectroscopy (IS) in a range of background light intensities
 % applying an oscillating voltage
 
@@ -184,7 +184,7 @@ ISwave_struct.impedance_re = impedance_re;
 ISwave_struct.cap_idrift = cap_idrift;
 ISwave_struct.impedance_idrift_im = impedance_idrift_im;
 ISwave_struct.impedance_idrift_re = impedance_idrift_re;
-if save_results
+if save_result
     assignin('base', ['ISwave_' output_name], ISwave_struct);
 end
 
