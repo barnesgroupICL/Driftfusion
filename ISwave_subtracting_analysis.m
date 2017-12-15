@@ -1,4 +1,4 @@
-function [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t, Ji_disp] = ISwave_subtracting_analysis(sol_i_Int_ISwave)
+function [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(sol_i_Int_ISwave)
 % calculate the charge excess in device under illumination compared with
 % the previous time point and express this as a current, for impedance
 % spectroscopy with oscillating voltage, this is used as a reference for
@@ -10,12 +10,8 @@ s = sol_i_Int_ISwave;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % select x points in each layer
 
-% p-type points logical array
-%ptype_points = (s.x <= s.params.tp);
 % Intrinsic points logical array
-itype_points= (s.x > s.params.tp & s.x < s.params.tp + s.params.ti);
-% n-type points logical array
-%ntype_points = (s.x >= s.params.tp + s.params.ti & s.x <= s.params.tp + s.params.ti + s.params.tn);
+itype_points= (s.x >= s.params.tp & s.x <= s.params.tp + s.params.ti);
 
 % make a new matrix subtracting from each profile at a time point the
 % profile at the previous time point, the resulting rows will be one row
@@ -46,21 +42,11 @@ i_delta_reflex_matrix(:, x_center_index:end) = -i_delta_reflex_matrix(:, x_cente
 % dividing by two for not counting twice each ion (once from where it left and once for where it arrived)
 i_delta_t = transpose(trapz(s.x, i_delta_reflex_matrix, 2) / 2);
 
-% subtract background ion concentration, for having less noise in trapz
-i_matrix = s.sol(:, :, 3) - s.params.NI;
-% calculate electric field due to ions in the middle of the material (no reason for taking the middle)
-% Efield_i_middle = s.params.e * trapz(s.x(1:x_center_index), i_matrix(:, 1:x_center_index), 2) / s.params.eppi;
-Efield_i = s.params.e * cumtrapz(s.x, i_matrix, 2) / s.params.eppi;
-Efield_i_mean = mean(Efield_i(:, itype_points), 2);
-
-Ji_disp = s.params.eppi * gradient(Efield_i_mean, s.t); % in Amperes
-
 % sum of the absolute delta ions profile over thickness, obtain a point
 % for each time, this is equivalent of a total current due to ions
 % displacing
 % dividing by two for not counting twice each ion (once from where it left and once for where it arrived)
 i_delta_abs_t = transpose(trapz(s.x, i_delta_abs_matrix, 2) / 2);
-
 
 % sum of the electrons just in the intrinsic layer, obtain a point for each time
 n_delta_intr_t = transpose(trapz(s.x(itype_points), n_delta_matrix(:, itype_points), 2));
