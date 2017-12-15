@@ -19,19 +19,19 @@ fit_t = s.t(fit_t_index:end);
 fit_J = s.Jtotr(fit_t_index:end) / 1000; % in Ampere
 fit_coeff = ISwave_single_fit(fit_t, fit_J, s.params.J_func);
 
-% Intrinsic points logical array
-itype_points= (s.x >= s.params.tp & s.x <= s.params.tp + s.params.ti);
-% subtract background ion concentration, for having less noise in trapz
-i_matrix = s.sol(:, :, 3) - s.params.NI;
-% calculate electric field due to ions
-Efield_i = s.params.e * cumtrapz(s.x, i_matrix, 2) / s.params.eppi;
-% an average would be enough if the spatial mesh was homogeneous in the
-% intrinsic, indeed I have to use trapz for considering the spatial mesh
-Efield_i_mean = trapz(s.x(itype_points), Efield_i(:, itype_points), 2) / s.params.ti;
-% calculate displacement current due to ions
-Ji_disp = s.params.eppi * gradient(Efield_i_mean, s.t); % in Amperes
-
 if s.params.mui % if there was ion mobility, current due to ions have been calculated, fit it
+    % Intrinsic points logical array
+    itype_points= (s.x >= s.params.tp & s.x <= s.params.tp + s.params.ti);
+    % subtract background ion concentration, for having less noise in trapz
+    i_matrix = s.sol(:, :, 3) - s.params.NI;
+    % calculate electric field due to ions
+    Efield_i = s.params.e * cumtrapz(s.x, i_matrix, 2) / s.params.eppi;
+    % an average would be enough if the spatial mesh was homogeneous in the
+    % intrinsic, indeed I have to use trapz for considering the spatial mesh
+    Efield_i_mean = trapz(s.x(itype_points), Efield_i(:, itype_points), 2) / s.params.ti;
+    % calculate displacement current due to ions
+    Ji_disp = s.params.eppi * gradient(Efield_i_mean, s.t); % in Amperes
+
     fit_Ji = Ji_disp(fit_t_index:end); % in Ampere
     fit_i_coeff = ISwave_single_fit(fit_t, fit_Ji, s.params.J_func);
 else
@@ -70,16 +70,19 @@ if ~minimal_mode % disable all this stuff if under parallelization
         plot(s.t, s.Jdispr / 1000); % Ampere
         plot(s.t(2:end), subtracting_n_intr_t);
         plot(s.t(2:end), subtracting_n_contacts_t);
-        plot(s.t(2:end), subtracting_i_abs_t);
-        plot(s.t(2:end), subtracting_i_t);
-        plot(s.t, Ji_disp);
         plot(fit_t, s.params.J_func(fit_coeff, fit_t), 'g')
         plot(fit_t, J_outphase, 'r')
-        legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Displaced ions abs", "Displaced ions", "Disp Curr Ions", "Fit", "Out of Phase Current"];
-        if max(s.params.Jpoints) % if the ionic drift has been calculated (that value is different from zero)
-            plot(s.t, s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
-            plot(fit_t, s.params.J_func(fit_i_coeff, fit_t), 'g--');
-            legend_array = [legend_array, "Ionic drift", "Ion drift fit"];
+        legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Fit", "Out of Phase Current"];
+        if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
+            plot(s.t(2:end), subtracting_i_abs_t);
+            plot(s.t(2:end), subtracting_i_t);
+            plot(s.t, Ji_disp);
+            legend_array = [legend_array, "Displaced ions abs", "Displaced ions", "Disp Curr Ions"];
+            if max(s.params.Jpoints) % if the ionic drift has been calculated (that value is different from zero)
+                plot(s.t, s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
+                plot(fit_t, s.params.J_func(fit_i_coeff, fit_t), 'g--');
+                legend_array = [legend_array, "Ionic drift", "Ion drift fit"];
+            end
         end
         ylabel('Current [A/cm2]');
         hold off
