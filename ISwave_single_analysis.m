@@ -17,7 +17,7 @@ periods = round(s.params.tmax * s.params.Vapp_params(4) / (2 * pi));
 fit_t_index = round((s.params.tpoints - 1) * round(periods * 0.5) / periods);
 fit_t = s.t(fit_t_index:end);
 fit_J = s.Jtotr(fit_t_index:end) / 1000; % in Ampere
-fit_coeff = ISwave_single_fit(fit_t, fit_J, s.params.J_func);
+fit_coeff = ISwave_single_fit(fit_t, fit_J, s.params.J_E_func);
 
 if s.params.mui % if there was ion mobility, current due to ions have been calculated, fit it
     % Intrinsic points logical array
@@ -33,7 +33,7 @@ if s.params.mui % if there was ion mobility, current due to ions have been calcu
     Ji_disp = s.params.eppi * gradient(Efield_i_mean, s.t); % in Amperes
 
     fit_Ji = Ji_disp(fit_t_index:end); % in Ampere
-    fit_i_coeff = ISwave_single_fit(fit_t, fit_Ji, s.params.J_func);
+    fit_i_coeff = ISwave_single_fit(fit_t, fit_Ji, s.params.J_E_func);
 else
     fit_i_coeff = [NaN, NaN, NaN];
 end
@@ -54,7 +54,7 @@ if ~minimal_mode % disable all this stuff if under parallelization
     J_bias = fit_coeff(1);
     J_amp = fit_coeff(2);
     J_bias_outphase = J_bias * J_amp_outphase / J_amp;
-    J_outphase = s.params.J_func([J_bias_outphase, J_amp_outphase, pi/2], fit_t);
+    J_outphase = s.params.J_E_func([J_bias_outphase, J_amp_outphase, pi/2], fit_t);
 
     % fourth value of Vapp_params is pulsatance
     figure('Name', ['Single ISwave, Int ' num2str(s.params.Int) ' Freq ' num2str(s.params.Vapp_params(4) / (2 * pi))], 'NumberTitle', 'off');
@@ -70,18 +70,18 @@ if ~minimal_mode % disable all this stuff if under parallelization
         plot(s.t, s.Jdispr / 1000); % Ampere
         plot(s.t(2:end), subtracting_n_intr_t);
         plot(s.t(2:end), subtracting_n_contacts_t);
-        plot(fit_t, s.params.J_func(fit_coeff, fit_t), 'g')
+        plot(fit_t, s.params.J_E_func(fit_coeff, fit_t), 'g')
         plot(fit_t, J_outphase, 'r')
         legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Fit", "Out of Phase Current"];
         if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             plot(s.t(2:end), subtracting_i_abs_t);
             plot(s.t(2:end), subtracting_i_t);
             plot(s.t, Ji_disp);
-            legend_array = [legend_array, "Displaced ions abs", "Displaced ions", "Disp Curr Ions"];
+            plot(fit_t, s.params.J_E_func(fit_i_coeff, fit_t), 'g--');
+            legend_array = [legend_array, "Displaced ions abs", "Displaced ions", "Disp J Ions", "Disp J Ions fit"];
             if max(s.params.Jpoints) % if the ionic drift has been calculated (that value is different from zero)
                 plot(s.t, s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
-                plot(fit_t, s.params.J_func(fit_i_coeff, fit_t), 'g--');
-                legend_array = [legend_array, "Ionic drift", "Ion drift fit"];
+                legend_array = [legend_array, "Ionic drift"];
             end
         end
         ylabel('Current [A/cm2]');
