@@ -97,8 +97,9 @@ for i = 1:length(Int_array)
         sol_i_Int.params.Int = 0;
     end 
     parfor (j = 1:length(Freq_array), parforArg)
-        sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, RelTol); % do IS
-        if save_solutions && ~parallelize
+        tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
+        sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
+        if save_solutions && ~parallelize % assignin cannot be used in a parallel loop, so single solutions cannot be saved
             sol_i_Int_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
             sol_name = matlab.lang.makeValidName([output_name '_Int_' num2str(Int_array(i)) '_Freq_' num2str(Freq_array(j)) '_ISwave']);
             assignin('base', sol_name, sol_i_Int_ISwave);
@@ -107,15 +108,15 @@ for i = 1:length(Int_array)
         % if phase is small or negative, double check increasing accuracy of the solver
         if fit_coeff(3) < 0.03
             disp('ISwave_full_exec - Fitted phase is very small or negative, double checking with higher solver accuracy')
-            newRelTol = RelTol / 100;
-            sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, newRelTol); % do IS
+            tempRelTol = tempRelTol / 100;
+            sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave, parallelize); % repeat analysis on new solution
         end
         % if the phase is negative even with the new accuracy, check again
         if fit_coeff(3) < 0.003
             disp('ISwave_full_exec - Fitted phase is extremely small, increasing solver accuracy again')
-            newRelTol = newRelTol / 100;
-            sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, newRelTol); % do IS
+            tempRelTol = tempRelTol / 100;
+            sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave, parallelize); % repeat analysis on new solution
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
