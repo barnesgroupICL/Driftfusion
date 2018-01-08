@@ -162,6 +162,10 @@ pthtl = ni*exp((Ei-Ethtl)/(kB*T));     % Density of VB holes when Fermi level at
 % m=2 spherical polar coordinates).
 m = 0;
 
+% Define the default relative tolerance for the pdepe solver
+% 1e-3 is the default, can be decreased if needed
+RelTol = 1e-3;
+
 % Space Charge Region- initial guess required with trial and error better
 % than analytical solution
 wp = 25e-7;  %((-ti*NA*q) + ((NA^0.5)*(q^0.5)*(((ti^2)*NA*q) + (4*eppi*Vbi))^0.5))/(2*NA*q);
