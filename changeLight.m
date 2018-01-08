@@ -14,7 +14,6 @@ if tmax
 else
     if p.mui
         p.tmax = 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i));
-
     else
         p.tmax = 2^(-log10(p.mue_i));
     end
@@ -48,4 +47,5 @@ end
 warning('on','pindrift:verifyStabilization');
 
 % just repeat the last one, for sake of paranoia yeee
-sol_Int = pindrift(sol_Int, sol_Int.params);
+disp(['changeLight - Stabilizing over ' num2str(p.tmax) ' s']);
+sol_Int = pindrift(sol_Int, p);
