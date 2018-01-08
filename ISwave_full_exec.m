@@ -15,15 +15,18 @@ ssol_i_eq.params.figson = 0;
 % taken from https://stackoverflow.com/questions/8488758/inhibit-matlab-window-focus-stealing
 set(0, 'DefaultFigureVisible', 'off');
 
-tmesh_type = 1;
-periods = 10; % the current looks reproducible already after few oscillations, this could be set in an automatic way
+tmesh_type = 1; % linear time mesh, 'cause here we're not interested in a decay, but in a oscillation going on during the whole simulated timespan
+
+% number of complete oscillation periods to simulate
+% the current looks reproducible already after few oscillations, this could be set in an automatic way
+periods = 10;
 
 % for having a meaningful output from verifyStabilization, here use a
 % number of tpoints which is 1 + a multiple of 4 * periods
 tpoints = 1 + 10 * 4 * periods; % gets redefined by changeLight, so re-setting is needed
 
-% default pdepe tolerance is 1e-3, in case of small phase, RelTol is
-% used instead
+% default pdepe tolerance is 1e-3, for having an accurate phase from the
+% fitting, improving the tollerance is useful
 RelTol = 1e-4;
 
 % define light intensity values, always decreasing
@@ -59,12 +62,12 @@ else
   parforArg = 0;
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % do a serie of IS measurements
 disp('ISwave_full_exec - Doing the IS at various light intensities');
 % set zero time for stabilization tmax, so changeLight will determine a good one
 changeLight_tmax = 0;
 
-tic
 for i = 1:length(Int_array)
     if frozen_ions
         ssol_i_Int.params.mui = original_p.mui; % reset default value of ion mobility in case frozen_ions option was used
@@ -131,7 +134,6 @@ for i = 1:length(Int_array)
         tmax_matrix(i,j) = sol_i_Int_ISwave.params.tmax;
     end
 end
-toc
 
 sun_index = find(Int_array == 1); % could used for plotting... maybe...
 
