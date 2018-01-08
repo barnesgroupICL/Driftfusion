@@ -1,4 +1,4 @@
-function ISwave_struct = ISwave_full_exec(ssol_i_eq, ssol_i_light, startInt, endInt, Int_points, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, frozen_freecharges, calcJi, parallelize, save_solutions, save_result)
+function ISwave_struct = ISwave_full_exec(ssol_i_eq, ssol_i_light, startInt, endInt, Int_points, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_result)
 % do Impedance Spectroscopy (IS) in a range of background light intensities
 % applying an oscillating voltage
 
@@ -72,14 +72,6 @@ for i = 1:length(Int_array)
     if frozen_ions
         ssol_i_Int.params.mui = original_p.mui; % reset default value of ion mobility in case frozen_ions option was used
     end
-    if frozen_freecharges
-        sol_i_Int.params.mue_i = original_p.mue_i; % electron mobility in intrinsic
-        sol_i_Int.params.muh_i = original_p.muh_i; % hole mobility in intrinsic
-        sol_i_Int.params.mue_p = original_p.mue_p;
-        sol_i_Int.params.muh_p = original_p.muh_p;
-        sol_i_Int.params.mue_n = original_p.mue_n;
-        sol_i_Int.params.muh_n = original_p.muh_n;
-    end
     if Int_array(i) % in dark use the ssol_i_eq solution, needed for no ions case where changeLight cannot reach dark
         ssol_i_Int = changeLight(ssol_i_Int, Int_array(i), changeLight_tmax); % decrease light intensity, on the symmetrical solution
         changeLight_tmax = ssol_i_Int.params.tmax / 2; % time to use for next iteration
@@ -90,15 +82,6 @@ for i = 1:length(Int_array)
     if frozen_ions
         sol_i_Int.params.mui = 0; % if frozen_ions, freezing ions
     end
-    if frozen_freecharges
-        sol_i_Int.params.mue_i = 0; % electron mobility in intrinsic
-        sol_i_Int.params.muh_i = 0; % hole mobility in intrinsic
-        sol_i_Int.params.mue_p = 0;
-        sol_i_Int.params.muh_p = 0;
-        sol_i_Int.params.mue_n = 0;
-        sol_i_Int.params.muh_n = 0;
-        sol_i_Int.params.Int = 0;
-    end 
     parfor (j = 1:length(Freq_array), parforArg)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
         sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
