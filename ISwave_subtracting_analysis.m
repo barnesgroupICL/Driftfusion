@@ -1,11 +1,11 @@
-function [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(sol_i_Int_ISwave)
+function [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(asymstr_ISwave)
 % calculate the charge excess in device under illumination compared with
 % the previous time point and express this as a current, for impedance
 % spectroscopy with oscillating voltage, this is used as a reference for
 % Impedance Spectroscopy and for separating the ionic contribution
 
 % evil shortcut
-s = sol_i_Int_ISwave;
+s = asymstr_ISwave;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % select x points in each layer

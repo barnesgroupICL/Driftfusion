@@ -1,16 +1,16 @@
-function ISwave_struct = ISwave_full_exec(ssol_i_eq, ssol_i_light, startInt, endInt, Int_points, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_result)
+function ISwave_struct = ISwave_full_exec(symstr_eq, symstr_light, startInt, endInt, Int_points, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_result)
 % do Impedance Spectroscopy (IS) in a range of background light intensities
 % applying an oscillating voltage
 
-ssol_i_Int = ssol_i_light;
+symstr_Int = symstr_light;
 output_name = inputname(1);
 
 % in case ions should be frozen during IS, set the mobility to zero after stabilization at new light intensity
-original_p = ssol_i_Int.params;
+original_p = symstr_Int.params;
 
 % decrease annoiance by figures popping up
-ssol_i_Int.params.figson = 0;
-ssol_i_eq.params.figson = 0;
+symstr_Int.params.figson = 0;
+symstr_eq.params.figson = 0;
 % don't display figures until the end of the script, as they steal the focus
 % taken from https://stackoverflow.com/questions/8488758/inhibit-matlab-window-focus-stealing
 set(0, 'DefaultFigureVisible', 'off');
@@ -33,7 +33,7 @@ RelTol = 1e-4;
 Int_array = logspace(log10(startInt), log10(endInt), Int_points);
 
 % in certain cases (e.g. no ions moving) dark takes too long to reach
-% stability, so ssol_i_eq is used
+% stability, so symstr_eq is used
 Int_array = [Int_array, 0];
 % anyway dark gives strange results
 
@@ -70,40 +70,40 @@ changeLight_tmax = 0;
 
 for i = 1:length(Int_array)
     if frozen_ions
-        ssol_i_Int.params.mui = original_p.mui; % reset default value of ion mobility in case frozen_ions option was used
+        symstr_Int.params.mui = original_p.mui; % reset default value of ion mobility in case frozen_ions option was used
     end
-    if Int_array(i) % in dark use the ssol_i_eq solution, needed for no ions case where changeLight cannot reach dark
-        ssol_i_Int = changeLight(ssol_i_Int, Int_array(i), changeLight_tmax); % decrease light intensity, on the symmetrical solution
-        changeLight_tmax = ssol_i_Int.params.tmax / 2; % time to use for next iteration
+    if Int_array(i) % in dark use the symstr_eq solution, needed for no ions case where changeLight cannot reach dark
+        symstr_Int = changeLight(symstr_Int, Int_array(i), changeLight_tmax); % decrease light intensity, on the symmetrical solution
+        changeLight_tmax = symstr_Int.params.tmax / 2; % time to use for next iteration
     else
-        ssol_i_Int = ssol_i_eq;
+        symstr_Int = symstr_eq;
     end
-    [sol_i_Int, Voc_array(i)] = asymmetricize(ssol_i_Int, BC); % normal BC 1 should work, also BC 2 can be employed
+    [asymstr_Int, Voc_array(i)] = asymmetricize(symstr_Int, BC); % normal BC 1 should work, also BC 2 can be employed
     if frozen_ions
-        sol_i_Int.params.mui = 0; % if frozen_ions, freezing ions
+        asymstr_Int.params.mui = 0; % if frozen_ions, freezing ions
     end
     parfor (j = 1:length(Freq_array), parforArg)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
-        sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
+        asymstr_ISwave = ISwave_single_exec(asymstr_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
         if save_solutions && ~parallelize % assignin cannot be used in a parallel loop, so single solutions cannot be saved
-            sol_i_Int_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
+            asymstr_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
             sol_name = matlab.lang.makeValidName([output_name '_Int_' num2str(Int_array(i)) '_Freq_' num2str(Freq_array(j)) '_ISwave']);
-            assignin('base', sol_name, sol_i_Int_ISwave);
+            assignin('base', sol_name, asymstr_ISwave);
         end
-        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave, parallelize); % extract parameters and do plot
+        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstr_ISwave, parallelize); % extract parameters and do plot
         % if phase is small or negative, double check increasing accuracy of the solver
         if fit_coeff(3) < 0.03
             disp('ISwave_full_exec - Fitted phase is very small or negative, double checking with higher solver accuracy')
             tempRelTol = tempRelTol / 100;
-            sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave, parallelize); % repeat analysis on new solution
+            asymstr_ISwave = ISwave_single_exec(asymstr_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstr_ISwave, parallelize); % repeat analysis on new solution
         end
         % if the phase is negative even with the new accuracy, check again
         if fit_coeff(3) < 0.003
             disp('ISwave_full_exec - Fitted phase is extremely small, increasing solver accuracy again')
             tempRelTol = tempRelTol / 100;
-            sol_i_Int_ISwave = ISwave_single_exec(sol_i_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(sol_i_Int_ISwave, parallelize); % repeat analysis on new solution
+            asymstr_ISwave = ISwave_single_exec(asymstr_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstr_ISwave, parallelize); % repeat analysis on new solution
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
         J_amp(i, j) = fit_coeff(2);
@@ -114,7 +114,7 @@ for i = 1:length(Int_array)
 
         % as the number of periods is fixed, there's no need for tmax to be
         % a matrix, but this could change, so it's a matrix
-        tmax_matrix(i,j) = sol_i_Int_ISwave.params.tmax;
+        tmax_matrix(i,j) = asymstr_ISwave.params.tmax;
     end
 end
 

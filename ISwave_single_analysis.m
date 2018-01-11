@@ -1,4 +1,4 @@
-function [fit_coeff, fit_i_coeff, subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t, Ji_disp] = ISwave_single_analysis(sol_i_Int_ISwave, minimal_mode)
+function [fit_coeff, fit_i_coeff, subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t, Ji_disp] = ISwave_single_analysis(asymstr_ISwave, minimal_mode)
 % calculate impedance (reactance and resistance) and phase by impedance
 % spectroscopy with oscillating voltage
 
@@ -7,7 +7,7 @@ function [fit_coeff, fit_i_coeff, subtracting_n_t, subtracting_n_intr_t, subtrac
 % subtracting_analysis does not get launched
 
 % evil shortcut
-s = sol_i_Int_ISwave;
+s = asymstr_ISwave;
 
 % round should not be needed here
 % s.params.Vapp_params(4) should be pulsatance
@@ -40,7 +40,7 @@ end
 
 if ~minimal_mode % disable all this stuff if under parallelization
     
-    [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(sol_i_Int_ISwave);
+    [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(asymstr_ISwave);
 
     Vapp = s.params.Vapp_func(s.params.Vapp_params, s.t);
 
