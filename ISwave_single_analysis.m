@@ -36,6 +36,7 @@ if s.params.mui % if there was ion mobility, current due to ions have been calcu
     fit_i_coeff = ISwave_single_fit(fit_t, fit_Ji, s.params.J_E_func);
 else
     fit_i_coeff = [NaN, NaN, NaN];
+    Ji_disp = NaN;
 end
 
 if ~minimal_mode % disable all this stuff if under parallelization
