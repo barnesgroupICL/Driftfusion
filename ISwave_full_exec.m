@@ -64,7 +64,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % do a serie of IS measurements
-disp('ISwave_full_exec - Doing the IS at various light intensities');
+disp([mfilename ' - Doing the IS at various light intensities']);
 % set zero time for stabilization tmax, so changeLight will determine a good one
 changeLight_tmax = 0;
 
@@ -93,14 +93,14 @@ for i = 1:length(Int_array)
         [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstr_ISwave, parallelize); % extract parameters and do plot
         % if phase is small or negative, double check increasing accuracy of the solver
         if fit_coeff(3) < 0.03
-            disp('ISwave_full_exec - Fitted phase is very small or negative, double checking with higher solver accuracy')
+            disp([mfilename ' - Fitted phase is very small or negative, double checking with higher solver accuracy'])
             tempRelTol = tempRelTol / 100;
             asymstr_ISwave = ISwave_single_exec(asymstr_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstr_ISwave, parallelize); % repeat analysis on new solution
         end
         % if the phase is negative even with the new accuracy, check again
         if fit_coeff(3) < 0.003
-            disp('ISwave_full_exec - Fitted phase is extremely small, increasing solver accuracy again')
+            disp([mfilename ' - Fitted phase is extremely small, increasing solver accuracy again'])
             tempRelTol = tempRelTol / 100;
             asymstr_ISwave = ISwave_single_exec(asymstr_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstr_ISwave, parallelize); % repeat analysis on new solution

@@ -10,7 +10,7 @@ p.BC = BC; %
 % get the Voc value in the middle of the symmetrical solution at the final time step
 Voc = ssol.Voc(end);
 p.Vapp = Voc; % use potential value in the middle as new applied voltage, this is needed for BC 0
-disp(['asymmetricize - Symmetric solution voltage was ' num2str(Voc)])
+disp([mfilename ' - Symmetric solution voltage was ' num2str(Voc)])
 
 % p.calcJ = 2; % verify that we're at open circuit equivalent conditions, looking at the current
 
@@ -22,4 +22,4 @@ sol_ic.x = ssol.x(1:centerIndex); % providing just sol to pindrift is not enough
 % stabilize the divided solution
 sol = pindrift(sol_ic, p); % should already be stable...
 newVoc = sol.Efn(end) - sol.Efp(1);
-disp(['asymmetricize - Asymmetrized solution voltage is ' num2str(newVoc)])
+disp([mfilename ' - Asymmetrized solution voltage is ' num2str(newVoc)])

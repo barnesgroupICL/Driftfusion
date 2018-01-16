@@ -32,13 +32,13 @@ Int_array = logspace(log10(p.Int), log10(newInt), steps);
 % each step, so stabilization is not verified here
 % skip first value in the array as is the initial Int
 for i = 2:length(Int_array)
-    disp(['changeLight - Go from light intensity ' num2str(p.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(p.tmax) ' s'])
+    disp([mfilename ' - Go from light intensity ' num2str(p.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(p.tmax) ' s'])
     p.Int = Int_array(i); % set new light intensity
     sol_Int = pindrift(sol_Int, p);
 end
 
 while ~verifyStabilization(sol_Int.sol, sol_Int.t, 1e-8) % check stability in a strict way
-    disp(['changeLight - Stabilizing over ' num2str(p.tmax) ' s']);
+    disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
     sol_Int = pindrift(sol_Int, p);
     p.tmax = p.tmax * 10; % this change gets saved in sol_Int only if another cycle is performed
 end
@@ -47,5 +47,5 @@ end
 warning('on','pindrift:verifyStabilization');
 
 % just repeat the last one, for sake of paranoia yeee
-disp(['changeLight - Stabilizing over ' num2str(p.tmax) ' s']);
+disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
 sol_Int = pindrift(sol_Int, p);
