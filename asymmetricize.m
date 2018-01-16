@@ -14,6 +14,13 @@ disp([mfilename ' - Symmetric solution voltage was ' num2str(Voc)])
 
 % p.calcJ = 2; % verify that we're at open circuit equivalent conditions, looking at the current
 
+% set an initial time for stabilization tmax
+if p.mui
+    p.tmax = 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i));
+else
+    p.tmax = 2^(-log10(p.mue_i));
+end
+
 % halve the solution
 centerIndex = ceil(length(ssol.x) / 2); % get the index of the middle of the x mesh
 sol_ic.sol = ssol.sol(end, 1:centerIndex, :); % take the first spatial half of the matrix, at last time step
