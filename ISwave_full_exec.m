@@ -88,6 +88,7 @@ for i = 1:length(Int_array)
         if save_solutions && ~parallelize % assignin cannot be used in a parallel loop, so single solutions cannot be saved
             asymstr_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
             sol_name = matlab.lang.makeValidName([output_name '_Int_' num2str(Int_array(i)) '_Freq_' num2str(Freq_array(j)) '_ISwave']);
+            asymstr_ISwave.params.figson = 1;
             assignin('base', sol_name, asymstr_ISwave);
         end
         [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstr_ISwave, parallelize); % extract parameters and do plot
