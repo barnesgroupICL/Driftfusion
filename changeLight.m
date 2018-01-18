@@ -1,12 +1,12 @@
- function sol_Int = changeLight(sol, newInt, tmax)
+ function sol_Int = changeLight(struct, newInt, tmax)
 % stabilize at a new light intensity
 
-p = sol.params;
+p = struct.params;
 p.pulseon = 0;
 p.tmesh_type = 2;
 p.t0 = 1e-10;
 p.tpoints = 30;
-sol_Int = sol;
+sol_Int = struct;
 
 % set an initial time for stabilization tmax
 if tmax

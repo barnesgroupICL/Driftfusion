@@ -1,15 +1,15 @@
-function ISwave_struct = ISwave_full_exec(symstr_eq, symstr_light, startInt, endInt, Int_points, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_result)
+function ISwave_struct = ISwave_full_exec(symstruct_eq, symstruct_light, startInt, endInt, Int_points, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_result)
 % do Impedance Spectroscopy (IS) in a range of background light intensities
 % applying an oscillating voltage
 
-symstr_Int = symstr_light;
+symstruct_Int = symstruct_light;
 output_name = inputname(2);
 
 % in case ions should be frozen during IS, set the mobility to zero after stabilization at new light intensity
-original_p = symstr_Int.params;
+original_p = symstruct_Int.params;
 
 % decrease annoiance by figures popping up
-symstr_Int.params.figson = 0;
+symstruct_Int.params.figson = 0;
 % don't display figures until the end of the script, as they steal the focus
 % taken from https://stackoverflow.com/questions/8488758/inhibit-matlab-window-focus-stealing
 set(0, 'DefaultFigureVisible', 'off');
@@ -33,10 +33,10 @@ Int_array = logspace(log10(startInt), log10(endInt), Int_points);
 
 % if stabilized dark solution is provided in input, calculate the point at dark
 % conditions using that solution
-if isa(symstr_eq, 'struct') % dark calculation can be disabled using "false" as first command argument
+if isa(symstruct_eq, 'struct') % dark calculation can be disabled using "false" as first command argument
     Int_array = [Int_array, 0];
     % decrease annoiance by figures popping up
-    symstr_eq.params.figson = 0;
+    symstruct_eq.params.figson = 0;
 end
 % anyway dark gives strange results
 
@@ -73,41 +73,41 @@ changeLight_tmax = 0;
 
 for i = 1:length(Int_array)
     if frozen_ions
-        symstr_Int.params.mui = original_p.mui; % reset default value of ion mobility in case frozen_ions option was used
+        symstruct_Int.params.mui = original_p.mui; % reset default value of ion mobility in case frozen_ions option was used
     end
-    if Int_array(i) % in dark use the symstr_eq solution, needed for no ions case where changeLight cannot reach dark
-        symstr_Int = changeLight(symstr_Int, Int_array(i), changeLight_tmax); % decrease light intensity, on the symmetrical solution
-        changeLight_tmax = symstr_Int.params.tmax / 2; % time to use for next iteration
+    if Int_array(i) % in dark use the symstruct_eq solution, needed for no ions case where changeLight cannot reach dark
+        symstruct_Int = changeLight(symstruct_Int, Int_array(i), changeLight_tmax); % decrease light intensity, on the symmetrical solution
+        changeLight_tmax = symstruct_Int.params.tmax / 2; % time to use for next iteration
     else
-        symstr_Int = symstr_eq;
+        symstruct_Int = symstruct_eq;
     end
-    [asymstr_Int, Voc_array(i)] = asymmetricize(symstr_Int, BC); % normal BC 1 should work, also BC 2 can be employed
+    [asymstruct_Int, Voc_array(i)] = asymmetricize(symstruct_Int, BC); % normal BC 1 should work, also BC 2 can be employed
     if frozen_ions
-        asymstr_Int.params.mui = 0; % if frozen_ions, freezing ions
+        asymstruct_Int.params.mui = 0; % if frozen_ions, freezing ions
     end
     parfor (j = 1:length(Freq_array), parforArg)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
-        asymstr_ISwave = ISwave_single_exec(asymstr_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
+        asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
         if save_solutions && ~parallelize % assignin cannot be used in a parallel loop, so single solutions cannot be saved
-            asymstr_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
+            asymstruct_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
             sol_name = matlab.lang.makeValidName([output_name '_Int_' num2str(Int_array(i)) '_Freq_' num2str(Freq_array(j)) '_ISwave']);
-            asymstr_ISwave.params.figson = 1;
-            assignin('base', sol_name, asymstr_ISwave);
+            asymstruct_ISwave.params.figson = 1;
+            assignin('base', sol_name, asymstruct_ISwave);
         end
-        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstr_ISwave, parallelize); % extract parameters and do plot
+        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize); % extract parameters and do plot
         % if phase is small or negative, double check increasing accuracy of the solver
         if fit_coeff(3) < 0.03
             disp([mfilename ' - Fitted phase is very small or negative, double checking with higher solver accuracy'])
             tempRelTol = tempRelTol / 100;
-            asymstr_ISwave = ISwave_single_exec(asymstr_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstr_ISwave, parallelize); % repeat analysis on new solution
+            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize); % repeat analysis on new solution
         end
         % if the phase is negative even with the new accuracy, check again
         if fit_coeff(3) < 0.003
             disp([mfilename ' - Fitted phase is extremely small, increasing solver accuracy again'])
             tempRelTol = tempRelTol / 100;
-            asymstr_ISwave = ISwave_single_exec(asymstr_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstr_ISwave, parallelize); % repeat analysis on new solution
+            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize); % repeat analysis on new solution
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
         J_amp(i, j) = fit_coeff(2);
@@ -118,7 +118,7 @@ for i = 1:length(Int_array)
 
         % as the number of periods is fixed, there's no need for tmax to be
         % a matrix, but this could change, so it's a matrix
-        tmax_matrix(i,j) = asymstr_ISwave.params.tmax;
+        tmax_matrix(i,j) = asymstruct_ISwave.params.tmax;
     end
 end
 
