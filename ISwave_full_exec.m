@@ -10,7 +10,6 @@ original_p = symstr_Int.params;
 
 % decrease annoiance by figures popping up
 symstr_Int.params.figson = 0;
-symstr_eq.params.figson = 0;
 % don't display figures until the end of the script, as they steal the focus
 % taken from https://stackoverflow.com/questions/8488758/inhibit-matlab-window-focus-stealing
 set(0, 'DefaultFigureVisible', 'off');
@@ -32,9 +31,13 @@ RelTol = 1e-4;
 % define light intensity values, always decreasing
 Int_array = logspace(log10(startInt), log10(endInt), Int_points);
 
-% in certain cases (e.g. no ions moving) dark takes too long to reach
-% stability, so symstr_eq is used
-Int_array = [Int_array, 0];
+% if stabilized dark solution is provided in input, calculate the point at dark
+% conditions using that solution
+if isa(symstr_eq, 'struct') % dark calculation can be disabled using "false" as first command argument
+    Int_array = [Int_array, 0];
+    % decrease annoiance by figures popping up
+    symstr_eq.params.figson = 0;
+end
 % anyway dark gives strange results
 
 Int_array = unique(Int_array); % remove duplicates, useful just in case dark is selected as the only illumination condition from input options
