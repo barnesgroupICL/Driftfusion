@@ -3,7 +3,7 @@ function ISwave_struct = ISwave_full_exec(symstr_eq, symstr_light, startInt, end
 % applying an oscillating voltage
 
 symstr_Int = symstr_light;
-output_name = inputname(1);
+output_name = inputname(2);
 
 % in case ions should be frozen during IS, set the mobility to zero after stabilization at new light intensity
 original_p = symstr_Int.params;
@@ -152,7 +152,7 @@ cap_idrift = sin(J_i_phase) ./ (pulsatance_matrix .* impedance_i_abs);
 
 % save results, this struct is similar to ISstep_struct in terms of fields,
 % but the columns and rows in the fields can be different
-ISwave_struct.sol_name = inputname(1);
+ISwave_struct.sol_name = inputname(2);
 ISwave_struct.Voc = Voc_array;
 ISwave_struct.periods = periods;
 ISwave_struct.Freq = Freq_matrix;
