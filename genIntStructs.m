@@ -21,7 +21,7 @@ if isa(struct_eq, 'struct') % dark calculation can be disabled using "false" as 
 end
 
 % pre allocate
-structCell = cell(1, length(Int_array));
+structCell = cell(2, length(Int_array));
 
 existingVars = evalin('base', 'who');
 changeLight_tmax = false; % automatic tmax for the first run
@@ -38,6 +38,7 @@ for i = 1:length(Int_array)
     % in any case, stabilize at the new intensity
     struct_Int = changeLight(struct_Int, Int_array(i), changeLight_tmax); % change light intensity
     changeLight_tmax = struct_Int.params.tmax / 2; % time to use for next iteration
-    structCell{i} = struct_Int;
+    structCell{1, i} = struct_Int;
+    structCell{2, i} = name;
     assignin('base', name, struct_Int);
 end
