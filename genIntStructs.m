@@ -5,7 +5,7 @@ function structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, p
 %
 % Inputs:
 %   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions, or a logic false for not having the dark.
-%   STRUCT_LIGHT - a solution struct as created by PINDRIFT with illumination.
+%   STRUCT_LIGHT - a solution struct as created by PINDRIFT with 1 sun illumination.
 %   STARTINT - higher requested illumination.
 %   ENDINT - lower requested illumination.
 %   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
@@ -34,16 +34,11 @@ function structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, p
 
 %------------- BEGIN CODE --------------
 
-if endInt > startInt
-    warning('endInt should be smaller than startInt')
-end
-
 struct_Int = struct_light;
 
 % define light intensity values, always decreasing
 Int_array = logspace(log10(startInt), log10(endInt), points);
-Int_array = unique(Int_array, 'stable'); % remove duplicates (just in case of startInt equal to endInt) and do not change ordering
-
+Int_array = [Int_array, 1]; % 1 sun should always be included, it will be always provided in input as second argument
 % if stabilized dark solution is provided in input, calculate the point at dark
 % conditions using that solution
 if isa(struct_eq, 'struct') % dark calculation can be disabled using "false" as first command argument
@@ -51,6 +46,9 @@ if isa(struct_eq, 'struct') % dark calculation can be disabled using "false" as 
     % decrease annoiance by figures popping up
     struct_eq.params.figson = 0;
 end
+
+Int_array = unique(Int_array); % remove duplicates
+Int_array = sort(Int_array, 'descend'); % from high intensity to low, beware to not use changeLight for reaching dark as logspace to zero doesn't work
 
 % pre allocate
 structCell = cell(2, length(Int_array));
@@ -67,6 +65,8 @@ for i = 1:length(Int_array)
         struct_Int = struct_light;
     elseif ~Int_array(i)
         struct_Int = struct_eq;
+        % if none of the previous if conditions is true, just use the
+        % previously set struct_Int
     end
     % decrease annoiance by figures popping up
     struct_Int.params.figson = 0;
