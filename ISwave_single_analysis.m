@@ -68,18 +68,6 @@ if ~minimal_mode % disable all this stuff if under parallelization
 
     Vapp = s.params.Vapp_func(s.params.Vapp_params, s.t);
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % calculate current out of phase
-
-    % calculate amplitude of out of phase oscillation
-    J_amp_outphase = fit_coeff(2) * sin(fit_coeff(3));
-
-    % calculate bias of out of phase component as fraction of total J_bias
-    J_bias = fit_coeff(1);
-    J_amp = fit_coeff(2);
-    J_bias_outphase = J_bias * J_amp_outphase / J_amp;
-    J_outphase = s.params.J_E_func([J_bias_outphase, J_amp_outphase, pi/2], fit_t);
-
     % fourth value of Vapp_params is pulsatance
     figure('Name', ['Single ISwave, Int ' num2str(s.params.Int) ' Freq ' num2str(s.params.Vapp_params(4) / (2 * pi))], 'NumberTitle', 'off');
         yyaxis right
@@ -95,8 +83,7 @@ if ~minimal_mode % disable all this stuff if under parallelization
         plot(s.t(2:end), subtracting_n_intr_t);
         plot(s.t(2:end), subtracting_n_contacts_t);
         plot(fit_t, s.params.J_E_func(fit_coeff, fit_t), 'g')
-        plot(fit_t, J_outphase, 'r')
-        legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Fit", "Out of Phase Current"];
+        legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Fit"];
         if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             plot(s.t(2:end), subtracting_i_abs_t);
             plot(s.t(2:end), subtracting_i_t);
