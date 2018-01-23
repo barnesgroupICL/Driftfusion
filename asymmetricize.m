@@ -33,6 +33,7 @@ function [asymstruct, newVoc] = asymmetricize(symstruct, BC)
 p = symstruct.params;
 p.OC = 0; % without setting OC to 0 BC gets ignored, OC 0 is needed for the asymmetric solution
 p.BC = BC;
+p.tpoints = 5; % rough, just for re-stabilization at Vapp
 
 % get the Voc value in the middle of the symmetrical solution at the final time step
 Voc = symstruct.Voc(end);
