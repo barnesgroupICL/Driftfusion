@@ -87,7 +87,7 @@ for i = 1:length(Int_array)
     end
     parfor (j = 1:length(Freq_array), parforArg)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
-        asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
+        asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
         if save_solutions && ~parallelize % assignin cannot be used in a parallel loop, so single solutions cannot be saved
             asymstruct_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
             sol_name = matlab.lang.makeValidName([output_name '_Int_' num2str(Int_array(i)) '_Freq_' num2str(Freq_array(j)) '_ISwave']);
@@ -99,14 +99,14 @@ for i = 1:length(Int_array)
         if fit_coeff(3) < 0.03
             disp([mfilename ' - Fitted phase is very small or negative, double checking with higher solver accuracy'])
             tempRelTol = tempRelTol / 100;
-            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
+            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize); % repeat analysis on new solution
         end
         % if the phase is negative even with the new accuracy, check again
         if fit_coeff(3) < 0.003
             disp([mfilename ' - Fitted phase is extremely small, increasing solver accuracy again'])
             tempRelTol = tempRelTol / 100;
-            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, Voc_array(i), deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
+            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, Freq_array(j), periods, tmesh_type, tpoints, calcJi, tempRelTol); % do IS
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize); % repeat analysis on new solution
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
