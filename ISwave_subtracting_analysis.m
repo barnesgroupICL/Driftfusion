@@ -1,14 +1,38 @@
 function [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(asymstruct_ISwave)
-% calculate the charge excess in device under illumination compared with
-% the previous time point and express this as a current, for impedance
-% spectroscopy with oscillating voltage, this is used as a reference for
-% Impedance Spectroscopy and for separating the ionic contribution
+%ISWAVE_SUBTRACTING_ANALYSIS - Calculate the charge excess in a device
+% under illumination compared with the previous time point and express this
+% as a current, for Impedance Spectroscopy with oscillating voltage (ISwave)
+% This is used as a reference for IS and for separating the ionic contribution
+%
+% Syntax:  [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(asymstruct_ISwave)
+%
+% Inputs:
+%   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbated by an
+%     oscillating voltage, as generated from ISwave_single_exec
+%
+% Outputs:
+%
+%
+% Example:
+%   ISwave_subtracting_analysis(ISwave_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, 1e-4))
+%     extract reference values
+%
+% Other m-files required: none
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also ISwave_full_exec, ISwave_single_exec, ISwave_single_analysis.
+
+% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
+% Institute of Chemical Research of Catalonia (ICIQ)
+% Research Group Prof. Emilio Palomares
+% email address: iochesonome@gmail.com
+% October 2017; Last revision: January 2018
+
+%------------- BEGIN CODE --------------
 
 % evil shortcut
 s = asymstruct_ISwave;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% select x points in each layer
 
 % Intrinsic points logical array
 itype_points= (s.x >= s.params.tp & s.x <= s.params.tp + s.params.ti);
@@ -57,3 +81,5 @@ subtracting_i_abs_t = s.params.e * i_delta_abs_t ./ t_array; % convert from numb
 subtracting_i_t = s.params.e * i_delta_t ./ t_array; % convert from number of ions to charge per time point
 subtracting_n_intr_t = -s.params.e * n_delta_intr_t ./ t_array; % convert from number of electrons in the intrinsic to charge per time point
 subtracting_n_contacts_t = subtracting_n_t - subtracting_n_intr_t; % this is the same as actually doing the integral in the contacts
+
+%------------- END OF CODE --------------
