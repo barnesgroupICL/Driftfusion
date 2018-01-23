@@ -1,10 +1,33 @@
 function [fit_coeff, fit_i_coeff, subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t, Ji_disp] = ISwave_single_analysis(asymstruct_ISwave, minimal_mode)
-% calculate impedance (reactance and resistance) and phase by impedance
-% spectroscopy with oscillating voltage
+%ISWAVE_SINGLE_ANALYSIS - Calculate impedance (reactance and resistance) and phase by Impedance
+% Spectroscopy (ISwave) with oscillating voltage
+%
+% Syntax:  ISwave_single_analysis(asymstruct_ISwave, minimal_mode)
+%
+% Inputs:
+%   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbated by an
+%     oscillating voltage, as generated from ISwave_single_exec
+%   MINIMAL_MODE - logical, when true graphics does not get created and
+%     ISwave_subtracting_analysis does not get launched, useful when
+%     launched under parallelization
+%
+% Example:
+%   ISwave_single_analysis(ISwave_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, 1e-4), false)
+%     do plot
+%
+% Other m-files required: ISwave_subtracting_analysis
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also ISwave_full_exec, ISwave_single_exec, ISwave_subtracting_analysis.
 
-% when run in parallelization, minimal_mode is set so that graphics does
-% get created (they does not appear when under parallelization) and
-% subtracting_analysis does not get launched
+% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
+% Institute of Chemical Research of Catalonia (ICIQ)
+% Research Group Prof. Emilio Palomares
+% email address: iochesonome@gmail.com
+% October 2017; Last revision: January 2018
+
+%------------- BEGIN CODE --------------
 
 % evil shortcut
 s = asymstruct_ISwave;
@@ -85,7 +108,7 @@ if ~minimal_mode % disable all this stuff if under parallelization
                 legend_array = [legend_array, "Ionic drift"];
             end
         end
-        ylabel('Current [A/cm2]');
+        ylabel('Current [A/cm^2]');
         hold off
         xlabel('Time [s]');
         legend(legend_array);
@@ -98,3 +121,5 @@ else
     subtracting_i_t = NaN;
     Ji_disp = NaN;
 end
+
+%------------- END OF CODE --------------
