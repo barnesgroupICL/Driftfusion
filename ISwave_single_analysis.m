@@ -66,12 +66,14 @@ end
 %% plot solutions
 if ~minimal_mode % disable all this stuff if under parallelization
     
-    [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(asymstruct_ISwave);
+    [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t,...
+        subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(asymstruct_ISwave);
 
     Vapp = s.params.Vapp_func(s.params.Vapp_params, s.t);
 
     % fourth value of Vapp_params is pulsatance
-    figure('Name', ['Single ISwave, Int ' num2str(s.params.Int) ' Freq ' num2str(s.params.Vapp_params(4) / (2 * pi))], 'NumberTitle', 'off');
+    figure('Name', ['Single ISwave, Int ' num2str(s.params.Int) ' Freq '...
+        num2str(s.params.Vapp_params(4) / (2 * pi))], 'NumberTitle', 'off');
         yyaxis right
         hold off
         plot(s.t, Vapp);

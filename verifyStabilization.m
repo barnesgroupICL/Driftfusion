@@ -44,10 +44,12 @@ all_stable = true;
 
 % no need to calculate end_time for each of the 4 solutions: if they
 % break they break at the same time
-end_time = t_array(length(sol_matrix(:, 1, 1))); % using t(end) could get a time out of the solution when the computation broke before reaching the final time
+% using t(end) could get a time out of the solution when the computation broke before reaching the final time
+end_time = t_array(length(sol_matrix(:, 1, 1)));
 [~, time_index] = min(abs(t_array - time_fraction * end_time)); % get time mesh index at a specified percentage of maximum time reached
 
-for i = 1:length(sol_matrix(1, 1, :)) % for each component of the solution verify that didn't change significantly over the requested time
+% for each component of the solution verify that didn't change significantly over the requested time
+for i = 1:length(sol_matrix(1, 1, :))
     profile_at_time = sol_matrix(time_index, :, i); % take profile of values at a certain time of evolution
     profile_end = sol_matrix(end, :, i); % take profile of values at the end of time
     if log(i) % for variables ranging on huge scales comparing the log values makes more sense
@@ -60,7 +62,9 @@ for i = 1:length(sol_matrix(1, 1, :)) % for each component of the solution verif
     stable = difference <= threshold;
 
     if ~stable
-        warning('pindrift:verifyStabilization', 'Comparing final solutions at %s s and %s s showed that the %s distribution did not reach stability. Consider trying with a greater tmax.', num2str(t_array(time_index)), num2str(t_array(end)), names(i));
+        warning('pindrift:verifyStabilization',...
+            'Comparing final solutions at %s s and %s s showed that the %s distribution did not reach stability. Consider trying with a greater tmax.',...
+            num2str(t_array(time_index)), num2str(t_array(end)), names(i));
     end
     all_stable = all_stable && stable;
 end

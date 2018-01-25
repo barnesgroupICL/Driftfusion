@@ -42,7 +42,8 @@ itype_points= (s.x >= s.params.tp & s.x <= s.params.tp + s.params.ti);
 % less than the original solution matrix
 
 % for simulating a current, taking half of the abs is the right way
-% I divide by two 'cause otherwise I would calculate once the charge getting to the new place and another time the charge missing in the old place
+% I divide by two 'cause otherwise I would calculate once the charge
+% getting to the new place and another time the charge missing in the old place
 n_delta_matrix = s.sol(2:end, :, 1) - s.sol(1:end-1, :, 1);
 i_delta_matrix = s.sol(2:end, :, 3) - s.sol(1:end-1, :, 3);
 i_delta_abs_matrix = abs(s.sol(2:end, :, 3) - s.sol(1:end-1, :, 3)); % out of the intrinsic the difference is constantly zero
@@ -75,11 +76,16 @@ i_delta_abs_t = transpose(trapz(s.x, i_delta_abs_matrix, 2) / 2);
 % sum of the electrons just in the intrinsic layer, obtain a point for each time
 n_delta_intr_t = transpose(trapz(s.x(itype_points), n_delta_matrix(:, itype_points), 2));
 
-% dividing by time delta converts the output in a current
-subtracting_n_t = -s.params.e * n_delta_t ./ t_array; % convert from number of electrons to charge per time point
-subtracting_i_abs_t = s.params.e * i_delta_abs_t ./ t_array; % convert from number of ions to charge per time point
-subtracting_i_t = s.params.e * i_delta_t ./ t_array; % convert from number of ions to charge per time point
-subtracting_n_intr_t = -s.params.e * n_delta_intr_t ./ t_array; % convert from number of electrons in the intrinsic to charge per time point
-subtracting_n_contacts_t = subtracting_n_t - subtracting_n_intr_t; % this is the same as actually doing the integral in the contacts
+%% dividing by time delta converts the output in a current
+% convert from number of electrons to charge per time point
+subtracting_n_t = -s.params.e * n_delta_t ./ t_array;
+% convert from number of ions to charge per time point
+subtracting_i_abs_t = s.params.e * i_delta_abs_t ./ t_array;
+% convert from number of ions to charge per time point
+subtracting_i_t = s.params.e * i_delta_t ./ t_array;
+% convert from number of electrons in the intrinsic to charge per time point
+subtracting_n_intr_t = -s.params.e * n_delta_intr_t ./ t_array;
+% this is the same as actually doing the integral in the contacts
+subtracting_n_contacts_t = subtracting_n_t - subtracting_n_intr_t;
 
 %------------- END OF CODE --------------

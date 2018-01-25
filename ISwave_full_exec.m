@@ -123,24 +123,30 @@ for i = 1:length(symstructs(1, :))
     % will have to be replaced with for (j = 1:length(Freq_array))
     parfor (j = 1:length(Freq_array), parforArg)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
-        asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
+        asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV,...
+            Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
         % set ISwave_single_analysis minimal_mode is true if parallelize is true
-        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize); % extract parameters and do plot
+        % extract parameters and do plot
+        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize);
         % if phase is small or negative, double check increasing accuracy of the solver
         if fit_coeff(3) < 0.03
             disp([mfilename ' - Fitted phase is very small or negative, double checking with higher solver accuracy'])
             tempRelTol = tempRelTol / 100;
-            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
+            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC,...
+                deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize); % repeat analysis on new solution
+            % repeat analysis on new solution
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] =ISwave_single_analysis(asymstruct_ISwave, parallelize);
         end
         % if the phase is negative even with the new accuracy, check again
         if fit_coeff(3) < 0.003
             disp([mfilename ' - Fitted phase is extremely small, increasing solver accuracy again'])
             tempRelTol = tempRelTol / 100;
-            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
+            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC,...
+                deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize); % repeat analysis on new solution
+            % repeat analysis on new solution
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize);
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
         J_amp(i, j) = fit_coeff(2);
