@@ -114,11 +114,6 @@ for i = 1:length(symstructs(1, :))
     parfor (j = 1:length(Freq_array), parforArg)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
         asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
-        if save_solutions && ~parallelize % assignin cannot be used in a parallel loop, so single solutions cannot be saved
-            sol_name = matlab.lang.makeValidName([symstructs{2, i} '_Freq_' num2str(Freq_array(j)) '_ISwave']);
-            asymstruct_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
-            assignin('base', sol_name, asymstruct_ISwave);
-        end
         % set ISwave_single_analysis minimal_mode is true if parallelize is true
         [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize); % extract parameters and do plot
         % if phase is small or negative, double check increasing accuracy of the solver
@@ -147,6 +142,12 @@ for i = 1:length(symstructs(1, :))
         % as the number of periods is fixed, there's no need for tmax to be
         % a matrix, but this could change, so it's a matrix
         tmax_matrix(i,j) = asymstruct_ISwave.params.tmax;
+        
+        if save_solutions && ~parallelize % assignin cannot be used in a parallel loop, so single solutions cannot be saved
+            sol_name = matlab.lang.makeValidName([symstructs{2, i} '_Freq_' num2str(Freq_array(j)) '_ISwave']);
+            asymstruct_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
+            assignin('base', sol_name, asymstruct_ISwave);
+        end
     end
 end
 
