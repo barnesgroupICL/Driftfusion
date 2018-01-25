@@ -1,6 +1,56 @@
 function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_result)
-% do Impedance Spectroscopy (IS) in a range of background light intensities
-% applying an oscillating voltage
+%ISWAVE_FULL_EXEC - Do Impedance Spectroscopy approximated applying an
+% oscillating voltage (ISwave) in a range of background light intensities
+%
+% Syntax:  ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_result)
+%
+% Inputs:
+%   SYMSTRUCTS - can be a cell structure containing structs at various background
+%     light intensities. This can be generated using genIntStructs.
+%     Otherwise it can be a single struct as created by PINDRIFT.
+%   STARTFREQ - higher frequency limit
+%   ENDFREQ - lower frequency limit
+%   FREQ_POINTS - number of points to simulate between STARTFREQ and
+%     ENDFREQ
+%   DELTAV - voltage oscillation amplitude in volts, one mV should be enough
+%   BC - boundary conditions indicating if the contacts are selective, see
+%     PINDRIFT
+%   FROZEN_IONS - logical, after stabilization sets the mobility of
+%     ionic defects to zero
+%   CALCJI - logical, should if set the ionic current is calculated also in
+%     the middle of the intrinsic
+%   PARALLELIZE - use parallelization for simulating different frequencies
+%     at the same time, requires Parallel Computing Toolbox
+%   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
+%     workspace the calulated solutions of single ISstep perturbations
+%   SAVE_RESULTS - is a logic defining if to assing in volatile base
+%     workspace the most important results of the simulation
+%
+% Outputs:
+%   ISWAVE_STRUCT - a struct containing the most important results of the simulation
+%
+% Example:
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 0.1, 4), 1e9, 1e-2, 23, 1e-3, 1, false, false, false, true, true)
+%     calculate also with dark background, do not freeze ions, use a
+%     voltage oscillation amplitude of 1 mV, on 23 points from frequencies of 1 GHz to
+%     0.01 Hz, with selective contacts, without calculating ionic current,
+%     without parallelization
+%
+% Other m-files required: asymmetricize, ISwave_single_exec,
+%   ISwave_single_analysis, ISwave_full_analysis_nyquist,
+%   IS_full_analysis_vsfrequency
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also genIntStructs, pindrift, ISwave_single_exec, ISwave_full_analysis_nyquist, ISwave_single_analysis.
+
+% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
+% Institute of Chemical Research of Catalonia (ICIQ)
+% Research Group Prof. Emilio Palomares
+% email address: iochesonome@gmail.com  
+% October 2017; Last revision: January 2018
+
+%------------- BEGIN CODE --------------
 
 % in case a single struct is given in input, convert it to a cell structure
 % with just one cell
@@ -100,6 +150,8 @@ for i = 1:length(symstructs(1, :))
     end
 end
 
+%% calculate apparent capacity 
+
 sun_index = find(Int_array == 1); % could used for plotting... maybe...
 
 % even if here the frequency is always the same for each illumination, it
@@ -128,7 +180,9 @@ impedance_i_re = impedance_i_abs .* cos(J_i_phase); % this is the resistance
 impedance_i_im = impedance_i_abs .* sin(J_i_phase);
 cap_idrift = sin(J_i_phase) ./ (pulsatance_matrix .* impedance_i_abs);
 
-% save results, this struct is similar to ISstep_struct in terms of fields,
+%% save results
+
+% this struct is similar to ISstep_struct in terms of fields,
 % but the columns and rows in the fields can be different
 ISwave_struct.sol_name = symstructs{2, 1};
 ISwave_struct.Voc = Voc_array;
@@ -165,3 +219,5 @@ ISwave_full_analysis_nyquist(ISwave_struct);
 set(0, 'DefaultFigureVisible', 'on');
 figHandles = findall(groot, 'Type', 'figure');
 set(figHandles(:), 'visible', 'on')
+
+%------------- END OF CODE --------------
