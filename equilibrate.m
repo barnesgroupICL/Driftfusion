@@ -38,7 +38,9 @@ function [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_
 % Research Group Prof. Jenny Nelson
 % Institute of Chemical Research of Catalonia (ICIQ)
 % Research Group Prof. Emilio Palomares
-% email address: p.calado13@imperial.ac.uk, iochesonome@gmail.com  
+% email address: p.calado13@imperial.ac.uk, iochesonome@gmail.com
+% Supervised by: Dr. Piers Barnes, Prof. Jenny Nelson
+% Imperial College London
 % 2015; Last revision: January 2018
 
 %------------- BEGIN CODE --------------

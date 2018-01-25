@@ -21,7 +21,9 @@ function ISwave_full_analysis_nyquist(ISwave_struct)
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
 % Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com  
+% email address: iochesonome@gmail.com
+% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+% Imperial College London
 % October 2017; Last revision: January 2018
 
 %------------- BEGIN CODE --------------

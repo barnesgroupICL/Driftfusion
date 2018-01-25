@@ -27,6 +27,8 @@ function [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtr
 % Institute of Chemical Research of Catalonia (ICIQ)
 % Research Group Prof. Emilio Palomares
 % email address: iochesonome@gmail.com
+% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+% Imperial College London
 % October 2017; Last revision: January 2018
 
 %------------- BEGIN CODE --------------
