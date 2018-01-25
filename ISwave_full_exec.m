@@ -80,7 +80,16 @@ RelTol = 1e-4;
 % define frequency values
 Freq_array = logspace(log10(startFreq), log10(endFreq), Freq_points);
 
-% pre allocate arrays filling them with zeros
+% switch on or off the parallelization calculation of solution, when true
+% less pictures gets created and the solutions does not get saved in main
+% workspace
+if parallelize
+  parforArg = Inf;
+else
+  parforArg = 0;
+end
+
+%% pre allocate arrays filling them with zeros
 Voc_array = zeros(length(symstructs(1, :)));
 Int_array = Voc_array;
 tmax_matrix = zeros(length(symstructs(1, :)), length(Freq_array));
@@ -90,15 +99,6 @@ J_phase = tmax_matrix;
 J_i_bias = tmax_matrix;
 J_i_amp = tmax_matrix;
 J_i_phase = tmax_matrix;
-
-% switch on or off the parallelization calculation of solution, when true
-% less pictures gets created and the solutions does not get saved in main
-% workspace
-if parallelize
-  parforArg = Inf;
-else
-  parforArg = 0;
-end
 
 %% do a serie of IS measurements
 
@@ -111,6 +111,8 @@ for i = 1:length(symstructs(1, :))
     if frozen_ions
         asymstruct_Int.params.mui = 0; % if frozen_ions option is set, freezing ions
     end
+    % if Parallel Computing Toolbox is not available, the following line
+    % will have to be replaced with for (j = 1:length(Freq_array))
     parfor (j = 1:length(Freq_array), parforArg)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
         asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
@@ -213,6 +215,7 @@ if save_result
     assignin('base', ['ISwave_' symstructs{2, 1}], ISwave_struct);
 end
 
+%% plot results
 IS_full_analysis_vsfrequency(ISwave_struct);
 ISwave_full_analysis_nyquist(ISwave_struct);
 

@@ -56,6 +56,7 @@ structCell = cell(2, length(Int_array));
 existingVars = evalin('base', 'who');
 changeLight_tmax = false; % automatic tmax for the first run
 
+%% generate solutions
 for i = 1:length(Int_array)
     disp([mfilename ' - illumination intensity ' num2str(Int_array(i))])
     name = matlab.lang.makeValidName([inputname(2) '_Int_' num2str(Int_array(i))]);

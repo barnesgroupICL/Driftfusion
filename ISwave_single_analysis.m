@@ -42,6 +42,7 @@ fit_t = s.t(fit_t_index:end);
 fit_J = s.Jtotr(fit_t_index:end) / 1000; % in Ampere
 fit_coeff = ISwave_single_fit(fit_t, fit_J, s.params.J_E_func);
 
+%% calculate ionic contribution
 if s.params.mui % if there was ion mobility, current due to ions have been calculated, fit it
     % Intrinsic points logical array
     itype_points= (s.x >= s.params.tp & s.x <= s.params.tp + s.params.ti);
@@ -62,6 +63,7 @@ else
     Ji_disp = NaN;
 end
 
+%% plot solutions
 if ~minimal_mode % disable all this stuff if under parallelization
     
     [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(asymstruct_ISwave);

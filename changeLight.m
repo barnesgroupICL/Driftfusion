@@ -60,7 +60,8 @@ steps = 1 + ceil(abs(log10(newInt / p.Int)));
 % if the step is just one, then newInt is the output of logspace function
 Int_array = logspace(log10(p.Int), log10(newInt), steps);
 
-% change light in steps, not needed to reach a good stabilized solution in
+%% change light in steps
+% not needed to reach a good stabilized solution in
 % each step, so stabilization is not verified here
 % skip first value in the array as is the initial Int
 for i = 2:length(Int_array)
@@ -69,6 +70,7 @@ for i = 2:length(Int_array)
     struct_Int = pindrift(struct_Int, p);
 end
 
+%% stabilize
 while ~verifyStabilization(struct_Int.sol, struct_Int.t, 1e-8) % check stability in a strict way
     disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
     struct_Int = pindrift(struct_Int, p);
