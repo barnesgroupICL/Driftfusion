@@ -74,10 +74,11 @@ for i = 1:length(Int_array)
     % in any case (even the one not considered by the if), stabilize at the new intensity
     struct_Int = changeLight(struct_Int, Int_array(i), changeLight_tmax); % change light intensity
     changeLight_tmax = struct_Int.params.tmax / 2; % time to use for next iteration
-    structCell{1, i} = struct_Int;
-    structCell{2, i} = name;
+
     % restore figson before saving
     struct_Int.params.figson = 1;
+    structCell{1, i} = struct_Int;
+    structCell{2, i} = name;
     assignin('base', name, struct_Int);
 end
 
