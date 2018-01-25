@@ -83,21 +83,21 @@ if ~minimal_mode % disable all this stuff if under parallelization
 
         yyaxis left
         hold off
-        plot(s.t, s.Jtotr / 1000); % Ampere
+        plot(s.t, -s.Jtotr / 1000); % Ampere
         hold on
-        plot(s.t, s.Jdispr / 1000); % Ampere
-        plot(s.t(2:end), subtracting_n_intr_t);
-        plot(s.t(2:end), subtracting_n_contacts_t);
-        plot(fit_t, s.params.J_E_func(fit_coeff, fit_t), 'g')
+        plot(s.t, -s.Jdispr / 1000); % Ampere
+        plot(s.t(2:end), -subtracting_n_intr_t);
+        plot(s.t(2:end), -subtracting_n_contacts_t);
+        plot(fit_t, -s.params.J_E_func(fit_coeff, fit_t), 'g')
         legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Fit"];
         if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
-            plot(s.t(2:end), subtracting_i_abs_t);
-            plot(s.t(2:end), subtracting_i_t);
-            plot(s.t, Ji_disp);
-            plot(fit_t, s.params.J_E_func(fit_i_coeff, fit_t), 'g--');
+            plot(s.t(2:end), -subtracting_i_abs_t);
+            plot(s.t(2:end), -subtracting_i_t);
+            plot(s.t, -Ji_disp);
+            plot(fit_t, -s.params.J_E_func(fit_i_coeff, fit_t), 'g--');
             legend_array = [legend_array, "Displaced ions abs", "Displaced ions", "Disp J Ions", "Disp J Ions fit"];
             if max(s.params.Jpoints) % if the ionic drift has been calculated (that value is different from zero)
-                plot(s.t, s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
+                plot(s.t, -s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
                 legend_array = [legend_array, "Ionic drift"];
             end
         end
