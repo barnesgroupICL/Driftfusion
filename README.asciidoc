@@ -1,1 +1,222 @@
-ICL
+= DrIFtFUSION software
+
+See the headers of the .m files for complete documentation. Here just some key points are reported.
+
+== Generate stabilized solutions
+
+Needed .m files:
+
+* pindrift
+* pinParams
+* mobsetfun
+* verifyStabilization
+
+% Syntax:  [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_eq, ssol_i_light] = EQUILIBRATE(NAME)
+%
+% Outputs:
+%   sol_eq - short circuit in dark without mobile ionic defects
+%   sol_light - short circuit at 1 sun conditions without mobile ionic defects
+%   ssol_eq - open circuit in dark without mobile ionic defects
+%   ssol_light - open circuit at 1 sun conditions without mobile ionic defects
+%   sol_i_eq - short circuit in dark with mobile ionic defects
+%   sol_i_light - short circuit at 1 sun conditions with mobile ionic defects
+%   ssol_i_eq - open circuit in dark without mobile ionic defects
+%   ssol_i_light - open circuit at 1 sun conditions without mobile ionic defects
+
+>> equilibrate();
+
+== Generate a list of solutions at open circuit at various light intensities
+
+Needed .m files:
+
+* changeLight
+* verifyStabilization
+
+% Syntax:  structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
+%
+% Inputs:
+%   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions, or a logic false for not having the dark.
+%   STRUCT_LIGHT - a solution struct as created by PINDRIFT with 1 sun illumination.
+%   STARTINT - higher requested illumination.
+%   ENDINT - lower requested illumination.
+%   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
+%
+% Outputs:
+%   STRUCTCELL - a cell containing structs of solutions at various light
+%     intensities
+
+>> structs = genIntStructs(ssol_i_eq, ssol_i_light, 1e3, 1e-7, 23);
+
+== Transient PhotoVoltage simulation
+
+=== TPV with constant pulse intensity
+
+Needed .m files:
+
+* TPV_single_exec
+* TPV_single_analysis
+* pindrift
+* verifyStabilization
+* TPVconst_full_exec
+
+% Syntax:  TPV_struct = TPVconst_full_exec(SYMSTRUCTS, SAVE_SOLUTIONS, SAVE_RESULTS)
+%
+% Inputs:
+%   SYMSTRUCTS - can be a cell structure containing structs at various background
+%     light intensities. This can be generated using genIntStructs.
+%     Otherwise it can be a single struct as created by PINDRIFT.
+%   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
+%     workspace the calulated solutions of single TPV decays
+%   SAVE_RESULTS - is a logic defining if to assing in volatile base
+%     workspace the most important results of the simulation
+%
+% Outputs:
+%   TPV_STRUCT - a struct containing the most important results of the simulation
+
+>> TPV_struct = TPVconst_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 1e3, 1e-7, 23), true, true);
+
+=== TPV with pulse intensity adjusted for being in the small perturbation regime
+
+Needed .m files:
+
+* TPV_single_exec
+* TPV_single_analysis
+* pindrift
+* verifyStabilization
+* TPVvariab_full_exec
+
+% Syntax:  TPV_struct = TPVvariab_full_exec(SYMSTRUCTS, SAVE_SOLUTIONS, SAVE_RESULTS)
+%
+% Inputs:
+%   SYMSTRUCTS - can be a cell structure containing structs at various background
+%     light intensities. This can be generated using genIntStructs.
+%     Otherwise it can be a single struct as created by PINDRIFT.
+%   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
+%     workspace the calulated solutions of single TPV decays
+%   SAVE_RESULTS - is a logic defining if to assing in volatile base
+%     workspace the most important results of the simulation
+%
+% Outputs:
+%   TPV_STRUCT - a struct containing the most important results of the simulation
+
+>> TPV_struct = TPVvariab_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 1e3, 1e-7, 23), true, true);
+
+== Charge Extraction simulation
+
+Needed .m files:
+
+* CE_full_exec
+* CE_single_exec
+* CE_ISstep_single_analysis
+* CE_ISstep_subtracting_analysis
+* CE_full_fit
+* CE_full_analysis
+* pindrift
+* verifyStabilization
+* asymmetricize
+
+% Syntax:  CE_struct = CE_full_exec(symstructs, BC, save_solutions, save_results)
+%
+% Inputs:
+%   SYMSTRUCTS - can be a cell structure containing structs at various background
+%     light intensities. This can be generated using genIntStructs.
+%     Otherwise it can be a single struct as created by PINDRIFT.
+%   BC - boudary conditions to be used during open circuit stabilization
+%     and charge extraction
+%   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
+%     workspace the calulated solutions of single CE decays
+%   SAVE_RESULTS - is a logic defining if to assing in volatile base
+%     workspace the most important results of the simulation
+%
+% Outputs:
+%   CE_struct - a struct containing the most important results of the simulation
+
+>> CE_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 1e3, 1e-7, 23), 1, true, true);
+
+== Impedance Spectroscopy simulation
+
+=== IS approximated with a voltage step
+
+Needed .m files:
+
+* ISstep_full_exec
+* asymmetricize
+* ISstep_single_exec
+* CE_ISstep_single_analysis
+* CE_ISstep_subtracting_analysis
+* ISstep_full_analysis_vsvoltage
+* IS_full_analysis_vsfrequency
+* pindrift
+* verifyStabilization
+
+% Syntax:  ISstep_struct = ISstep_full_exec(symstructs, deltaV, BC, frozen_ions, save_solutions, save_results)
+%
+% Inputs:
+%   SYMSTRUCTS - can be a cell structure containing structs at various background
+%     light intensities. This can be generated using genIntStructs.
+%     Otherwise it can be a single struct as created by PINDRIFT.
+%   DELTAV - voltage step in volts, one mV should be enough
+%   BC - boundary conditions indicating if the contacts are selective, see
+%     PINDRIFT
+%   FROZEN_IONS - logical, after stabilization sets the mobility of
+%     ionic defects to zero
+%   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
+%     workspace the calulated solutions of single ISstep perturbations
+%   SAVE_RESULTS - is a logic defining if to assing in volatile base
+%     workspace the most important results of the simulation
+%
+% Outputs:
+%   ISSTEP_STRUCT - a struct containing the most important results of the simulation
+
+>> ISstep_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 1e3, 1e-7, 23), 1e-3, 1, false, true, true);
+
+=== IS applying an oscillating voltage
+
+Needed .m files:
+
+* ISwave_full_exec
+* asymmetricize
+* ISwave_single_exec
+* ISwave_single_analysis
+* ISwave_full_analysis_nyquist
+* IS_full_analysis_vsfrequency
+* ISwave_subtracting_analysis
+* ISwave_single_fit
+* ISwave_single_demodulation
+* pindrift
+* verifyStabilization
+
+% Syntax:  ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_results)
+%
+% Inputs:
+%   SYMSTRUCTS - can be a cell structure containing structs at various background
+%     light intensities. This can be generated using genIntStructs.
+%     Otherwise it can be a single struct as created by PINDRIFT.
+%   STARTFREQ - higher frequency limit
+%   ENDFREQ - lower frequency limit
+%   FREQ_POINTS - number of points to simulate between STARTFREQ and
+%     ENDFREQ
+%   DELTAV - voltage oscillation amplitude in volts, one mV should be enough
+%   BC - boundary conditions indicating if the contacts are selective, see
+%     PINDRIFT
+%   FROZEN_IONS - logical, after stabilization sets the mobility of
+%     ionic defects to zero
+%   CALCJI - logical, should if set the ionic current is calculated also in
+%     the middle of the intrinsic
+%   PARALLELIZE - use parallelization for simulating different frequencies
+%     at the same time, requires Parallel Computing Toolbox
+%   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
+%     workspace the calulated solutions of single ISstep perturbations
+%   SAVE_RESULTS - is a logic defining if to assing in volatile base
+%     workspace the most important results of the simulation
+%
+% Outputs:
+%   ISWAVE_STRUCT - a struct containing the most important results of the simulation
+
+==== Oscillating around open circuit conditions
+
+>> ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 1e3, 1e-7, 23), 1e9, 1e-2, 23, 1e-3, 1, false, false, false, true, true);
+
+==== Oscillating around short circuit conditions
+
+>> ISwave_full_exec(genIntStructs(sol_i_eq, sol_i_light, 1e3, 1e-7, 23), 1e9, 1e-2, 23, 1e-3, 1, false, false, false, true, true);
