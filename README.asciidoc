@@ -205,6 +205,17 @@ Outputs:
 
 >> ISwave_full_exec(genIntStructs(sol_i_eq, sol_i_light, 1e3, 1e-7, 23), 1e9, 1e-2, 23, 1e-3, 1, false, false, false, true, true);
 
+== Plot charge dynamics during transients
+
+Syntax:  plot_charges_single(struct, save_name)
+
+Inputs:
+
+* STRUCT - a symmetric or asymmetric struct of a solution evolving over time
+* IMAGES_PREFIX - optional string, if provided saves the images in the current directory with the name starting with images_prefix
+
+>> plot_charges_single(solution_saved_by_tpv_or_ce)
+
 == Unit testing
 
 >> runtests('unit_test')
