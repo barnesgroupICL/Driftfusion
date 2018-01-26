@@ -114,10 +114,15 @@ J_i_phase = tmax_matrix;
 
 disp([mfilename ' - Doing the IS at various light intensities']);
 for i = 1:length(symstructs(1, :))
-    Int_array(i) = symstructs{1, i}.params.Int;
+    struct = symstructs{1, i};
+    Int_array(i) = struct.params.Int;
     % decrease annoiance by figures popping up
-    symstructs{1, i}.params.figson = 0;
-    [asymstruct_Int, Voc_array(i)] = asymmetricize(symstructs{1, i}, BC); % normal BC 1 should work, also BC 2 can be employed
+    struct.params.figson = 0;
+    if struct.params.OC % in case the solution is symmetric, break it in halves
+        [asymstruct_Int, Voc_array(i)] = asymmetricize(struct, BC); % normal BC 1 should work, also BC 2 can be employed
+    else
+        asymstruct_Int = struct;
+    end
     if frozen_ions
         asymstruct_Int.params.mui = 0; % if frozen_ions option is set, freezing ions
     end
