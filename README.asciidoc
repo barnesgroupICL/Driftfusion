@@ -204,3 +204,7 @@ Outputs:
 ==== Oscillating around short circuit conditions
 
 >> ISwave_full_exec(genIntStructs(sol_i_eq, sol_i_light, 1e3, 1e-7, 23), 1e9, 1e-2, 23, 1e-3, 1, false, false, false, true, true);
+
+== Unit testing
+
+>> runtests('unit_test')
