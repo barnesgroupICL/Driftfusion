@@ -19,7 +19,7 @@ function struct_Int = changeLight(struct, newInt, tmax)
 %   changeLight(ssol_i_light, 1e-3, 0)
 %     as above, but estimate a good time for stabilization
 %
-% Other m-files required: pindrift
+% Other m-files required: pindrift, verifyStabilization
 % Subfunctions: none
 % MAT-files required: none
 %

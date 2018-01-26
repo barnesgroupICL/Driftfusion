@@ -27,7 +27,7 @@ function [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_
 %   Equilibrate('new_')
 %     as above but prepending a string to the saved struct name
 %
-% Other m-files required: pindrift, paramsStruct, mobsetfun
+% Other m-files required: pindrift, pinParams, mobsetfun
 % Subfunctions: none
 % MAT-files required: none
 %
