@@ -1,8 +1,8 @@
-function [fit_coeff, fit_i_coeff, subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t, Ji_disp] = ISwave_single_analysis(asymstruct_ISwave, minimal_mode)
+function [coeff, i_coeff, subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t, Ji_disp] = ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
 %ISWAVE_SINGLE_ANALYSIS - Calculate impedance (reactance and resistance) and phase by Impedance
 % Spectroscopy (ISwave) with oscillating voltage
 %
-% Syntax:  ISwave_single_analysis(asymstruct_ISwave, minimal_mode)
+% Syntax:  ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
 %
 % Inputs:
 %   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbated by an
@@ -10,16 +10,17 @@ function [fit_coeff, fit_i_coeff, subtracting_n_t, subtracting_n_intr_t, subtrac
 %   MINIMAL_MODE - logical, when true graphics does not get created and
 %     ISwave_subtracting_analysis does not get launched, useful when
 %     launched under parallelization
+%   DEMODULATION - logical, get phase via demodulation instead of using a fitting
 %
 % Example:
-%   ISwave_single_analysis(ISwave_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, 1e-4), false)
+%   ISwave_single_analysis(ISwave_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, 1e-4), false, true)
 %     do plot
 %
-% Other m-files required: ISwave_subtracting_analysis
+% Other m-files required: ISwave_subtracting_analysis, ISwave_single_fit, ISwave_single_demodulation
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also ISwave_full_exec, ISwave_single_exec, ISwave_subtracting_analysis.
+% See also ISwave_full_exec, ISwave_single_exec, ISwave_subtracting_analysis, ISwave_single_demodulation, ISwave_single_fit.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -39,10 +40,16 @@ s = asymstruct_ISwave;
 periods = round(s.params.tmax * s.params.Vapp_params(4) / (2 * pi));
 % this works if, as now is, the frequency is constant internally each solution
 % round should not be needed here
-fit_t_index = round((s.params.tpoints - 1) * round(periods * 0.5) / periods);
+% here is critical that exactely an entire number of periods is provided to
+% ISwave_single_demodulator
+fit_t_index = round((s.params.tpoints - 1) * round(periods * 0.5) / periods) + 1;
 fit_t = s.t(fit_t_index:end);
 fit_J = s.Jtotr(fit_t_index:end) / 1000; % in Ampere
-fit_coeff = ISwave_single_fit(fit_t, fit_J, s.params.J_E_func);
+if demodulation
+    coeff = ISwave_single_demodulation(fit_t, fit_J, s.params.J_E_func, s.params.Vapp_params);
+else
+    coeff = ISwave_single_fit(fit_t, fit_J, s.params.J_E_func);
+end
 
 %% calculate ionic contribution
 if s.params.mui % if there was ion mobility, current due to ions have been calculated, fit it
@@ -59,9 +66,14 @@ if s.params.mui % if there was ion mobility, current due to ions have been calcu
     Ji_disp = s.params.eppi * gradient(Efield_i_mean, s.t); % in Amperes
 
     fit_Ji = Ji_disp(fit_t_index:end); % in Ampere
-    fit_i_coeff = ISwave_single_fit(fit_t, fit_Ji, s.params.J_E_func);
+    if demodulation
+        % here the fit_Ji has to be provided as a row
+        i_coeff = ISwave_single_demodulation(fit_t, fit_Ji', s.params.Vapp_func, s.params.Vapp_params);
+    else
+        i_coeff = ISwave_single_fit(fit_t, fit_Ji, s.params.J_E_func);
+    end
 else
-    fit_i_coeff = [NaN, NaN, NaN];
+    i_coeff = [NaN, NaN, NaN];
     Ji_disp = NaN;
 end
 
@@ -88,8 +100,8 @@ if ~minimal_mode % disable all this stuff if under parallelization
         plot(s.t, -s.Jdispr / 1000); % Ampere
         plot(s.t(2:end), -subtracting_n_intr_t);
         plot(s.t(2:end), -subtracting_n_contacts_t);
-        plot(fit_t, -s.params.J_E_func(fit_coeff, fit_t), 'g')
-        legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Fit"];
+        plot(fit_t, -s.params.J_E_func(coeff, fit_t), 'g')
+        legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Demodulation"];
         if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             % plot(s.t(2:end), -subtracting_i_abs_t);
             % plot(s.t(2:end), -subtracting_i_t);

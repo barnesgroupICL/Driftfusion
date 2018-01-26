@@ -75,9 +75,16 @@ end
 % taken from https://stackoverflow.com/questions/8488758/inhibit-matlab-window-focus-stealing
 set(0, 'DefaultFigureVisible', 'off');
 
+% which method to use for extracting phase and amplitude of the current
+% if false, uses fitting, if true uses demodulation multiplying the current
+% by sin waves
+demodulation = true;
+
 % number of complete oscillation periods to simulate
 % the current looks reproducible already after few oscillations, this could be set in an automatic way
-periods = 10;
+% this number should be above 20 for having good phase estimation in dark
+% solutions via ISwave_single_demodulation
+periods = 20;
 
 % for having a meaningful output from verifyStabilization, here use a
 % number of tpoints which is 1 + a multiple of 4 * periods
@@ -134,26 +141,28 @@ for i = 1:length(symstructs(1, :))
             Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
         % set ISwave_single_analysis minimal_mode is true if parallelize is true
         % extract parameters and do plot
-        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize);
+        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize, demodulation);
         % if phase is small or negative, double check increasing accuracy of the solver
-        if fit_coeff(3) < 0.03
-            disp([mfilename ' - Fitted phase is very small or negative, double checking with higher solver accuracy'])
+        % a phase close to 90 degrees can be indicated as it was -90 degree
+        % by the demodulation, the fitting way does not have this problem
+        if fit_coeff(3) < 0.03 || (abs(fit_coeff(3)) - pi/2) < 0.06
+            disp([mfilename ' - Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is very small or negative or close to pi/2, double checking with higher solver accuracy'])
             tempRelTol = tempRelTol / 100;
             asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] =ISwave_single_analysis(asymstruct_ISwave, parallelize);
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize, demodulation);
         end
         % if the phase is negative even with the new accuracy, check again
         if fit_coeff(3) < 0.003
-            disp([mfilename ' - Fitted phase is extremely small, increasing solver accuracy again'])
+            disp([mfilename ' - Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small, increasing solver accuracy again'])
             tempRelTol = tempRelTol / 100;
             asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize);
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize, demodulation);
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
         J_amp(i, j) = fit_coeff(2);
