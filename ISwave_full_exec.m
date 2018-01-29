@@ -107,7 +107,7 @@ else
 end
 
 %% pre allocate arrays filling them with zeros
-Voc_array = zeros(length(symstructs(1, :)));
+Voc_array = zeros(length(symstructs(1, :)), 1);
 Int_array = Voc_array;
 tmax_matrix = zeros(length(symstructs(1, :)), length(Freq_array));
 J_bias = tmax_matrix;
