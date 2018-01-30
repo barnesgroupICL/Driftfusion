@@ -44,12 +44,12 @@ struct_Int = struct;
 
 % set an initial time for stabilization tmax
 if tmax
-    p.tmax = tmax;
+    tmax_temp = tmax;
 else % if tmax was zero, estimate a good one
     if p.mui
-        p.tmax = 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i));
+        tmax_temp = 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i));
     else
-        p.tmax = 2^(-log10(p.mue_i));
+        tmax_temp = 2^(-log10(p.mue_i));
     end
 end
 
@@ -74,9 +74,10 @@ end
 
 %% stabilize
 while ~verifyStabilization(struct_Int.sol, struct_Int.t, 1e-8) % check stability in a strict way
+    p.tmax = tmax_temp;
     disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
     struct_Int = pindrift(struct_Int, p);
-    p.tmax = p.tmax * 10; % this change gets saved in sol_Int only if another cycle is performed
+    tmax_temp = p.tmax * 10; % this change gets saved in sol_Int only if another cycle is performed
 end
 
 % warnings about stability can be useful again
