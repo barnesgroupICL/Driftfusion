@@ -145,7 +145,7 @@ for i = 1:length(symstructs(1, :))
         % if phase is small or negative, double check increasing accuracy of the solver
         % a phase close to 90 degrees can be indicated as it was -90 degree
         % by the demodulation, the fitting way does not have this problem
-        if fit_coeff(3) < 0.03 || (abs(abs(fit_coeff(3))) - pi/2) < 0.06
+        if fit_coeff(3) < 0.03 || abs(abs(fit_coeff(3)) - pi/2) < 0.06
             disp([mfilename ' - Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is very small or negative or close to pi/2, double checking with higher solver accuracy'])
             tempRelTol = tempRelTol / 100;
             asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC,...
