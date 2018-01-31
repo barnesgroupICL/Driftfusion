@@ -177,7 +177,7 @@ Needed .m files:
 * pindrift
 * verifyStabilization
 
-Syntax:  ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_results)
+Syntax:  ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
 
 Inputs:
 
@@ -187,6 +187,7 @@ Inputs:
 * FREQ_POINTS - number of points to simulate between STARTFREQ and ENDFREQ
 * DELTAV - voltage oscillation amplitude in volts, one mV should be enough
 * BC - boundary conditions indicating if the contacts are selective, see PINDRIFT
+* REACH_STABILITY - logical, check if the oscillating solution reached a (oscillating) stabilization, otherwise just use the result of the initial simulation. This can be useful when it's known that the starting solution is not stabilized, for example measuring with an unstabilized ionic profile without frozen_ions
 * FROZEN_IONS - logical, after stabilization sets the mobility of ionic defects to zero
 * CALCJI - logical, should if set the ionic current is calculated also in the middle of the intrinsic
 * PARALLELIZE - use parallelization for simulating different frequencies at the same time, requires Parallel Computing Toolbox
@@ -199,11 +200,11 @@ Outputs:
 
 ==== Oscillating around open circuit conditions
 
->> ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 1e3, 1e-7, 23), 1e9, 1e-2, 23, 1e-3, 1, false, false, false, true, true);
+>> ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 1e3, 1e-7, 23), 1e9, 1e-2, 23, 1e-3, 1, true, false, false, false, true, true);
 
 ==== Oscillating around short circuit conditions
 
->> ISwave_full_exec(genIntStructs(sol_i_eq, sol_i_light, 1e3, 1e-7, 23), 1e9, 1e-2, 23, 1e-3, 1, false, false, false, true, true);
+>> ISwave_full_exec(genIntStructs(sol_i_eq, sol_i_light, 1e3, 1e-7, 23), 1e9, 1e-2, 23, 1e-3, 1, true, false, false, false, true, true);
 
 == Plot charge dynamics during transients
 
