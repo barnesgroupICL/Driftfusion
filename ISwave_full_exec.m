@@ -35,18 +35,18 @@ function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_p
 %   ISWAVE_STRUCT - a struct containing the most important results of the simulation
 %
 % Example:
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, false, false, false, true, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, false, false, true, true)
 %     calculate also with dark background, do not freeze ions, use a
 %     voltage oscillation amplitude of 1 mV, on 23 points from frequencies of 1 GHz to
 %     0.01 Hz, with selective contacts, without calculating ionic current,
 %     without parallelization
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, false, false, false, true, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, false, false, true, true)
 %     as above but freezing ions during voltage oscillation
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, false, true, false, true, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true, false, true, true)
 %     calculate ionic current in the middle of the intrinsic
-%   ISwave_full_exec(ssol_i_light_BC2, 1e9, 1e-2, 23, 1e-3, 2, false, false, false, true, true)
+%   ISwave_full_exec(ssol_i_light_BC2, 1e9, 1e-2, 23, 1e-3, 2, true, false, false, false, true, true)
 %     use non perfectly selective contacts (BC = 2)
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, false, false, true, true, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, false, true, true, true)
 %     use parallelization over multiple CPU cores
 %
 % Other m-files required: asymmetricize, ISwave_single_exec,
