@@ -1,8 +1,8 @@
-function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_results)
+function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
 %ISWAVE_FULL_EXEC - Do Impedance Spectroscopy approximated applying an
 % oscillating voltage (ISwave) in a range of background light intensities
 %
-% Syntax:  ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, parallelize, save_solutions, save_results)
+% Syntax:  ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
 %
 % Inputs:
 %   SYMSTRUCTS - can be a cell structure containing structs at various background
@@ -15,6 +15,11 @@ function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_p
 %   DELTAV - voltage oscillation amplitude in volts, one mV should be enough
 %   BC - boundary conditions indicating if the contacts are selective, see
 %     PINDRIFT
+%   REACH_STABILITY - logical, check if the oscillating solution reached a
+%     (oscillating) stabilization, otherwise just use the result of the
+%     initial simulation. This can be useful when it's known that the
+%     starting solution is not stabilized, for example measuring with an
+%     unstabilized ionic profile without frozen_ions
 %   FROZEN_IONS - logical, after stabilization sets the mobility of
 %     ionic defects to zero
 %   CALCJI - logical, should if set the ionic current is calculated also in
@@ -138,7 +143,7 @@ for i = 1:length(symstructs(1, :))
     parfor (j = 1:length(Freq_array), parforArg)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
         asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV,...
-            Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
+            Freq_array(j), periods, tpoints_per_period, reach_stability, calcJi, tempRelTol); % do IS
         % set ISwave_single_analysis minimal_mode is true if parallelize is true
         % extract parameters and do plot
         [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize, demodulation);
@@ -149,7 +154,7 @@ for i = 1:length(symstructs(1, :))
             disp([mfilename ' - Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is very small or negative or close to pi/2, double checking with higher solver accuracy'])
             tempRelTol = tempRelTol / 100;
             asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC,...
-                deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
+                deltaV, Freq_array(j), periods, tpoints_per_period, reach_stability, calcJi, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize, demodulation);
@@ -159,7 +164,7 @@ for i = 1:length(symstructs(1, :))
             disp([mfilename ' - Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small, increasing solver accuracy again'])
             tempRelTol = tempRelTol / 100;
             asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC,...
-                deltaV, Freq_array(j), periods, tpoints_per_period, calcJi, tempRelTol); % do IS
+                deltaV, Freq_array(j), periods, tpoints_per_period, reach_stability, calcJi, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize, demodulation);
