@@ -103,7 +103,7 @@ tpoints_per_period = 10 * 4; % gets redefined by changeLight, so re-setting is n
 
 % default pdepe tolerance is 1e-3, for having an accurate phase from the
 % fitting, improving the tollerance is useful
-RelTol = 1e-4;
+RelTol = 1e-6;
 
 % define frequency values
 Freq_array = logspace(log10(startFreq), log10(endFreq), Freq_points);
@@ -156,20 +156,17 @@ for i = 1:length(symstructs(1, :))
         % if phase is small or negative, double check increasing accuracy of the solver
         % a phase close to 90 degrees can be indicated as it was -90 degree
         % by the demodulation, the fitting way does not have this problem
-        if fit_coeff(3) < 0.03 || abs(abs(fit_coeff(3)) - pi/2) < 0.06
-            disp([mfilename ' - Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is very small or negative or close to pi/2, double checking with higher solver accuracy'])
+        if fit_coeff(3) < 0.006 || abs(abs(fit_coeff(3)) - pi/2) < 0.006
+            disp([mfilename ' - Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small or negative or close to pi/2, increasing solver accuracy and calculate again'])
             tempRelTol = tempRelTol / 100;
-            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC,...
-                deltaV, Freq_array(j), periods, tpoints_per_period, reach_stability, calcJi, tempRelTol); % do IS
-            % set ISwave_single_analysis minimal_mode is true if parallelize is true
-            % repeat analysis on new solution
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize, demodulation);
-        end
-        % if the phase is negative even with the new accuracy, check again
-        if fit_coeff(3) < 0.003
-            disp([mfilename ' - Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small, increasing solver accuracy again'])
-            tempRelTol = tempRelTol / 100;
-            asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC,...
+            % if just the initial solution, non-stabilized, is requested, do
+            % not start from oscillating solution
+            if reach_stability
+                asymstruct_temp = asymstruct_ISwave; % the oscillating solution, better starting point
+            else
+                asymstruct_temp = asymstruct_Int; % use the non oscillation solution if requested
+            end
+            asymstruct_ISwave = ISwave_single_exec(asymstruct_temp, BC,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, reach_stability, calcJi, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
