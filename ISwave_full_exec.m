@@ -83,13 +83,7 @@ set(0, 'DefaultFigureVisible', 'off');
 % which method to use for extracting phase and amplitude of the current
 % if false, uses fitting, if true uses demodulation multiplying the current
 % by sin waves
-% when the output is dirty, demodulation can easily mess 90 degrees phase
-% with -90 degrees phase, better using traditional fitting
-if reach_stability
-    demodulation = true;
-else
-    demodulation = false;
-end
+demodulation = true;
 
 % number of complete oscillation periods to simulate
 % the current looks reproducible already after few oscillations, this could be set in an automatic way
