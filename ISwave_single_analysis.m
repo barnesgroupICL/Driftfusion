@@ -45,10 +45,21 @@ periods = round(s.params.tmax * s.params.Vapp_params(4) / (2 * pi));
 fit_t_index = round((s.params.tpoints - 1) * round(periods * 0.5) / periods) + 1;
 fit_t = s.t(fit_t_index:end);
 fit_J = s.Jtotr(fit_t_index:end) / 1000; % in Ampere
+
+% remove some tilting from fit_J to get better fit and better demodulation in case of
+% unstabilized solutions
+delta_t = fit_t(end) - fit_t(1);
+% this assumes that the first and last point are at the same point in the oscillating voltage
+delta_J = fit_J(end) - fit_J(1);
+tilting = delta_J/delta_t;
+t_middle = fit_t(round(end/2));
+% because of this, the bias value that will be obtained from the fit/demodulation is not going to be correct
+fit_J_flat = fit_J - tilting * (fit_t - t_middle);
+
 if demodulation
-    coeff = ISwave_single_demodulation(fit_t, fit_J, s.params.J_E_func, s.params.Vapp_params);
+    coeff = ISwave_single_demodulation(fit_t, fit_J_flat, s.params.Vapp_func, s.params.Vapp_params);
 else
-    coeff = ISwave_single_fit(fit_t, fit_J, s.params.J_E_func);
+    coeff = ISwave_single_fit(fit_t, fit_J_flat, s.params.J_E_func);
 end
 
 %% calculate ionic contribution
@@ -66,11 +77,20 @@ if s.params.mui % if there was ion mobility, current due to ions have been calcu
     Ji_disp = s.params.eppi * gradient(Efield_i_mean, s.t); % in Amperes
 
     fit_Ji = Ji_disp(fit_t_index:end); % in Ampere
+    
+    % remove some tilting from fit_Ji to get better fit and better demodulation in case of
+    % unstabilized solutions
+    % this assumes that the first and last point are at the same point in the oscillating voltage
+    delta_Ji = fit_Ji(end) - fit_Ji(1);
+    tilting_i = delta_Ji/delta_t;
+    % because of this, the bias value that will be obtained from the fit/demodulation is not going to be correct
+    % here the fit_Ji has to be provided as a row
+    fit_Ji_flat = fit_Ji' - tilting_i * (fit_t - t_middle);
+
     if demodulation
-        % here the fit_Ji has to be provided as a row
-        i_coeff = ISwave_single_demodulation(fit_t, fit_Ji', s.params.Vapp_func, s.params.Vapp_params);
+        i_coeff = ISwave_single_demodulation(fit_t, fit_Ji_flat, s.params.Vapp_func, s.params.Vapp_params);
     else
-        i_coeff = ISwave_single_fit(fit_t, fit_Ji, s.params.J_E_func);
+        i_coeff = ISwave_single_fit(fit_t, fit_Ji_flat, s.params.J_E_func);
     end
 else
     i_coeff = [NaN, NaN, NaN];
@@ -100,14 +120,14 @@ if ~minimal_mode % disable all this stuff if under parallelization
         plot(s.t, -s.Jdispr / 1000); % Ampere
         plot(s.t(2:end), -subtracting_n_intr_t);
         plot(s.t(2:end), -subtracting_n_contacts_t);
-        plot(fit_t, -s.params.J_E_func(coeff, fit_t), 'g')
-        legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "Demodulation"];
+        plot(fit_t, -s.params.J_E_func_tilted(coeff, fit_t, tilting, t_middle), 'g')
+        legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "J fit"];
         if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             % plot(s.t(2:end), -subtracting_i_abs_t);
             % plot(s.t(2:end), -subtracting_i_t);
             plot(s.t, -Ji_disp);
-            % plot(fit_t, -s.params.J_E_func(fit_i_coeff, fit_t), 'g--');
-            legend_array = [legend_array, "Disp J Ions"];
+            plot(fit_t, -s.params.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle), 'g--');
+            legend_array = [legend_array, "Disp J Ions", "J ions fit"];
             % if max(s.params.Jpoints) % if the ionic drift has been calculated (that value is different from zero)
                 % plot(s.t, -s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
                 % legend_array = [legend_array, "Ionic drift"];
