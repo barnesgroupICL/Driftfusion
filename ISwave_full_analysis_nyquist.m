@@ -37,23 +37,25 @@ jet_matrix = jet(length(ISwave_struct.Int) + 1);
 % colors list
 jet_yellow_logical = ismember(jet_matrix, [1, 1, 0], 'rows');
 jet_no_yellow = jet_matrix(~jet_yellow_logical, :);
-Int_colors = colormap(jet_no_yellow);
+jet_no_yellow_flip = flipud(jet_no_yellow);
+Int_colors = colormap(jet_no_yellow_flip);
 
+% round to two significant digits
+legend_flip = round(ISwave_struct.Int, 2, 'significant');
 % flip array and matrixes for starting from dark
-legend_Int = string(flipud(ISwave_struct.Int));
-re_flip = flipud(ISwave_struct.impedance_re);
-im_flip = flipud(ISwave_struct.impedance_im);
-
+legend_flip = string(flipud(legend_flip));
 % add sun to numbers in legend
-legend_Int = strcat(legend_Int, ' sun');
-
+legend_flip = strcat(legend_flip, ' sun');
 % replace zero in legend with dark
-legend_Int(legend_Int=="0 sun") = "dark";
+legend_flip(legend_flip=="0 sun") = "dark";
+
+% preallocate figures handles
+h = zeros(length(ISwave_struct.Int), 1);
 
 figure('Name', 'Nyquist plot of IS at various light intensities', 'NumberTitle', 'off')
     hold off
     for i = 1:length(ISwave_struct.Int)
-        plot(re_flip(i, :), im_flip(i, :)',...
+        h(i) = plot(ISwave_struct.impedance_re(i, :), ISwave_struct.impedance_im(i, :)',...
             'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
             'MarkerSize', 3, 'LineWidth', 1.3);
@@ -61,6 +63,6 @@ figure('Name', 'Nyquist plot of IS at various light intensities', 'NumberTitle',
     end
     xlabel('Re(Z) [\Omega cm^2]');
     ylabel('-Im(Z) [\Omega cm^2]');
-    legend(legend_Int)
+    legend(flipud(h), legend_flip)
     
 %------------- END OF CODE --------------
