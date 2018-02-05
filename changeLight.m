@@ -52,6 +52,7 @@ else % if tmax was zero, estimate a good one
         tmax_temp = 2^(-log10(p.mue_i));
     end
 end
+p.tmax = tmax_temp;
 
 % warnings about stability are not needed in the first steps
 warning('off', 'pindrift:verifyStabilization'); 
