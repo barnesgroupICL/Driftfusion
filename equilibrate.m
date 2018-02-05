@@ -9,7 +9,7 @@ function [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_
 %
 % Inputs:
 %   NAME - if is provided, saves the solution as [NAME *sol*] in the
-%   volatile base workspace.
+%     volatile base workspace.
 %
 % Outputs:
 %   sol_eq - short circuit in dark without mobile ionic defects
