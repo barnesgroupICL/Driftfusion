@@ -1,15 +1,17 @@
-function [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_eq, ssol_i_light] = equilibrate(name)
+function [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_eq, ssol_i_light] = equilibrate(varargin)
 %EQUILIBRATE Generate accurate initial conditions at equilibrium
 %Takes the parameters from pinParams.m file and tries
 %to obtain an equilibrium solution (as if the device has been left for
 %a long period of time). This solution can then be used as accurate
 %initial conditions for other simulations, e.g. a JV scan.
 %
-% Syntax:  [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_eq, ssol_i_light] = EQUILIBRATE(NAME)
+% Syntax:  [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_eq, ssol_i_light] = EQUILIBRATE(NAME, PARAMS)
 %
 % Inputs:
-%   NAME - if is provided, saves the solution as [NAME *sol*] in the
+%   NAME - optional, if is provided, saves the solution as [NAME *sol*] in the
 %     volatile base workspace.
+%   PARAMS - optional, struct containing the needed parameters as obtained
+%     pinParams.m
 %
 % Outputs:
 %   sol_eq - short circuit in dark without mobile ionic defects
@@ -26,6 +28,8 @@ function [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_
 %     generate stabilized solutions and save them to base workspace
 %   Equilibrate('new_')
 %     as above but prepending a string to the saved struct name
+%   Equilibrate('new_', pinParams)
+%     as above but specifying which parameters struct to use
 %
 % Other m-files required: pindrift, pinParams, mobsetfun
 % Subfunctions: none
@@ -45,15 +49,25 @@ function [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_
 
 %------------- BEGIN CODE --------------
 
-if ~nargin
-    name = '';
+switch nargin
+    case 0
+        name = '';
+        % load parameters from pinParams.m file
+        p = pinParams;
+    case 1
+        name = varargin{1};
+        % load parameters from pinParams.m file
+        p = pinParams;
+    case 2
+        name = varargin{1};
+        % load parameters from input
+        p = varargin{2};
 end
 
 % initial empty solution makes pindrift to generate an analytical one
 sol.sol = 0;
 
-% load parameters from pinParams.m file
-p = pinParams;
+% saves the parameters before changing them
 original_p = p;
 
 p.tmesh_type = 2; % logarithmic time mesh
