@@ -26,7 +26,6 @@ deltax = tint/pint;    % spacing in the interfacial region- requires for mesh ge
 % Parameters for spatial mesh of solution points - see meshgen_x for
 % xmesh_type specification
 xmesh_type = 4; 
-xmax = tp + ti + tn;      % cm
 
 % General Parameters
 OC = 1;                % Closed circuit = 0, Open Circuit = 1 

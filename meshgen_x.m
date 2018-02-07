@@ -3,6 +3,7 @@ function [x] = meshgen_x(params)
 v2struct(params);
 
 meshfigon = 1;
+xmax = tp + ti + tn;
 
 % Linearly spaced
 if xmesh_type == 1
