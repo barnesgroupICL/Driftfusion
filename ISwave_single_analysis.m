@@ -98,7 +98,7 @@ else
 end
 
 %% plot solutions
-if ~minimal_mode % disable all this stuff if under parallelization
+if ~minimal_mode % disable all this stuff if under parallelization or if explicitly asked to not plot any graphics
     
     [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t,...
         subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(asymstruct_ISwave);

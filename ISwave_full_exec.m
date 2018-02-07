@@ -1,4 +1,4 @@
-function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
+function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, do_graphics, save_solutions, save_results)
 %ISWAVE_FULL_EXEC - Do Impedance Spectroscopy approximated applying an
 % oscillating voltage (ISwave) in a range of background light intensities
 %
@@ -26,6 +26,8 @@ function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_p
 %     the middle of the intrinsic
 %   PARALLELIZE - use parallelization for simulating different frequencies
 %     at the same time, requires Parallel Computing Toolbox
+%   DO_GRAPHICS - logical, whether to graph the individual solutions and
+%     the overall graphics
 %   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
 %     workspace the calulated solutions of single ISstep perturbations
 %   SAVE_RESULTS - is a logic defining if to assing in volatile base
@@ -78,7 +80,9 @@ end
 
 % don't display figures until the end of the script, as they steal the focus
 % taken from https://stackoverflow.com/questions/8488758/inhibit-matlab-window-focus-stealing
-set(0, 'DefaultFigureVisible', 'off');
+if do_graphics
+    set(0, 'DefaultFigureVisible', 'off');
+end
 
 % which method to use for extracting phase and amplitude of the current
 % if false, uses fitting, if true uses demodulation multiplying the current
@@ -144,9 +148,10 @@ for i = 1:length(symstructs(1, :))
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
         asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV,...
             Freq_array(j), periods, tpoints_per_period, reach_stability, calcJi, tempRelTol); % do IS
-        % set ISwave_single_analysis minimal_mode is true if parallelize is true
+        % set ISwave_single_analysis minimal_mode to true if parallelize is
+        % true or if do_graphics is false
         % extract parameters and do plot
-        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize, demodulation);
+        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, (parallelize || ~do_graphics), demodulation);
         % if phase is small or negative, double check increasing accuracy of the solver
         % a phase close to 90 degrees can be indicated as it was -90 degree
         % by the demodulation, the fitting way does not have this problem
@@ -164,7 +169,7 @@ for i = 1:length(symstructs(1, :))
                 deltaV, Freq_array(j), periods, tpoints_per_period, reach_stability, calcJi, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, parallelize, demodulation);
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, (parallelize || ~do_graphics), demodulation);
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
         J_amp(i, j) = fit_coeff(2);
@@ -248,12 +253,14 @@ if save_results
 end
 
 %% plot results
-IS_full_analysis_vsfrequency(ISwave_struct);
-ISwave_full_analysis_nyquist(ISwave_struct);
 
-% make the figures appear, all at the end of the script
-set(0, 'DefaultFigureVisible', 'on');
-figHandles = findall(groot, 'Type', 'figure');
-set(figHandles(:), 'visible', 'on')
+if do_graphics
+    IS_full_analysis_vsfrequency(ISwave_struct);
+    ISwave_full_analysis_nyquist(ISwave_struct);
+    % make the figures appear, all at the end of the script
+    set(0, 'DefaultFigureVisible', 'on');
+    figHandles = findall(groot, 'Type', 'figure');
+    set(figHandles(:), 'visible', 'on')
+end
 
 %------------- END OF CODE --------------
