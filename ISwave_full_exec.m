@@ -156,7 +156,7 @@ for i = 1:length(symstructs(1, :))
         % a phase close to 90 degrees can be indicated as it was -90 degree
         % by the demodulation, the fitting way does not have this problem
         if fit_coeff(3) < 0.006 || abs(abs(fit_coeff(3)) - pi/2) < 0.006
-            disp([mfilename ' - Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small or negative or close to pi/2, increasing solver accuracy and calculate again'])
+            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small or negative or close to pi/2, increasing solver accuracy and calculate again'])
             tempRelTol = tempRelTol / 100;
             % if just the initial solution, non-stabilized, is requested, do
             % not start from oscillating solution
