@@ -25,7 +25,10 @@ function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_p
 %   CALCJI - logical, should if set the ionic current is calculated also in
 %     the middle of the intrinsic
 %   PARALLELIZE - use parallelization for simulating different frequencies
-%     at the same time, requires Parallel Computing Toolbox
+%     at the same time, requires Parallel Computing Toolbox. The single
+%     solutions are not going to be saved nor plotted. The solutions could
+%     be slightly different from the un-parallelized calculation, the
+%     reason being some MatLab funcions are different in PCT, see https://es.mathworks.com/products/parallel-computing/features.html
 %   DO_GRAPHICS - logical, whether to graph the individual solutions and
 %     the overall graphics
 %   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
