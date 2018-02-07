@@ -47,7 +47,8 @@ fit_t = s.t(fit_t_index:end);
 fit_J = s.Jtotr(fit_t_index:end) / 1000; % in Ampere
 
 % remove some tilting from fit_J to get better fit and better demodulation in case of
-% unstabilized solutions
+% unstabilized solutions. In case of noisy solutions this could work badly
+% but should not affect too much the fitting/demodulation
 delta_t = fit_t(end) - fit_t(1);
 % this assumes that the first and last point are at the same point in the oscillating voltage
 delta_J = fit_J(end) - fit_J(1);
