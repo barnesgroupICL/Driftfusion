@@ -141,8 +141,8 @@ for i = 1:length(structs(1, :))
         % if phase is small or negative, double check increasing accuracy of the solver
         % a phase close to 90 degrees can be indicated as it was -90 degree
         % by the demodulation, the fitting way does not have this problem
-        if fit_coeff(3) < 0.006 || abs(abs(fit_coeff(3)) - pi/2) < 0.006
-            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small or negative or close to pi/2, increasing solver accuracy and calculate again'])
+        if fit_coeff(3) < 0.006 || fit_coeff(3) > pi/2 - 0.006
+            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small or close to pi/2 or out of 0-pi/2 range, increasing solver accuracy and calculate again'])
             tempRelTol = tempRelTol / 100;
             % start from the oscillating solution, better starting point
             asymstruct_ISwave = ISwave_single_exec(asymstruct_ISwave, BC,...
@@ -151,10 +151,25 @@ for i = 1:length(structs(1, :))
             % repeat analysis on new solution
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
         end
-        % if phase is still negative, likely is demodulation that is
+        % if phase is still negative or bigger than pi/2, likely is demodulation that is
         % failing (no idea why), use safer fitting method without repeating
         % the simulation
-        if fit_coeff(3) < 0
+        if fit_coeff(3) < 0 || fit_coeff(3) > pi/2
+            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Phase from demodulation is weird: ' num2str(rad2deg(fit_coeff(3))) ' degrees, confirming using fitting'])
+            % use fitting
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, true, false);
+            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Phase from fitting is: ' num2str(rad2deg(fit_coeff(3))) ' degrees'])
+        end
+        % if phase is still negative or more than pi/2, check again increasing accuracy
+        if fit_coeff(3) < 0 || abs(fit_coeff(3)) > pi/2
+            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is out of 0-pi/2 range, increasing solver accuracy and calculate again'])
+            tempRelTol = tempRelTol / 100;
+            % start from the oscillating solution, better starting point
+            asymstruct_ISwave = ISwave_single_exec(asymstruct_ISwave, BC,...
+                deltaV, Freq_array(j), periods, tpoints_per_period, true, calcJi, tempRelTol); % do IS
+            % set ISwave_single_analysis minimal_mode is true if parallelize is true
+            % repeat analysis on new solution
+            % use fitting
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, (parallelize || ~do_graphics), false);
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
