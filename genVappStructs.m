@@ -17,11 +17,11 @@ function structCell = genVappStructs(asymstruct, startVapp, endVapp, points)
 %   structs_Vapp_dark = genVappStructs(sol_i_eq, 1, 0, 6);
 %     generates dark solutions at 6 different applied voltages
 %
-% Other m-files required: 
+% Other m-files required: pindrift
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also , pindrift.
+% See also genIntStructs, pindrift.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
