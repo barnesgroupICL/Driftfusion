@@ -1,8 +1,8 @@
-function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, do_graphics, save_solutions, save_results)
+function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, do_graphics, save_results)
 %ISWAVE_FULL_EXEC - Do Impedance Spectroscopy approximated applying an
 % oscillating voltage (ISwave) in a range of background light intensities
 %
-% Syntax:  ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
+% Syntax:  ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, calcJi, do_graphics, save_results)
 %
 % Inputs:
 %   STRUCTS - can be a cell structure containing structs at various background
@@ -24,15 +24,8 @@ function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_poin
 %     ionic defects to zero
 %   CALCJI - logical, should if set the ionic current is calculated also in
 %     the middle of the intrinsic
-%   PARALLELIZE - use parallelization for simulating different frequencies
-%     at the same time, requires Parallel Computing Toolbox. The single
-%     solutions are not going to be saved nor plotted. The solutions could
-%     be slightly different from the un-parallelized calculation, the
-%     reason being some MatLab funcions are different in PCT, see https://es.mathworks.com/products/parallel-computing/features.html
 %   DO_GRAPHICS - logical, whether to graph the individual solutions and
 %     the overall graphics
-%   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
-%     workspace the calulated solutions of single ISstep perturbations
 %   SAVE_RESULTS - is a logic defining if to assing in volatile base
 %     workspace the most important results of the simulation
 %
@@ -40,19 +33,17 @@ function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_poin
 %   ISWAVE_STRUCT - a struct containing the most important results of the simulation
 %
 % Example:
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, false, false, true, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, false, true, true)
 %     calculate also with dark background, do not freeze ions, use a
 %     voltage oscillation amplitude of 1 mV, on 23 points from frequencies of 1 GHz to
 %     0.01 Hz, with selective contacts, without calculating ionic current,
 %     without parallelization
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, false, false, true, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, false, true, true)
 %     as above but freezing ions during voltage oscillation
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true, false, true, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true, true, true)
 %     calculate ionic current in the middle of the intrinsic
-%   ISwave_full_exec(ssol_i_light_BC2, 1e9, 1e-2, 23, 1e-3, 2, true, false, false, false, true, true)
+%   ISwave_full_exec(ssol_i_light_BC2, 1e9, 1e-2, 23, 1e-3, 2, true, false, false, false, true)
 %     use non perfectly selective contacts (BC = 2)
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, false, true, true, true)
-%     use parallelization over multiple CPU cores
 %
 % Other m-files required: asymmetricize, ISwave_single_exec,
 %   ISwave_single_analysis, ISwave_full_analysis_nyquist,
@@ -88,8 +79,8 @@ if do_graphics
 end
 
 % which method to use for extracting phase and amplitude of the current
-% if false, uses fitting, if true uses demodulation multiplying the current
-% by sin waves
+% if false, always uses fitting, if true uses demodulation multiplying the current
+% by sin waves. Anyway if the obtained phase is werid, fit will be used
 demodulation = true;
 
 % number of complete oscillation periods to simulate
@@ -108,16 +99,6 @@ RelTol = 1e-6;
 
 % define frequency values
 Freq_array = logspace(log10(startFreq), log10(endFreq), Freq_points);
-
-% switch on or off the parallelization calculation of solution, when true
-% less pictures gets created and the solutions does not get saved in main
-% workspace
-% if reach_stability is false, parallelization cannot be used
-if parallelize && reach_stability
-  parforArg = Inf;
-else
-  parforArg = 0;
-end
 
 %% pre allocate arrays filling them with zeros
 Vdc_array = zeros(length(structs(1, :)), 1);
@@ -148,33 +129,27 @@ for i = 1:length(structs(1, :))
         asymstruct_Int.params.mui = 0; % if frozen_ions option is set, freezing ions
     end
     % if Parallel Computing Toolbox is not available, the following line
-    % will have to be replaced with for (j = 1:length(Freq_array))
-    parfor (j = 1:length(Freq_array), parforArg)
+    % will work as a normal for cycle
+    parfor (j = 1:length(Freq_array), Inf)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
         asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV,...
-            Freq_array(j), periods, tpoints_per_period, reach_stability, calcJi, tempRelTol); % do IS
+            Freq_array(j), periods, tpoints_per_period, true, calcJi, tempRelTol); % do IS
         % set ISwave_single_analysis minimal_mode to true if parallelize is
         % true or if do_graphics is false
         % extract parameters and do plot
-        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, (parallelize || ~do_graphics), demodulation);
+        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
         % if phase is small or negative, double check increasing accuracy of the solver
         % a phase close to 90 degrees can be indicated as it was -90 degree
         % by the demodulation, the fitting way does not have this problem
         if fit_coeff(3) < 0.006 || abs(abs(fit_coeff(3)) - pi/2) < 0.006
             disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small or negative or close to pi/2, increasing solver accuracy and calculate again'])
             tempRelTol = tempRelTol / 100;
-            % if just the initial solution, non-stabilized, is requested, do
-            % not start from oscillating solution
-            if reach_stability
-                asymstruct_temp = asymstruct_ISwave; % the oscillating solution, better starting point
-            else
-                asymstruct_temp = asymstruct_Int; % strictly use the last point from previous cycle
-            end
-            asymstruct_ISwave = ISwave_single_exec(asymstruct_temp, BC,...
-                deltaV, Freq_array(j), periods, tpoints_per_period, reach_stability, calcJi, tempRelTol); % do IS
+            % start from the oscillating solution, better starting point
+            asymstruct_ISwave = ISwave_single_exec(asymstruct_ISwave, BC,...
+                deltaV, Freq_array(j), periods, tpoints_per_period, true, calcJi, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, (parallelize || ~do_graphics), demodulation);
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
         end
         % if phase is still negative, likely is demodulation that is
         % failing (no idea why), use safer fitting method without repeating
@@ -192,12 +167,6 @@ for i = 1:length(structs(1, :))
         % as the number of periods is fixed, there's no need for tmax to be
         % a matrix, but this could change, so it's a matrix
         tmax_matrix(i,j) = asymstruct_ISwave.params.tmax;
-        
-        if save_solutions && ~parallelize || ~reach_stability % assignin cannot be used in a parallel loop, so single solutions cannot be saved
-            sol_name = matlab.lang.makeValidName([structs{2, i} '_Freq_' num2str(Freq_array(j)) '_ISwave']);
-            asymstruct_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
-            assignin('base', sol_name, asymstruct_ISwave);
-        end
     end
 end
 
