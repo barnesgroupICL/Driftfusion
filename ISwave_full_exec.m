@@ -120,8 +120,8 @@ else
 end
 
 %% pre allocate arrays filling them with zeros
-Voc_array = zeros(length(symstructs(1, :)), 1);
-Int_array = Voc_array;
+Vdc_array = zeros(length(symstructs(1, :)), 1);
+Int_array = Vdc_array;
 tmax_matrix = zeros(length(symstructs(1, :)), length(Freq_array));
 J_bias = tmax_matrix;
 J_amp = tmax_matrix;
@@ -139,9 +139,10 @@ for i = 1:length(symstructs(1, :))
     % decrease annoiance by figures popping up
     struct.params.figson = 0;
     if struct.params.OC % in case the solution is symmetric, break it in halves
-        [asymstruct_Int, Voc_array(i)] = asymmetricize(struct, BC); % normal BC 1 should work, also BC 2 can be employed
+        [asymstruct_Int, Vdc_array(i)] = asymmetricize(struct, BC); % normal BC 1 should work, also BC 2 can be employed
     else
         asymstruct_Int = struct;
+        Vdc_array(i) = struct.Efn(end) - struct.Efp(1);
     end
     if frozen_ions
         asymstruct_Int.params.mui = 0; % if frozen_ions option is set, freezing ions
@@ -235,7 +236,7 @@ cap_idrift = sin(J_i_phase) ./ (pulsatance_matrix .* impedance_i_abs);
 % this struct is similar to ISstep_struct in terms of fields,
 % but the columns and rows in the fields can be different
 ISwave_struct.sol_name = symstructs{2, 1};
-ISwave_struct.Voc = Voc_array;
+ISwave_struct.Vdc = Vdc_array;
 ISwave_struct.periods = periods;
 ISwave_struct.Freq = Freq_matrix;
 ISwave_struct.tpoints = 1 + tpoints_per_period * periods;
