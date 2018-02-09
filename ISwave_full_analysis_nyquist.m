@@ -31,8 +31,17 @@ function ISwave_full_analysis_nyquist(ISwave_struct)
 % increase graphics font size
 set(0, 'defaultAxesFontSize', 30)
 
+% check which was the variable being explored
+if numel(unique(ISwave_struct.Int)) > 1
+    legend_text = ISwave_struct.Int;
+    legend_append = ' sun';
+else
+    legend_text = ISwave_struct.Vdc;
+    legend_append = ' Vdc';
+end
+
 % create a color array with one color more than necessary
-jet_matrix = jet(length(ISwave_struct.Int) + 1);
+jet_matrix = jet(length(legend_text) + 1);
 % find the yellow (which in RGB code is 1,1,0) and remove it from the
 % colors list
 jet_yellow_logical = ismember(jet_matrix, [1, 1, 0], 'rows');
@@ -41,20 +50,20 @@ jet_no_yellow_flip = flipud(jet_no_yellow);
 Int_colors = colormap(jet_no_yellow_flip);
 
 % round to two significant digits
-legend_flip = round(ISwave_struct.Int, 2, 'significant');
+legend_flip = round(legend_text, 2, 'significant');
 % flip array and matrixes for starting from dark
 legend_flip = string(flipud(legend_flip));
 % add sun to numbers in legend
-legend_flip = strcat(legend_flip, ' sun');
+legend_flip = strcat(legend_flip, legend_append);
 % replace zero in legend with dark
 legend_flip(legend_flip=="0 sun") = "dark";
 
 % preallocate figures handles
-h = zeros(length(ISwave_struct.Int), 1);
+h = zeros(length(legend_text), 1);
 
 figure('Name', 'Nyquist plot of IS at various light intensities', 'NumberTitle', 'off')
     hold off
-    for i = 1:length(ISwave_struct.Int)
+    for i = 1:length(legend_text)
         h(i) = plot(ISwave_struct.impedance_re(i, :), ISwave_struct.impedance_im(i, :)',...
             'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
