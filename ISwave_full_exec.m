@@ -22,7 +22,7 @@ function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_poin
 %     unstabilized ionic profile without frozen_ions
 %   FROZEN_IONS - logical, after stabilization sets the mobility of
 %     ionic defects to zero
-%   CALCJI - logical, should if set the ionic current is calculated also in
+%   CALCJI - deprecated, logical, should if set the ionic current is calculated also in
 %     the middle of the intrinsic
 %   DO_GRAPHICS - logical, whether to graph the individual solutions and
 %     the overall graphics
