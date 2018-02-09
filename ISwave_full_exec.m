@@ -1,11 +1,11 @@
-function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, do_graphics, save_solutions, save_results)
+function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, do_graphics, save_solutions, save_results)
 %ISWAVE_FULL_EXEC - Do Impedance Spectroscopy approximated applying an
 % oscillating voltage (ISwave) in a range of background light intensities
 %
-% Syntax:  ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
+% Syntax:  ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
 %
 % Inputs:
-%   SYMSTRUCTS - can be a cell structure containing structs at various background
+%   STRUCTS - can be a cell structure containing structs at various background
 %     light intensities. This can be generated using genIntStructs.
 %     Otherwise it can be a single struct as created by PINDRIFT.
 %   STARTFREQ - higher frequency limit
@@ -74,11 +74,11 @@ function ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_p
 
 % in case a single struct is given in input, convert it to a cell structure
 % with just one cell
-if length(symstructs(:, 1)) == 1 % if the input is a single structure instead of a cell with structures
-    symstructs_temp = cell(2, 1);
-    symstructs_temp{1, 1} = symstructs;
-    symstructs_temp{2, 1} = inputname(1);
-    symstructs = symstructs_temp;
+if length(structs(:, 1)) == 1 % if the input is a single structure instead of a cell with structures
+    structs_temp = cell(2, 1);
+    structs_temp{1, 1} = structs;
+    structs_temp{2, 1} = inputname(1);
+    structs = structs_temp;
 end
 
 % don't display figures until the end of the script, as they steal the focus
@@ -120,9 +120,9 @@ else
 end
 
 %% pre allocate arrays filling them with zeros
-Vdc_array = zeros(length(symstructs(1, :)), 1);
+Vdc_array = zeros(length(structs(1, :)), 1);
 Int_array = Vdc_array;
-tmax_matrix = zeros(length(symstructs(1, :)), length(Freq_array));
+tmax_matrix = zeros(length(structs(1, :)), length(Freq_array));
 J_bias = tmax_matrix;
 J_amp = tmax_matrix;
 J_phase = tmax_matrix;
@@ -133,8 +133,8 @@ J_i_phase = tmax_matrix;
 %% do a serie of IS measurements
 
 disp([mfilename ' - Doing the IS at various light intensities']);
-for i = 1:length(symstructs(1, :))
-    struct = symstructs{1, i};
+for i = 1:length(structs(1, :))
+    struct = structs{1, i};
     Int_array(i) = struct.params.Int;
     % decrease annoiance by figures popping up
     struct.params.figson = 0;
@@ -194,7 +194,7 @@ for i = 1:length(symstructs(1, :))
         tmax_matrix(i,j) = asymstruct_ISwave.params.tmax;
         
         if save_solutions && ~parallelize || ~reach_stability % assignin cannot be used in a parallel loop, so single solutions cannot be saved
-            sol_name = matlab.lang.makeValidName([symstructs{2, i} '_Freq_' num2str(Freq_array(j)) '_ISwave']);
+            sol_name = matlab.lang.makeValidName([structs{2, i} '_Freq_' num2str(Freq_array(j)) '_ISwave']);
             asymstruct_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
             assignin('base', sol_name, asymstruct_ISwave);
         end
@@ -208,7 +208,7 @@ sun_index = find(Int_array == 1); % could used for plotting... maybe...
 % even if here the frequency is always the same for each illumination, it
 % is not the case for ISstep, and the solution has to be more similar in
 % order to be used by the same IS_full_analysis_vsfrequency script
-Freq_matrix = repmat(Freq_array, length(symstructs(1, :)), 1);
+Freq_matrix = repmat(Freq_array, length(structs(1, :)), 1);
 
 % deltaV is a scalar, J_amp and J_phase are matrices
 % as the current of MPP is defined as positive in the model, we expect that
@@ -221,7 +221,7 @@ impedance_abs = -deltaV ./ J_amp; % J_amp is in amperes
 % current-voltage "delay"
 impedance_re = impedance_abs .* cos(J_phase); % this is the resistance
 impedance_im = impedance_abs .* sin(J_phase);
-pulsatance_matrix = 2 * pi * repmat(Freq_array, length(symstructs(1, :)), 1);
+pulsatance_matrix = 2 * pi * repmat(Freq_array, length(structs(1, :)), 1);
 % the capacitance is the imaginary part of 1/(pulsatance*complex_impedance)
 % or can be obtained in the same way with Joutphase/(pulsatance*deltaV)
 cap = sin(J_phase) ./ (pulsatance_matrix .* impedance_abs);
@@ -235,7 +235,7 @@ cap_idrift = sin(J_i_phase) ./ (pulsatance_matrix .* impedance_i_abs);
 
 % this struct is similar to ISstep_struct in terms of fields,
 % but the columns and rows in the fields can be different
-ISwave_struct.sol_name = symstructs{2, 1};
+ISwave_struct.sol_name = structs{2, 1};
 ISwave_struct.Vdc = Vdc_array;
 ISwave_struct.periods = periods;
 ISwave_struct.Freq = Freq_matrix;
@@ -260,7 +260,7 @@ ISwave_struct.impedance_i_abs = impedance_i_abs;
 ISwave_struct.impedance_i_im = impedance_i_im;
 ISwave_struct.impedance_i_re = impedance_i_re;
 if save_results
-    assignin('base', ['ISwave_' symstructs{2, 1}], ISwave_struct);
+    assignin('base', ['ISwave_' structs{2, 1}], ISwave_struct);
 end
 
 %% plot results
