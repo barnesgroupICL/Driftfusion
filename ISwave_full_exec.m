@@ -112,7 +112,8 @@ Freq_array = logspace(log10(startFreq), log10(endFreq), Freq_points);
 % switch on or off the parallelization calculation of solution, when true
 % less pictures gets created and the solutions does not get saved in main
 % workspace
-if parallelize
+% if reach_stability is false, parallelization cannot be used
+if parallelize && reach_stability
   parforArg = Inf;
 else
   parforArg = 0;
@@ -166,13 +167,19 @@ for i = 1:length(symstructs(1, :))
             if reach_stability
                 asymstruct_temp = asymstruct_ISwave; % the oscillating solution, better starting point
             else
-                asymstruct_temp = asymstruct_Int; % use the non oscillation solution if requested
+                asymstruct_temp = asymstruct_Int; % strictly use the last point from previous cycle
             end
             asymstruct_ISwave = ISwave_single_exec(asymstruct_temp, BC,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, reach_stability, calcJi, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
             [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, (parallelize || ~do_graphics), demodulation);
+        end
+        % if phase is still negative, likely is demodulation that is
+        % failing (no idea why), use safer fitting method without repeating
+        % the simulation
+        if fit_coeff(3) < 0
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, (parallelize || ~do_graphics), false);
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
         J_amp(i, j) = fit_coeff(2);
@@ -185,7 +192,7 @@ for i = 1:length(symstructs(1, :))
         % a matrix, but this could change, so it's a matrix
         tmax_matrix(i,j) = asymstruct_ISwave.params.tmax;
         
-        if save_solutions && ~parallelize % assignin cannot be used in a parallel loop, so single solutions cannot be saved
+        if save_solutions && ~parallelize || ~reach_stability % assignin cannot be used in a parallel loop, so single solutions cannot be saved
             sol_name = matlab.lang.makeValidName([symstructs{2, i} '_Freq_' num2str(Freq_array(j)) '_ISwave']);
             asymstruct_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
             assignin('base', sol_name, asymstruct_ISwave);
