@@ -20,11 +20,11 @@ function structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, p
 %   genIntStructs(false, ssol_i_light, 100, 0.1, 4)
 %     as above but without the solution at 0 illumination (dark)
 %
-% Other m-files required: changeLight
+% Other m-files required: changeLight, pindrift
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also changeLight, pindrift.
+% See also genVappStructs, changeLight, pindrift.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
