@@ -170,7 +170,7 @@ for i = 1:length(structs(1, :))
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
             % use fitting
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, (parallelize || ~do_graphics), false);
+            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, true, false);
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
         J_amp(i, j) = fit_coeff(2);
