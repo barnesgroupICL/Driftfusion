@@ -118,24 +118,25 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         num2str(s.params.Vapp_params(4) / (2 * pi))], 'NumberTitle', 'off');
         yyaxis right
         hold off
-        plot(s.t, Vapp, 'r', 'LineWidth', 2);
+        h(1) = plot(s.t, Vapp, 'r', 'LineWidth', 2);
+        legend_array = "Applied Voltage";
         ylabel('Applied voltage [V]');
 
         yyaxis left
         hold off
-        plot(s.t, -s.Jtotr, 'LineWidth', 2); % mA
+        h(2) = plot(s.t, -s.Jtotr, 'b--', 'LineWidth', 2); % mA
         hold on
-        plot(s.t, -s.Jdispr); % mA
-        plot(s.t(2:end), -subtracting_n_intr_t * 1000); % mA
-        plot(s.t(2:end), -subtracting_n_contacts_t * 1000); % mA
-        plot(fit_t, -s.params.J_E_func_tilted(coeff, fit_t, tilting, t_middle) * 1000, 'k') % mA
+        h(3) = plot(s.t, -s.Jdispr); % mA
+        h(4) = plot(s.t(2:end), -subtracting_n_intr_t * 1000); % mA
+        h(5) = plot(s.t(2:end), -subtracting_n_contacts_t * 1000); % mA
+        h(6) = plot(fit_t, -s.params.J_E_func_tilted(coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
 
-        legend_array = ["Current", "Displacement J", "Charges intrinsic", "Charges contacts", "1st harmonic"];
+        legend_array = [legend_array, "Current", "Displacement J", "Charges intrinsic", "Charges contacts", "1st harmonic"];
         if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             % plot(s.t(2:end), -subtracting_i_abs_t);
             % plot(s.t(2:end), -subtracting_i_t);
-            plot(s.t, -Ji_disp * 1000); % mA
-            plot(fit_t, -s.params.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
+            h(7) = plot(s.t, -Ji_disp * 1000); % mA
+            h(8) = plot(fit_t, -s.params.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
             legend_array = [legend_array, "Disp J Ions", "J ions fit"];
             % if max(s.params.Jpoints) % if the ionic drift has been calculated (that value is different from zero)
                 % plot(s.t, -s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
@@ -145,7 +146,7 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         ylabel('Current [mA/cm^2]');
         hold off
         xlabel('Time [s]');
-        legend(legend_array);
+        legend(h, legend_array);
         hold off
 else
     subtracting_n_t = NaN;
