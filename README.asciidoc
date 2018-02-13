@@ -161,12 +161,12 @@ Needed .m files:
 * pindrift
 * verifyStabilization
 
-Syntax:  ISstep_struct = ISstep_full_exec(symstructs, deltaV, BC, frozen_ions, save_solutions, save_results)
+Syntax:  ISstep_struct = ISstep_full_exec(symstructs, deltaV_array, BC, frozen_ions, save_solutions, save_results)
 
 Inputs:
 
 * SYMSTRUCTS - can be a cell structure containing structs at various background light intensities. This can be generated using genIntStructs. Otherwise it can be a single struct as created by PINDRIFT.
-* DELTAV - voltage step in volts, one mV should be enough
+* DELTAV_ARRAY - voltage step in volts, one mV should be enough. Can be provided as array or as single value
 * BC - boundary conditions indicating if the contacts are selective, see PINDRIFT
 * FROZEN_IONS - logical, after stabilization sets the mobility of ionic defects to zero
 * SAVE_SOLUTIONS - is a logic defining if to assing in volatile base workspace the calulated solutions of single ISstep perturbations
