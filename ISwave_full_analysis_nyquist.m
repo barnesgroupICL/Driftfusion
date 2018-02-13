@@ -29,7 +29,11 @@ function ISwave_full_analysis_nyquist(ISwave_struct)
 %------------- BEGIN CODE --------------
 
 % increase graphics font size
-set(0, 'defaultAxesFontSize', 30)
+set(0, 'defaultAxesFontSize', 30);
+% set image dimension
+set(0, 'defaultfigureposition', [0, 0, 1000, 750]);
+% set line thickness
+set(0, 'defaultLineLineWidth', 2);
 
 % check which was the variable being explored
 if numel(unique(ISwave_struct.Int)) > 1
