@@ -68,11 +68,20 @@ h = zeros(length(legend_text), 1);
 figure('Name', 'Nyquist plot of IS at various light intensities', 'NumberTitle', 'off')
     hold off
     for i = 1:length(legend_text)
+        % find the points of the decades
+        temp_logfreq = log10(ISwave_struct.Freq(i,:));
+        decades_index = temp_logfreq == round(temp_logfreq);
+        
         h(i) = plot(ISwave_struct.impedance_re(i, :), ISwave_struct.impedance_im(i, :)',...
             'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
             'MarkerSize', 3, 'LineWidth', 1.3);
         hold on
+        
+        % add bigger markers for the points of the decades
+        plot(ISwave_struct.impedance_re(i, decades_index), ISwave_struct.impedance_im(i, decades_index)',...
+            'MarkerFaceColor', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
+            'Marker', 'd', 'LineStyle', 'none', 'MarkerSize', 5);
     end
     xlabel('Re(Z) [\Omega cm^2]');
     ylabel('-Im(Z) [\Omega cm^2]');
