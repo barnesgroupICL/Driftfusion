@@ -177,10 +177,13 @@ p.t0 = p.tmax / 1e9;
 
 warning('off', 'pindrift:verifyStabilization'); % the following line is expected to fail on stabilization
 ssol_i_light = pindrift(ssol_i_eq, p);
+ssol_i_light = pindrift(ssol_i_light, p);
 warning('on', 'pindrift:verifyStabilization'); % reenable the warnings
 
-p.tmax = 2 ^ (-log10(p.mui)) + 1e4 * 2 ^ (-log10(p.mue_i));
-ssol_i_light = pindrift(ssol_i_light, p);
+if ~verifyStabilization(ssol_i_light.sol, ssol_i_light.t, 0.5)
+    p.tmax = 2 ^ (-log10(p.mui)) + 1e4 * 2 ^ (-log10(p.mue_i));
+    ssol_i_light = pindrift(ssol_i_light, p);
+end
 
 assignin('base', [name 'ssol_i_light'], ssol_i_light);
 
