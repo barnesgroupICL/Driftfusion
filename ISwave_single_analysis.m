@@ -111,30 +111,31 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         num2str(s.params.Vapp_params(4) / (2 * pi))], 'NumberTitle', 'off');
         yyaxis right
         hold off
-        plot(s.t, Vapp);
+        plot(s.t, Vapp, 'r', 'LineWidth', 2);
         ylabel('Applied voltage [V]');
 
         yyaxis left
         hold off
-        plot(s.t, -s.Jtotr / 1000); % Ampere
+        plot(s.t, -s.Jtotr, 'LineWidth', 2); % mA
         hold on
-        plot(s.t, -s.Jdispr / 1000); % Ampere
-        plot(s.t(2:end), -subtracting_n_intr_t);
-        plot(s.t(2:end), -subtracting_n_contacts_t);
-        plot(fit_t, -s.params.J_E_func_tilted(coeff, fit_t, tilting, t_middle), 'g')
-        legend_array = ["Total J", "Displacement J", "Charges intrinsic", "Charges contacts", "J fit"];
+        plot(s.t, -s.Jdispr); % mA
+        plot(s.t(2:end), -subtracting_n_intr_t * 1000); % mA
+        plot(s.t(2:end), -subtracting_n_contacts_t * 1000); % mA
+        plot(fit_t, -s.params.J_E_func_tilted(coeff, fit_t, tilting, t_middle) * 1000, 'k') % mA
+
+        legend_array = ["Current", "Displacement J", "Charges intrinsic", "Charges contacts", "1st harmonic"];
         if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             % plot(s.t(2:end), -subtracting_i_abs_t);
             % plot(s.t(2:end), -subtracting_i_t);
-            plot(s.t, -Ji_disp);
-            plot(fit_t, -s.params.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle), 'g--');
+            plot(s.t, -Ji_disp * 1000); % mA
+            plot(fit_t, -s.params.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
             legend_array = [legend_array, "Disp J Ions", "J ions fit"];
             % if max(s.params.Jpoints) % if the ionic drift has been calculated (that value is different from zero)
                 % plot(s.t, -s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
                 % legend_array = [legend_array, "Ionic drift"];
             % end
         end
-        ylabel('Current [A/cm^2]');
+        ylabel('Current [mA/cm^2]');
         hold off
         xlabel('Time [s]');
         legend(legend_array);

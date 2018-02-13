@@ -76,6 +76,9 @@ end
 % taken from https://stackoverflow.com/questions/8488758/inhibit-matlab-window-focus-stealing
 if do_graphics
     set(0, 'DefaultFigureVisible', 'off');
+    set(0, 'defaultfigureposition', [0, 0, 1000, 750]);
+    set(0, 'defaultAxesFontSize', 30);
+    set(0, 'defaultLineLineWidth', 2);
 end
 
 % which method to use for extracting phase and amplitude of the current
