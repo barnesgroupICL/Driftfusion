@@ -26,7 +26,7 @@ Outputs:
 
 >> equilibrate();
 
-== Generate a list of solutions at open circuit at various light intensities
+== Generate a list of solutions at various light intensities
 
 Needed .m files:
 
@@ -48,6 +48,23 @@ Outputs:
 * STRUCTCELL - a cell containing structs of solutions at various light intensities
 
 >> structs = genIntStructs(ssol_i_eq, ssol_i_light, 1e3, 1e-7, 23);
+
+== Generate a list of solutions at various applied voltages
+
+Syntax:  structCell = genVappStructs(asymstruct, startVapp, endVapp, points)
+
+Inputs:
+
+* ASYMSTRUCT - a solution asymmetric struct as created by PINDRIFT.
+* STARTVAPP - higher requested Vapp.
+* ENDVAPP - lower requested Vapp.
+* POINTS - number of applied voltages requested between STARTVAPP and ENDVAPP, including extrema.
+
+Outputs:
+
+* STRUCTCELL - a cell containing structs of solutions at various applied voltages
+
+>> structs = genVappStructs(sol_i_eq, 1, 0, 6);
 
 == Transient PhotoVoltage simulation
 
@@ -177,11 +194,11 @@ Needed .m files:
 * pindrift
 * verifyStabilization
 
-Syntax:  ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
+Syntax:  ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
 
 Inputs:
 
-* SYMSTRUCTS - can be a cell structure containing structs at various background light intensities. This can be generated using genIntStructs. Otherwise it can be a single struct as created by PINDRIFT.
+* STRUCTS - can be a cell structure containing structs at various background light intensities. This can be generated using genIntStructs. Otherwise it can be a single struct as created by PINDRIFT.
 * STARTFREQ - higher frequency limit
 * ENDFREQ - lower frequency limit
 * FREQ_POINTS - number of points to simulate between STARTFREQ and ENDFREQ
