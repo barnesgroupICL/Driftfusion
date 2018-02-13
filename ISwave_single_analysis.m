@@ -33,7 +33,7 @@ function [coeff, i_coeff, subtracting_n_t, subtracting_n_intr_t, subtracting_n_c
 %------------- BEGIN CODE --------------
 
 % increase graphics font size
-set(0, 'defaultAxesFontSize', 30);
+set(0, 'defaultAxesFontSize', 24);
 % set image dimension
 set(0, 'defaultfigureposition', [0, 0, 1000, 750]);
 % set line thickness
