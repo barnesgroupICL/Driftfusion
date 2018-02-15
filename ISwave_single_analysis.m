@@ -131,7 +131,7 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         h(5) = plot(s.t(2:end), -subtracting_n_contacts_t * 1000); % mA
         h(6) = plot(fit_t, -s.params.J_E_func_tilted(coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
 
-        legend_array = [legend_array, "Current", "Displacement J", "Charges intrinsic", "Charges contacts", "1st harmonic"];
+        legend_array = [legend_array, "Current", "Displacement current", "Charge variation intrinsic", "Charge variation contacts", "1st harmonic"];
         if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             % plot(s.t(2:end), -subtracting_i_abs_t);
             % plot(s.t(2:end), -subtracting_i_t);
