@@ -156,6 +156,7 @@ p.OC = 1;
 
 warning('off', 'pindrift:verifyStabilization'); % the following line is expected to fail on stabilization
 ssol_i_eq = pindrift(symsol, p); % first run is not enough for stabilization
+ssol_i_eq = pindrift(ssol_i_eq, p);
 
 % ssol_i_eq takes long time to equilibrate
 p.tmax = 2 ^ (-log10(p.mui)) + 1e4 * 2 ^ (-log10(p.mue_i));
