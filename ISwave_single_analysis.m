@@ -137,7 +137,7 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
             % plot(s.t(2:end), -subtracting_i_t);
             h(7) = plot(s.t, -Ji_disp * 1000); % mA
             h(8) = plot(fit_t, -s.params.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
-            legend_array = [legend_array, "Disp J Ions", "J ions fit"];
+            legend_array = [legend_array, "Ionic displacement current", "Ionic disp J fit"];
             % if max(s.params.Jpoints) % if the ionic drift has been calculated (that value is different from zero)
                 % plot(s.t, -s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
                 % legend_array = [legend_array, "Ionic drift"];
