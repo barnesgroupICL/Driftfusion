@@ -2,14 +2,13 @@ function [x] = meshgen_x(params)
 
 v2struct(params);
 
-% Linearly spaced
-if xmesh_type == 1
-    
+switch xmesh_type
+    % Linearly spaced
+    case 1
     x = linspace(0,xmax,pp+pii+pn);
-    
-% Linearly spaced, more points at interfaces
-elseif xmesh_type == 2
-    
+
+    % Linearly spaced, more points at interfaces
+    case 2
     x = [linspace(0, tp-tinter, pp),...
         linspace(tp-tinter+deltax, tp, pinter),...
         linspace(tp+deltax, tp+tinter, pinter),...
@@ -18,9 +17,8 @@ elseif xmesh_type == 2
         linspace(tp+ti, tp+ti+tinter-deltax, pinter),...
         linspace(tp+ti+tinter, xmax, pn)];
 
-% Linearly spaced, more points at interfaces and electrodes
-elseif xmesh_type == 3
-    
+    % Linearly spaced, more points at interfaces and electrodes
+    case 3
     x = [linspace(0, te, pepe),...
         linspace(te+deltax, tp-tint, pp),...
         linspace(tp-tint+deltax, tp, pint),...
@@ -31,9 +29,8 @@ elseif xmesh_type == 3
         linspace(tp+ti+tint, xmax-te-deltax, pn),...
         linspace(xmax-te, xmax, pepe);];
     
-% More points in SCR and interfaces
-elseif xmesh_type == 4
-    
+    % More points in SCR and interfaces
+    case 4
     x = [linspace(0, tp-tscr, pp),...
         linspace(tp-tscr+(tscr/pscr), tp-tint, pscr),...
         linspace(tp-tint+(tint/pint), tp, pint),...
@@ -45,7 +42,8 @@ elseif xmesh_type == 4
         linspace(tp+ti, tp+ti+tint-(tint/pint), pint),...
         linspace(tp+ti+tint, tp+ti+tscr-(tscr/pscr), pscr),...
         linspace(tp+ti+tscr, xmax, pn);];
-    
+    otherwise
+       error('DrIFtFUSION:xmesh_type', [mfilename ' - xmesh_type not recognized'])
 end
 
 end
