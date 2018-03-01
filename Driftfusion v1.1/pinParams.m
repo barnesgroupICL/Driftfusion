@@ -52,7 +52,6 @@ mesht_figon = 0;        % Toggles t-mesh figures on/off
 side = 1;               % illumination side 1 = EE, 2 = SE
 calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position, calcJ = 2, calculates DD at boundary.
 mobset = 1;             % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
-mobseti = 0;            % Switch on/off ion mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
 JV = 0;                 % Toggle run JV scan on/off
 Ana = 1;                % Toggle on/off analysis
 
@@ -127,13 +126,7 @@ else
     
 end
 
-if mobseti == 0
-        
-    mui = 0;    % ion mobility
-else 
-        
-    mui = 1e-10;    % ion mobility
-end
+mui = 1e-10; % ion mobility
 
 eppp = 20*epp0;         % Dielectric constant p-type
 eppi = 20*epp0;         % Dielectric constant intrinsic
