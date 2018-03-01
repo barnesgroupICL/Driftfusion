@@ -62,9 +62,8 @@ sol.sol = 0;
 
 p = pinParams;
 
-% Store initial mobility of intrinsic layer- note all mobilities will be
-% set to this value during the equilibration procedure.
-mue_i = p.mue_i;
+% Store initial parameters
+original_p = p;
 
 %% Start with low recombination coefficients
 p.klin = 0;
@@ -102,12 +101,20 @@ disp('Initial solution, zero mobility')
 sol = pindrift(sol, p);
 disp('Complete')
 
-p = mobsetfun(mue_i, 0, p);
 p.figson = 1;
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
 
 %% Mobility with mobility switched on
+
+% switch on electron and hole mobility
+p.mue_i = original_p.mue_i; % electron mobility in intrinsic
+p.muh_i = original_p.muh_i; % hole mobility in intrinsic
+p.mue_p = original_p.mue_p; % electron mobility in p-type
+p.muh_p = original_p.muh_p; % hole mobility in n-type
+p.mue_n = original_p.mue_n; % electron mobility in p-type
+p.muh_n = original_p.muh_n; % hole mobility in n-type
+
 disp('Solution with mobility switched on')
 sol = pindrift(sol, p);
 
@@ -148,14 +155,20 @@ disp('Complete')
 disp('Open circuit solution with mobility switched on')
 p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
-p = mobsetfun(mue_i, 0, p);
+
+% switch on electron and hole mobility
+p.mue_i = original_p.mue_i; % electron mobility in intrinsic
+p.muh_i = original_p.muh_i; % hole mobility in intrinsic
+p.mue_p = original_p.mue_p; % electron mobility in p-type
+p.muh_p = original_p.muh_p; % hole mobility in n-type
+p.mue_n = original_p.mue_n; % electron mobility in p-type
+p.muh_n = original_p.muh_n; % hole mobility in n-type
 
 ssol = pindrift(ssol, p);
 
 % Longer time step to ensure equilibrium has been reached
 p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
-p = mobsetfun(mue_i, 0, p);
 
 ssol_eq = pindrift(ssol, p);
 disp('Complete')
@@ -216,14 +229,21 @@ ssol = pindrift(symsol, p);
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
 p.mui = 0;
-p = mobsetfun(mue_i, 0, p);
+
+% switch on electron and hole mobility
+p.mue_i = original_p.mue_i; % electron mobility in intrinsic
+p.muh_i = original_p.muh_i; % hole mobility in intrinsic
+p.mue_p = original_p.mue_p; % electron mobility in p-type
+p.muh_p = original_p.muh_p; % hole mobility in n-type
+p.mue_n = original_p.mue_n; % electron mobility in p-type
+p.muh_n = original_p.muh_n; % hole mobility in n-type
 
 ssol = pindrift(ssol, p);
 
 % Switch on ion mobility to ensure equilibrium has been reached
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
-p = mobsetfun(mue_i, 1e-6, p);
+p.mui = original_p.mui; % this requires mui to be set in the original params
 
 ssol = pindrift(ssol, p);
 
