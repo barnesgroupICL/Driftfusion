@@ -1,8 +1,56 @@
 function [sol_eq, sol_i_eq, ssol_eq, ssol_i_eq, sol_i_eq_SR] = equilibrate
-% Uses analytical initial conditions and runs to equilibrium
+%EQUILIBRATE Uses analytical initial conditions and runs to equilibrium and steady state
+% Takes the parameters from pinParams.m file and tries
+% to obtain an equilibrium solution (as if the device has been left for
+% a long period of time). This solution can then be used as accurate
+% initial conditions for other simulations, e.g. a JV scan.
 % Note that tmax is consistently adjusted to appropriate values for to
 % ensure there are numerous mesh points where large gradients in the time
-% dimension are present
+% dimension are present.
+%
+% Syntax:  [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_light, sol_light_SR, sol_i_light, sol_i_light_SR, ssol_light, ssol_light_SR, ssol_i_light, ssol_i_light_SR] = EQUILIBRATE()
+%
+% Inputs:
+%
+% Outputs:
+%   sol_eq - short circuit, dark, no mobile ionic defects, no SRH
+%   sol_eq_SR - short circuit, dark, no mobile ionic defects, with SRH
+%   sol_i_eq - short circuit, dark, mobile ionic defects, no SRH
+%   sol_i_eq_SR - short circuit, dark, mobile ionic defects, with SRH
+%   ssol_eq - open circuit, dark, no mobile ionic defects, no SRH
+%   ssol_eq_SR - open circuit, dark, no mobile ionic defects, with SRH
+%   ssol_i_eq - open circuit, dark, mobile ionic defects, no SRH
+%   ssol_i_eq_SR - open circuit, dark, mobile ionic defects, with SRH
+%   sol_light - short circuit, 1 sun, no mobile ionic defects, no SRH
+%   sol_light_SR - short circuit, 1 sun, no mobile ionic defects, with SRH
+%   sol_i_light - short circuit, 1 sun, mobile ionic defects, no SRH
+%   sol_i_light_SR - short circuit, 1 sun, mobile ionic defects, with SRH
+%   ssol_light - open circuit, 1 sun, no mobile ionic defects, no SRH
+%   ssol_light_SR - open circuit, 1 sun, no mobile ionic defects, with SRH
+%   ssol_i_light - open circuit, 1 sun, mobile ionic defects, no SRH
+%   ssol_i_light_SR - open circuit, 1 sun, mobile ionic defects, with SRH
+%
+% Example:
+%   equilibrate()
+%     generate stabilized solutions and save them to base workspace
+%
+% Other m-files required: pindrift, pinParams, mobsetfun
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also pindrift, paramsStruct.
+
+% Author: Phil Calado, Ph.D., Ilario Gelmetti, Ph.D. student
+% Imperial College London
+% Research Group Prof. Jenny Nelson
+% Institute of Chemical Research of Catalonia (ICIQ)
+% Research Group Prof. Emilio Palomares
+% email address: p.calado13@imperial.ac.uk, iochesonome@gmail.com
+% Supervised by: Dr. Piers Barnes, Prof. Jenny Nelson
+% Imperial College London
+% 2015; Last revision: January 2018
+
+%------------- BEGIN CODE --------------
 
 tic;    % Start stopwatch
 
