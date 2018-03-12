@@ -133,15 +133,9 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
 
         legend_array = [legend_array, "Current", "Displacement current", "Charge variation intrinsic", "Charge variation contacts", "1st harmonic"];
         if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
-            % plot(s.t(2:end), -subtracting_i_abs_t);
-            % plot(s.t(2:end), -subtracting_i_t);
             h(7) = plot(s.t, -Ji_disp * 1000); % mA
             h(8) = plot(fit_t, -s.params.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
             legend_array = [legend_array, "Ionic displacement current", "Ionic disp J fit"];
-            % if max(s.params.Jpoints) % if the ionic drift has been calculated (that value is different from zero)
-                % plot(s.t, -s.Jidrift_points(:,end) / 1000, 'k.-'); % in Ampere
-                % legend_array = [legend_array, "Ionic drift"];
-            % end
         end
         ylabel('Current [mA/cm^2]');
         hold off
