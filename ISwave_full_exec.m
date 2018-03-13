@@ -127,9 +127,8 @@ for i = 1:length(structs(1, :))
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
         asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV,...
             Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
-        % set ISwave_single_analysis minimal_mode to true if parallelize is
-        % true or if do_graphics is false
-        % extract parameters and do plot
+        % set ISwave_single_analysis minimal_mode to true as under
+        % parallelization graphics for single solutions cannot be created
         [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
         % if phase is small or negative, double check increasing accuracy of the solver
         % a phase close to 90 degrees can be indicated as it was -90 degree

@@ -86,6 +86,7 @@ figure('Name', 'IS at light intensities', 'NumberTitle', 'off');
     xlabel('Frequency [Hz]');
     ylabel('Im(\omega^{-1} Z^{-1}) [F/cm^2]');
     legend(flipud(h), legend_flip)
+    legend boxoff
 
 %% in case of ISwave do additional graphics
 if isfield(IS_struct, 'J_phase') % just ISwave have phase output
@@ -107,6 +108,7 @@ if isfield(IS_struct, 'J_phase') % just ISwave have phase output
         xlabel('Frequency [Hz]');
         ylabel('-Im(Z) [\Omega cm^2]');
         legend(flipud(h), legend_flip)
+        legend boxoff
         
     figure('Name', 'real impedance at light intensities', 'NumberTitle', 'off');
         hold off
@@ -125,6 +127,7 @@ if isfield(IS_struct, 'J_phase') % just ISwave have phase output
         xlabel('Frequency [Hz]');
         ylabel('Re(Z) [\Omega cm^2]');
         legend(flipud(h), legend_flip)
+        legend boxoff
        
     figure('Name', 'abs impedance at light intensities', 'NumberTitle', 'off');
         hold off
@@ -143,6 +146,7 @@ if isfield(IS_struct, 'J_phase') % just ISwave have phase output
         xlabel('Frequency [Hz]');
         ylabel('Abs(Z) [\Omega cm^2]');
         legend(flipud(h), legend_flip)
+        legend boxoff
 end
 
 %------------- END OF CODE --------------
