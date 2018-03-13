@@ -274,8 +274,10 @@ end
 %% plot results
 
 if do_graphics
-    IS_full_analysis_vsfrequency(ISwave_struct);
+    ISwave_EA_full_analysis_phase(ISwave_struct);
+    IS_full_analysis_impedance(ISwave_struct);
     ISwave_full_analysis_nyquist(ISwave_struct);
+
     % make the figures appear, all at the end of the script
     set(0, 'DefaultFigureVisible', 'on');
     figHandles = findall(groot, 'Type', 'figure');
