@@ -1,4 +1,4 @@
-function IS_full_analysis_vsfrequency(IS_struct)
+function IS_full_analysis_impedance(IS_struct)
 %IS_FULL_ANALYSIS_VSFREQUENCY - Plot Impedance Spectroscopy (IS) in a range
 % of background light intensities, capacitance versus voltage oscillation
 % frequency at various light bias
@@ -89,26 +89,7 @@ figure('Name', 'IS at light intensities', 'NumberTitle', 'off');
 
 %% in case of ISwave do additional graphics
 if isfield(IS_struct, 'J_phase') % just ISwave have phase output
-    phase_deg = rad2deg(IS_struct.J_phase);
-    phase_i_deg = rad2deg(IS_struct.J_i_phase);
-    figure('Name', 'Phase plot of IS at various light intensities', 'NumberTitle', 'off')
-        hold off
-        for i = 1:length(legend_text)
-            h(i) = plot(IS_struct.Freq(i, :), phase_deg(i, :)',...
-                'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
-                'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
-                'MarkerSize', 3, 'LineWidth', 1.3);
-            hold on
-            plot(IS_struct.Freq(i, :), phase_i_deg(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
-        end
-        ax = gca;
-        ax.XScale = 'log'; % for putting the scale in log
-        xlim([min(min(IS_struct.Freq)), max(max(IS_struct.Freq))])
-        xlabel('Frequency [Hz]');
-        ylabel('Phase [deg]');
-        legend(flipud(h), legend_flip)
-        legend boxoff
-        
+
     figure('Name', 'imaginary impedance at light intensities', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
