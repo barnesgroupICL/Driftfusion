@@ -15,11 +15,6 @@ function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_poin
 %   DELTAV - voltage oscillation amplitude in volts, one mV should be enough
 %   BC - boundary conditions indicating if the contacts are selective, see
 %     PINDRIFT
-%   REACH_STABILITY - logical, check if the oscillating solution reached a
-%     (oscillating) stabilization, otherwise just use the result of the
-%     initial simulation. This can be useful when it's known that the
-%     starting solution is not stabilized, for example measuring with an
-%     unstabilized ionic profile without frozen_ions
 %   FROZEN_IONS - logical, after stabilization sets the mobility of
 %     ionic defects to zero
 %   CALCJI - deprecated, logical, should if set the ionic current is calculated also in
