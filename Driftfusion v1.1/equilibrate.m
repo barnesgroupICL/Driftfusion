@@ -126,6 +126,7 @@ p.tmax = 1e-2;
 p.t0 = p.tmax/1e10;
 
 sol_eq = pindrift(sol, p);
+sol_eq_p = p; % temporarily save params
 disp('Complete')
 
 %% Set up solution for open circuit
@@ -173,6 +174,7 @@ p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
 
 ssol_eq = pindrift(ssol, p);
+ssol_eq_p = p; % temporarily save params
 disp('Complete')
 
 %% Equilibrium solutions with ion mobility switched on
@@ -193,6 +195,7 @@ p.t0 = p.tmax/1e3;
 p.mui = original_p.mui; % Ions are set to the correct speed indicated in pinParams
 
 sol_i_eq = pindrift(sol, p);
+sol_i_eq_p = p; % temporarily save params
 disp('Complete')
 
 %% Ion equilibrium with surface recombination
@@ -207,6 +210,7 @@ p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
 
 sol_i_eq_SR = pindrift(sol_i_eq, p);
+sol_i_eq_SR_p = p; % temporarily save params
 disp('Complete')
 
 % Switch off SR
@@ -254,6 +258,7 @@ p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
 
 ssol_i_eq = pindrift(ssol, p);
+ssol_i_eq_p = p; % temporarily save params
 disp('Complete')
 
 disp('EQUILIBRATION COMPLETE')
