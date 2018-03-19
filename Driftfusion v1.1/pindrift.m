@@ -117,7 +117,7 @@ t = meshgen_t(p);
 %% Call solver
 
 % SOLVER OPTIONS  - limit maximum time step size during integration.
-options = odeset('MaxOrder',5, 'NonNegative', [1, 1, 1, 0], 'RelTol', RelTol); % Reduce RelTol to improve precision of solution
+options = odeset('MaxOrder',5, 'NonNegative', [1, 1, 1, 0], 'RelTol', p.RelTol); % Reduce RelTol to improve precision of solution
 
 % inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
