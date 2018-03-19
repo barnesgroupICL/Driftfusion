@@ -184,9 +184,9 @@ kradhtl = krad;         % [cm3 s-1] HTL Radiative Recombination coefficient
 
 % SRH recmobination in the contact regions, 
 % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-taun_etl = 1e6;         % [s] SRH time constant for electrons
+taun_etl = 1e-11;         % [s] SRH time constant for electrons
 taup_etl = taun_etl;    % [s] SRH time constant for holes
-taun_htl = 1e6;        %%%% USE a high value of (e.g.) 1 to switch off
+taun_htl = 1e-11;        %%%% USE a high value of (e.g.) 1 to switch off
 taup_htl = taun_htl;    %%%% NOT 0- these variables are in the denominator
 taun_i = 1e6;
 taup_i = 1e6;
