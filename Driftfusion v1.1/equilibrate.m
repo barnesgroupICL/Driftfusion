@@ -1,4 +1,4 @@
-function [sol_eq, sol_i_eq, ssol_eq, ssol_i_eq, sol_i_eq_SR] = equilibrate
+function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq, ssol_i_eq_SR] = equilibrate
 %EQUILIBRATE Uses analytical initial conditions and runs to equilibrium and steady state
 % Takes the parameters from pinParams.m file and tries
 % to obtain an equilibrium solution (as if the device has been left for
@@ -259,6 +259,42 @@ p.t0 = p.tmax/1e3;
 
 ssol_i_eq = pindrift(ssol, p);
 ssol_i_eq_p = p; % temporarily save params
+disp('Complete')
+
+%% Dark, short circuit, surface recombination
+disp("Dark, short circuit, surface recombination")
+p = sol_eq_p;
+p.taun_etl = original_p.taun_etl;
+p.taup_etl = original_p.taup_etl;
+p.taun_htl = original_p.taun_htl;
+p.taup_htl = original_p.taup_htl;
+
+sol_eq_SR = pindrift(sol_eq, p);
+sol_eq_SR_p = p; % temporarily save params
+disp('Complete')
+
+%% Dark, open circuit, surface recombination
+disp("Dark, open circuit, surface recombination")
+p = ssol_eq_p;
+p.taun_etl = original_p.taun_etl;
+p.taup_etl = original_p.taup_etl;
+p.taun_htl = original_p.taun_htl;
+p.taup_htl = original_p.taup_htl;
+
+ssol_eq_SR = pindrift(ssol_eq, p);
+ssol_eq_SR_p = p; % temporarily save params
+disp('Complete')
+
+%% Dark, mobile ions, open circuit, surface recombination
+disp("Dark, mobile ions, open circuit, surface recombination")
+p = ssol_i_eq_p;
+p.taun_etl = original_p.taun_etl;
+p.taup_etl = original_p.taup_etl;
+p.taun_htl = original_p.taun_htl;
+p.taup_htl = original_p.taup_htl;
+
+ssol_i_eq_SR = pindrift(ssol_i_eq, p);
+ssol_i_eq_SR_p = p; % temporarily save params
 disp('Complete')
 
 disp('EQUILIBRATION COMPLETE')
