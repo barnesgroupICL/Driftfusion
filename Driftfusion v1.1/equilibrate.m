@@ -127,6 +127,7 @@ p.t0 = p.tmax/1e10;
 
 sol_eq = pindrift(sol, p);
 sol_eq_p = p; % temporarily save params
+verifyStabilization(sol_eq.sol, sol_eq.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Set up solution for open circuit
@@ -175,6 +176,7 @@ p.t0 = p.tmax/1e3;
 
 ssol_eq = pindrift(ssol, p);
 ssol_eq_p = p; % temporarily save params
+verifyStabilization(ssol_eq.sol, ssol_eq.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Equilibrium solutions with ion mobility switched on
@@ -196,6 +198,7 @@ p.mui = original_p.mui; % Ions are set to the correct speed indicated in pinPara
 
 sol_i_eq = pindrift(sol, p);
 sol_i_eq_p = p; % temporarily save params
+verifyStabilization(sol_i_eq.sol, sol_i_eq.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Ion equilibrium with surface recombination
@@ -211,6 +214,7 @@ p.t0 = p.tmax/1e3;
 
 sol_i_eq_SR = pindrift(sol_i_eq, p);
 sol_i_eq_SR_p = p; % temporarily save params
+verifyStabilization(sol_i_eq_SR.sol, sol_i_eq_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
 % Switch off SR
@@ -259,6 +263,7 @@ p.t0 = p.tmax/1e3;
 
 ssol_i_eq = pindrift(ssol, p);
 ssol_i_eq_p = p; % temporarily save params
+verifyStabilization(ssol_i_eq.sol, ssol_i_eq.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Dark, short circuit, surface recombination
@@ -271,6 +276,7 @@ p.taup_htl = original_p.taup_htl;
 
 sol_eq_SR = pindrift(sol_eq, p);
 sol_eq_SR_p = p; % temporarily save params
+verifyStabilization(sol_eq_SR.sol, sol_eq_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Dark, open circuit, surface recombination
@@ -283,6 +289,7 @@ p.taup_htl = original_p.taup_htl;
 
 ssol_eq_SR = pindrift(ssol_eq, p);
 ssol_eq_SR_p = p; % temporarily save params
+verifyStabilization(ssol_eq_SR.sol, ssol_eq_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Dark, mobile ions, open circuit, surface recombination
@@ -295,6 +302,7 @@ p.taup_htl = original_p.taup_htl;
 
 ssol_i_eq_SR = pindrift(ssol_i_eq, p);
 ssol_i_eq_SR_p = p; % temporarily save params
+verifyStabilization(ssol_i_eq_SR.sol, ssol_i_eq_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Illuminated, short circuit
@@ -303,6 +311,7 @@ p = sol_eq_p;
 p.Int = original_p.Int;
 
 sol_light = pindrift(sol_eq, p);
+verifyStabilization(sol_light.sol, sol_light.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Illuminated, short circuit, surface recombination
@@ -311,6 +320,7 @@ p = sol_eq_SR_p;
 p.Int = original_p.Int;
 
 sol_light_SR = pindrift(sol_eq_SR, p);
+verifyStabilization(sol_light_SR.sol, sol_light_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Illuminated, mobile ions, short circuit
@@ -319,6 +329,7 @@ p = sol_i_eq_p;
 p.Int = original_p.Int;
 
 sol_i_light = pindrift(sol_i_eq, p);
+verifyStabilization(sol_i_light.sol, sol_i_light.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Illuminated, mobile ions, short circuit, surface recombination
@@ -327,6 +338,7 @@ p = sol_i_eq_SR_p;
 p.Int = original_p.Int;
 
 sol_i_light_SR = pindrift(sol_i_eq_SR, p);
+verifyStabilization(sol_i_light_SR.sol, sol_i_light_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Illuminated, open circuit
@@ -335,6 +347,7 @@ p = ssol_eq_p;
 p.Int = original_p.Int;
 
 ssol_light = pindrift(ssol_eq, p);
+verifyStabilization(ssol_light.sol, ssol_light.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Illuminated, open circuit, surface recombination
@@ -343,6 +356,7 @@ p = ssol_eq_SR_p;
 p.Int = original_p.Int;
 
 ssol_light_SR = pindrift(ssol_eq_SR, p);
+verifyStabilization(ssol_light_SR.sol, ssol_light_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Illuminated, mobile ions, open circuit
@@ -351,6 +365,7 @@ p = ssol_i_eq_p;
 p.Int = original_p.Int;
 
 ssol_i_light = pindrift(ssol_i_eq, p);
+verifyStabilization(ssol_i_light.sol, ssol_i_light.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Illuminated, mobile ions, open circuit, surface recombination
@@ -359,6 +374,7 @@ p = ssol_i_eq_SR_p;
 p.Int = original_p.Int;
 
 ssol_i_light_SR = pindrift(ssol_i_eq_SR, p);
+verifyStabilization(ssol_i_light_SR.sol, ssol_i_light_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
 disp('EQUILIBRATION COMPLETE')
