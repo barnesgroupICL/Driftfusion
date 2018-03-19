@@ -1,9 +1,9 @@
-function [asymstruct, newVoc] = asymmetricize(symstruct, BC)
+function asymstruct = asymmetricize(symstruct, BC)
 %ASYMMETRICIZE - Break a symmetrical solution in two halves and stabilize the
 % asymmetrical model at pseudo-OC conditions applying Vapp equal to Voc
 % taken from the symmetrical solution
 %
-% Syntax:  [sol, newVoc] = asymmetricize(ssol, BC)
+% Syntax:  sol = asymmetricize(ssol, BC)
 %
 % Inputs:
 %   SYMSTRUCT - a symmetric struct as created by pindrift using the OC
@@ -13,7 +13,7 @@ function [asymstruct, newVoc] = asymmetricize(symstruct, BC)
 %
 %
 % Example:
-%   [sol_i_light_OC, newVoc] = asymmetricize(ssol_i_light, 1)
+%   sol_i_light_OC = asymmetricize(ssol_i_light, 1)
 %     take the first half of symmetrical solution at open circuit
 %
 % Other m-files required: pindrift
