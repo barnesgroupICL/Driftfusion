@@ -35,7 +35,7 @@ function struct_Int = changeLight(struct, newInt, tmax)
 
 %------------- BEGIN CODE --------------
 
-p = struct.params;
+p = struct.p;
 p.pulseon = 0;
 p.tmesh_type = 2;
 p.t0 = 1e-10;

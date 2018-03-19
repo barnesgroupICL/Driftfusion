@@ -67,7 +67,7 @@ elseif length(varargin) == 2
         
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
         
-        par = varargin{1, 1}.params;
+        par = varargin{1, 1}.p;
         icsol = varargin{1, 1}.sol;
         icx = varargin{1, 1}.x;
         
@@ -881,7 +881,7 @@ else
     
 end
 % Store params
-solstruct.params = par;
+solstruct.p = par;
 
 end
 

@@ -43,13 +43,13 @@ set(0, 'defaultLineLineWidth', 2);
 s = asymstruct_ISwave;
 
 % round should not be needed here
-% s.params.Vapp_params(4) should be pulsatance
-periods = round(s.params.tmax * s.params.Vapp_params(4) / (2 * pi));
+% s.p.Vapp_params(4) should be pulsatance
+periods = round(s.p.tmax * s.p.Vapp_params(4) / (2 * pi));
 % this works if, as now is, the frequency is constant internally each solution
 % round should not be needed here
 % here is critical that exactely an entire number of periods is provided to
 % ISwave_single_demodulator
-fit_t_index = round((s.params.tpoints - 1) * round(periods * 0.5) / periods) + 1;
+fit_t_index = round((s.p.tpoints - 1) * round(periods * 0.5) / periods) + 1;
 fit_t = s.t(fit_t_index:end);
 fit_J = s.Jtotr(fit_t_index:end) / 1000; % in Ampere
 
@@ -65,24 +65,24 @@ t_middle = fit_t(round(end/2));
 fit_J_flat = fit_J - tilting * (fit_t - t_middle);
 
 if demodulation
-    coeff = ISwave_single_demodulation(fit_t, fit_J_flat, s.params.Vapp_func, s.params.Vapp_params);
+    coeff = ISwave_single_demodulation(fit_t, fit_J_flat, s.p.Vapp_func, s.p.Vapp_params);
 else
-    coeff = ISwave_single_fit(fit_t, fit_J_flat, s.params.J_E_func);
+    coeff = ISwave_single_fit(fit_t, fit_J_flat, s.p.J_E_func);
 end
 
 %% calculate ionic contribution
-if s.params.mui % if there was ion mobility, current due to ions have been calculated, fit it
+if s.p.mui % if there was ion mobility, current due to ions have been calculated, fit it
     % Intrinsic points logical array
-    itype_points= (s.x >= s.params.tp & s.x <= s.params.tp + s.params.ti);
+    itype_points= (s.x >= s.p.tp & s.x <= s.p.tp + s.p.ti);
     % subtract background ion concentration, for having less noise in trapz
-    i_matrix = s.sol(:, :, 3) - s.params.NI;
+    i_matrix = s.sol(:, :, 3) - s.p.NI;
     % calculate electric field due to ions
-    Efield_i = s.params.e * cumtrapz(s.x, i_matrix, 2) / s.params.eppi;
+    Efield_i = s.p.e * cumtrapz(s.x, i_matrix, 2) / s.p.eppi;
     % an average would be enough if the spatial mesh was homogeneous in the
     % intrinsic, indeed I have to use trapz for considering the spatial mesh
-    Efield_i_mean = trapz(s.x(itype_points), Efield_i(:, itype_points), 2) / s.params.ti;
+    Efield_i_mean = trapz(s.x(itype_points), Efield_i(:, itype_points), 2) / s.p.ti;
     % calculate displacement current due to ions
-    Ji_disp = s.params.eppi * gradient(Efield_i_mean, s.t); % in Amperes
+    Ji_disp = s.p.eppi * gradient(Efield_i_mean, s.t); % in Amperes
 
     fit_Ji = Ji_disp(fit_t_index:end); % in Ampere
     
@@ -96,9 +96,9 @@ if s.params.mui % if there was ion mobility, current due to ions have been calcu
     fit_Ji_flat = fit_Ji' - tilting_i * (fit_t - t_middle);
 
     if demodulation
-        i_coeff = ISwave_single_demodulation(fit_t, fit_Ji_flat, s.params.Vapp_func, s.params.Vapp_params);
+        i_coeff = ISwave_single_demodulation(fit_t, fit_Ji_flat, s.p.Vapp_func, s.p.Vapp_params);
     else
-        i_coeff = ISwave_single_fit(fit_t, fit_Ji_flat, s.params.J_E_func);
+        i_coeff = ISwave_single_fit(fit_t, fit_Ji_flat, s.p.J_E_func);
     end
 else
     i_coeff = [NaN, NaN, NaN];
@@ -111,11 +111,11 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
     [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t,...
         subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(asymstruct_ISwave);
 
-    Vapp = s.params.Vapp_func(s.params.Vapp_params, s.t);
+    Vapp = s.p.Vapp_func(s.p.Vapp_params, s.t);
 
     % fourth value of Vapp_params is pulsatance
-    figure('Name', ['Single ISwave, Int ' num2str(s.params.Int) ' Freq '...
-        num2str(s.params.Vapp_params(4) / (2 * pi))], 'NumberTitle', 'off');
+    figure('Name', ['Single ISwave, Int ' num2str(s.p.Int) ' Freq '...
+        num2str(s.p.Vapp_params(4) / (2 * pi))], 'NumberTitle', 'off');
         yyaxis right
         hold off
         h(1) = plot(s.t, Vapp, 'r', 'LineWidth', 2);
@@ -129,12 +129,12 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         h(3) = plot(s.t, -s.Jdispr); % mA
         h(4) = plot(s.t(2:end), -subtracting_n_intr_t * 1000); % mA
         h(5) = plot(s.t(2:end), -subtracting_n_contacts_t * 1000); % mA
-        h(6) = plot(fit_t, -s.params.J_E_func_tilted(coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
+        h(6) = plot(fit_t, -s.p.J_E_func_tilted(coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
 
         legend_array = [legend_array, "Current", "Displacement current", "Charge variation intrinsic", "Charge variation contacts", "1st harmonic"];
-        if s.params.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
+        if s.p.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             h(7) = plot(s.t, -Ji_disp * 1000); % mA
-            h(8) = plot(fit_t, -s.params.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
+            h(8) = plot(fit_t, -s.p.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
             legend_array = [legend_array, "Ionic displacement current", "Ionic disp J fit"];
         end
         ylabel('Current [mA/cm^2]');

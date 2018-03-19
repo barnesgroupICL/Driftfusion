@@ -109,17 +109,17 @@ J_i_phase = tmax_matrix;
 disp([mfilename ' - Doing the IS at various light intensities']);
 for i = 1:length(structs(1, :))
     struct = structs{1, i};
-    Int_array(i) = struct.params.Int;
+    Int_array(i) = struct.p.Int;
     % decrease annoiance by figures popping up
-    struct.params.figson = 0;
-    if struct.params.OC % in case the solution is symmetric, break it in halves
+    struct.p.figson = 0;
+    if struct.p.OC % in case the solution is symmetric, break it in halves
         [asymstruct_Int, Vdc_array(i)] = asymmetricize(struct, BC); % normal BC 1 should work, also BC 2 can be employed
     else
         asymstruct_Int = struct;
         Vdc_array(i) = struct.Efn(end) - struct.Efp(1);
     end
     if frozen_ions
-        asymstruct_Int.params.mui = 0; % if frozen_ions option is set, freezing ions
+        asymstruct_Int.p.mui = 0; % if frozen_ions option is set, freezing ions
     end
     % if Parallel Computing Toolbox is not available, the following line
     % will work as a normal for cycle
@@ -173,7 +173,7 @@ for i = 1:length(structs(1, :))
 
         % as the number of periods is fixed, there's no need for tmax to be
         % a matrix, but this could change, so it's a matrix
-        tmax_matrix(i,j) = asymstruct_ISwave.params.tmax;
+        tmax_matrix(i,j) = asymstruct_ISwave.p.tmax;
     end
 end
 

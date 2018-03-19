@@ -46,7 +46,7 @@ Int_array = [Int_array, 1]; % 1 sun should always be included, it will be always
 if isa(struct_eq, 'struct') % dark calculation can be disabled using "false" as first command argument
     Int_array = [Int_array, 0];
     % decrease annoiance by figures popping up
-    struct_eq.params.figson = 0;
+    struct_eq.p.figson = 0;
 end
 
 Int_array = unique(Int_array); % remove duplicates
@@ -72,13 +72,13 @@ for i = 1:length(Int_array)
         % previously set struct_Int
     end
     % decrease annoiance by figures popping up
-    struct_Int.params.figson = 0;
+    struct_Int.p.figson = 0;
     % in any case (even the one not considered by the if), stabilize at the new intensity
     struct_Int = changeLight(struct_Int, Int_array(i), changeLight_tmax); % change light intensity
-    changeLight_tmax = max(struct_Int.params.tmax / 5, 1e-8); % time to use for next iteration
+    changeLight_tmax = max(struct_Int.p.tmax / 5, 1e-8); % time to use for next iteration
 
     % restore figson before saving
-    struct_Int.params.figson = 1;
+    struct_Int.p.figson = 1;
     structCell{1, i} = struct_Int;
     structCell{2, i} = name;
     assignin('base', name, struct_Int);

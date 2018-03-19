@@ -37,7 +37,7 @@ function [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtr
 s = asymstruct_ISwave;
 
 % Intrinsic points logical array
-itype_points= (s.x >= s.params.tp & s.x <= s.params.tp + s.params.ti);
+itype_points= (s.x >= s.p.tp & s.x <= s.p.tp + s.p.ti);
 
 % make a new matrix subtracting from each profile at a time point the
 % profile at the previous time point, the resulting rows will be one row
@@ -61,7 +61,7 @@ n_delta_t = transpose(trapz(s.x, n_delta_matrix, 2));
 % middle could be not the correct point to use, but good enough
 % get the index of the point closest to thickness p-type + half of
 % thickness intrinsic
-[~, x_center_index] = min(abs(s.x - (s.params.tp + s.params.ti / 2)));
+[~, x_center_index] = min(abs(s.x - (s.p.tp + s.p.ti / 2)));
 % invert in sign the second spatial half of the ion profile, so that the
 % integral over the thickness doesn't result always zero
 i_delta_reflex_matrix = i_delta_matrix;
@@ -80,13 +80,13 @@ n_delta_intr_t = transpose(trapz(s.x(itype_points), n_delta_matrix(:, itype_poin
 
 %% dividing by time delta converts the output in a current
 % convert from number of electrons to charge per time point
-subtracting_n_t = -s.params.e * n_delta_t ./ t_array;
+subtracting_n_t = -s.p.e * n_delta_t ./ t_array;
 % convert from number of ions to charge per time point
-subtracting_i_abs_t = s.params.e * i_delta_abs_t ./ t_array;
+subtracting_i_abs_t = s.p.e * i_delta_abs_t ./ t_array;
 % convert from number of ions to charge per time point
-subtracting_i_t = s.params.e * i_delta_t ./ t_array;
+subtracting_i_t = s.p.e * i_delta_t ./ t_array;
 % convert from number of electrons in the intrinsic to charge per time point
-subtracting_n_intr_t = -s.params.e * n_delta_intr_t ./ t_array;
+subtracting_n_intr_t = -s.p.e * n_delta_intr_t ./ t_array;
 % this is the same as actually doing the integral in the contacts
 subtracting_n_contacts_t = subtracting_n_t - subtracting_n_intr_t;
 

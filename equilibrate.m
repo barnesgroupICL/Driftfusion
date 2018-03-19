@@ -105,7 +105,7 @@ assignin('base', [name 'sol_eq'], sol_eq);
 
 %% SC condition without ions at 1 sun conditions
 
-p = sol_eq.params;
+p = sol_eq.p;
 p.Int = 1;
 
 sol_light = pindrift(sol_eq, p);
@@ -115,7 +115,7 @@ assignin('base', [name 'sol_light'], sol_light);
 
 symsol = symmetricize(sol_eq);
 
-p = sol_eq.params;
+p = sol_eq.p;
 p.OC = 1;
 
 ssol_eq = pindrift(symsol, p);
@@ -123,7 +123,7 @@ assignin('base', [name 'ssol_eq'], ssol_eq);
 
 %% OC condition without ions at 1 sun conditions
 
-p = ssol_eq.params;
+p = ssol_eq.p;
 p.Int = 1;
 
 ssol_light = pindrift(ssol_eq, p);
@@ -131,7 +131,7 @@ assignin('base', [name 'ssol_light'], ssol_light);
 
 %% SC condition with ions in dark
 
-p = sol_eq.params;
+p = sol_eq.p;
 
 %Switch on ion mobility
 p.mui = original_p.mui; % ionic mobility
@@ -141,7 +141,7 @@ assignin('base', [name 'sol_i_eq'], sol_i_eq);
 
 %% SC condition with ions at 1 sun conditions
 
-p = sol_i_eq.params;
+p = sol_i_eq.p;
 p.Int = 1;
 
 sol_i_light = pindrift(sol_i_eq, p);
@@ -151,7 +151,7 @@ assignin('base', [name 'sol_i_light'], sol_i_light);
 
 symsol = symmetricize(sol_i_eq);
 
-p = sol_i_eq.params;
+p = sol_i_eq.p;
 p.OC = 1;
 
 warning('off', 'pindrift:verifyStabilization'); % the following line is expected to fail on stabilization
@@ -170,7 +170,7 @@ assignin('base', [name 'ssol_i_eq'], ssol_i_eq);
 
 %% OC condition with ions at 1 sun conditions
 
-p = ssol_i_eq.params;
+p = ssol_i_eq.p;
 p.Int = 1;
 
 p.tmax = 10;

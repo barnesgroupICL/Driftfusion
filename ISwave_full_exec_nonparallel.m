@@ -116,17 +116,17 @@ J_i_phase = tmax_matrix;
 disp([mfilename ' - Doing the IS at various light intensities']);
 for i = 1:length(symstructs(1, :))
     struct = symstructs{1, i};
-    Int_array(i) = struct.params.Int;
+    Int_array(i) = struct.p.Int;
     % decrease annoiance by figures popping up
-    struct.params.figson = 0;
-    if struct.params.OC % in case the solution is symmetric, break it in halves
+    struct.p.figson = 0;
+    if struct.p.OC % in case the solution is symmetric, break it in halves
         [asymstruct_Int, Vdc_array(i)] = asymmetricize(struct, BC); % normal BC 1 should work, also BC 2 can be employed
     else
         asymstruct_Int = struct;
         Vdc_array(i) = struct.Efn(end) - struct.Efp(1);
     end
     if frozen_ions
-        asymstruct_Int.params.mui = 0; % if frozen_ions option is set, freezing ions
+        asymstruct_Int.p.mui = 0; % if frozen_ions option is set, freezing ions
     end
     % simulate first frequency with the stabilized solution
     asymstruct_start = asymstruct_Int;
@@ -193,11 +193,11 @@ for i = 1:length(symstructs(1, :))
 
         % as the number of periods is fixed, there's no need for tmax to be
         % a matrix, but this could change, so it's a matrix
-        tmax_matrix(i,j) = asymstruct_ISwave.params.tmax;
+        tmax_matrix(i,j) = asymstruct_ISwave.p.tmax;
         
         if save_solutions % assignin cannot be used in a parallel loop, so single solutions cannot be saved
             sol_name = matlab.lang.makeValidName([symstructs{2, i} '_Freq_' num2str(Freq_array(j)) '_ISwave']);
-            asymstruct_ISwave.params.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
+            asymstruct_ISwave.p.figson = 1; % re-enable figures by default when using the saved solution, that were disabled above
             assignin('base', sol_name, asymstruct_ISwave);
         end
         % in case the next simulation is run starting from the last time
