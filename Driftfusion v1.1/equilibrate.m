@@ -190,16 +190,17 @@ sol = pindrift(sol_eq, p);
 p.calcJ = 2;
 p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
+p.mui = original_p.mui; % Ions are set to the correct speed indicated in pinParams
 
 sol_i_eq = pindrift(sol, p);
 disp('Complete')
 
 %% Ion equilibrium with surface recombination
 disp('Switching on surface recombination')
-p.taun_etl = 1e-11;
-p.taup_etl = 1e-11;
-p.taun_htl = 1e-11;
-p.taup_htl = 1e-11; 
+p.taun_etl = original_p.taun_etl;
+p.taup_etl = original_p.taup_etl;
+p.taun_htl = original_p.taun_htl;
+p.taup_htl = original_p.taup_htl;
 
 p.calcJ = 0;
 p.tmax = 1e-6;
