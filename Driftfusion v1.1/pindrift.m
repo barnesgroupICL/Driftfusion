@@ -467,7 +467,7 @@ solstruct.p = p;
 
 if p.Ana == 1
     
-    [Voc, Vapp_arr, Jn] = pinAna(solstruct);
+    [Voc, Vapp_arr, Jn, Efn, Efp] = pinAna(solstruct);
     
     if p.OC == 1
         
@@ -486,6 +486,9 @@ if p.Ana == 1
         solstruct.Jn = Jn;
         
     end
+    
+    solstruct.Efn = Efn;
+    solstruct.Efp = Efp;
     
 end
 
