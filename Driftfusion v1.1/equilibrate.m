@@ -1,4 +1,4 @@
-function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq, ssol_i_eq_SR] = equilibrate
+function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_light, sol_light_SR, sol_i_light, sol_i_light_SR, ssol_light, ssol_light_SR, ssol_i_light, ssol_i_light_SR] = equilibrate
 %EQUILIBRATE Uses analytical initial conditions and runs to equilibrium and steady state
 % Takes the parameters from pinParams.m file and tries
 % to obtain an equilibrium solution (as if the device has been left for
@@ -295,6 +295,70 @@ p.taup_htl = original_p.taup_htl;
 
 ssol_i_eq_SR = pindrift(ssol_i_eq, p);
 ssol_i_eq_SR_p = p; % temporarily save params
+disp('Complete')
+
+%% Illuminated, short circuit
+disp("Illuminated, short circuit")
+p = sol_eq_p;
+p.Int = original_p.Int;
+
+sol_light = pindrift(sol_eq, p);
+disp('Complete')
+
+%% Illuminated, short circuit, surface recombination
+disp("Illuminated, short circuit, surface recombination")
+p = sol_eq_SR_p;
+p.Int = original_p.Int;
+
+sol_light_SR = pindrift(sol_eq_SR, p);
+disp('Complete')
+
+%% Illuminated, mobile ions, short circuit
+disp("Illuminated, mobile ions, short circuit")
+p = sol_i_eq_p;
+p.Int = original_p.Int;
+
+sol_i_light = pindrift(sol_i_eq, p);
+disp('Complete')
+
+%% Illuminated, mobile ions, short circuit, surface recombination
+disp("Illuminated, mobile ions, short circuit, surface recombination")
+p = sol_i_eq_SR_p;
+p.Int = original_p.Int;
+
+sol_i_light_SR = pindrift(sol_i_eq_SR, p);
+disp('Complete')
+
+%% Illuminated, open circuit
+disp("Illuminated, open circuit")
+p = ssol_eq_p;
+p.Int = original_p.Int;
+
+ssol_light = pindrift(ssol_eq, p);
+disp('Complete')
+
+%% Illuminated, open circuit, surface recombination
+disp("Illuminated, open circuit, surface recombination")
+p = ssol_eq_SR_p;
+p.Int = original_p.Int;
+
+ssol_light_SR = pindrift(ssol_eq_SR, p);
+disp('Complete')
+
+%% Illuminated, mobile ions, open circuit
+disp("Illuminated, mobile ions, open circuit")
+p = ssol_i_eq_p;
+p.Int = original_p.Int;
+
+ssol_i_light = pindrift(ssol_i_eq, p);
+disp('Complete')
+
+%% Illuminated, mobile ions, open circuit, surface recombination
+disp("Illuminated, mobile ions, open circuit, surface recombination")
+p = ssol_i_eq_SR_p;
+p.Int = original_p.Int;
+
+ssol_i_light_SR = pindrift(ssol_i_eq_SR, p);
 disp('Complete')
 
 disp('EQUILIBRATION COMPLETE')
