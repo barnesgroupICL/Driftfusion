@@ -40,7 +40,7 @@ end
 
 % General Parameters
 OC = 0;                 % Closed circuit = 0, Open Circuit = 1 
-Int = 0;                % Bias Light intensity (Suns Eq.)
+Int = 1;                % Bias Light intensity (Suns Eq.)
 G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
 tmax = 1e-3;            % Time
 pulseon = 0;            % Switch pulse on TPC or TPV
