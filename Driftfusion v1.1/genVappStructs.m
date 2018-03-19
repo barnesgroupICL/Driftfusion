@@ -36,10 +36,10 @@ function structCell = genVappStructs(asymstruct, startVapp, endVapp, points)
 asymstruct_Vapp = asymstruct;
 
 % estimate a good tmax
-if asymstruct_Vapp.params.mui
-    tmax_temp = 2^(-log10(asymstruct_Vapp.params.mui)) / 10 + 2^(-log10(asymstruct_Vapp.params.mue_i));
+if asymstruct_Vapp.p.mui
+    tmax_temp = 2^(-log10(asymstruct_Vapp.p.mui)) / 10 + 2^(-log10(asymstruct_Vapp.p.mue_i));
 else
-    tmax_temp = 2^(-log10(asymstruct_Vapp.params.mue_i));
+    tmax_temp = 2^(-log10(asymstruct_Vapp.p.mue_i));
 end
 
 % define linearly spaced applied voltage values
@@ -63,9 +63,9 @@ for i = 1:length(Vapp_array)
         % previously set struct_Vapp
     end
     % decrease annoiance by figures popping up
-    asymstruct_Vapp.params.figson = 0;
+    asymstruct_Vapp.p.figson = 0;
     
-    p = asymstruct_Vapp.params;
+    p = asymstruct_Vapp.p;
     % prepare parameters for the voltage change
     p.tmesh_type = 2;
     p.t0 = 1e-10;
@@ -85,7 +85,7 @@ for i = 1:length(Vapp_array)
     asymstruct_Vapp = pindrift(asymstruct_Vapp, p);
 
     % restore figson before saving
-    asymstruct_Vapp.params.figson = 1;
+    asymstruct_Vapp.p.figson = 1;
     structCell{1, i} = asymstruct_Vapp;
     structCell{2, i} = name;
     assignin('base', name, asymstruct_Vapp);
