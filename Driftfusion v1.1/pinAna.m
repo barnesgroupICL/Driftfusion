@@ -1,4 +1,4 @@
-function [Voc, Vapp_arr, Jn] = pinAna(solstruct)
+function [Voc, Vapp_arr, Jn, Efn, Efp] = pinAna(solstruct)
 
 % pinAna analyses the input solution and plots various useful graphs.
 % Many plots are available to the user although currently these are
