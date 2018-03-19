@@ -184,7 +184,7 @@ disp('Complete')
 disp('Closed circuit equilibrium with ions')
 
 p.OC = 0;
-p.tmax = 1e-9;
+p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
 p.mui = 1e-6;           % Ions are accelerated to reach equilibrium
 
@@ -192,7 +192,7 @@ sol = pindrift(sol_eq, p);
 
 % Much longer second step to ensure that ions have migrated
 p.calcJ = 2;
-p.tmax = 1e-2;
+p.tmax = 1e2;
 p.t0 = p.tmax/1e3;
 p.mui = original_p.mui; % Ions are set to the correct speed indicated in pinParams
 
@@ -252,13 +252,13 @@ p.muh_n = original_p.muh_n; % hole mobility in n-type
 ssol = pindrift(ssol, p);
 
 % Switch on ion mobility to ensure equilibrium has been reached
-p.tmax = 1e-9;
+p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
 p.mui = original_p.mui; % this requires mui to be set in the original params
 
 ssol = pindrift(ssol, p);
 
-p.tmax = 1e-2;
+p.tmax = 1e2;
 p.t0 = p.tmax/1e3;
 
 ssol_i_eq = pindrift(ssol, p);
@@ -345,6 +345,7 @@ disp('Complete')
 disp("Illuminated, open circuit")
 p = ssol_eq_p;
 p.Int = original_p.Int;
+p.tmax = 1e-1;
 
 ssol_light = pindrift(ssol_eq, p);
 verifyStabilization(ssol_light.sol, ssol_light.t, 0.2); % verify solution stability
@@ -365,6 +366,11 @@ p = ssol_i_eq_p;
 p.Int = original_p.Int;
 
 ssol_i_light = pindrift(ssol_i_eq, p);
+
+p.tmax = 1e3;
+
+ssol_i_light = pindrift(ssol_i_light, p);
+
 verifyStabilization(ssol_i_light.sol, ssol_i_light.t, 0.2); % verify solution stability
 disp('Complete')
 
