@@ -32,7 +32,7 @@ function [asymstruct, newVoc] = asymmetricize(symstruct, BC)
 
 %------------- BEGIN CODE --------------
 
-p = symstruct.params;
+p = symstruct.p;
 p.OC = 0; % without setting OC to 0 BC gets ignored, OC 0 is needed for the asymmetric solution
 p.BC = BC;
 p.tpoints = 5; % rough, just for re-stabilization at Vapp
