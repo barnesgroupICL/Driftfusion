@@ -82,7 +82,7 @@ p.taup_htl = 1e6;
 
 %% General initial parameters
 p.tmesh_type = 2;
-p.tpoints = 200;
+p.tpoints = 20;
 
 p.Ana = 0;
 p.JV = 0;
