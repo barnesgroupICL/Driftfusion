@@ -80,10 +80,13 @@ rho_a_tot = trapz(p.x, rho_a, 2)/p.xmax;    % Total Net ion charge
 ntot = trapz(p.x, n, 2);                  % Integrated electron density 
 ptot = trapz(p.x, P, 2);                  % Integrated hole density
 
-if p.JV == 1
-    Vapp_arr = p.Vstart + ((p.Vend-p.Vstart)*p.t*(1/p.tmax)); % Current voltage array
-else
-    Vapp_arr = nan;
+switch p.JV % Current voltage array
+    case 1
+        Vapp_arr = p.Vstart + ((p.Vend-p.Vstart)*p.t*(1/p.tmax));
+    case 2
+        Vapp_arr = p.Vapp_func(p.Vapp_params, p.t);
+    otherwise
+        Vapp_arr = NaN;
 end
 
 if p.OC == 0
