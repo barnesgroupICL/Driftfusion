@@ -5,7 +5,8 @@ function struct_Int = changeLight(struct, newInt, tmax)
 %
 % Inputs:
 %   STRUCT - a solution struct as created by PINDRIFT.
-%   NEWINT - the requested light intensity
+%   NEWINT - the requested light intensity, zero is not supported as it is
+%     much more robust to obtain a dark solution directly from equilibrate
 %   TMAX - the initial stabilization time, can be zero for an automatic
 %     guess
 %
