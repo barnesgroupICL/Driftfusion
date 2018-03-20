@@ -37,9 +37,9 @@ asymstruct_Vapp = asymstruct;
 
 % estimate a good tmax
 if asymstruct_Vapp.p.mui
-    tmax_temp = 2^(-log10(asymstruct_Vapp.p.mui)) / 10 + 2^(-log10(asymstruct_Vapp.p.mue_i));
+    tmax_temp = min(1e3, 2^(-log10(asymstruct_Vapp.p.mui)) / 10 + 2^(-log10(asymstruct_Vapp.p.mue_i)));
 else
-    tmax_temp = 2^(-log10(asymstruct_Vapp.p.mue_i));
+    tmax_temp = min(1, 2^(-log10(asymstruct_Vapp.p.mue_i)));
 end
 
 % define linearly spaced applied voltage values
