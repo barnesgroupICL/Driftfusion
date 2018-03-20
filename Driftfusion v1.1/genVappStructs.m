@@ -77,16 +77,25 @@ for i = 1:length(Vapp_array)
     % ideal sudden change is voltage maybe cannot be solved
     % boundary conditions have to be changed more slowly 
     % the solver needs at least one point at the starting voltage, before switching to short circuit
-    p.JV = 2; % new mode for fast Voc changes
-    p.t_npoints_V_step = 10; % new variable for Voc sudden changes, if equals tpoints is like a JV scan, minimum 2 points which is a direct step
-    p.Vstart = asymstruct_Vapp.Efn(end) - asymstruct_Vapp.Efp(1);
-    p.Vend = Vapp_array(i); % final Voc
+    p.JV = 2; % new mode for arbitrary Vapp profiles
+    [~, ~, ~, Efn, Efp] = pinAna(asymstruct_Vapp); % quasi-fermi levels are needed for knowing the current Voc
+    Vstart = Efn(end, end) - Efp(end, 1); % current Voc
+    Vend = Vapp_array(i); % final Voc
+    
+    % the third parameter is the time point when the change from the old
+    % voltage to the new one happens
+    p.Vapp_params = [Vstart, Vend, 10 * p.t0];
+    % starts at Vstart, linear Vapp decrease for the first points, then constant to Vend
+    p.Vapp_func = @(coeff, t) (coeff(1) + (coeff(2)-coeff(1)).*t/coeff(3)) .* (t < coeff(3)) + coeff(2) .* (t >= coeff(3));
 
     % go to the new Vapp
     asymstruct_Vapp = pindrift(asymstruct_Vapp, p);
 
     % restore figson before saving
     asymstruct_Vapp.p.figson = 1;
+    % eliminate JV configuration before saving
+    asymstruct_Vapp.p.JV = 0;
+    
     structCell{1, i} = asymstruct_Vapp;
     structCell{2, i} = name;
     assignin('base', name, asymstruct_Vapp);
