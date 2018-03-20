@@ -54,9 +54,6 @@ else % if tmax was zero, estimate a good one
 end
 p.tmax = tmax_temp;
 
-% warnings about stability are not needed in the first steps
-warning('off', 'pindrift:verifyStabilization'); 
-
 % change light intensity in small steps
 steps = 1 + ceil(abs(log10(newInt / p.Int)));
 
@@ -78,13 +75,10 @@ while ~verifyStabilization(struct_Int.sol, struct_Int.t, 1e-8) % check stability
     p.tmax = tmax_temp;
     disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
     struct_Int = pindrift(struct_Int, p);
-    tmax_temp = p.tmax * 10; % this change gets saved in sol_Int only if another cycle is performed
+    tmax_temp = p.tmax * 10;
 end
 
-% warnings about stability can be useful again
-warning('on', 'pindrift:verifyStabilization');
-
-% just repeat the last one, for sake of paranoia yeee
+% just repeat the last one, for sake of paranoia
 disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
 struct_Int = pindrift(struct_Int, p);
 
