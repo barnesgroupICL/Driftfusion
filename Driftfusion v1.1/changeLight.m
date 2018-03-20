@@ -80,12 +80,14 @@ for i = 2:length(Int_array)
 end
 
 %% stabilize
+warning('off', 'pindrift:verifyStabilization');
 while ~verifyStabilization(struct_Int.sol, struct_Int.t, 1e-8) % check stability in a strict way
     p.tmax = tmax_temp;
     disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
     struct_Int = pindrift(struct_Int, p);
     tmax_temp = p.tmax * 10;
 end
+warning('on', 'pindrift:verifyStabilization');
 
 % just repeat the last one, for sake of paranoia
 disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
