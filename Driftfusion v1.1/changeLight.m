@@ -47,9 +47,9 @@ if tmax
     tmax_temp = tmax;
 else % if tmax was zero, estimate a good one
     if p.mui
-        tmax_temp = 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i));
+        tmax_temp = min(1e3, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i)));
     else
-        tmax_temp = 2^(-log10(p.mue_i));
+        tmax_temp = min(1, 2^(-log10(p.mue_i)));
     end
 end
 p.tmax = tmax_temp;
