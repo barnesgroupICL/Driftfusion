@@ -348,6 +348,9 @@ p.Int = original_p.Int;
 p.tmax = 1e-1;
 
 ssol_light = pindrift(ssol_eq, p);
+% repeat for stabilization
+ssol_light = pindrift(ssol_light, p);
+
 verifyStabilization(ssol_light.sol, ssol_light.t, 0.2); % verify solution stability
 disp('Complete')
 
@@ -367,6 +370,7 @@ p.Int = original_p.Int;
 
 ssol_i_light = pindrift(ssol_i_eq, p);
 
+% repeat for stabilization
 p.tmax = 1e3;
 
 ssol_i_light = pindrift(ssol_i_light, p);
