@@ -37,6 +37,7 @@ function struct_Int = changeLight(struct, newInt, tmax)
 
 p = struct.p;
 p.pulseon = 0;
+p.calcJ = 0;
 p.tmesh_type = 2;
 p.t0 = 1e-10;
 p.tpoints = 30;
