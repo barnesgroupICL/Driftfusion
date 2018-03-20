@@ -55,11 +55,18 @@ else % if tmax was zero, estimate a good one
 end
 p.tmax = tmax_temp;
 
-% change light intensity in small steps
-steps = 1 + ceil(abs(log10(newInt / p.Int)));
+% find the initial illumination intensity, if it's zero (dark) just use
+% 1e-4, so that the first stabilization will be from dark to 1e-3
+if p.Int
+    oldInt = p.Int;
+    steps = 1 + ceil(abs(log10(newInt / oldInt)));
+else
+    oldInt = 1e-4;
+    steps = 1 + ceil(max(1, log10(newInt / oldInt)));
+end
 
 % if the step is just one, then newInt is the output of logspace function
-Int_array = logspace(log10(p.Int), log10(newInt), steps);
+Int_array = logspace(log10(oldInt), log10(newInt), steps);
 
 %% change light in steps
 % not needed to reach a good stabilized solution in
