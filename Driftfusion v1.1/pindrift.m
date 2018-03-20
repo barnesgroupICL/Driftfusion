@@ -341,10 +341,11 @@ end
 function [pl,ql,pr,qr] = pdex4bc(xl,ul,xr,ur,t)
 
 %% Current voltage scan, voltage sweep
-if p.JV == 1
-        
-    p.Vapp = p.Vstart + ((p.Vend-p.Vstart)*t*(1/p.tmax));
-    
+switch p.JV
+    case 1 % normal JV scan
+        p.Vapp = p.Vstart + ((p.Vend-p.Vstart)*t*(1/p.tmax));
+    case 2 % for custom profile of voltage
+        p.Vapp = p.Vapp_func(p.Vapp_params, t);
 end
 
 %% Open circuit condition- symmetric model
@@ -475,7 +476,7 @@ if p.Ana == 1
         
     end
     
-    if p.JV == 1
+    if p.JV
         
         solstruct.Vapp = Vapp_arr;
         
