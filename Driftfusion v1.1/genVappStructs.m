@@ -1,21 +1,24 @@
-function structCell = genVappStructs(asymstruct, startVapp, endVapp, points)
+function structCell = genVappStructs(asymstruct, Vapp_array)
 %GENVAPPSTRUCTS - Generates a cell containing asymmetric structures of solutions at various applied voltages
 %
 % Syntax:  structCell = genVappStructs(asymstruct, startVapp, endVapp, points)
 %
 % Inputs:
 %   ASYMSTRUCT - a solution asymmetric struct as created by PINDRIFT.
-%   STARTVAPP - higher requested Vapp.
-%   ENDVAPP - lower requested Vapp.
-%   POINTS - number of applied voltages requested between STARTVAPP and ENDVAPP, including extrema.
+%   VAPP_ARRAY - an array containing the requested Vapp list.
 %
 % Outputs:
 %   STRUCTCELL - a cell containing structs of solutions at various applied
-%     voltages
+%     voltages, ordered with ascending voltages
 %
 % Example:
-%   structs_Vapp_dark = genVappStructs(sol_i_eq, 1, 0, 6);
-%     generates dark solutions at 6 different applied voltages
+%   structs_Vapp_dark = genVappStructs(sol_i_eq, 0:0.2:1);
+%     generates dark solutions at 0, 0.2, 0.4, 0.6, 0.8 and 1 V applied voltages
+%   structs_Vapp_dark = genVappStructs(sol_i_eq, linspace(0, 1, 15));
+%     generates dark solutions at 15 different voltages from 0 to 1 V
+%   structs_Vapp_dark = genVappStructs(sol_i_eq, [0, 0.8, 0.9]);
+%     generates dark solutions at a list of applied voltages, remember that
+%     the list will have an ascending ordering in the output structure
 %
 % Other m-files required: pindrift
 % Subfunctions: none
@@ -42,8 +45,6 @@ else
     tmax_temp = min(1, 2^(-log10(asymstruct_Vapp.p.mue_i)));
 end
 
-% define linearly spaced applied voltage values
-Vapp_array = linspace(startVapp, endVapp, points);
 % usually the solution in short circuit is given in input, so start from
 % zero Vapp
 Vapp_array = sort(Vapp_array, 'ascend');
