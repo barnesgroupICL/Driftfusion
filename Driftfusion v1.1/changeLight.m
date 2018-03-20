@@ -89,8 +89,4 @@ while ~verifyStabilization(struct_Int.sol, struct_Int.t, 1e-8) % check stability
 end
 warning('on', 'pindrift:verifyStabilization');
 
-% just repeat the last one, for sake of paranoia
-disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
-struct_Int = pindrift(struct_Int, p);
-
 %------------- END OF CODE --------------
