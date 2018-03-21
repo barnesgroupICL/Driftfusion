@@ -117,7 +117,7 @@ t = meshgen_t(p);
 %% Call solver
 
 % SOLVER OPTIONS  - limit maximum time step size during integration.
-options = odeset('MaxOrder',5, 'NonNegative', [1, 1, 1, 0]);%, 'RelTol', 1e-7);     % Reduce RelTol to improve accuracy of solution
+options = odeset('MaxOrder',5, 'NonNegative', [1, 1, 1, 0], 'RelTol', p.RelTol); % Reduce RelTol to improve precision of solution
 
 % inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
@@ -341,10 +341,11 @@ end
 function [pl,ql,pr,qr] = pdex4bc(xl,ul,xr,ur,t)
 
 %% Current voltage scan, voltage sweep
-if p.JV == 1
-        
-    p.Vapp = p.Vstart + ((p.Vend-p.Vstart)*t*(1/p.tmax));
-    
+switch p.JV
+    case 1 % normal JV scan
+        p.Vapp = p.Vstart + ((p.Vend-p.Vstart)*t*(1/p.tmax));
+    case 2 % for custom profile of voltage
+        p.Vapp = p.Vapp_func(p.Vapp_params, t);
 end
 
 %% Open circuit condition- symmetric model
@@ -467,7 +468,7 @@ solstruct.p = p;
 
 if p.Ana == 1
     
-    [Voc, Vapp_arr, Jn] = pinAna(solstruct);
+    [Voc, Vapp_arr, Jn, ~, ~] = pinAna(solstruct);
     
     if p.OC == 1
         
@@ -475,7 +476,7 @@ if p.Ana == 1
         
     end
     
-    if p.JV == 1
+    if p.JV
         
         solstruct.Vapp = Vapp_arr;
         

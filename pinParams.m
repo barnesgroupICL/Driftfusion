@@ -40,7 +40,7 @@ end
 
 % General Parameters
 OC = 0;                 % Closed circuit = 0, Open Circuit = 1 
-Int = 0;                % Bias Light intensity (Suns Eq.)
+Int = 1;                % Bias Light intensity (Suns Eq.)
 G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
 tmax = 1e-3;            % Time
 pulseon = 0;            % Switch pulse on TPC or TPV
@@ -52,7 +52,6 @@ mesht_figon = 0;        % Toggles t-mesh figures on/off
 side = 1;               % illumination side 1 = EE, 2 = SE
 calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position, calcJ = 2, calculates DD at boundary.
 mobset = 1;             % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
-mobseti = 0;            % Switch on/off ion mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
 JV = 0;                 % Toggle run JV scan on/off
 Ana = 1;                % Toggle on/off analysis
 
@@ -127,13 +126,7 @@ else
     
 end
 
-if mobseti == 0
-        
-    mui = 0;    % ion mobility
-else 
-        
-    mui = 1e-10;    % ion mobility
-end
+mui = 1e-10; % ion mobility
 
 eppp = 20*epp0;         % Dielectric constant p-type
 eppi = 20*epp0;         % Dielectric constant intrinsic
@@ -184,9 +177,9 @@ kradhtl = krad;         % [cm3 s-1] HTL Radiative Recombination coefficient
 
 % SRH recmobination in the contact regions, 
 % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-taun_etl = 1e6;         % [s] SRH time constant for electrons
+taun_etl = 1e-11;         % [s] SRH time constant for electrons
 taup_etl = taun_etl;    % [s] SRH time constant for holes
-taun_htl = 1e6;        %%%% USE a high value of (e.g.) 1 to switch off
+taun_htl = 1e-11;        %%%% USE a high value of (e.g.) 1 to switch off
 taup_htl = taun_htl;    %%%% NOT 0- these variables are in the denominator
 taun_i = 1e6;
 taup_i = 1e6;
@@ -209,6 +202,10 @@ pti = ni*exp((Ei-Eti)/(kB*T));
 % Define geometry of the system (m=0 1D, m=1 cylindrical polar coordinates,
 % m=2 spherical polar coordinates).
 m = 0;
+
+% Define the default relative tolerance for the pdepe solver
+% 1e-3 is the default, can be decreased if more precision is needed
+RelTol = 1e-3;
 
 % Space Charge Region- initial guess required with trial and error better
 % than analytical solution
