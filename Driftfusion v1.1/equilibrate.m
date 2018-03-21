@@ -191,7 +191,7 @@ p.mui = 1e-6;           % Ions are accelerated to reach equilibrium
 sol = pindrift(sol_eq, p);
 
 % Much longer second step to ensure that ions have migrated
-p.calcJ = 2;
+p.calcJ = 0;
 p.tmax = 1e2;
 p.t0 = p.tmax/1e3;
 p.mui = original_p.mui; % Ions are set to the correct speed indicated in pinParams
