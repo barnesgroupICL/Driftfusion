@@ -45,11 +45,10 @@ s = asymstruct_ISwave;
 % round should not be needed here
 % s.p.Vapp_params(4) should be pulsatance
 periods = round(s.p.tmax * s.p.Vapp_params(4) / (2 * pi));
-% this works if, as now is, the frequency is constant internally each solution
-% round should not be needed here
+
 % here is critical that exactely an entire number of periods is provided to
 % ISwave_single_demodulator
-fit_t_index = round((s.p.tpoints - 1) * round(periods * 0.5) / periods) + 1;
+fit_t_index = round((s.p.tpoints - 1) * round(periods / 2) / periods) + 1;
 fit_t = s.t(fit_t_index:end);
 fit_J = s.Jtotr(fit_t_index:end) / 1000; % in Ampere
 
