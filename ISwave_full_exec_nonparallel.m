@@ -120,17 +120,18 @@ for i = 1:length(symstructs(1, :))
     % decrease annoiance by figures popping up
     struct.p.figson = 0;
     if struct.p.OC % in case the solution is symmetric, break it in halves
-        [asymstruct_Int, Vdc_array(i)] = asymmetricize(struct, BC); % normal BC 1 should work, also BC 2 can be employed
+        asymstruct_Int = asymmetricize(struct, BC); % normal BC 1 should work, also BC 2 can be employed
     else
         asymstruct_Int = struct;
-        Vdc_array(i) = struct.Efn(end) - struct.Efp(1);
     end
+    [~, ~, ~, Efn, Efp] = pinAna(asymstruct_Int);
+    Vdc_array(i) = Efn(end, end) - Efp(end, 1);
     if frozen_ions
         asymstruct_Int.p.mui = 0; % if frozen_ions option is set, freezing ions
     end
     % simulate first frequency with the stabilized solution
     asymstruct_start = asymstruct_Int;
-    for (j = 1:length(Freq_array))
+    for j = 1:length(Freq_array)
         tempRelTol = RelTol; % reset RelTol variable
         asymstruct_ISwave = ISwave_single_exec(asymstruct_start, BC, deltaV,...
             Freq_array(j), periods, tpoints_per_period, ~sequential, false, tempRelTol); % do IS
