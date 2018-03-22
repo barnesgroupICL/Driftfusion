@@ -8,20 +8,20 @@ function [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtr
 %
 % Inputs:
 %   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbated by an
-%     oscillating voltage, as generated from ISwave_single_exec
+%     oscillating voltage, as generated from ISwave_EA_single_exec
 %
 % Outputs:
 %
 %
 % Example:
-%   ISwave_subtracting_analysis(ISwave_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, true, 1e-4))
+%   ISwave_subtracting_analysis(ISwave_EA_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, true, 1e-4))
 %     extract reference values
 %
 % Other m-files required: none
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also ISwave_full_exec, ISwave_single_exec, ISwave_single_analysis.
+% See also ISwave_full_exec, ISwave_EA_single_exec, ISwave_single_analysis.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)

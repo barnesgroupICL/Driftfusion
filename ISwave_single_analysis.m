@@ -6,21 +6,21 @@ function [coeff, i_coeff, subtracting_n_t, subtracting_n_intr_t, subtracting_n_c
 %
 % Inputs:
 %   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbated by an
-%     oscillating voltage, as generated from ISwave_single_exec
+%     oscillating voltage, as generated from ISwave_EA_single_exec
 %   MINIMAL_MODE - logical, when true graphics does not get created and
 %     ISwave_subtracting_analysis does not get launched, useful when
 %     launched under parallelization
 %   DEMODULATION - logical, get phase via demodulation instead of using a fitting
 %
 % Example:
-%   ISwave_single_analysis(ISwave_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, true, 1e-4), false, true)
+%   ISwave_single_analysis(ISwave_EA_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, true, 1e-4), false, true)
 %     do plot
 %
-% Other m-files required: ISwave_subtracting_analysis, ISwave_single_fit, ISwave_single_demodulation
+% Other m-files required: ISwave_subtracting_analysis, ISwave_EA_single_fit, ISwave_EA_single_demodulation
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also ISwave_full_exec, ISwave_single_exec, ISwave_subtracting_analysis, ISwave_single_demodulation, ISwave_single_fit.
+% See also ISwave_full_exec, ISwave_EA_single_exec, ISwave_subtracting_analysis, ISwave_EA_single_demodulation, ISwave_EA_single_fit.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -65,9 +65,9 @@ t_middle = fit_t(round(end/2));
 fit_J_flat = fit_J - tilting * (fit_t - t_middle);
 
 if demodulation
-    coeff = ISwave_single_demodulation(fit_t, fit_J_flat, s.p.Vapp_func, s.p.Vapp_params);
+    coeff = ISwave_EA_single_demodulation(fit_t, fit_J_flat, s.p.Vapp_func, s.p.Vapp_params);
 else
-    coeff = ISwave_single_fit(fit_t, fit_J_flat, s.p.J_E_func);
+    coeff = ISwave_EA_single_fit(fit_t, fit_J_flat, s.p.J_E_func);
 end
 
 %% calculate ionic contribution
@@ -96,9 +96,9 @@ if s.p.mui % if there was ion mobility, current due to ions have been calculated
     fit_Ji_flat = fit_Ji' - tilting_i * (fit_t - t_middle);
 
     if demodulation
-        i_coeff = ISwave_single_demodulation(fit_t, fit_Ji_flat, s.p.Vapp_func, s.p.Vapp_params);
+        i_coeff = ISwave_EA_single_demodulation(fit_t, fit_Ji_flat, s.p.Vapp_func, s.p.Vapp_params);
     else
-        i_coeff = ISwave_single_fit(fit_t, fit_Ji_flat, s.p.J_E_func);
+        i_coeff = ISwave_EA_single_fit(fit_t, fit_Ji_flat, s.p.J_E_func);
     end
 else
     i_coeff = [NaN, NaN, NaN];

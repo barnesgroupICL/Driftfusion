@@ -1,4 +1,4 @@
-function coeff = ISwave_single_demodulation(t, y, Vapp_func, Vapp_params)
+function coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
 %ISWAVE_SINGLE_DEMODULATION - Calculate phase and amplitude demodulating
 % oscillating current data from impedance spectroscopy with oscillating
 % voltage. The current profile gets multiplied by the voltage profile and,
@@ -10,7 +10,7 @@ function coeff = ISwave_single_demodulation(t, y, Vapp_func, Vapp_params)
 % https://en.wikipedia.org/wiki/Demodulation
 % https://en.wikipedia.org/wiki/In-phase_and_quadrature_components
 %
-% Syntax:  coeff = ISwave_single_demodulation(t, y, Vapp_func, Vapp_params)
+% Syntax:  coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
 %
 % Inputs:
 %   T - an array with the time mesh.
@@ -26,14 +26,14 @@ function coeff = ISwave_single_demodulation(t, y, Vapp_func, Vapp_params)
 %     bias, sinusoid amplitude, phase shift.
 %
 % Example:
-%   ISwave_single_demodulation(ssol_i_light_Int_1_Freq_100_ISwave.t, ssol_i_light_Int_1_Freq_100_ISwave.Jtotr, @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + coeff(4) * t), ssol_i_light_Int_1_Freq_100_ISwave.)
+%   ISwave_EA_single_demodulation(ssol_i_light_Int_1_Freq_100_ISwave.t, ssol_i_light_Int_1_Freq_100_ISwave.Jtotr, @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + coeff(4) * t), ssol_i_light_Int_1_Freq_100_ISwave.)
 %     demodulate the components of the oscillating current
 %
 % Other m-files required: none
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also ISwave_single_exec, ISwave_full_exec, ISwave_single_fit.
+% See also ISwave_EA_single_exec, ISwave_full_exec, ISwave_EA_single_fit.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)

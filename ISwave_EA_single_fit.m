@@ -1,7 +1,7 @@
-function fit_coeff = ISwave_single_fit(t, y, J_E_func)
+function fit_coeff = ISwave_EA_single_fit(t, y, J_E_func)
 %ISWAVE_SINGLE_FIT - Calculate phase and amplitude fitting oscillating current data from impedance spectroscopy with oscillating voltage
 %
-% Syntax:  fit_coeff = ISwave_single_fit(t, y, func)
+% Syntax:  fit_coeff = ISwave_EA_single_fit(t, y, func)
 %
 % Inputs:
 %   T - an array with the time mesh.
@@ -16,14 +16,14 @@ function fit_coeff = ISwave_single_fit(t, y, J_E_func)
 %     bias, sinusoid amplitude, phase shift.
 %
 % Example:
-%   ISwave_single_fit(ssol_i_light_Int_1_Freq_100_ISwave.t, ssol_i_light_Int_1_Freq_100_ISwave.Jtotr, @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + 2 * pi * 100 * t))
+%   ISwave_EA_single_fit(ssol_i_light_Int_1_Freq_100_ISwave.t, ssol_i_light_Int_1_Freq_100_ISwave.Jtotr, @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + 2 * pi * 100 * t))
 %     fits the charge vs voltage data
 %
 % Other m-files required: none
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also ISwave_single_exec, ISwave_full_exec, ISwave_single_demodulation.
+% See also ISwave_EA_single_exec, ISwave_full_exec, ISwave_EA_single_demodulation.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)

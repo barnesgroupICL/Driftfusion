@@ -1,7 +1,7 @@
-function asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
+function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
 %ISWAVE_SINGLE_EXEC - Do a single Impedance Spectroscopy (ISwave) experiment
 %
-% Syntax:  asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, freq, periods, tpoints_per_period, reach_stability, calcJi, RelTol)
+% Syntax:  asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV, freq, periods, tpoints_per_period, reach_stability, calcJi, RelTol)
 %
 % Inputs:
 %   ASYMSTRUCT_INT - a single asymmetric struct as created by PINDRIFT.
@@ -25,7 +25,7 @@ function asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV, freq
 %     oscillating voltage
 %
 % Example:
-%   ISwave_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, true, 1e-6)
+%   ISwave_EA_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, true, 1e-6)
 %     simulate an oscillating voltage at 1 MHz and 2 mV of amplitude, with
 %     selective contacts, 20 periods and 40 time points per period,
 %     calculating the ionic current and using a starting relative tolerance
@@ -97,8 +97,8 @@ while ~verifyStabilization(asymstruct_ISwave.sol, asymstruct_ISwave.t, (periods 
     asymstruct_ISwave = pindrift(asymstruct_ISwave, p);
     i = i+1;
     if i > 2
-        warning('pindrift:ISwave_single_exec',...
-            'ISwave_single_exec seems that the solution did not reach complete stabilization after %s repetitions on %s periods',...
+        warning('pindrift:ISwave_EA_single_exec',...
+            'ISwave_EA_single_exec seems that the solution did not reach complete stabilization after %s repetitions on %s periods',...
             num2str(i), num2str(periods))
         break
     end

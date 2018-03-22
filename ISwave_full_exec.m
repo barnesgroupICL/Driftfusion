@@ -38,13 +38,13 @@ function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_poin
 %   ISwave_full_exec(ssol_i_light_BC2, 1e9, 1e-2, 23, 1e-3, 2, true, false, false, true)
 %     use non perfectly selective contacts (BC = 2)
 %
-% Other m-files required: asymmetricize, ISwave_single_exec,
+% Other m-files required: asymmetricize, ISwave_EA_single_exec,
 %   ISwave_single_analysis, ISwave_full_analysis_nyquist,
-%   IS_full_analysis_vsfrequency
+%   IS_full_analysis_impedance, ISwave_EA_full_analysis_phase
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also genIntStructs, pindrift, ISwave_single_exec, ISwave_full_analysis_nyquist, ISwave_single_analysis.
+% See also genIntStructs, pindrift, ISwave_EA_single_exec, ISwave_full_analysis_nyquist, ISwave_single_analysis, IS_full_analysis_impedance, ISwave_EA_full_analysis_phase.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -79,7 +79,7 @@ demodulation = true;
 % number of complete oscillation periods to simulate
 % the current looks reproducible already after few oscillations, this could be set in an automatic way
 % this number should be above 20 for having good phase estimation in dark
-% solutions via ISwave_single_demodulation
+% solutions via ISwave_EA_single_demodulation
 periods = 20;
 
 % for having a meaningful output from verifyStabilization, here use a
@@ -126,7 +126,7 @@ for i = 1:length(structs(1, :))
     % will work as a normal for cycle
     parfor (j = 1:length(Freq_array), Inf)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
-        asymstruct_ISwave = ISwave_single_exec(asymstruct_Int, BC, deltaV,...
+        asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV,...
             Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
         % set ISwave_single_analysis minimal_mode to true as under
         % parallelization graphics for single solutions cannot be created
@@ -138,7 +138,7 @@ for i = 1:length(structs(1, :))
             disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small or close to pi/2 or out of 0-pi/2 range, increasing solver accuracy and calculate again'])
             tempRelTol = tempRelTol / 100;
             % start from the oscillating solution, better starting point
-            asymstruct_ISwave = ISwave_single_exec(asymstruct_ISwave, BC,...
+            asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_ISwave, BC,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
@@ -158,7 +158,7 @@ for i = 1:length(structs(1, :))
             disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is out of 0-pi/2 range, increasing solver accuracy and calculate again'])
             tempRelTol = tempRelTol / 100;
             % start from the oscillating solution, better starting point
-            asymstruct_ISwave = ISwave_single_exec(asymstruct_ISwave, BC,...
+            asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_ISwave, BC,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
@@ -184,7 +184,7 @@ sun_index = find(Int_array == 1); % could used for plotting... maybe...
 
 % even if here the frequency is always the same for each illumination, it
 % is not the case for ISstep, and the solution has to be more similar in
-% order to be used by the same IS_full_analysis_vsfrequency script
+% order to be used by the same scripts
 Freq_matrix = repmat(Freq_array, length(structs(1, :)), 1);
 
 % deltaV is a scalar, J_amp and J_phase are matrices

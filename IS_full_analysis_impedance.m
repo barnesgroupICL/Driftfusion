@@ -3,20 +3,20 @@ function IS_full_analysis_impedance(IS_struct)
 % of background light intensities, capacitance versus voltage oscillation
 % frequency at various light bias
 %
-% Syntax:  IS_full_analysis_vsfrequency(IS_struct)
+% Syntax:  IS_full_analysis_impedance(IS_struct)
 %
 % Inputs:
 %   IS_STRUCT - a struct containing the most important results of the ISstep or the ISwave simulation
 %
 % Example:
-%   IS_full_analysis_vsfrequency(IS_struct)
+%   IS_full_analysis_impedance(IS_struct)
 %     do plot
 %
 % Other m-files required: none
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also ISstep_full_exec, ISwave_full_exec.
+% See also ISstep_full_exec, ISwave_full_exec, ISwave_EA_full_analysis_phase, ISwave_full_analysis_nyquist.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
