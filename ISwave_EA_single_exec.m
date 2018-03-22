@@ -43,7 +43,7 @@ function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV, f
 % email address: iochesonome@gmail.com
 % Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
 % Imperial College London
-% October 2017; Last revision: January 2018
+% October 2017; Last revision: March 2018
 
 %------------- BEGIN CODE --------------
 
