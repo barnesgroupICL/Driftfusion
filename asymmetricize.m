@@ -6,11 +6,15 @@ function asymstruct = asymmetricize(symstruct, BC)
 % Syntax:  sol = asymmetricize(ssol, BC)
 %
 % Inputs:
-%   SYMSTRUCT - a symmetric struct as created by pindrift using the OC
+%   SYMSTRUCT - a symmetric struct as created by PINDRIFT using the OC
 %     parameter set to 1
+%   BC - boudary conditions to be used for the new solution, as defined in
+%     PINPARAMS and PINDRIFT
 %
 % Outputs:
-%
+%   ASYMSTRUCT - an asymmetric struct as created by PINDRIFT using the OC
+%     parameter set to 0 and applied voltage identical to the open circuit
+%     voltage taken from the input SYMSTRUCT
 %
 % Example:
 %   sol_i_light_OC = asymmetricize(ssol_i_light, 1)

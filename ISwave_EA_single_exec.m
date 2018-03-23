@@ -1,7 +1,7 @@
 function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
 %ISWAVE_SINGLE_EXEC - Do a single Impedance Spectroscopy (ISwave) experiment
 %
-% Syntax:  asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV, freq, periods, tpoints_per_period, reach_stability, calcJi, RelTol)
+% Syntax:  asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
 %
 % Inputs:
 %   ASYMSTRUCT_INT - a single asymmetric struct as created by PINDRIFT.
