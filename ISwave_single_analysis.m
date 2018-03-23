@@ -49,8 +49,8 @@ periods = round(s.p.tmax * s.p.Vapp_params(4) / (2 * pi));
 % here is critical that exactely an entire number of periods is provided to
 % ISwave_single_demodulator
 fit_t_index = round((s.p.tpoints - 1) * round(periods / 2) / periods) + 1;
-fit_t = s.t(fit_t_index:end);
-fit_J = s.Jtotr(fit_t_index:end) / 1000; % in Ampere
+fit_t = s.t(fit_t_index:end)';
+fit_J = s.Jtot(fit_t_index:end) / 1000; % in Ampere
 
 % remove some tilting from fit_J to get better fit and better demodulation in case of
 % unstabilized solutions. In case of noisy solutions this could work badly
@@ -81,7 +81,7 @@ if s.p.mui % if there was ion mobility, current due to ions have been calculated
     % intrinsic, indeed I have to use trapz for considering the spatial mesh
     Efield_i_mean = trapz(s.x(itype_points), Efield_i(:, itype_points), 2) / s.p.ti;
     % calculate displacement current due to ions
-    Ji_disp = s.p.eppi * gradient(Efield_i_mean, s.t); % in Amperes
+    Ji_disp = -s.p.eppi * gradient(Efield_i_mean, s.t); % in Amperes
 
     fit_Ji = Ji_disp(fit_t_index:end); % in Ampere
     
@@ -92,7 +92,7 @@ if s.p.mui % if there was ion mobility, current due to ions have been calculated
     tilting_i = delta_Ji/delta_t;
     % because of this, the bias value that will be obtained from the fit/demodulation is not going to be correct
     % here the fit_Ji has to be provided as a row
-    fit_Ji_flat = fit_Ji' - tilting_i * (fit_t - t_middle);
+    fit_Ji_flat = fit_Ji - tilting_i * (fit_t - t_middle);
 
     if demodulation
         i_coeff = ISwave_EA_single_demodulation(fit_t, fit_Ji_flat, s.p.Vapp_func, s.p.Vapp_params);
@@ -117,23 +117,24 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         num2str(s.p.Vapp_params(4) / (2 * pi))], 'NumberTitle', 'off');
         yyaxis right
         hold off
-        h(1) = plot(s.t, Vapp, 'r', 'LineWidth', 2);
+        i=1;
+        h(i) = plot(s.t, Vapp, 'r', 'LineWidth', 2);
         legend_array = "Applied Voltage";
         ylabel('Applied voltage [V]');
 
         yyaxis left
         hold off
-        h(2) = plot(s.t, -s.Jtotr, 'b--', 'LineWidth', 2); % mA
+        i=i+1; h(i) = plot(s.t, s.Jtot, 'b--', 'LineWidth', 2); % mA
         hold on
-        h(3) = plot(s.t, -s.Jdispr); % mA
-        h(4) = plot(s.t(2:end), -subtracting_n_intr_t * 1000); % mA
-        h(5) = plot(s.t(2:end), -subtracting_n_contacts_t * 1000); % mA
-        h(6) = plot(fit_t, -s.p.J_E_func_tilted(coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
+        %i=i+1; h(i) = plot(s.t, -s.Jdispr); % mA
+        i=i+1; h(i) = plot(s.t(2:end), -subtracting_n_intr_t * 1000); % mA
+        i=i+1; h(i) = plot(s.t(2:end), -subtracting_n_contacts_t * 1000); % mA
+        i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
 
-        legend_array = [legend_array, "Current", "Displacement current", "Charge variation intrinsic", "Charge variation contacts", "1st harmonic"];
+        legend_array = [legend_array, "Current", "Charge variation intrinsic", "Charge variation contacts", "1st harmonic"]; % "Displacement current"
         if s.p.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
-            h(7) = plot(s.t, -Ji_disp * 1000); % mA
-            h(8) = plot(fit_t, -s.p.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
+            i=i+1; h(i) = plot(s.t, Ji_disp * 1000); % mA
+            i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
             legend_array = [legend_array, "Ionic displacement current", "Ionic disp J fit"];
         end
         ylabel('Current [mA/cm^2]');
