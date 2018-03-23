@@ -1,8 +1,8 @@
-function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, do_graphics, save_results)
+function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, do_graphics)
 %ISWAVE_FULL_EXEC - Do Impedance Spectroscopy approximated applying an
 % oscillating voltage (ISwave) in a range of background light intensities
 %
-% Syntax:  ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, do_graphics, save_results)
+% Syntax:  ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, do_graphics)
 %
 % Inputs:
 %   STRUCTS - can be a cell structure containing structs at various background
@@ -19,23 +19,21 @@ function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_poin
 %     ionic defects to zero
 %   DO_GRAPHICS - logical, whether to graph the individual solutions and
 %     the overall graphics
-%   SAVE_RESULTS - is a logic defining if to assing in volatile base
-%     workspace the most important results of the simulation
 %
 % Outputs:
 %   ISWAVE_STRUCT - a struct containing the most important results of the simulation
 %
 % Example:
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true)
 %     calculate also with dark background, do not freeze ions, use a
 %     voltage oscillation amplitude of 1 mV, on 23 points from frequencies of 1 GHz to
 %     0.01 Hz, with selective contacts, without calculating ionic current,
 %     without parallelization
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true)
 %     as above but freezing ions during voltage oscillation
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, true, true, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, true, true)
 %     calculate ionic current in the middle of the intrinsic
-%   ISwave_full_exec(ssol_i_light_BC2, 1e9, 1e-2, 23, 1e-3, 2, true, false, false, true)
+%   ISwave_full_exec(ssol_i_light_BC2, 1e9, 1e-2, 23, 1e-3, 2, true, false, false)
 %     use non perfectly selective contacts (BC = 2)
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
@@ -236,9 +234,6 @@ ISwave_struct.cap_idrift = cap_idrift;
 ISwave_struct.impedance_i_abs = impedance_i_abs;
 ISwave_struct.impedance_i_im = impedance_i_im;
 ISwave_struct.impedance_i_re = impedance_i_re;
-if save_results
-    assignin('base', ['ISwave_' structs{2, 1}], ISwave_struct);
-end
 
 %% plot results
 

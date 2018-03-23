@@ -1,9 +1,9 @@
-function ISwave_struct = ISwave_full_exec_nonparallel(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, sequential, frozen_ions, do_graphics, save_solutions, save_results)
+function ISwave_struct = ISwave_full_exec_nonparallel(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, sequential, frozen_ions, do_graphics, save_solutions)
 %ISWAVE_FULL_EXEC_NONPARALLEL - Do Impedance Spectroscopy approximated applying an
 % oscillating voltage (ISwave) in a range of background light intensities.
 % Getting rid of annoying parfor
 %
-% Syntax:  ISwave_struct = ISwave_full_exec_nonparallel(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, sequential, frozen_ions, do_graphics, save_solutions, save_results)
+% Syntax:  ISwave_struct = ISwave_full_exec_nonparallel(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, sequential, frozen_ions, do_graphics, save_solutions)
 %
 % Inputs:
 %   SYMSTRUCTS - can be a cell structure containing structs at various background
@@ -28,21 +28,19 @@ function ISwave_struct = ISwave_full_exec_nonparallel(symstructs, startFreq, end
 %     the overall graphics
 %   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
 %     workspace the calulated solutions of single ISstep perturbations
-%   SAVE_RESULTS - is a logic defining if to assing in volatile base
-%     workspace the most important results of the simulation
 %
 % Outputs:
 %   ISWAVE_STRUCT - a struct containing the most important results of the simulation
 %
 % Example:
-%   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true, true, true)
+%   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true, true)
 %     calculate also with dark background, do not freeze ions, use a
 %     voltage oscillation amplitude of 1 mV, on 23 points from frequencies of 1 GHz to
 %     0.01 Hz, with selective contacts, without calculating ionic current,
 %     without parallelization
-%   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, true, true, true, true)
+%   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, true, true, true)
 %     as above but freezing ions during voltage oscillation
-%   ISwave_full_exec_nonparallel(ssol_i_light_BC2, 1e9, 1e-2, 23, 1e-3, 2, true, false, true, true, true)
+%   ISwave_full_exec_nonparallel(ssol_i_light_BC2, 1e9, 1e-2, 23, 1e-3, 2, true, false, true, true)
 %     use non perfectly selective contacts (BC = 2)
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
