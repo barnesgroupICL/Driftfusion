@@ -121,7 +121,7 @@ disp('Solution with mobility switched on')
 sol = pindrift(sol, p);
 
 p.Ana = 1;
-p.calcJ = 2;
+p.calcJ = 0;
 p.tmax = 1e-2;
 p.t0 = p.tmax/1e10;
 
