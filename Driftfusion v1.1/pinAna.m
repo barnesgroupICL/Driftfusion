@@ -104,6 +104,7 @@ if p.OC == 0
     %% Recombination
     Ubtb = p.krad*(n.*P - p.ni^2);
     Usrh = ((n.*P-p.ni^2)./((p.taun_htl.*(P+p.pthtl)) + (p.taup_htl.*(n+p.nthtl)))).*pBM...
+        +((n.*P-p.ni^2)./((p.taun_i.*(P+p.pti)) + (p.taup_i.*(n+p.nti)))).*iBM...
         +((n.*P-p.ni^2)./((p.taun_etl.*(P+p.ptetl)) + (p.taup_etl.*(n+p.ntetl)))).*nBM;
     
     U = Ubtb + Usrh;
