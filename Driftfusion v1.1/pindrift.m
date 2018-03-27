@@ -161,7 +161,7 @@ if p.Int ~= 0 && p.OM ==1 || p.Int ~= 0 && p.OM == 2
 % Uniform Generation
 elseif p.OM == 0
       
-      if p.Int ~= 0 && x > p.tp && x < (p.tp+p.ti)    
+      if p.Int ~= 0% && x >= p.tp && x <= (p.tp+p.ti)    
            g = p.Int*p.G0;
       else
            g = 0;
