@@ -28,11 +28,11 @@ Phip = real(p.Ei-(p.kB*p.T/p.q)*log(P/p.ni)-p.EA);
 Phi = Phin - Phip;
 
 % p-type binary matrix
-pBM = ones(length(p.t), p.xpoints)*diag(p.x < p.tp);
+pBM = ones(length(p.t), p.xpoints)*diag(p.x <= p.tp);
 % Intrinsic binary matrix
-iBM = ones(length(p.t), p.xpoints)*diag(p.x >= p.tp & p.x <= (p.tp + p.ti));
+iBM = ones(length(p.t), p.xpoints)*diag(p.x > p.tp & p.x < (p.tp + p.ti));
 % n-type binary matrix
-nBM = ones(length(p.t), p.xpoints)*diag(p.x > p.tp + p.ti);
+nBM = ones(length(p.t), p.xpoints)*diag(p.x >= p.tp + p.ti);
 
 nstat = zeros(1, p.xpoints);                                  % Static charge array
 nstat = (-p.NA-p.NI)*pBM + (-p.NI*iBM) + (p.ND-p.NI)*nBM; %(-NA+pthtl-nthtl-NI)*pBM + (-NI*iBM) + (ND+ptetl-ntetl-NI)*nBM;   
