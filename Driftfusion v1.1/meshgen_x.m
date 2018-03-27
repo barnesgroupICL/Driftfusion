@@ -44,4 +44,9 @@ switch p.xmesh_type
        error('DrIFtFUSION:xmesh_type', [mfilename ' - xmesh_type not recognized'])
 end
 
+% when comparing x mesh points to layers thicknesses defined in pinParams,
+% the douple accuracy can make the comparison have unpredictable result,
+% rounding the x coordinates fixes
+x = round(x, 13, 'significant');
+
 end
