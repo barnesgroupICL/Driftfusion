@@ -27,12 +27,19 @@ Phin = real(p.Ei+(p.kB*p.T/p.q)*log(n/p.ni)-p.EA);     % Chemical Potential elec
 Phip = real(p.Ei-(p.kB*p.T/p.q)*log(P/p.ni)-p.EA);
 Phi = Phin - Phip;
 
-% p-type binary matrix
-pBM = ones(length(p.t), p.xpoints)*diag(p.x <= p.tp);
-% Intrinsic binary matrix
-iBM = ones(length(p.t), p.xpoints)*diag(p.x > p.tp & p.x < (p.tp + p.ti));
-% n-type binary matrix
-nBM = ones(length(p.t), p.xpoints)*diag(p.x >= p.tp + p.ti);
+% p-type binary matrix without interfacial point
+pBM = ones(length(p.t), p.xpoints)*diag(p.x < p.tp & ~ismembertol(p.x, p.tp));
+% Intrinsic binary matrix without interfacial point
+iBM = ones(length(p.t), p.xpoints)*diag(((p.x > p.tp & p.x < (p.tp + p.ti)) & ~ismembertol(p.x, p.tp)) & ~ismembertol(p.x, p.tp + p.ti));
+% n-type binary matrix without interfacial point
+nBM = ones(length(p.t), p.xpoints)*diag(p.x > p.tp + p.ti & ~ismembertol(p.x, p.tp + p.ti));
+% interfacial points
+p_i = ones(length(p.t), p.xpoints)*diag(ismembertol(p.x, p.tp));
+i_n = ones(length(p.t), p.xpoints)*diag(ismembertol(p.x, p.tp + p.ti));
+% interfacial points are partially of one material and partially of another
+pBM = pBM + 0.5*p_i;
+iBM = iBM + 0.5*p_i + 0.5*i_n;
+nBM = nBM + 0.5*i_n;
 
 nstat = zeros(1, p.xpoints);                                  % Static charge array
 nstat = (-p.NA-p.NI)*pBM + (-p.NI*iBM) + (p.ND-p.NI)*nBM; %(-NA+pthtl-nthtl-NI)*pBM + (-NI*iBM) + (ND+ptetl-ntetl-NI)*nBM;   
