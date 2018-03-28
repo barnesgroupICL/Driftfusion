@@ -473,17 +473,15 @@ if p.Ana == 1
         
         solstruct.Voc = Voc;
         
+    else
+        
+        solstruct.Jn = Jn;
+        
     end
     
     if p.JV == 1
         
         solstruct.Vapp = Vapp_arr;
-        
-    end
-    
-    if p.calcJ ~= 0
-        
-        solstruct.Jn = Jn;
         
     end
     
