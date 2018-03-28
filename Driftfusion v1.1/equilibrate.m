@@ -1,8 +1,58 @@
-function [sol_eq, sol_i_eq, ssol_eq, ssol_i_eq, sol_i_eq_SR] = equilibrate
-% Uses analytical initial conditions and runs to equilibrium
+function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_light, sol_light_SR, sol_i_light, sol_i_light_SR, ssol_light, ssol_light_SR, ssol_i_light, ssol_i_light_SR] = equilibrate
+%EQUILIBRATE Uses analytical initial conditions and runs to equilibrium and steady state
+% Takes the parameters from pinParams.m file and tries
+% to obtain an equilibrium solution (as if the device has been left for
+% a long period of time). This solution can then be used as accurate
+% initial conditions for other simulations, e.g. a JV scan.
 % Note that tmax is consistently adjusted to appropriate values for to
 % ensure there are numerous mesh points where large gradients in the time
-% dimension are present
+% dimension are present.
+%
+% Syntax:  [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_light, sol_light_SR, sol_i_light, sol_i_light_SR, ssol_light, ssol_light_SR, ssol_i_light, ssol_i_light_SR] = EQUILIBRATE()
+%
+% Inputs:
+%
+% Outputs:
+%   sol_eq - short circuit, dark, no mobile ionic defects, no SRH
+%   sol_eq_SR - short circuit, dark, no mobile ionic defects, with SRH
+%   sol_i_eq - short circuit, dark, mobile ionic defects, no SRH
+%   sol_i_eq_SR - short circuit, dark, mobile ionic defects, with SRH
+%   ssol_eq - open circuit, dark, no mobile ionic defects, no SRH
+%   ssol_eq_SR - open circuit, dark, no mobile ionic defects, with SRH
+%   ssol_i_eq - open circuit, dark, mobile ionic defects, no SRH
+%   ssol_i_eq_SR - open circuit, dark, mobile ionic defects, with SRH
+%   sol_light - short circuit, 1 sun, no mobile ionic defects, no SRH
+%   sol_light_SR - short circuit, 1 sun, no mobile ionic defects, with SRH
+%   sol_i_light - short circuit, 1 sun, mobile ionic defects, no SRH
+%   sol_i_light_SR - short circuit, 1 sun, mobile ionic defects, with SRH
+%   ssol_light - open circuit, 1 sun, no mobile ionic defects, no SRH
+%   ssol_light_SR - open circuit, 1 sun, no mobile ionic defects, with SRH
+%   ssol_i_light - open circuit, 1 sun, mobile ionic defects, no SRH
+%   ssol_i_light_SR - open circuit, 1 sun, mobile ionic defects, with SRH
+%
+% Example:
+%   equilibrate()
+%     generate stabilized solutions and save them to base workspace
+%
+% Other m-files required: pindrift, pinParams, mobsetfun
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also pindrift, paramsStruct.
+
+% Author: Phil Calado, Ph.D.
+% Imperial College London
+% Research Group Prof. Jenny Nelson
+% email address: p.calado13@imperial.ac.uk
+% Contributors: Ilario Gelmetti, Ph.D. student
+% Institute of Chemical Research of Catalonia (ICIQ)
+% Research Group Prof. Emilio Palomares
+% email address: iochesonome@gmail.com
+% Supervised by: Dr. Piers Barnes, Prof. Jenny Nelson
+% Imperial College London
+% 2015; Last revision: January 2018
+
+%------------- BEGIN CODE --------------
 
 tic;    % Start stopwatch
 
@@ -14,9 +64,8 @@ sol.sol = 0;
 
 p = pinParams;
 
-% Store initial mobility of intrinsic layer- note all mobilities will be
-% set to this value during the equilibration procedure.
-mue_i = p.mue_i;
+% Store initial parameters
+original_p = p;
 
 %% Start with low recombination coefficients
 p.klin = 0;
@@ -33,7 +82,7 @@ p.taup_htl = 1e6;
 
 %% General initial parameters
 p.tmesh_type = 2;
-p.tpoints = 200;
+p.tpoints = 20;
 
 p.Ana = 0;
 p.JV = 0;
@@ -54,12 +103,20 @@ disp('Initial solution, zero mobility')
 sol = pindrift(sol, p);
 disp('Complete')
 
-p = mobsetfun(mue_i, 0, p);
 p.figson = 1;
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
 
 %% Mobility with mobility switched on
+
+% switch on electron and hole mobility
+p.mue_i = original_p.mue_i; % electron mobility in intrinsic
+p.muh_i = original_p.muh_i; % hole mobility in intrinsic
+p.mue_p = original_p.mue_p; % electron mobility in p-type
+p.muh_p = original_p.muh_p; % hole mobility in n-type
+p.mue_n = original_p.mue_n; % electron mobility in p-type
+p.muh_n = original_p.muh_n; % hole mobility in n-type
+
 disp('Solution with mobility switched on')
 sol = pindrift(sol, p);
 
@@ -69,6 +126,8 @@ p.tmax = 1e-2;
 p.t0 = p.tmax/1e10;
 
 sol_eq = pindrift(sol, p);
+sol_eq_p = p; % temporarily save params
+verifyStabilization(sol_eq.sol, sol_eq.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Set up solution for open circuit
@@ -100,16 +159,24 @@ disp('Complete')
 disp('Open circuit solution with mobility switched on')
 p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
-p = mobsetfun(mue_i, 0, p);
+
+% switch on electron and hole mobility
+p.mue_i = original_p.mue_i; % electron mobility in intrinsic
+p.muh_i = original_p.muh_i; % hole mobility in intrinsic
+p.mue_p = original_p.mue_p; % electron mobility in p-type
+p.muh_p = original_p.muh_p; % hole mobility in n-type
+p.mue_n = original_p.mue_n; % electron mobility in p-type
+p.muh_n = original_p.muh_n; % hole mobility in n-type
 
 ssol = pindrift(ssol, p);
 
 % Longer time step to ensure equilibrium has been reached
 p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
-p = mobsetfun(mue_i, 0, p);
 
 ssol_eq = pindrift(ssol, p);
+ssol_eq_p = p; % temporarily save params
+verifyStabilization(ssol_eq.sol, ssol_eq.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Equilibrium solutions with ion mobility switched on
@@ -117,32 +184,37 @@ disp('Complete')
 disp('Closed circuit equilibrium with ions')
 
 p.OC = 0;
-p.tmax = 1e-9;
+p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
 p.mui = 1e-6;           % Ions are accelerated to reach equilibrium
 
 sol = pindrift(sol_eq, p);
 
 % Much longer second step to ensure that ions have migrated
-p.calcJ = 2;
-p.tmax = 1e-2;
+p.calcJ = 0;
+p.tmax = 1e2;
 p.t0 = p.tmax/1e3;
+p.mui = original_p.mui; % Ions are set to the correct speed indicated in pinParams
 
 sol_i_eq = pindrift(sol, p);
+sol_i_eq_p = p; % temporarily save params
+verifyStabilization(sol_i_eq.sol, sol_i_eq.t, 0.2); % verify solution stability
 disp('Complete')
 
 %% Ion equilibrium with surface recombination
 disp('Switching on surface recombination')
-p.taun_etl = 1e-11;
-p.taup_etl = 1e-11;
-p.taun_htl = 1e-11;
-p.taup_htl = 1e-11; 
+p.taun_etl = original_p.taun_etl;
+p.taup_etl = original_p.taup_etl;
+p.taun_htl = original_p.taun_htl;
+p.taup_htl = original_p.taup_htl;
 
 p.calcJ = 0;
 p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
 
 sol_i_eq_SR = pindrift(sol_i_eq, p);
+sol_i_eq_SR_p = p; % temporarily save params
+verifyStabilization(sol_i_eq_SR.sol, sol_i_eq_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
 % Switch off SR
@@ -168,21 +240,151 @@ ssol = pindrift(symsol, p);
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
 p.mui = 0;
-p = mobsetfun(mue_i, 0, p);
+
+% switch on electron and hole mobility
+p.mue_i = original_p.mue_i; % electron mobility in intrinsic
+p.muh_i = original_p.muh_i; % hole mobility in intrinsic
+p.mue_p = original_p.mue_p; % electron mobility in p-type
+p.muh_p = original_p.muh_p; % hole mobility in n-type
+p.mue_n = original_p.mue_n; % electron mobility in p-type
+p.muh_n = original_p.muh_n; % hole mobility in n-type
 
 ssol = pindrift(ssol, p);
 
 % Switch on ion mobility to ensure equilibrium has been reached
-p.tmax = 1e-9;
+p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
-p = mobsetfun(mue_i, 1e-6, p);
+p.mui = original_p.mui; % this requires mui to be set in the original params
 
 ssol = pindrift(ssol, p);
 
-p.tmax = 1e-2;
+p.tmax = 1e2;
 p.t0 = p.tmax/1e3;
 
 ssol_i_eq = pindrift(ssol, p);
+ssol_i_eq_p = p; % temporarily save params
+verifyStabilization(ssol_i_eq.sol, ssol_i_eq.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Dark, short circuit, surface recombination
+disp("Dark, short circuit, surface recombination")
+p = sol_eq_p;
+p.taun_etl = original_p.taun_etl;
+p.taup_etl = original_p.taup_etl;
+p.taun_htl = original_p.taun_htl;
+p.taup_htl = original_p.taup_htl;
+
+sol_eq_SR = pindrift(sol_eq, p);
+sol_eq_SR_p = p; % temporarily save params
+verifyStabilization(sol_eq_SR.sol, sol_eq_SR.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Dark, open circuit, surface recombination
+disp("Dark, open circuit, surface recombination")
+p = ssol_eq_p;
+p.taun_etl = original_p.taun_etl;
+p.taup_etl = original_p.taup_etl;
+p.taun_htl = original_p.taun_htl;
+p.taup_htl = original_p.taup_htl;
+
+ssol_eq_SR = pindrift(ssol_eq, p);
+ssol_eq_SR_p = p; % temporarily save params
+verifyStabilization(ssol_eq_SR.sol, ssol_eq_SR.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Dark, mobile ions, open circuit, surface recombination
+disp("Dark, mobile ions, open circuit, surface recombination")
+p = ssol_i_eq_p;
+p.taun_etl = original_p.taun_etl;
+p.taup_etl = original_p.taup_etl;
+p.taun_htl = original_p.taun_htl;
+p.taup_htl = original_p.taup_htl;
+
+ssol_i_eq_SR = pindrift(ssol_i_eq, p);
+ssol_i_eq_SR_p = p; % temporarily save params
+verifyStabilization(ssol_i_eq_SR.sol, ssol_i_eq_SR.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Illuminated, short circuit
+disp("Illuminated, short circuit")
+p = sol_eq_p;
+p.Int = original_p.Int;
+
+sol_light = pindrift(sol_eq, p);
+verifyStabilization(sol_light.sol, sol_light.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Illuminated, short circuit, surface recombination
+disp("Illuminated, short circuit, surface recombination")
+p = sol_eq_SR_p;
+p.Int = original_p.Int;
+
+sol_light_SR = pindrift(sol_eq_SR, p);
+verifyStabilization(sol_light_SR.sol, sol_light_SR.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Illuminated, mobile ions, short circuit
+disp("Illuminated, mobile ions, short circuit")
+p = sol_i_eq_p;
+p.Int = original_p.Int;
+
+sol_i_light = pindrift(sol_i_eq, p);
+verifyStabilization(sol_i_light.sol, sol_i_light.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Illuminated, mobile ions, short circuit, surface recombination
+disp("Illuminated, mobile ions, short circuit, surface recombination")
+p = sol_i_eq_SR_p;
+p.Int = original_p.Int;
+
+sol_i_light_SR = pindrift(sol_i_eq_SR, p);
+verifyStabilization(sol_i_light_SR.sol, sol_i_light_SR.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Illuminated, open circuit
+disp("Illuminated, open circuit")
+p = ssol_eq_p;
+p.Int = original_p.Int;
+p.tmax = 1e-1;
+
+ssol_light = pindrift(ssol_eq, p);
+% repeat for stabilization
+ssol_light = pindrift(ssol_light, p);
+
+verifyStabilization(ssol_light.sol, ssol_light.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Illuminated, open circuit, surface recombination
+disp("Illuminated, open circuit, surface recombination")
+p = ssol_eq_SR_p;
+p.Int = original_p.Int;
+
+ssol_light_SR = pindrift(ssol_eq_SR, p);
+verifyStabilization(ssol_light_SR.sol, ssol_light_SR.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Illuminated, mobile ions, open circuit
+disp("Illuminated, mobile ions, open circuit")
+p = ssol_i_eq_p;
+p.Int = original_p.Int;
+
+ssol_i_light = pindrift(ssol_i_eq, p);
+
+% repeat for stabilization
+p.tmax = 1e3;
+
+ssol_i_light = pindrift(ssol_i_light, p);
+
+verifyStabilization(ssol_i_light.sol, ssol_i_light.t, 0.2); % verify solution stability
+disp('Complete')
+
+%% Illuminated, mobile ions, open circuit, surface recombination
+disp("Illuminated, mobile ions, open circuit, surface recombination")
+p = ssol_i_eq_SR_p;
+p.Int = original_p.Int;
+
+ssol_i_light_SR = pindrift(ssol_i_eq_SR, p);
+verifyStabilization(ssol_i_light_SR.sol, ssol_i_light_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
 disp('EQUILIBRATION COMPLETE')

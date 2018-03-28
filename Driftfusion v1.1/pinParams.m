@@ -40,7 +40,7 @@ end
 
 % General Parameters
 p.OC = 0;                 % Closed circuit = 0, Open Circuit = 1 
-p.Int = 0;                % Bias Light intensity (Suns Eq.)
+p.Int = 1;                % Bias Light intensity (Suns Eq.)
 p.G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
 p.tmax = 1e-3;            % Time
 p.pulseon = 0;            % Switch pulse on TPC or TPV
@@ -172,10 +172,10 @@ p.kradhtl = p.krad;         % [cm3 s-1] HTL Radiative Recombination coefficient
 
 % SRH recmobination in the contact regions, 
 % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-p.taun_etl = 1e6;         % [s] SRH time constant for electrons
-p.taup_etl = 1e6;    % [s] SRH time constant for holes
-p.taun_htl = 1e6;        %%%% USE a high value of (e.g.) 1 to switch off
-p.taup_htl = 1e6;    %%%% NOT 0- these variables are in the denominator
+p.taun_etl = 1e-11;         % [s] SRH time constant for electrons
+p.taup_etl = 1e-11;    % [s] SRH time constant for holes
+p.taun_htl = 1e-11;        %%%% USE a high value of (e.g.) 1 to switch off
+p.taup_htl = 1e-11;    %%%% NOT 0- these variables are in the denominator
 p.taun_i = 1e6;
 p.taup_i = 1e6;
 p.sn = 0;%1e7;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
