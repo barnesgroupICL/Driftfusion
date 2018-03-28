@@ -40,7 +40,7 @@ end
 
 % General Parameters
 p.OC = 0;                 % Closed circuit = 0, Open Circuit = 1 
-p.Int = 0;                % Bias Light intensity (Suns Eq.)
+p.Int = 1;                % Bias Light intensity (Suns Eq.)
 p.G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
 p.tmax = 1e-3;            % Time
 p.pulseon = 0;            % Switch pulse on TPC or TPV
@@ -52,7 +52,6 @@ p.mesht_figon = 0;        % Toggles t-mesh figures on/off
 p.side = 1;               % illumination side 1 = EE, 2 = SE
 p.calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position, calcJ = 2, calculates DD at boundary.
 p.mobset = 1;             % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
-p.mobseti = 0;            % Switch on/off ion mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
 p.JV = 0;                 % Toggle run JV scan on/off
 p.Ana = 1;                % Toggle on/off analysis
 
@@ -118,8 +117,8 @@ if ~ p.mobset
     
 else
     
-    p.mue_i = 20;           % electron mobility
-    p.muh_i = 20;           % hole mobility
+    p.mue_i = 20;          % electron mobility
+    p.muh_i = 20;      % hole mobility
     p.mue_p = p.mue_i;
     p.muh_p = p.mue_i;
     p.mue_n = p.mue_i;
@@ -127,13 +126,7 @@ else
     
 end
 
-if p.mobseti == 0
-        
-    p.mui = 0;    % ion mobility
-else 
-        
-    p.mui = 1e-10;    % ion mobility
-end
+p.mui = 1e-10; % ion mobility
 
 p.eppp = 20*p.epp0;         % Dielectric constant p-type
 p.eppi = 20*p.epp0;         % Dielectric constant intrinsic
@@ -230,6 +223,15 @@ if p.JV == 1
     
 end
 
+
+% % Pack parameters in to structure 'params'
+% varlist = who('*')';
+% varstr = strjoin(varlist, ',');
+% 
+% varcell = who('*')';                    % Store variables names in cell array
+% varcell = ['fieldnames', varcell];      % adhere to syntax for v2struct
+% 
+% params = v2struct(varcell);
 params = p; %saves writing params all the time
 
 end
