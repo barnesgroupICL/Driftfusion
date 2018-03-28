@@ -1,4 +1,4 @@
-function [sol_eq, sol_i_eq, ssol_eq, ssol_i_eq, sol_i_eq_SR] = equilibrate
+function [sol_eq, sol_i_eq, ssol_eq, ssol_i_eq, sol_i_eq_SR, ssol_i_eq_SR, ssol_i_1S_SR ] = equilibrate
 % Uses analytical initial conditions and runs to equilibrium
 % Note that tmax is consistently adjusted to appropriate values for to
 % ensure there are numerous mesh points where large gradients in the time
@@ -16,7 +16,13 @@ p = pinParams;
 
 % Store initial mobility of intrinsic layer- note all mobilities will be
 % set to this value during the equilibration procedure.
-mue_i = p.mue_i;
+mue_i = p.mue_i;          % electron mobility
+muh_i = p.muh_i;      % hole mobility
+mue_p = p.mue_p;
+muh_p = p.muh_p;
+mue_n = p.mue_n;
+muh_n = p.muh_n;
+mui = p.mui;    % Ion mobility
 
 %% Start with low recombination coefficients
 p.klin = 0;
@@ -46,20 +52,34 @@ p.tmesh_type = 2;
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e4;
 
-%% Mobsetfun is used to easily set mobilities
-p = mobsetfun(0, 0, p);
+%% Switch off mbilities
+p.mue_i = 0;          % electron mobility
+p.muh_i = 0;      % hole mobility
+p.mue_p = 0;
+p.muh_p = 0;
+p.mue_n = 0;
+p.muh_n = 0;
+p.mui = 0;
 
 %% Initial solution with zero mobility
 disp('Initial solution, zero mobility')
 sol = pindrift(sol, p);
 disp('Complete')
 
-p = mobsetfun(mue_i, 0, p);
+% Switch on mobilities
+p.mue_i = mue_i;          % electron mobility
+p.muh_i = muh_i;      % hole mobility
+p.mue_p = mue_p;
+p.muh_p = muh_p;
+p.mue_n = mue_n;
+p.muh_n = muh_n;
+p.mui = mui;
+
 p.figson = 1;
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
 
-%% Mobility with mobility switched on
+%% Soluition with mobility switched on
 disp('Solution with mobility switched on')
 sol = pindrift(sol, p);
 
@@ -91,7 +111,15 @@ disp('Initial equilibrium open circuit solution')
 p.BC = 1;
 p.OC = 1;
 p.calcJ = 0;
-p = mobsetfun(0, 0, p);
+
+%% Switch off mbilities
+p.mue_i = 0;          % electron mobility
+p.muh_i = 0;      % hole mobility
+p.mue_p = 0;
+p.muh_p = 0;
+p.mue_n = 0;
+p.muh_n = 0;
+p.mui = 0;
 
 ssol = pindrift(symsol, p);
 disp('Complete')
@@ -100,14 +128,20 @@ disp('Complete')
 disp('Open circuit solution with mobility switched on')
 p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
-p = mobsetfun(mue_i, 0, p);
+% Switch on mobilities
+p.mue_i = mue_i;          % electron mobility
+p.muh_i = muh_i;      % hole mobility
+p.mue_p = mue_p;
+p.muh_p = muh_p;
+p.mue_n = mue_n;
+p.muh_n = muh_n;
+p.mui = 0;
 
 ssol = pindrift(ssol, p);
 
 % Longer time step to ensure equilibrium has been reached
 p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
-p = mobsetfun(mue_i, 0, p);
 
 ssol_eq = pindrift(ssol, p);
 disp('Complete')
@@ -133,10 +167,10 @@ disp('Complete')
 
 %% Ion equilibrium with surface recombination
 disp('Switching on surface recombination')
-p.taun_etl = 1e-11;
-p.taup_etl = 1e-11;
-p.taun_htl = 1e-11;
-p.taup_htl = 1e-11; 
+p.taun_etl = 1e-10;
+p.taup_etl = 1e-10;
+p.taun_htl = 1e-10;
+p.taup_htl = 1e-10; 
 
 p.calcJ = 0;
 p.tmax = 1e-6;
@@ -159,7 +193,15 @@ disp('Complete')
 p.OC = 1;
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
-p = mobsetfun(0, 0, p);
+
+%% Switch off mbilities
+p.mue_i = 0;          % electron mobility
+p.muh_i = 0;      % hole mobility
+p.mue_p = 0;
+p.muh_p = 0;
+p.mue_n = 0;
+p.muh_n = 0;
+p.mui = 0;
 
 %% OC condition with ions at equilbirium
 disp('Open circuit equilibrium with ions')
@@ -167,15 +209,22 @@ ssol = pindrift(symsol, p);
 
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
+
+% Switch on mobilities
+p.mue_i = mue_i;          % electron mobility
+p.muh_i = muh_i;      % hole mobility
+p.mue_p = mue_p;
+p.muh_p = muh_p;
+p.mue_n = mue_n;
+p.muh_n = muh_n;
 p.mui = 0;
-p = mobsetfun(mue_i, 0, p);
 
 ssol = pindrift(ssol, p);
 
 % Switch on ion mobility to ensure equilibrium has been reached
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
-p = mobsetfun(mue_i, 1e-6, p);
+p.mui = 1e-6;
 
 ssol = pindrift(ssol, p);
 
@@ -183,7 +232,30 @@ p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
 
 ssol_i_eq = pindrift(ssol, p);
+
 disp('Complete')
+
+%% Ions, OC Surface recombination
+p.taun_etl = 1e-10;
+p.taup_etl = 1e-10;
+p.taun_htl = 1e-10;
+p.taup_htl = 1e-10; 
+
+p.tmax = 1e-3;
+p.t0 = p.tmax/1e6;
+
+ssol_i_eq_SR = pindrift(ssol_i_eq , p);
+
+%% 1 Sun quasi equilibrium
+disp('1 Sun quasi equilibrium')
+tmax = 1e-3;
+p.t0 = p.tmax/1e6;
+p.Int = 1;
+
+ssol_i_1S_SR = pindrift(ssol_i_eq_SR, p);
+
+disp('Complete')
+
 
 disp('EQUILIBRATION COMPLETE')
 toc

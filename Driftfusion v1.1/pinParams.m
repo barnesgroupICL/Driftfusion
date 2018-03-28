@@ -118,8 +118,8 @@ if ~ p.mobset
     
 else
     
-    p.mue_i = 20;          % electron mobility
-    p.muh_i = 20;      % hole mobility
+    p.mue_i = 20;           % electron mobility
+    p.muh_i = 20;           % hole mobility
     p.mue_p = p.mue_i;
     p.muh_p = p.mue_i;
     p.mue_n = p.mue_i;
@@ -230,15 +230,6 @@ if p.JV == 1
     
 end
 
-
-% % Pack parameters in to structure 'params'
-% varlist = who('*')';
-% varstr = strjoin(varlist, ',');
-% 
-% varcell = who('*')';                    % Store variables names in cell array
-% varcell = ['fieldnames', varcell];      % adhere to syntax for v2struct
-% 
-% params = v2struct(varcell);
 params = p; %saves writing params all the time
 
 end
