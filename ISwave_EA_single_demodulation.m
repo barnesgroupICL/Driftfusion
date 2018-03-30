@@ -50,7 +50,7 @@ assert(size(t, 2) == 1, [mfilename ' - ' inputname(1) ' has to be provided as a 
 assert(size(y, 1) == size(t, 1), [mfilename ' - ' inputname(1) ' and ' inputname(2) ' need to have the same number of rows']);
 % verify if the first and last point are identical, or into the double
 % precision error
-if Vapp_func(Vapp_params, t(1)) >= Vapp_func(Vapp_params, t(end)) + 1e-15 || Vapp_func(Vapp_params, t(1)) <= Vapp_func(Vapp_params, t(end)) - 1e-15
+if Vapp_func(Vapp_params, t(1)) >= Vapp_func(Vapp_params, t(end)) + 1e-14 || Vapp_func(Vapp_params, t(1)) <= Vapp_func(Vapp_params, t(end)) - 1e-14
     warning('pindrift:demodulation', 'It is suggested to provide a whole period, including the first and last repeated points')
 end
 

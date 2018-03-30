@@ -48,9 +48,9 @@ p.Vapp = Voc; % use potential value in the middle as new applied voltage, this i
 
 % set an initial time for stabilization tmax
 if p.mui
-    p.tmax = 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i));
+    p.tmax = min(1e1, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i)));
 else
-    p.tmax = 2^(-log10(p.mue_i));
+    p.tmax = min(1e1, 2^(-log10(p.mue_i)));
 end
 
 %% halve the solution
@@ -59,10 +59,6 @@ sol_ic.sol = symstruct.sol(end, 1:centerIndex, :); % take the first spatial half
 sol_ic.x = symstruct.x(1:centerIndex); % providing just sol to pindrift is not enough, a more complete structure is needed, including at least x mesh
 
 %% stabilize the divided solution
-asymstruct = pindrift(sol_ic, p); % should already be stable...
-
-asymstruct.p.calcJ = 1;
-[~,~, Jn, Efn, Efp] = pinAna(asymstruct);
-disp([mfilename ' - Symmetric solution voltage was ' num2str(Voc) ' V; asymmetrized solution voltage is ' num2str(Efn(end, end) - Efp(end, 1)) ' V; residual current is ' num2str(Jn(end)) ' mA'])
+asymstruct = pindrift(sol_ic, p); % should already be stable, this run of pindrift should be fast...
 
 %------------- END OF CODE --------------

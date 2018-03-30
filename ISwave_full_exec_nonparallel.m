@@ -223,7 +223,7 @@ Freq_matrix = repmat(Freq_array, length(symstructs(1, :)), 1);
 
 % the absolute value of impedance has to be taken from the absolute values
 % of oscillation of voltage and of current
-impedance_abs = -deltaV ./ J_amp; % J_amp is in amperes
+impedance_abs = deltaV ./ J_amp; % J_amp is in amperes
 % the components of the impedance gets calculated with the phase from the
 % current-voltage "delay"
 impedance_re = impedance_abs .* cos(J_phase); % this is the resistance
@@ -233,7 +233,7 @@ pulsatance_matrix = 2 * pi * repmat(Freq_array, length(symstructs(1, :)), 1);
 % or can be obtained in the same way with Joutphase/(pulsatance*deltaV)
 cap = sin(J_phase) ./ (pulsatance_matrix .* impedance_abs);
 
-impedance_i_abs = -deltaV ./ J_i_amp; % J_amp is in amperes
+impedance_i_abs = deltaV ./ J_i_amp; % J_amp is in amperes
 impedance_i_re = impedance_i_abs .* cos(J_i_phase); % this is the resistance
 impedance_i_im = impedance_i_abs .* sin(J_i_phase);
 cap_idrift = sin(J_i_phase) ./ (pulsatance_matrix .* impedance_i_abs);
@@ -266,9 +266,6 @@ ISwave_struct.cap_idrift = cap_idrift;
 ISwave_struct.impedance_i_abs = impedance_i_abs;
 ISwave_struct.impedance_i_im = impedance_i_im;
 ISwave_struct.impedance_i_re = impedance_i_re;
-if save_results
-    assignin('base', ['ISwave_' symstructs{2, 1}], ISwave_struct);
-end
 
 %% plot results
 

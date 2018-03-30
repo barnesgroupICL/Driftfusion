@@ -52,7 +52,7 @@ periods = round(s.p.tmax * s.p.Vapp_params(4) / (2 * pi));
 % ISwave_single_demodulator
 fit_t_index = round((s.p.tpoints - 1) * round(periods / 2) / periods) + 1;
 fit_t = s.t(fit_t_index:end)';
-fit_J = s.Jtot(fit_t_index:end) / 1000; % in Ampere
+fit_J = s.Jn(fit_t_index:end) / 1000; % in Ampere
 
 % remove some tilting from fit_J to get better fit and better demodulation in case of
 % unstabilized solutions. In case of noisy solutions this could work badly
@@ -126,7 +126,7 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
 
         yyaxis left
         hold off
-        i=i+1; h(i) = plot(s.t, s.Jtot, 'b--', 'LineWidth', 2); % mA
+        i=i+1; h(i) = plot(s.t, s.Jn, 'b--', 'LineWidth', 2); % mA
         hold on
         %i=i+1; h(i) = plot(s.t, -s.Jdispr); % mA
         i=i+1; h(i) = plot(s.t(2:end), -subtracting_n_intr_t * 1000); % mA
