@@ -1,4 +1,4 @@
-function [Voc, Vapp_arr, Jn, Efn, Efp] = pinAna(solstruct)
+function [Voc, Vapp_arr, Jn, Efn, Efp, Utot] = pinAna(solstruct)
 
 % pinAna analyses the input solution and plots various useful graphs.
 % Many plots are available to the user although currently these are
@@ -136,6 +136,8 @@ if p.OC == 0
     
     Jn = trapz(p.x, dJndx, 2)*1000*p.e;
     
+    Utot = trapz(p.x, U, 2)*1000*p.e;
+    
     %% Calculates current at every point and all times
     % Note the drift and diffusion currents do not cancel properly here
     if p.calcJ == 1
@@ -180,6 +182,7 @@ if p.OC == 0
 else
     
     Jn = 0;
+    Utot = NaN;
     
 end
 

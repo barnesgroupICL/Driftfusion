@@ -70,7 +70,7 @@ p.RelTol = RelTol; % in case some were defined, for increasing accuracy
 p.JV = 2; % new mode for arbitrary Vapp functions
 
 % get Efn and Efp
-[~, ~, ~, Efn, Efp] = pinAna(asymstruct_Int);
+[~, ~, ~, Efn, Efp, ~] = pinAna(asymstruct_Int);
 
 Vstart = Efn(end, end) - Efp(end, 1);
 p.Vapp_params = [Vstart, deltaV, 0, 2 * pi * freq];

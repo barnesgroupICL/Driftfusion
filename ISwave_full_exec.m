@@ -115,7 +115,7 @@ for i = 1:length(structs(1, :))
     else
         asymstruct_Int = struct;
     end
-    [~, ~, ~, Efn, Efp] = pinAna(asymstruct_Int);
+    [~, ~, ~, Efn, Efp, ~] = pinAna(asymstruct_Int);
     Vdc_array(i) = Efn(end, end) - Efp(end, 1);
     if frozen_ions
         asymstruct_Int.p.mui = 0; % if frozen_ions option is set, freezing ions
