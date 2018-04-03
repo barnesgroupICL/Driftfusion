@@ -53,6 +53,10 @@ periods = round(s.p.tmax * s.p.Vapp_params(4) / (2 * pi));
 fit_t_index = round((s.p.tpoints - 1) * round(periods / 2) / periods) + 1;
 fit_t = s.t(fit_t_index:end)';
 fit_J = s.Jn(fit_t_index:end) / 1000; % in Ampere
+% obtain recombination current
+[~, ~, ~, ~, ~, U] = pinAna(s);
+Utot = trapz(s.p.x, U, 2)*s.p.e;
+fit_U = Utot(fit_t_index:end); % in Ampere
 
 % remove some tilting from fit_J to get better fit and better demodulation in case of
 % unstabilized solutions. In case of noisy solutions this could work badly
@@ -67,8 +71,10 @@ fit_J_flat = fit_J - tilting * (fit_t - t_middle);
 
 if demodulation
     coeff = ISwave_EA_single_demodulation(fit_t, fit_J_flat, s.p.Vapp_func, s.p.Vapp_params);
+    U_coeff = ISwave_EA_single_demodulation(fit_t, fit_U, s.p.Vapp_func, s.p.Vapp_params);
 else
     coeff = ISwave_EA_single_fit(fit_t, fit_J_flat, s.p.J_E_func);
+    U_coeff = ISwave_EA_single_fit(fit_t, fit_U, s.p.J_E_func);
 end
 
 %% calculate ionic contribution
@@ -128,12 +134,14 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         hold off
         i=i+1; h(i) = plot(s.t, s.Jn, 'b--', 'LineWidth', 2); % mA
         hold on
+        i=i+1; h(i) = plot(s.t, Utot, 'g.', 'LineWidth', 2); % mA
         %i=i+1; h(i) = plot(s.t, -s.Jdispr); % mA
         i=i+1; h(i) = plot(s.t(2:end), -subtracting_n_intr_t * 1000); % mA
         i=i+1; h(i) = plot(s.t(2:end), -subtracting_n_contacts_t * 1000); % mA
         i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
-
-        legend_array = [legend_array, "Current", "Charge variation intrinsic", "Charge variation contacts", "1st harmonic"]; % "Displacement current"
+        i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(U_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
+        
+        legend_array = [legend_array, "Current", "Recombination current", "Charge variation intrinsic", "Charge variation contacts", "1st harmonic", "Rec J fit"]; % "Displacement current"
         if s.p.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             i=i+1; h(i) = plot(s.t, Ji_disp * 1000); % mA
             i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
