@@ -301,6 +301,10 @@ p.taun_htl = original_p.taun_htl;
 p.taup_htl = original_p.taup_htl;
 
 ssol_i_eq_SR = pindrift(ssol_i_eq, p);
+p.tmax = p.tmax * 10;
+ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
+p.tmax = p.tmax * 10;
+ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
 ssol_i_eq_SR_p = p; % temporarily save params
 verifyStabilization(ssol_i_eq_SR.sol, ssol_i_eq_SR.t, 0.2); % verify solution stability
 disp('Complete')
@@ -383,7 +387,10 @@ disp("Illuminated, mobile ions, open circuit, surface recombination")
 p = ssol_i_eq_SR_p;
 p.Int = original_p.Int;
 
+p.tmax = p.tmax / 1e1;
 ssol_i_light_SR = pindrift(ssol_i_eq_SR, p);
+p.tmax = p.tmax * 1e2;
+ssol_i_light_SR = pindrift(ssol_i_light_SR, p);
 verifyStabilization(ssol_i_light_SR.sol, ssol_i_light_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
