@@ -103,7 +103,7 @@ disp('Initial solution, zero mobility')
 sol = pindrift(sol, p);
 disp('Complete')
 
-p.figson = 1;
+p.figson = 0; % reduce annoyance of figures popping up
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
 
@@ -126,8 +126,10 @@ p.tmax = 1e-2;
 p.t0 = p.tmax/1e10;
 
 sol_eq = pindrift(sol, p);
+
 sol_eq_p = p; % temporarily save params
 verifyStabilization(sol_eq.sol, sol_eq.t, 0.2); % verify solution stability
+sol_eq.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Set up solution for open circuit
@@ -175,8 +177,10 @@ p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
 
 ssol_eq = pindrift(ssol, p);
+
 ssol_eq_p = p; % temporarily save params
 verifyStabilization(ssol_eq.sol, ssol_eq.t, 0.2); % verify solution stability
+ssol_eq.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Equilibrium solutions with ion mobility switched on
@@ -197,8 +201,10 @@ p.t0 = p.tmax/1e3;
 p.mui = original_p.mui; % Ions are set to the correct speed indicated in pinParams
 
 sol_i_eq = pindrift(sol, p);
+
 sol_i_eq_p = p; % temporarily save params
 verifyStabilization(sol_i_eq.sol, sol_i_eq.t, 0.2); % verify solution stability
+sol_i_eq.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Ion equilibrium with surface recombination
@@ -213,8 +219,10 @@ p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
 
 sol_i_eq_SR = pindrift(sol_i_eq, p);
+
 sol_i_eq_SR_p = p; % temporarily save params
 verifyStabilization(sol_i_eq_SR.sol, sol_i_eq_SR.t, 0.2); % verify solution stability
+sol_i_eq_SR.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 % Switch off SR
@@ -262,8 +270,10 @@ p.tmax = 1e2;
 p.t0 = p.tmax/1e3;
 
 ssol_i_eq = pindrift(ssol, p);
+
 ssol_i_eq_p = p; % temporarily save params
 verifyStabilization(ssol_i_eq.sol, ssol_i_eq.t, 0.2); % verify solution stability
+ssol_i_eq.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Dark, short circuit, surface recombination
@@ -275,8 +285,10 @@ p.taun_htl = original_p.taun_htl;
 p.taup_htl = original_p.taup_htl;
 
 sol_eq_SR = pindrift(sol_eq, p);
+
 sol_eq_SR_p = p; % temporarily save params
 verifyStabilization(sol_eq_SR.sol, sol_eq_SR.t, 0.2); % verify solution stability
+sol_eq_SR.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Dark, open circuit, surface recombination
@@ -288,8 +300,10 @@ p.taun_htl = original_p.taun_htl;
 p.taup_htl = original_p.taup_htl;
 
 ssol_eq_SR = pindrift(ssol_eq, p);
+
 ssol_eq_SR_p = p; % temporarily save params
 verifyStabilization(ssol_eq_SR.sol, ssol_eq_SR.t, 0.2); % verify solution stability
+ssol_eq_SR.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Dark, mobile ions, open circuit, surface recombination
@@ -305,8 +319,10 @@ p.tmax = p.tmax * 10;
 ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
 p.tmax = p.tmax * 10;
 ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
+
 ssol_i_eq_SR_p = p; % temporarily save params
 verifyStabilization(ssol_i_eq_SR.sol, ssol_i_eq_SR.t, 0.2); % verify solution stability
+ssol_i_eq_SR.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Illuminated, short circuit
@@ -315,7 +331,9 @@ p = sol_eq_p;
 p.Int = original_p.Int;
 
 sol_light = pindrift(sol_eq, p);
+
 verifyStabilization(sol_light.sol, sol_light.t, 0.2); % verify solution stability
+sol_light.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Illuminated, short circuit, surface recombination
@@ -324,7 +342,9 @@ p = sol_eq_SR_p;
 p.Int = original_p.Int;
 
 sol_light_SR = pindrift(sol_eq_SR, p);
+
 verifyStabilization(sol_light_SR.sol, sol_light_SR.t, 0.2); % verify solution stability
+sol_light_SR.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Illuminated, mobile ions, short circuit
@@ -333,7 +353,9 @@ p = sol_i_eq_p;
 p.Int = original_p.Int;
 
 sol_i_light = pindrift(sol_i_eq, p);
+
 verifyStabilization(sol_i_light.sol, sol_i_light.t, 0.2); % verify solution stability
+sol_i_light.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Illuminated, mobile ions, short circuit, surface recombination
@@ -342,7 +364,9 @@ p = sol_i_eq_SR_p;
 p.Int = original_p.Int;
 
 sol_i_light_SR = pindrift(sol_i_eq_SR, p);
+
 verifyStabilization(sol_i_light_SR.sol, sol_i_light_SR.t, 0.2); % verify solution stability
+sol_i_light_SR.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Illuminated, open circuit
@@ -356,6 +380,7 @@ ssol_light = pindrift(ssol_eq, p);
 ssol_light = pindrift(ssol_light, p);
 
 verifyStabilization(ssol_light.sol, ssol_light.t, 0.2); % verify solution stability
+ssol_light.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Illuminated, open circuit, surface recombination
@@ -364,7 +389,9 @@ p = ssol_eq_SR_p;
 p.Int = original_p.Int;
 
 ssol_light_SR = pindrift(ssol_eq_SR, p);
+
 verifyStabilization(ssol_light_SR.sol, ssol_light_SR.t, 0.2); % verify solution stability
+ssol_light_SR.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Illuminated, mobile ions, open circuit
@@ -380,17 +407,20 @@ p.tmax = 1e3;
 ssol_i_light = pindrift(ssol_i_light, p);
 
 verifyStabilization(ssol_i_light.sol, ssol_i_light.t, 0.2); % verify solution stability
+ssol_i_light.p.figson = 1; % re-enable figures creation for this solution
 disp('Complete')
 
 %% Illuminated, mobile ions, open circuit, surface recombination
 disp("Illuminated, mobile ions, open circuit, surface recombination")
 p = ssol_i_eq_SR_p;
 p.Int = original_p.Int;
+p.figson = 1; % for the last simulation, figures popping up are ok
 
 p.tmax = p.tmax / 1e1;
 ssol_i_light_SR = pindrift(ssol_i_eq_SR, p);
 p.tmax = p.tmax * 1e2;
 ssol_i_light_SR = pindrift(ssol_i_light_SR, p);
+
 verifyStabilization(ssol_i_light_SR.sol, ssol_i_light_SR.t, 0.2); % verify solution stability
 disp('Complete')
 
