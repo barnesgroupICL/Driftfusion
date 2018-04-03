@@ -180,7 +180,7 @@ if p.OC == 0
 else
     
     Jn = 0;
-    Utot = NaN;
+    U = NaN;
     
 end
 
