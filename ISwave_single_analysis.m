@@ -1,4 +1,4 @@
-function [coeff, i_coeff, subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t, subtracting_i_abs_t, subtracting_i_t, Ji_disp] = ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
+function [coeff, i_coeff, U_coeff] = ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
 %ISWAVE_SINGLE_ANALYSIS - Calculate impedance (reactance and resistance) and phase by Impedance
 % Spectroscopy (ISwave) with oscillating voltage
 %

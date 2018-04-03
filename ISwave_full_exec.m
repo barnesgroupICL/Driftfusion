@@ -128,7 +128,7 @@ for i = 1:length(structs(1, :))
             Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
         % set ISwave_single_analysis minimal_mode to true as under
         % parallelization graphics for single solutions cannot be created
-        [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
+        [fit_coeff, fit_idrift_coeff, ~] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
         % if phase is small or negative, double check increasing accuracy of the solver
         % a phase close to 90 degrees can be indicated as it was -90 degree
         % by the demodulation, the fitting way does not have this problem
@@ -140,7 +140,7 @@ for i = 1:length(structs(1, :))
                 deltaV, Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
+            [fit_coeff, fit_idrift_coeff, ~] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
         end
         % if phase is still negative or bigger than pi/2, likely is demodulation that is
         % failing (no idea why), use safer fitting method without repeating
@@ -148,7 +148,7 @@ for i = 1:length(structs(1, :))
         if fit_coeff(3) < 0 || fit_coeff(3) > pi/2
             disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Phase from demodulation is weird: ' num2str(rad2deg(fit_coeff(3))) ' degrees, confirming using fitting'])
             % use fitting
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, true, false);
+            [fit_coeff, fit_idrift_coeff, ~] = ISwave_single_analysis(asymstruct_ISwave, true, false);
             disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Phase from fitting is: ' num2str(rad2deg(fit_coeff(3))) ' degrees'])
         end
         % if phase is still negative or more than pi/2, check again increasing accuracy
@@ -161,7 +161,7 @@ for i = 1:length(structs(1, :))
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
             % use fitting
-            [fit_coeff, fit_idrift_coeff, ~, ~, ~, ~, ~, ~] = ISwave_single_analysis(asymstruct_ISwave, true, false);
+            [fit_coeff, fit_idrift_coeff, ~] = ISwave_single_analysis(asymstruct_ISwave, true, false);
         end
         J_bias(i, j) = fit_coeff(1); % not really that useful
         J_amp(i, j) = fit_coeff(2);
