@@ -20,7 +20,7 @@ function structCell = genVappStructs(asymstruct, Vapp_array)
 %     generates dark solutions at a list of applied voltages, remember that
 %     the list will have an ascending ordering in the output structure
 %
-% Other m-files required: pindrift
+% Other m-files required: pindrift, pinAna
 % Subfunctions: none
 % MAT-files required: none
 %

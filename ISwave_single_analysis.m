@@ -18,7 +18,8 @@ function [coeff, i_coeff, U_coeff] = ISwave_single_analysis(asymstruct_ISwave, m
 %   ISwave_single_analysis(ISwave_EA_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, false, 1e-4), false, true)
 %     do plot
 %
-% Other m-files required: ISwave_subtracting_analysis, ISwave_EA_single_fit, ISwave_EA_single_demodulation
+% Other m-files required: ISwave_subtracting_analysis,
+%   ISwave_EA_single_fit, ISwave_EA_single_demodulation, pinAna
 % Subfunctions: none
 % MAT-files required: none
 %

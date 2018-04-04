@@ -38,7 +38,7 @@ function ISwave_struct = ISwave_full_exec(structs, startFreq, endFreq, Freq_poin
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
 %   ISwave_single_analysis, ISwave_full_analysis_nyquist,
-%   IS_full_analysis_impedance, ISwave_EA_full_analysis_phase
+%   IS_full_analysis_impedance, ISwave_EA_full_analysis_phase, pinAna
 % Subfunctions: none
 % MAT-files required: none
 %

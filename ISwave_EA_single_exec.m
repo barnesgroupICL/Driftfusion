@@ -31,7 +31,7 @@ function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV, f
 %     calculating the ionic current and using a starting relative tolerance
 %     of 1e-4
 %
-% Other m-files required: pindrift, verifyStabilization
+% Other m-files required: pindrift, verifyStabilization, pinAna
 % Subfunctions: none
 % MAT-files required: none
 %
