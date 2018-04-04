@@ -200,16 +200,18 @@ Freq_matrix = repmat(Freq_array, length(structs(1, :)), 1);
 impedance_abs = deltaV ./ J_amp; % J_amp is in amperes
 % the components of the impedance gets calculated with the phase from the
 % current-voltage "delay"
-impedance_re = impedance_abs .* cos(J_phase); % this is the resistance
-impedance_im = impedance_abs .* sin(J_phase);
+% impedance phase is minus current phase, so -J_phase
+impedance_re = impedance_abs .* cos(-J_phase); % this is the resistance
+impedance_im = impedance_abs .* sin(-J_phase);
 pulsatance_matrix = 2 * pi * repmat(Freq_array, length(structs(1, :)), 1);
 % the capacitance is the imaginary part of 1/(pulsatance*complex_impedance)
 % or can be obtained in the same way with Joutphase/(pulsatance*deltaV)
 cap = sin(J_phase) ./ (pulsatance_matrix .* impedance_abs);
 
 impedance_i_abs = deltaV ./ J_i_amp; % J_amp is in amperes
-impedance_i_re = impedance_i_abs .* cos(J_i_phase); % this is the resistance
-impedance_i_im = impedance_i_abs .* sin(J_i_phase);
+% impedance phase is minus current phase, so -J_i_phase
+impedance_i_re = impedance_i_abs .* cos(-J_i_phase); % this is the resistance
+impedance_i_im = impedance_i_abs .* sin(-J_i_phase);
 cap_idrift = sin(J_i_phase) ./ (pulsatance_matrix .* impedance_i_abs);
 
 %% save results

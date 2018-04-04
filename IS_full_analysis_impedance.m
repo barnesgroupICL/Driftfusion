@@ -94,12 +94,12 @@ if isfield(IS_struct, 'J_phase') % just ISwave have phase output
     figure('Name', 'imaginary impedance at light intensities', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
-            h(i) = plot(IS_struct.Freq(i, :), IS_struct.impedance_im(i, :)',...
+            h(i) = plot(IS_struct.Freq(i, :), -IS_struct.impedance_im(i, :)',...
                 'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
                 'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
                 'MarkerSize', 3, 'LineWidth', 1.3);
             hold on
-            plot(IS_struct.Freq(i, :), IS_struct.impedance_i_im(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            plot(IS_struct.Freq(i, :), -IS_struct.impedance_i_im(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
         end
         ax = gca;
         ax.XScale = 'log'; % for putting the scale in log
