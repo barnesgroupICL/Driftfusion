@@ -84,7 +84,7 @@ figure('Name', 'IS at light intensities', 'NumberTitle', 'off');
     ax.YScale = 'log'; % for putting the scale in log
     xlim([min(min(IS_struct.Freq)), max(max(IS_struct.Freq))])
     xlabel('Frequency [Hz]');
-    ylabel('Im(\omega^{-1} Z^{-1}) [F/cm^2]');
+    ylabel('\omega^{-1}·Im(Z^{-1}) [F/cm^2]');
     legend(flipud(h), legend_flip)
     legend boxoff
 

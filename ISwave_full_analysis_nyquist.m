@@ -86,5 +86,6 @@ figure('Name', 'Nyquist plot of IS at various light intensities', 'NumberTitle',
     xlabel('Re(Z) [\Omega cm^2]');
     ylabel('-Im(Z) [\Omega cm^2]');
     legend(flipud(h(h~=0)), legend_flip)
+    legend boxoff
     
 %------------- END OF CODE --------------
