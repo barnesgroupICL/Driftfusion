@@ -237,7 +237,7 @@ else
 end
 
 %% Band Diagram - subplot 1
-FH1 = figure(1);
+FH1 = figure('Name', 'Band Diagram', 'NumberTitle', 'off');
 %set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
 PH1 = subplot(3,1,1);
 plot (xnm, Efn(end,:), '--', xnm, Efp(end,:), '--', xnm, Ecb(end, :), xnm, Evb(end ,:));
