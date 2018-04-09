@@ -60,7 +60,7 @@ tic;    % Start stopwatch
 % Setting sol.sol = 0 enables a parameters structure to be read into
 % pindrift but indicates that the initial conditions should be the
 % analytical solutions
-sol.sol = 0;    
+sol0.sol = 0;    
 
 p = pinParams;
 
@@ -81,7 +81,6 @@ p.taup_htl = 1e6;
 % p.kradhtl = 1e-20;
 
 %% General initial parameters
-p.tmesh_type = 2;
 p.tpoints = 20;
 
 p.Ana = 0;
@@ -100,7 +99,7 @@ p = mobsetfun(0, 0, p);
 
 %% Initial solution with zero mobility
 disp('Initial solution, zero mobility')
-sol = pindrift(sol, p);
+sol1 = pindrift(sol0, p);
 disp('Complete')
 
 p.figson = 0; % reduce annoyance of figures popping up
@@ -117,15 +116,19 @@ p.muh_p = original_p.muh_p; % hole mobility in n-type
 p.mue_n = original_p.mue_n; % electron mobility in p-type
 p.muh_n = original_p.muh_n; % hole mobility in n-type
 
+%p.krad = original_p.krad;
+%p.kradetl = original_p.kradetl;
+%p.kradhtl = original_p.kradhtl;
+
 disp('Solution with mobility switched on')
-sol = pindrift(sol, p);
+sol2 = pindrift(sol1, p);
 
 p.Ana = 1;
 p.calcJ = 0;
 p.tmax = 1e-2;
 p.t0 = p.tmax/1e10;
 
-sol_eq = pindrift(sol, p);
+sol_eq = pindrift(sol2, p);
 
 sol_eq_p = p; % temporarily save params
 verifyStabilization(sol_eq.sol, sol_eq.t, 0.2); % verify solution stability
@@ -139,12 +142,12 @@ p.BC = 0;
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
 
-sol = pindrift(sol_eq, p);
+sol3 = pindrift(sol_eq, p);
 disp('Complete')
 
 %% Symmetricise the solution
 disp('Symmetricise solution for open circuit')
-symsol = symmetricize(sol);
+symsol = symmetricize(sol3);
 disp('Complete')
 
 %% Equilibrium solution with mirrored cell and OC boundary conditions, mobility zero
@@ -192,7 +195,7 @@ p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
 p.mui = 1e-6;           % Ions are accelerated to reach equilibrium
 
-sol = pindrift(sol_eq, p);
+sol4 = pindrift(sol_eq, p);
 
 % Much longer second step to ensure that ions have migrated
 p.calcJ = 0;
@@ -200,7 +203,7 @@ p.tmax = 1e2;
 p.t0 = p.tmax/1e3;
 p.mui = original_p.mui; % Ions are set to the correct speed indicated in pinParams
 
-sol_i_eq = pindrift(sol, p);
+sol_i_eq = pindrift(sol4, p);
 
 sol_i_eq_p = p; % temporarily save params
 verifyStabilization(sol_i_eq.sol, sol_i_eq.t, 0.2); % verify solution stability
@@ -315,7 +318,9 @@ p.taun_htl = original_p.taun_htl;
 p.taup_htl = original_p.taup_htl;
 
 ssol_i_eq_SR = pindrift(ssol_i_eq, p);
+ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
 p.tmax = p.tmax * 10;
+ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
 ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
 p.tmax = p.tmax * 10;
 ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
@@ -414,11 +419,12 @@ disp('Complete')
 disp("Illuminated, mobile ions, open circuit, surface recombination")
 p = ssol_i_eq_SR_p;
 p.Int = original_p.Int;
-p.figson = 1; % for the last simulation, figures popping up are ok
 
 p.tmax = p.tmax / 1e1;
 ssol_i_light_SR = pindrift(ssol_i_eq_SR, p);
+
 p.tmax = p.tmax * 1e2;
+p.figson = 1; % for the last simulation, figures popping up are ok
 ssol_i_light_SR = pindrift(ssol_i_light_SR, p);
 
 verifyStabilization(ssol_i_light_SR.sol, ssol_i_light_SR.t, 0.2); % verify solution stability
