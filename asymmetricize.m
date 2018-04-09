@@ -39,7 +39,7 @@ function asymstruct = asymmetricize(symstruct, BC)
 p = symstruct.p;
 p.OC = 0; % without setting OC to 0 BC gets ignored, OC 0 is needed for the asymmetric solution
 p.BC = BC;
-p.tpoints = 5; % rough, just for re-stabilization at Vapp
+p.tpoints = 10; % rough, just for re-stabilization at Vapp
 p.Ana = 0;
 
 % get the Voc value in the middle of the symmetrical solution at the final time step
@@ -60,5 +60,12 @@ sol_ic.x = symstruct.x(1:centerIndex); % providing just sol to pindrift is not e
 
 %% stabilize the divided solution
 asymstruct = pindrift(sol_ic, p); % should already be stable, this run of pindrift should be fast...
+
+warning('off', 'pindrift:verifyStabilization');
+while ~verifyStabilization(asymstruct.sol, asymstruct.t, 1e-3) % check stability in a strict way
+    disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
+    asymstruct = pindrift(asymstruct, p);
+end
+warning('on', 'pindrift:verifyStabilization');
 
 %------------- END OF CODE --------------
