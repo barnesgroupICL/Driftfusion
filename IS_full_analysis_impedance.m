@@ -65,6 +65,10 @@ legend_flip(legend_flip=="0 sun") = "dark";
 % preallocate figures handles
 h = zeros(length(legend_text), 1);
 
+% in case just a single frequency was simulated, min and max are
+% coincident, so they are modified by a small percentage
+xlim_array = [min(min(IS_struct.Freq))*0.99, max(max(IS_struct.Freq)*1.01)];
+
 %% plot apparent capacitance vs frequency
 figure('Name', 'IS at light intensities', 'NumberTitle', 'off');
     hold off
@@ -82,7 +86,7 @@ figure('Name', 'IS at light intensities', 'NumberTitle', 'off');
     ax = gca;
     ax.XScale = 'log'; % for putting the scale in log
     ax.YScale = 'log'; % for putting the scale in log
-    xlim([min(min(IS_struct.Freq)), max(max(IS_struct.Freq))])
+    xlim(xlim_array)
     xlabel('Frequency [Hz]');
     ylabel('\omega^{-1}·Im(Z^{-1}) [F/cm^2]');
     legend(flipud(h), legend_flip)
@@ -104,7 +108,7 @@ if isfield(IS_struct, 'J_phase') % just ISwave have phase output
         ax = gca;
         ax.XScale = 'log'; % for putting the scale in log
         ax.YScale = 'log'; % for putting the scale in log
-        xlim([min(min(IS_struct.Freq)), max(max(IS_struct.Freq))])
+        xlim(xlim_array)
         xlabel('Frequency [Hz]');
         ylabel('-Im(Z) [\Omega cm^2]');
         legend(flipud(h), legend_flip)
@@ -123,7 +127,7 @@ if isfield(IS_struct, 'J_phase') % just ISwave have phase output
         ax = gca;
         ax.XScale = 'log'; % for putting the scale in log
         ax.YScale = 'log'; % for putting the scale in log
-        xlim([min(min(IS_struct.Freq)), max(max(IS_struct.Freq))])
+        xlim(xlim_array)
         xlabel('Frequency [Hz]');
         ylabel('Re(Z) [\Omega cm^2]');
         legend(flipud(h), legend_flip)
@@ -142,7 +146,7 @@ if isfield(IS_struct, 'J_phase') % just ISwave have phase output
         ax = gca;
         ax.XScale = 'log'; % for putting the scale in log
         ax.YScale = 'log'; % for putting the scale in log
-        xlim([min(min(IS_struct.Freq)), max(max(IS_struct.Freq))])
+        xlim(xlim_array)
         xlabel('Frequency [Hz]');
         ylabel('Abs(Z) [\Omega cm^2]');
         legend(flipud(h), legend_flip)
