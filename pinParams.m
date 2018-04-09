@@ -203,8 +203,11 @@ p.m = 0;
 p.RelTol = 1e-3;
 
 % Space Charge Region- initial guess required with trial and error better
-% than analytical solution
-p.wp = 25e-7;  %((-ti*NA*q) + ((NA^0.5)*(q^0.5)*(((ti^2)*NA*q) + (4*eppi*Vbi))^0.5))/(2*NA*q);
+% than analytical solution. Needs to be changed when ti (absorber
+% thickness) is changed.
+% ti 400e-7 wp 25e-7;
+% ti 500e-7 wp 22e-7;
+p.wp = p.tint; %((-ti*NA*q) + ((NA^0.5)*(q^0.5)*(((ti^2)*NA*q) + (4*eppi*Vbi))^0.5))/(2*NA*q);
 p.wn = p.wp;
 
 p.wscr = p.wp + p.ti + p.wn;    % width of space charge region
