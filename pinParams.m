@@ -9,13 +9,13 @@ p.q = 1;                % in e
 p.e = 1.61917e-19;      % Charge of an electron in Coulombs for current calculations
 
 % Device Dimensions [cm]
-p.tp = 100e-7;         % p-type layer thickness
+p.tp = 200e-7;         % p-type layer thickness
 p.pp = 60;             % p-type layer points
-p.ti = 500e-7;         % Intrinsic layer thickness
+p.ti = 500e-7;         % Intrinsic layer thickness; this affects the wp parameter
 p.pii = 100;           % Intrinsic points
-p.tn = 100e-7;         % n-type thickness
+p.tn = 200e-7;         % n-type thickness
 p.pn = 60;             % n-type points
-p.tint = 20e-7;      % 0.5x Interfacial region thickness (x_mesh_type = 3)
+p.tint = 22e-7;      % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
 p.pint = 40;         % 0.5x Interfacial points (x_mesh_type = 3)
 p.tscr = 50e-7;
 p.pscr = 50;
@@ -119,10 +119,10 @@ else
     
     p.mue_i = 20;          % electron mobility
     p.muh_i = 20;      % hole mobility
-    p.mue_p = 0.001;
-    p.muh_p = p.mue_i;
-    p.mue_n = p.mue_i;
-    p.muh_n = 0.001;
+    p.mue_p = 0.02;
+    p.muh_p = 20;
+    p.mue_n = 20;
+    p.muh_n = 0.02;
     
 end
 
@@ -172,10 +172,10 @@ p.kradhtl = p.krad;         % [cm3 s-1] HTL Radiative Recombination coefficient
 
 % SRH recmobination in the contact regions, 
 % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-p.taun_etl = 2e-9;         % [s] SRH time constant for electrons
-p.taup_etl = 2e-9;    % [s] SRH time constant for holes
-p.taun_htl = 2e-9;        %%%% USE a high value of (e.g.) 1 to switch off
-p.taup_htl = 2e-9;    %%%% NOT 0- these variables are in the denominator
+p.taun_etl = 5e-10;         % [s] SRH time constant for electrons
+p.taup_etl = 5e-10;    % [s] SRH time constant for holes
+p.taun_htl = 5e-10;        %%%% USE a high value of (e.g.) 1 to switch off
+p.taup_htl = 5e-10;    %%%% NOT 0- these variables are in the denominator
 p.taun_i = 1e6;
 p.taup_i = 1e6;
 p.sn = 0;%1e7;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
