@@ -1,9 +1,9 @@
-function ISwave_struct = ISwave_full_exec_nonparallel(structs, startFreq, endFreq, Freq_points, deltaV, BC, sequential, frozen_ions, do_graphics, save_solutions)
+function ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFreq, Freq_points, deltaV, BC, sequential, frozen_ions, do_graphics, save_solutions)
 %ISWAVE_FULL_EXEC_NONPARALLEL - Do Impedance Spectroscopy approximated applying an
 % oscillating voltage (ISwave) in a range of background light intensities.
 % Getting rid of annoying parfor
 %
-% Syntax:  ISwave_struct = ISwave_full_exec_nonparallel(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, sequential, frozen_ions, do_graphics, save_solutions)
+% Syntax:  ISwave_results = ISwave_full_exec_nonparallel(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, sequential, frozen_ions, do_graphics, save_solutions)
 %
 % Inputs:
 %   STRUCTS - can be a cell structure containing structs at various background
@@ -30,7 +30,7 @@ function ISwave_struct = ISwave_full_exec_nonparallel(structs, startFreq, endFre
 %     workspace the calulated solutions of single ISstep perturbations
 %
 % Outputs:
-%   ISWAVE_STRUCT - a struct containing the most important results of the simulation
+%   ISWAVE_RESULTS - a struct containing the most important results of the simulation
 %
 % Example:
 %   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true, true)
@@ -250,40 +250,37 @@ cap_idrift = sin(J_i_phase) ./ (pulsatance_matrix .* impedance_i_abs);
 
 % this struct is similar to ISstep_struct in terms of fields,
 % but the columns and rows in the fields can be different
-ISwave_struct.sol_name = structs{2, 1};
-ISwave_struct.Vdc = Vdc_array;
-ISwave_struct.periods = periods;
-ISwave_struct.Freq = Freq_matrix;
-ISwave_struct.tpoints = 1 + tpoints_per_period * periods;
-ISwave_struct.tmax = tmax_matrix;
-ISwave_struct.Int = Int_array;
-ISwave_struct.BC = BC;
-ISwave_struct.deltaV = deltaV;
-ISwave_struct.sun_index = sun_index;
-ISwave_struct.J_bias = J_bias;
-ISwave_struct.J_amp = J_amp;
-ISwave_struct.J_phase = J_phase;
-ISwave_struct.J_i_bias = J_i_bias;
-ISwave_struct.J_i_amp = J_i_amp;
-ISwave_struct.J_i_phase = J_i_phase;
-ISwave_struct.J_U_bias = J_U_bias;
-ISwave_struct.J_U_amp = J_U_amp;
-ISwave_struct.J_U_phase = J_U_phase;
-ISwave_struct.cap = cap;
-ISwave_struct.impedance_abs = impedance_abs;
-ISwave_struct.impedance_im = impedance_im;
-ISwave_struct.impedance_re = impedance_re;
-ISwave_struct.cap_idrift = cap_idrift;
-ISwave_struct.impedance_i_abs = impedance_i_abs;
-ISwave_struct.impedance_i_im = impedance_i_im;
-ISwave_struct.impedance_i_re = impedance_i_re;
+ISwave_results.sol_name = structs{2, 1};
+ISwave_results.Vdc = Vdc_array;
+ISwave_results.periods = periods;
+ISwave_results.Freq = Freq_matrix;
+ISwave_results.tpoints = 1 + tpoints_per_period * periods;
+ISwave_results.tmax = tmax_matrix;
+ISwave_results.Int = Int_array;
+ISwave_results.BC = BC;
+ISwave_results.deltaV = deltaV;
+ISwave_results.sun_index = sun_index;
+ISwave_results.J_bias = J_bias;
+ISwave_results.J_amp = J_amp;
+ISwave_results.J_phase = J_phase;
+ISwave_results.J_i_bias = J_i_bias;
+ISwave_results.J_i_amp = J_i_amp;
+ISwave_results.J_i_phase = J_i_phase;
+ISwave_results.cap = cap;
+ISwave_results.impedance_abs = impedance_abs;
+ISwave_results.impedance_im = impedance_im;
+ISwave_results.impedance_re = impedance_re;
+ISwave_results.cap_idrift = cap_idrift;
+ISwave_results.impedance_i_abs = impedance_i_abs;
+ISwave_results.impedance_i_im = impedance_i_im;
+ISwave_results.impedance_i_re = impedance_i_re;
 
 %% plot results
 
 if do_graphics
-    ISwave_EA_full_analysis_phase(ISwave_struct);
-    IS_full_analysis_impedance(ISwave_struct);
-    ISwave_full_analysis_nyquist(ISwave_struct);
+    ISwave_EA_full_analysis_phase(ISwave_results);
+    IS_full_analysis_impedance(ISwave_results);
+    ISwave_full_analysis_nyquist(ISwave_results);
 
     % make the figures appear, all at the end of the script
     set(0, 'DefaultFigureVisible', 'on');

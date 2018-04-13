@@ -1,4 +1,4 @@
-function IS_full_analysis_impedance(IS_struct)
+function IS_full_analysis_impedance(IS_results)
 %IS_FULL_ANALYSIS_VSFREQUENCY - Plot Impedance Spectroscopy (IS) in a range
 % of background light intensities, capacitance versus voltage oscillation
 % frequency at various light bias
@@ -36,11 +36,11 @@ set(0, 'defaultfigureposition', [0, 0, 1000, 750]);
 set(0, 'defaultLineLineWidth', 2);
 
 % check which was the variable being explored
-if numel(unique(IS_struct.Int)) > 1
-    legend_text = IS_struct.Int;
+if numel(unique(IS_results.Int)) > 1
+    legend_text = IS_results.Int;
     legend_append = ' sun';
 else
-    legend_text = IS_struct.Vdc;
+    legend_text = IS_results.Vdc;
     legend_append = ' Vdc';
 end
 
@@ -67,20 +67,20 @@ h = zeros(length(legend_text), 1);
 
 % in case just a single frequency was simulated, min and max are
 % coincident, so they are modified by a small percentage
-xlim_array = [min(min(IS_struct.Freq))*0.99, max(max(IS_struct.Freq)*1.01)];
+xlim_array = [min(min(IS_results.Freq))*0.99, max(max(IS_results.Freq)*1.01)];
 
 %% plot apparent capacitance vs frequency
 figure('Name', 'IS at light intensities', 'NumberTitle', 'off');
     hold off
     for i = 1:length(legend_text)
-        h(i) = plot(IS_struct.Freq(i, :), IS_struct.cap(i, :)',...
+        h(i) = plot(IS_results.Freq(i, :), IS_results.cap(i, :)',...
             'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
             'MarkerSize', 3, 'LineWidth', 1.3);
         hold on
-        if isfield(IS_struct, 'cap_idrift')
+        if isfield(IS_results, 'cap_idrift')
             % capacitance due to ions
-            plot(IS_struct.Freq(i, :), IS_struct.cap_idrift(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            plot(IS_results.Freq(i, :), IS_results.cap_idrift(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
         end
     end
     ax = gca;
@@ -93,17 +93,17 @@ figure('Name', 'IS at light intensities', 'NumberTitle', 'off');
     legend boxoff
 
 %% in case of ISwave do additional graphics
-if isfield(IS_struct, 'J_phase') % just ISwave have phase output
+if isfield(IS_results, 'J_phase') % just ISwave have phase output
 
     figure('Name', 'imaginary impedance at light intensities', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
-            h(i) = plot(IS_struct.Freq(i, :), -IS_struct.impedance_im(i, :)',...
+            h(i) = plot(IS_results.Freq(i, :), -IS_results.impedance_im(i, :)',...
                 'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
                 'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
                 'MarkerSize', 3, 'LineWidth', 1.3);
             hold on
-            plot(IS_struct.Freq(i, :), -IS_struct.impedance_i_im(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            plot(IS_results.Freq(i, :), -IS_results.impedance_i_im(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
         end
         ax = gca;
         ax.XScale = 'log'; % for putting the scale in log
@@ -117,12 +117,12 @@ if isfield(IS_struct, 'J_phase') % just ISwave have phase output
     figure('Name', 'real impedance at light intensities', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
-            h(i) = plot(IS_struct.Freq(i, :), IS_struct.impedance_re(i, :)',...
+            h(i) = plot(IS_results.Freq(i, :), IS_results.impedance_re(i, :)',...
                 'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
                 'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
                 'MarkerSize', 3, 'LineWidth', 1.3);
             hold on
-            plot(IS_struct.Freq(i, :), IS_struct.impedance_i_re(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            plot(IS_results.Freq(i, :), IS_results.impedance_i_re(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
         end
         ax = gca;
         ax.XScale = 'log'; % for putting the scale in log
@@ -136,12 +136,12 @@ if isfield(IS_struct, 'J_phase') % just ISwave have phase output
     figure('Name', 'abs impedance at light intensities', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
-            h(i) = plot(IS_struct.Freq(i, :), IS_struct.impedance_abs(i, :)',...
+            h(i) = plot(IS_results.Freq(i, :), IS_results.impedance_abs(i, :)',...
                 'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
                 'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
                 'MarkerSize', 3, 'LineWidth', 1.3);
             hold on
-            plot(IS_struct.Freq(i, :), IS_struct.impedance_i_abs(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            plot(IS_results.Freq(i, :), IS_results.impedance_i_abs(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
         end
         ax = gca;
         ax.XScale = 'log'; % for putting the scale in log

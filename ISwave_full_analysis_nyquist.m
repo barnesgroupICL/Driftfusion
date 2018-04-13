@@ -1,4 +1,4 @@
-function ISwave_full_analysis_nyquist(ISwave_struct)
+function ISwave_full_analysis_nyquist(ISwave_results)
 %ISSTEP_FULL_ANALYSIS_NYQUIST - Plot Nyquist graph for Impedance Spectroscopy (ISwave) in a range
 % of background light intensities, imaginary part of capacitance versus
 % real part of capacitance
@@ -36,11 +36,11 @@ set(0, 'defaultfigureposition', [0, 0, 1000, 750]);
 set(0, 'defaultLineLineWidth', 2);
 
 % check which was the variable being explored
-if numel(unique(ISwave_struct.Int)) > 1
-    legend_text = ISwave_struct.Int;
+if numel(unique(ISwave_results.Int)) > 1
+    legend_text = ISwave_results.Int;
     legend_append = ' sun';
 else
-    legend_text = ISwave_struct.Vdc;
+    legend_text = ISwave_results.Vdc;
     legend_append = ' Vdc';
 end
 
@@ -69,17 +69,17 @@ figure('Name', 'Nyquist plot of IS at various light intensities', 'NumberTitle',
     hold off
     for i = 1:length(legend_text)
         % find the points of the decades
-        temp_logfreq = log10(ISwave_struct.Freq(i,:));
+        temp_logfreq = log10(ISwave_results.Freq(i,:));
         evendecade_index = mod(temp_logfreq, 2) == 0;
         
-        h(i) = plot(ISwave_struct.impedance_re(i, :), -ISwave_struct.impedance_im(i, :)',...
+        h(i) = plot(ISwave_results.impedance_re(i, :), -ISwave_results.impedance_im(i, :)',...
             'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
             'MarkerSize', 3, 'LineWidth', 1.3);
         hold on
         
         % add bigger markers for the points of the decades
-        plot(ISwave_struct.impedance_re(i, evendecade_index), -ISwave_struct.impedance_im(i, evendecade_index)',...
+        plot(ISwave_results.impedance_re(i, evendecade_index), -ISwave_results.impedance_im(i, evendecade_index)',...
             'MarkerFaceColor', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'Marker', 'x', 'LineStyle', 'none', 'MarkerSize', 12);
     end
@@ -97,7 +97,7 @@ figure('Name', 'Normalized Nyquist plot of IS at various light intensities', 'Nu
     % take the last point orizontally
     %norm_array = ISwave_struct.impedance_re(:, end) / min(ISwave_struct.impedance_re(:, end));
     % take the maximum point vertically
-    max_array = max(-ISwave_struct.impedance_im, [], 2);
+    max_array = max(-ISwave_results.impedance_im, [], 2);
     norm_array = max_array / min(max_array);
     for i = 1:length(legend_text)
 %         fit_re = ISwave_struct.impedance_re(i, end-9:end);
@@ -110,17 +110,17 @@ figure('Name', 'Normalized Nyquist plot of IS at various light intensities', 'Nu
 %         end
         
         % find the points of the decades
-        temp_logfreq = log10(ISwave_struct.Freq(i,:));
+        temp_logfreq = log10(ISwave_results.Freq(i,:));
         evendecade_index = mod(temp_logfreq, 2) == 0;
         
-        h(i) = plot(ISwave_struct.impedance_re(i, :) / norm_array(i), -ISwave_struct.impedance_im(i, :)' / norm_array(i),...
+        h(i) = plot(ISwave_results.impedance_re(i, :) / norm_array(i), -ISwave_results.impedance_im(i, :)' / norm_array(i),...
             'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
             'MarkerSize', 3, 'LineWidth', 1.3);
         hold on
         
         % add bigger markers for the points of the decades
-        plot(ISwave_struct.impedance_re(i, evendecade_index) / norm_array(i), -ISwave_struct.impedance_im(i, evendecade_index)' / norm_array(i),...
+        plot(ISwave_results.impedance_re(i, evendecade_index) / norm_array(i), -ISwave_results.impedance_im(i, evendecade_index)' / norm_array(i),...
             'MarkerFaceColor', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'Marker', 'x', 'LineStyle', 'none', 'MarkerSize', 12);
     end
