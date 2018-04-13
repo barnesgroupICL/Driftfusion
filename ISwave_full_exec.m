@@ -104,6 +104,9 @@ J_i_phase = tmax_matrix;
 J_U_bias = tmax_matrix;
 J_U_amp = tmax_matrix;
 J_U_phase = tmax_matrix;
+J_noionic_bias = tmax_matrix;
+J_noionic_amp = tmax_matrix;
+J_noionic_phase = tmax_matrix;
 
 %% do a serie of IS measurements
 
@@ -131,32 +134,32 @@ for i = 1:length(structs(1, :))
             Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
         % set ISwave_single_analysis minimal_mode to true as under
         % parallelization graphics for single solutions cannot be created
-        [fit_coeff, fit_idrift_coeff, fit_U_coeff] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
+        [n_coeff, i_coeff, U_coeff, n_noionic_coeff] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
         % if phase is small or negative, double check increasing accuracy of the solver
         % a phase close to 90 degrees can be indicated as it was -90 degree
         % by the demodulation, the fitting way does not have this problem
-        if fit_coeff(3) < 0.006 || fit_coeff(3) > pi/2 - 0.006
-            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is extremely small or close to pi/2 or out of 0-pi/2 range, increasing solver accuracy and calculate again'])
+        if n_coeff(3) < 0.006 || n_coeff(3) > pi/2 - 0.006
+            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(n_coeff(3))) ' degrees, it is extremely small or close to pi/2 or out of 0-pi/2 range, increasing solver accuracy and calculate again'])
             tempRelTol = tempRelTol / 100;
             % start from the oscillating solution, better starting point
             asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_ISwave, BC,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
-            [fit_coeff, fit_idrift_coeff, fit_U_coeff] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
+            [n_coeff, i_coeff, U_coeff, n_noionic_coeff] = ISwave_single_analysis(asymstruct_ISwave, true, demodulation);
         end
         % if phase is still negative or bigger than pi/2, likely is demodulation that is
         % failing (no idea why), use safer fitting method without repeating
         % the simulation
-        if fit_coeff(3) < 0 || fit_coeff(3) > pi/2
-            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Phase from demodulation is weird: ' num2str(rad2deg(fit_coeff(3))) ' degrees, confirming using fitting'])
+        if n_coeff(3) < 0 || n_coeff(3) > pi/2
+            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Phase from demodulation is weird: ' num2str(rad2deg(n_coeff(3))) ' degrees, confirming using fitting'])
             % use fitting
-            [fit_coeff, fit_idrift_coeff, fit_U_coeff] = ISwave_single_analysis(asymstruct_ISwave, true, false);
-            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Phase from fitting is: ' num2str(rad2deg(fit_coeff(3))) ' degrees'])
+            [n_coeff, i_coeff, U_coeff, n_noionic_coeff] = ISwave_single_analysis(asymstruct_ISwave, true, false);
+            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Phase from fitting is: ' num2str(rad2deg(n_coeff(3))) ' degrees'])
         end
         % if phase is still negative or more than pi/2, check again increasing accuracy
-        if fit_coeff(3) < 0 || abs(fit_coeff(3)) > pi/2
-            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(fit_coeff(3))) ' degrees, it is out of 0-pi/2 range, increasing solver accuracy and calculate again'])
+        if n_coeff(3) < 0 || abs(n_coeff(3)) > pi/2
+            disp([mfilename ' - Freq: ' num2str(Freq_array(j)) '; Fitted phase is ' num2str(rad2deg(n_coeff(3))) ' degrees, it is out of 0-pi/2 range, increasing solver accuracy and calculate again'])
             tempRelTol = tempRelTol / 100;
             % start from the oscillating solution, better starting point
             asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_ISwave, BC,...
@@ -164,17 +167,20 @@ for i = 1:length(structs(1, :))
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
             % use fitting
-            [fit_coeff, fit_idrift_coeff, fit_U_coeff] = ISwave_single_analysis(asymstruct_ISwave, true, false);
+            [n_coeff, i_coeff, U_coeff, n_noionic_coeff] = ISwave_single_analysis(asymstruct_ISwave, true, false);
         end
-        J_bias(i, j) = fit_coeff(1);
-        J_amp(i, j) = fit_coeff(2);
-        J_phase(i, j) = fit_coeff(3);
-        J_i_bias(i, j) = fit_idrift_coeff(1);
-        J_i_amp(i, j) = fit_idrift_coeff(2);
-        J_i_phase(i, j) = fit_idrift_coeff(3);
-        J_U_bias(i, j) = fit_U_coeff(1);
-        J_U_amp(i, j) = fit_U_coeff(2);
-        J_U_phase(i, j) = fit_U_coeff(3);
+        J_bias(i, j) = n_coeff(1);
+        J_amp(i, j) = n_coeff(2);
+        J_phase(i, j) = n_coeff(3);
+        J_i_bias(i, j) = i_coeff(1);
+        J_i_amp(i, j) = i_coeff(2);
+        J_i_phase(i, j) = i_coeff(3);
+        J_U_bias(i, j) = U_coeff(1);
+        J_U_amp(i, j) = U_coeff(2);
+        J_U_phase(i, j) = U_coeff(3);
+        J_noionic_bias(i, j) = n_noionic_coeff(1);
+        J_noionic_amp(i, j) = n_noionic_coeff(2);
+        J_noionic_phase(i, j) = n_noionic_coeff(3);
 
         % as the number of periods is fixed, there's no need for tmax to be
         % a matrix, but this could change, so it's a matrix
@@ -214,6 +220,18 @@ impedance_i_re = impedance_i_abs .* cos(-J_i_phase); % this is the resistance
 impedance_i_im = impedance_i_abs .* sin(-J_i_phase);
 cap_idrift = sin(J_i_phase) ./ (pulsatance_matrix .* impedance_i_abs);
 
+impedance_U_abs = deltaV ./ J_U_amp; % J_amp is in amperes
+% impedance phase is minus current phase, so -J_U_phase
+impedance_U_re = impedance_U_abs .* cos(-J_U_phase); % this is the resistance
+impedance_U_im = impedance_U_abs .* sin(-J_U_phase);
+cap_U = sin(J_U_phase) ./ (pulsatance_matrix .* impedance_U_abs);
+
+impedance_noionic_abs = deltaV ./ J_noionic_amp; % J_amp is in amperes
+% impedance phase is minus current phase, so -J_n_noionic_phase
+impedance_noionic_re = impedance_noionic_abs .* cos(-J_noionic_phase); % this is the resistance
+impedance_noionic_im = impedance_noionic_abs .* sin(-J_noionic_phase);
+cap_noionic = sin(J_noionic_phase) ./ (pulsatance_matrix .* impedance_noionic_abs);
+
 %% save results
 
 % this struct is similar to ISstep_struct in terms of fields,
@@ -234,6 +252,12 @@ ISwave_results.J_phase = J_phase;
 ISwave_results.J_i_bias = J_i_bias;
 ISwave_results.J_i_amp = J_i_amp;
 ISwave_results.J_i_phase = J_i_phase;
+ISwave_results.J_U_bias = J_U_bias;
+ISwave_results.J_U_amp = J_U_amp;
+ISwave_results.J_U_phase = J_U_phase;
+ISwave_results.J_noionic_bias = J_noionic_bias;
+ISwave_results.J_noionic_amp = J_noionic_amp;
+ISwave_results.J_noionic_phase = J_noionic_phase;
 ISwave_results.cap = cap;
 ISwave_results.impedance_abs = impedance_abs;
 ISwave_results.impedance_im = impedance_im;
@@ -242,6 +266,14 @@ ISwave_results.cap_idrift = cap_idrift;
 ISwave_results.impedance_i_abs = impedance_i_abs;
 ISwave_results.impedance_i_im = impedance_i_im;
 ISwave_results.impedance_i_re = impedance_i_re;
+ISwave_results.cap_U = cap_U;
+ISwave_results.impedance_U_abs = impedance_U_abs;
+ISwave_results.impedance_U_im = impedance_U_im;
+ISwave_results.impedance_U_re = impedance_U_re;
+ISwave_results.cap_noionic = cap_noionic;
+ISwave_results.impedance_noionic_abs = impedance_noionic_abs;
+ISwave_results.impedance_noionic_im = impedance_noionic_im;
+ISwave_results.impedance_noionic_re = impedance_noionic_re;
 
 %% plot results
 
