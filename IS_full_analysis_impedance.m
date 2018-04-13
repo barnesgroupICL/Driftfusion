@@ -70,7 +70,7 @@ h = zeros(length(legend_text), 1);
 xlim_array = [min(min(IS_results.Freq))*0.99, max(max(IS_results.Freq)*1.01)];
 
 %% plot apparent capacitance vs frequency
-figure('Name', 'IS at light intensities', 'NumberTitle', 'off');
+figure('Name', 'IS at light intensities. Dashed: ionic; dotted: recombination', 'NumberTitle', 'off');
     hold off
     for i = 1:length(legend_text)
         h(i) = plot(IS_results.Freq(i, :), IS_results.cap(i, :)',...
@@ -81,6 +81,11 @@ figure('Name', 'IS at light intensities', 'NumberTitle', 'off');
         if isfield(IS_results, 'cap_idrift')
             % capacitance due to ions
             plot(IS_results.Freq(i, :), IS_results.cap_idrift(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            % capacitance calculated from the recombination amount
+            plot(IS_results.Freq(i, :), IS_results.cap_U(i, :)', 'Color', Int_colors(i, :), 'LineStyle', ':');
+            % capacitance calculated subtracting ions displacement current
+            % from total current
+            %plot(IS_results.Freq(i, :), IS_results.cap_noionic(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '-.');
         end
     end
     ax = gca;
@@ -95,7 +100,7 @@ figure('Name', 'IS at light intensities', 'NumberTitle', 'off');
 %% in case of ISwave do additional graphics
 if isfield(IS_results, 'J_phase') % just ISwave have phase output
 
-    figure('Name', 'imaginary impedance at light intensities', 'NumberTitle', 'off');
+    figure('Name', 'imaginary impedance at light intensities. Dashed: ionic; dotted: recombination', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
             h(i) = plot(IS_results.Freq(i, :), -IS_results.impedance_im(i, :)',...
@@ -104,6 +109,8 @@ if isfield(IS_results, 'J_phase') % just ISwave have phase output
                 'MarkerSize', 3, 'LineWidth', 1.3);
             hold on
             plot(IS_results.Freq(i, :), -IS_results.impedance_i_im(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            plot(IS_results.Freq(i, :), -IS_results.impedance_U_im(i, :)', 'Color', Int_colors(i, :), 'LineStyle', ':');
+            %plot(IS_results.Freq(i, :), -IS_results.impedance_noionic_im(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '-.');
         end
         ax = gca;
         ax.XScale = 'log'; % for putting the scale in log
@@ -114,7 +121,7 @@ if isfield(IS_results, 'J_phase') % just ISwave have phase output
         legend(flipud(h), legend_flip)
         legend boxoff
         
-    figure('Name', 'real impedance at light intensities', 'NumberTitle', 'off');
+    figure('Name', 'real impedance at light intensities. Dashed: ionic; dotted: recombination', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
             h(i) = plot(IS_results.Freq(i, :), IS_results.impedance_re(i, :)',...
@@ -123,6 +130,8 @@ if isfield(IS_results, 'J_phase') % just ISwave have phase output
                 'MarkerSize', 3, 'LineWidth', 1.3);
             hold on
             plot(IS_results.Freq(i, :), IS_results.impedance_i_re(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            plot(IS_results.Freq(i, :), IS_results.impedance_U_re(i, :)', 'Color', Int_colors(i, :), 'LineStyle', ':');
+            %plot(IS_results.Freq(i, :), IS_results.impedance_noionic_re(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '-.');
         end
         ax = gca;
         ax.XScale = 'log'; % for putting the scale in log
@@ -133,7 +142,7 @@ if isfield(IS_results, 'J_phase') % just ISwave have phase output
         legend(flipud(h), legend_flip)
         legend boxoff
        
-    figure('Name', 'abs impedance at light intensities', 'NumberTitle', 'off');
+    figure('Name', 'abs impedance at light intensities. Dashed: ionic; dotted: recombination', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
             h(i) = plot(IS_results.Freq(i, :), IS_results.impedance_abs(i, :)',...
@@ -142,6 +151,8 @@ if isfield(IS_results, 'J_phase') % just ISwave have phase output
                 'MarkerSize', 3, 'LineWidth', 1.3);
             hold on
             plot(IS_results.Freq(i, :), IS_results.impedance_i_abs(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            plot(IS_results.Freq(i, :), IS_results.impedance_U_abs(i, :)', 'Color', Int_colors(i, :), 'LineStyle', ':');
+            %plot(IS_results.Freq(i, :), IS_results.impedance_noionic_abs(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '-.');
         end
         ax = gca;
         ax.XScale = 'log'; % for putting the scale in log
