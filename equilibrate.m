@@ -405,6 +405,7 @@ p = ssol_i_eq_p;
 p.Int = original_p.Int;
 
 ssol_i_light = pindrift(ssol_i_eq, p);
+ssol_i_light = pindrift(ssol_i_light, p);
 
 % repeat for stabilization
 p.tmax = 1e3;
