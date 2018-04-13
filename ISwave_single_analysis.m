@@ -1,4 +1,4 @@
-function [coeff, i_coeff, U_coeff] = ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
+function [n_coeff, i_coeff, U_coeff, n_noionic_coeff] = ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
 %ISWAVE_SINGLE_ANALYSIS - Calculate impedance (reactance and resistance) and phase by Impedance
 % Spectroscopy (ISwave) with oscillating voltage
 %
@@ -71,10 +71,10 @@ t_middle = fit_t(round(end/2));
 fit_J_flat = fit_J - tilting * (fit_t - t_middle);
 
 if demodulation
-    coeff = ISwave_EA_single_demodulation(fit_t, fit_J_flat, s.p.Vapp_func, s.p.Vapp_params);
+    n_coeff = ISwave_EA_single_demodulation(fit_t, fit_J_flat, s.p.Vapp_func, s.p.Vapp_params);
     U_coeff = ISwave_EA_single_demodulation(fit_t, fit_U, s.p.Vapp_func, s.p.Vapp_params);
 else
-    coeff = ISwave_EA_single_fit(fit_t, fit_J_flat, s.p.J_E_func);
+    n_coeff = ISwave_EA_single_fit(fit_t, fit_J_flat, s.p.J_E_func);
     U_coeff = ISwave_EA_single_fit(fit_t, fit_U, s.p.J_E_func);
 end
 
@@ -108,16 +108,27 @@ if s.p.mui % if there was ion mobility, current due to ions have been calculated
     else
         i_coeff = ISwave_EA_single_fit(fit_t, fit_Ji_flat, s.p.J_E_func);
     end
+    
+    % calculate electronic current subtracting ionic contribution
+    Jn_noionic = s.Jn/1000 - Ji_disp; % in Ampere
+    fit_Jn_noionic = Jn_noionic(fit_t_index:end);
+    if demodulation
+        n_noionic_coeff = ISwave_EA_single_demodulation(fit_t, fit_Jn_noionic, s.p.Vapp_func, s.p.Vapp_params);
+    else
+        n_noionic_coeff = ISwave_EA_single_fit(fit_t, fit_Jn_noionic, s.p.J_E_func);
+    end
 else
     i_coeff = [NaN, NaN, NaN];
     Ji_disp = NaN;
+    n_noionic_coeff = [NaN, NaN, NaN];
+    Jn_noionic = NaN;
 end
 
 %% plot solutions
 if ~minimal_mode % disable all this stuff if under parallelization or if explicitly asked to not plot any graphics
     
-    [subtracting_n_t, subtracting_n_intr_t, subtracting_n_contacts_t,...
-        subtracting_i_abs_t, subtracting_i_t] = ISwave_subtracting_analysis(asymstruct_ISwave);
+    [~, subtracting_n_intr_t, subtracting_n_contacts_t,...
+        ~, ~] = ISwave_subtracting_analysis(asymstruct_ISwave);
 
     Vapp = s.p.Vapp_func(s.p.Vapp_params, s.t);
 
@@ -135,31 +146,25 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         hold off
         i=i+1; h(i) = plot(s.t, s.Jn, 'b--', 'LineWidth', 2); % mA
         hold on
-        i=i+1; h(i) = plot(s.t, Utot, 'g.', 'LineWidth', 2); % mA
-        %i=i+1; h(i) = plot(s.t, -s.Jdispr); % mA
+        i=i+1; h(i) = plot(s.t, Utot*1000, 'g.', 'LineWidth', 2); % mA
         i=i+1; h(i) = plot(s.t(2:end), -subtracting_n_intr_t * 1000); % mA
         i=i+1; h(i) = plot(s.t(2:end), -subtracting_n_contacts_t * 1000); % mA
-        i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
+        i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(n_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
         i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(U_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
         
         legend_array = [legend_array, "Current", "Recombination current", "Charge variation intrinsic", "Charge variation contacts", "1st harmonic", "Rec J fit"]; % "Displacement current"
         if s.p.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             i=i+1; h(i) = plot(s.t, Ji_disp * 1000); % mA
             i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
-            legend_array = [legend_array, "Ionic displacement current", "Ionic disp J fit"];
+            i=i+1; h(i) = plot(s.t, Jn_noionic * 1000); % mA
+            i=i+1; h(i) = plot(fit_t, s.p.J_E_func(n_noionic_coeff, fit_t) * 1000, 'kx-'); % mA
+            legend_array = [legend_array, "Ionic displacement current", "Ionic disp J fit", "Pure electronic J", "Electronic J fit"];
         end
         ylabel('Current [mA/cm^2]');
         hold off
         xlabel('Time [s]');
         legend(h, legend_array);
         hold off
-else
-    subtracting_n_t = NaN;
-    subtracting_n_intr_t = NaN;
-    subtracting_n_contacts_t = NaN;
-    subtracting_i_abs_t = NaN;
-    subtracting_i_t = NaN;
-    Ji_disp = NaN;
 end
 
 %------------- END OF CODE --------------
