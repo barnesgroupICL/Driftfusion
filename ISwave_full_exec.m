@@ -280,11 +280,11 @@ if do_graphics
     ISwave_EA_full_analysis_phase(ISwave_results);
     IS_full_analysis_impedance(ISwave_results);
     ISwave_full_analysis_nyquist(ISwave_results);
-
-    % make the figures appear, all at the end of the script
-    set(0, 'DefaultFigureVisible', 'on');
-    figHandles = findall(groot, 'Type', 'figure');
-    set(figHandles(:), 'visible', 'on')
 end
+
+% make the figures appear, all at the end of the script
+set(0, 'DefaultFigureVisible', 'on');
+figHandles = findall(groot, 'Type', 'figure');
+set(figHandles(:), 'visible', 'on')
 
 %------------- END OF CODE --------------
