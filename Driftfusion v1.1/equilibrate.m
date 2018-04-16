@@ -73,7 +73,7 @@ p.mue_p = mue_p;
 p.muh_p = muh_p;
 p.mue_n = mue_n;
 p.muh_n = muh_n;
-p.mui = mui;
+p.mui = 0;
 
 p.figson = 1;
 p.tmax = 1e-9;
