@@ -3,7 +3,7 @@ function asymstruct = asymmetricize(symstruct, BC)
 % asymmetrical model at pseudo-OC conditions applying Vapp equal to Voc
 % taken from the symmetrical solution
 %
-% Syntax:  sol = asymmetricize(ssol, BC)
+% Syntax:  asymstruct = asymmetricize(symstruct, BC)
 %
 % Inputs:
 %   SYMSTRUCT - a symmetric struct as created by PINDRIFT using the OC
