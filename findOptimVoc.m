@@ -38,7 +38,7 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 %------------- BEGIN CODE --------------
 
 asymstruct.p.figson = 0;
-asymstruct.p.tpoints = 20;
+asymstruct.p.tpoints = 10;
 asymstruct.p.Ana = 1;
 asymstruct.p.calcJ = 1;
 
@@ -65,6 +65,7 @@ Voc = fmincon(fun, asymstruct.p.Vapp, [1; -1], [asymstruct.p.Vapp + 0.01; -(asym
 
 %% stabilize at the real Voc
 
+asymstruct.p.tpoints = 30;
 asymstruct.p.JV = 2; % mode for arbitrary Vapp profiles
 Vstart = asymstruct.p.Vapp; % current applied voltage
 Vend = Voc; % new Voc    
@@ -129,8 +130,8 @@ warning('on', 'pindrift:verifyStabilization');
 
 % I want the absolute value, but it's nicer to take the squared rather than
 % the abs, for not introducing non derivable points
-% the stupid multiplicative factor is needed for getting out of tolerance
-% factor of fmincon
+% the stupid multiplicative factor is needed for getting far from the eps
+% (double precision)
 minimizeMe = 1e12 * Jn(end)^2;
 
 disp([mfilename ' - Using with Vapp ' num2str(Vapp) ' V, a current of ' num2str(Jn(end)) ' mA/cm2 was found'])
