@@ -17,5 +17,7 @@ symsol.x = [x1, x2];
 
 symsol.p = sol.p;
 symsol.p.OC = 1;
+symsol.p.x = x;
+symsol.p.xpoints = length(symsol.x);
 
 end
