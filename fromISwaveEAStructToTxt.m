@@ -7,7 +7,7 @@ p = struct.p;
 %% create header
 
 headerBand = ["x", "CB_Vmax", "Efn_Vmax", "Efp_Vmax", "CB_V0decr", "Efn_V0decr", "Efp_V0decr", "CB_Vmin", "Efn_Vmin", "Efp_Vmin", "CB_V0incr", "Efn_V0incr", "Efp_V0incr"];
-headerCurrent = ["t", "Vapp", "total", "ionic", "nonionic", "accumulating"];
+headerCurrent = ["t", "Vapp", "total", "ionic", "nonionic", "accumulating", "total_inphase", "total_outofphase", "nonionic_inphase", "nonionic_outofphase"];
 
 %% get measure units
 
@@ -80,7 +80,19 @@ J_noionic = Jn - Ji_disp * 1000; % in mA, column
 
 J_accumulating = -dQ_t * 1000; % mA, row
 
-data_current = [time', Vapp', Jn, Ji_disp, J_noionic, J_accumulating'];
+% taken from ISwave_single_analysis
+[n_coeff, ~, ~, ~, n_noionic_coeff] = ISwave_single_analysis(struct, false, true);
+% in phase electronic current
+Jn_inphase = p.J_E_func([n_coeff(1)*cos(n_coeff(3)), n_coeff(2)*cos(n_coeff(3)), 0], struct.t);
+% out of phase electronic current
+Jn_quadrature = p.J_E_func([n_coeff(1)*sin(n_coeff(3)), n_coeff(2)*sin(n_coeff(3)), pi/2], struct.t);
+
+% in phase electronic current
+Jn_noionic_inphase =  p.J_E_func([n_noionic_coeff(1)*cos(n_noionic_coeff(3)), n_noionic_coeff(2)*cos(n_noionic_coeff(3)), 0], struct.t);
+% out of phase electronic current
+Jn_noionic_quadrature = p.J_E_func([n_noionic_coeff(1)*sin(n_noionic_coeff(3)), n_noionic_coeff(2)*sin(n_noionic_coeff(3)), pi/2], struct.t);
+
+data_current = [time', Vapp', Jn, Ji_disp, J_noionic, J_accumulating', 1000*Jn_inphase', 1000*Jn_quadrature', 1000*Jn_noionic_inphase', 1000*Jn_noionic_quadrature'];
 
 %% join fields
 
