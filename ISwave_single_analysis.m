@@ -1,4 +1,4 @@
-function [n_coeff, i_coeff, U_coeff, dQ_coeff] = ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
+function [n_coeff, i_coeff, U_coeff, dQ_coeff, n_noionic_coeff] = ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
 %ISWAVE_SINGLE_ANALYSIS - Calculate impedance (reactance and resistance) and phase by Impedance
 % Spectroscopy (ISwave) with oscillating voltage
 %
@@ -117,12 +117,7 @@ if s.p.mui % if there was ion mobility, current due to ions have been calculated
     
     % calculate electronic current subtracting ionic contribution
     Jn_noionic = s.Jn/1000 - Ji_disp; % in Ampere
-%     fit_Jn_noionic = Jn_noionic(fit_t_index:end);
-%     if demodulation
-%         n_noionic_coeff = ISwave_EA_single_demodulation(fit_t, fit_Jn_noionic, s.p.Vapp_func, s.p.Vapp_params);
-%     else
-%         n_noionic_coeff = ISwave_EA_single_fit(fit_t, fit_Jn_noionic, s.p.J_E_func);
-%     end
+
 else
     i_coeff = [NaN, NaN, NaN];
     Ji_disp = NaN;
@@ -131,6 +126,29 @@ end
 
 %% plot solutions
 if ~minimal_mode % disable all this stuff if under parallelization or if explicitly asked to not plot any graphics
+
+    % in phase electronic current
+    Jn_inphase = s.p.J_E_func([n_coeff(1)*cos(n_coeff(3)), n_coeff(2)*cos(n_coeff(3)), 0], s.t);
+    % out of phase electronic current
+    Jn_quadrature = s.p.J_E_func([n_coeff(1)*sin(n_coeff(3)), n_coeff(2)*sin(n_coeff(3)), pi/2], s.t);
+
+    if s.p.mui
+        fit_Jn_noionic = Jn_noionic(fit_t_index:end);
+        if demodulation
+            n_noionic_coeff = ISwave_EA_single_demodulation(fit_t, fit_Jn_noionic, s.p.Vapp_func, s.p.Vapp_params);
+        else
+            n_noionic_coeff = ISwave_EA_single_fit(fit_t, fit_Jn_noionic, s.p.J_E_func);
+        end
+
+        % in phase electronic current
+        Jn_noionic_inphase =  s.p.J_E_func([n_noionic_coeff(1)*cos(n_noionic_coeff(3)), n_noionic_coeff(2)*cos(n_noionic_coeff(3)), 0], s.t);
+        % out of phase electronic current
+        Jn_noionic_quadrature = s.p.J_E_func([n_noionic_coeff(1)*sin(n_noionic_coeff(3)), n_noionic_coeff(2)*sin(n_noionic_coeff(3)), pi/2], s.t);
+
+    else
+        Jn_noionic_inphase = NaN;
+        Jn_noionic_quadrature = NaN;
+    end
 
     Vapp = s.p.Vapp_func(s.p.Vapp_params, s.t);
 
@@ -152,20 +170,25 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         i=i+1; h(i) = plot(s.t, -dQ_t * 1000, 'b:', 'LineWidth', 2); % mA
         %i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(n_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
         %i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(U_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
-        
-        legend_array = [legend_array, "Current", "Recombination current", "Accumulating current"];
+        i=i+1; h(i) = plot(s.t, Jn_inphase*1000, 'm-', 'LineWidth', 1, 'Marker', 'o', 'MarkerSize', 7); % mA
+        i=i+1; h(i) = plot(s.t, Jn_quadrature*1000, 'm-', 'LineWidth', 1, 'Marker', 'x', 'MarkerSize', 7); % mA
+        legend_array = [legend_array, "Current", "Recombination current", "Accumulating current", "In phase J", "Out of phase J"];
         if s.p.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             i=i+1; h(i) = plot(s.t, Ji_disp * 1000, 'g--', 'LineWidth', 2); % mA
             %i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
             i=i+1; h(i) = plot(s.t, Jn_noionic * 1000, 'c-.', 'LineWidth', 2); % mA
             %i=i+1; h(i) = plot(fit_t, s.p.J_E_func(n_noionic_coeff, fit_t) * 1000, 'kx-'); % mA
-            legend_array = [legend_array, "Ionic displacement current", "Purely electronic current"];
+            i=i+1; h(i) = plot(s.t, Jn_noionic_inphase*1000, 'm--', 'LineWidth', 1, 'Marker', '+', 'MarkerSize', 7); % mA
+            i=i+1; h(i) = plot(s.t, Jn_noionic_quadrature*1000, 'm--', 'LineWidth', 1, 'Marker', 's', 'MarkerSize', 7); % mA
+            legend_array = [legend_array, "Ionic displacement current", "Purely electronic current", "In phase electronic J", "Out of phase electronic J"];
         end
         ylabel('Current [mA/cm^2]');
         hold off
         xlabel('Time [s]');
         legend(h, legend_array);
         hold off
+else
+    n_noionic_coeff = [NaN, NaN, NaN];
 end
 
 %------------- END OF CODE --------------
