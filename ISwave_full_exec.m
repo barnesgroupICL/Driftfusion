@@ -38,11 +38,11 @@ function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_poi
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
 %   ISwave_single_analysis, ISwave_full_analysis_nyquist,
-%   IS_full_analysis_impedance, ISwave_EA_full_analysis_phase, pinAna
+%   IS_full_analysis_impedance, ISwave_full_analysis_phase, pinAna
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also genIntStructs, pindrift, ISwave_EA_single_exec, ISwave_full_analysis_nyquist, ISwave_single_analysis, IS_full_analysis_impedance, ISwave_EA_full_analysis_phase.
+% See also genIntStructs, pindrift, ISwave_EA_single_exec, ISwave_full_analysis_nyquist, ISwave_single_analysis, IS_full_analysis_impedance, ISwave_full_analysis_phase.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -277,7 +277,7 @@ ISwave_results.impedance_dQ_re = impedance_dQ_re;
 %% plot results
 
 if do_graphics
-    ISwave_EA_full_analysis_phase(ISwave_results);
+    ISwave_full_analysis_phase(ISwave_results);
     IS_full_analysis_impedance(ISwave_results);
     ISwave_full_analysis_nyquist(ISwave_results);
 end
