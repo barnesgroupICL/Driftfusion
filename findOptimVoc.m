@@ -22,7 +22,7 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 %     get closer to the real VOC
 %
 % Other m-files required: pindrift
-% Subfunctions: none
+% Subfunctions: IgiveCurrentForVoltage
 % MAT-files required: none
 %
 % See also pindrift.
@@ -33,7 +33,7 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 % email address: iochesonome@gmail.com
 % Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
 % Imperial College London
-% October 2017; Last revision: November 2017
+% April 2018; Last revision: April 2018
 
 %------------- BEGIN CODE --------------
 
@@ -84,6 +84,7 @@ asymstruct_voc.p.JV = 0;
 % should be set anyway, but for avoiding risks, set Vapp
 asymstruct_voc.p.Vapp = Vend;
 
+
 warning('off', 'pindrift:verifyStabilization');
 while ~verifyStabilization(asymstruct_voc.sol, asymstruct_voc.t, 1e-3) % check stability
     disp([mfilename ' - Stabilizing over ' num2str(asymstruct_voc.p.tmax) ' s']);
@@ -92,6 +93,8 @@ while ~verifyStabilization(asymstruct_voc.sol, asymstruct_voc.t, 1e-3) % check s
 end
 warning('on', 'pindrift:verifyStabilization');
 
+% save Vend also in Vapp field of the struct
+asymstruct_voc.Vapp = Vend;
 % restore figson
 asymstruct_voc.p.figson = 1;
 
@@ -131,10 +134,11 @@ warning('on', 'pindrift:verifyStabilization');
 % I want the absolute value, but it's nicer to take the squared rather than
 % the abs, for not introducing non derivable points
 % the stupid multiplicative factor is needed for getting far from the eps
-% (double precision)
-minimizeMe = 1e12 * Jn(end)^2;
+% (double precision) which is the minimum FunctionTolerance which can be
+% set
+minimizeMe = 1e30 * Jn(end)^2;
 
-disp([mfilename ' - Using with Vapp ' num2str(Vapp) ' V, a current of ' num2str(Jn(end)) ' mA/cm2 was found'])
+disp([mfilename ' - Using with Vapp ' num2str(Vapp, 8) ' V, a current of ' num2str(Jn(end)) ' mA/cm2 was found'])
 
 end
 
