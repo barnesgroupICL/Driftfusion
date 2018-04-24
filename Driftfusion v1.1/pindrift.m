@@ -290,10 +290,10 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
     % p-type SCR    
     elseif  x >= (p.tp - p.wp) && x < p.tp
 
-        u0 = [p.N0*exp((p.Efnside + p.EA + p.q*((((p.q*p.NA)/(2*p.eppi))*(x-p.tp+p.wp)^2)))/(p.kB*p.T));                            %ni*exp((Efnside - (-q*((((q*NA)/(2*eppp))*(x-tp+wp)^2))))/(kB*T));
-              p.N0*exp(-(p.q*((((p.q*p.NA)/(2*p.eppi))*(x-p.tp+p.wp)^2)) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
+        u0 = [p.N0*exp((p.Efnside + p.EA + p.q*((((p.q*p.NA)/(2*p.eppp))*(x-p.tp+p.wp)^2)))/(p.kB*p.T));                            %ni*exp((Efnside - (-q*((((q*NA)/(2*eppp))*(x-tp+wp)^2))))/(kB*T));
+              p.N0*exp(-(p.q*((((p.q*p.NA)/(2*p.eppp))*(x-p.tp+p.wp)^2)) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
               p.NI;
-              (((p.q*p.NA)/(2*p.eppi))*(x-p.tp+p.wp)^2)];
+              (((p.q*p.NA)/(2*p.eppp))*(x-p.tp+p.wp)^2)];
 
     % Intrinsic
 
@@ -307,10 +307,10 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
     % n-type SCR    
     elseif  x > (p.tp+p.ti) && x <= (p.tp + p.ti + p.wn)
 
-        u0 = [p.N0*exp((p.Efnside + p.EA + p.q*((((-(p.q*p.ND)/(2*p.eppi))*(x-p.ti-p.tp-p.wn)^2) + p.Vbi)))/(p.kB*p.T));
-              p.N0*exp(-(p.q*((((-(p.q*p.ND)/(2*p.eppi))*(x-p.ti-p.tp-p.wn)^2) + p.Vbi)) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
+        u0 = [p.N0*exp((p.Efnside + p.EA + p.q*((((-(p.q*p.ND)/(2*p.eppn))*(x-p.ti-p.tp-p.wn)^2) + p.Vbi)))/(p.kB*p.T));
+              p.N0*exp(-(p.q*((((-(p.q*p.ND)/(2*p.eppn))*(x-p.ti-p.tp-p.wn)^2) + p.Vbi)) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
               p.NI;
-              (((-(p.q*p.ND)/(2*p.eppi))*(x-p.tp - p.ti -p.wn)^2) + p.Vbi)]; 
+              (((-(p.q*p.ND)/(2*p.eppn))*(x-p.tp - p.ti -p.wn)^2) + p.Vbi)]; 
 
     % n-type
     elseif x > (p.tp + p.ti + p.wn) && x <= p.xmax
