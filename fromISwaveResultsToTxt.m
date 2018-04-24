@@ -25,7 +25,11 @@ legendImpedance(legendImpedance=="0 sun") = "dark";
 headerFrequencyIntVdc = ['Frequency', legendImpedance'];
 headerReIm = repelem(strcat(legendImpedance, ' real'), 2);
 headerReIm(2:2:end) = legendImpedance;
-headerNyquist = ['Frequency', headerReIm'];
+if iscolumn(headerReIm)
+    headerNyquist = ['Frequency', headerReIm'];
+else
+    headerNyquist = ['Frequency', headerReIm];
+end
 
 %% get measure units
 
