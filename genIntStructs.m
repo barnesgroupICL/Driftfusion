@@ -1,4 +1,4 @@
-function structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
+function [structCell, VOCs] = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
 %GENINTSTRUCTS - Generates a cell containing structures of solutions at various light intensities
 %
 % Syntax:  structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
@@ -13,6 +13,7 @@ function structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, p
 % Outputs:
 %   STRUCTCELL - a cell containing structs of solutions at various light
 %     intensities
+%   VOCS - an array with the VOC, getting populated just if the input structures were at open circuit
 %
 % Example:
 %   genIntStructs(ssol_i_eq, ssol_i_light, 100, 0.1, 4)
@@ -54,6 +55,7 @@ Int_array = sort(Int_array, 'descend'); % from high intensity to low, beware to 
 
 % pre allocate
 structCell = cell(2, length(Int_array));
+VOCs = NaN(1, length(Int_array));
 
 existingVars = evalin('base', 'who');
 changeLight_tmax = false; % automatic tmax for the first run
@@ -82,6 +84,9 @@ for i = 1:length(Int_array)
     structCell{1, i} = struct_Int;
     structCell{2, i} = name;
     assignin('base', name, struct_Int);
+    if isfield(struct_Int, 'Voc')
+        VOCs(i) = struct_Int.Voc(end);
+    end
 end
 
 %------------- END OF CODE --------------
