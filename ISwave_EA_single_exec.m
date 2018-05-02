@@ -96,7 +96,7 @@ while ~verifyStabilization(asymstruct_ISwave.sol, asymstruct_ISwave.t, (periods 
     disp([mfilename ' - solution was not stabilized, trying again'])
     asymstruct_ISwave = pindrift(asymstruct_ISwave, p);
     i = i+1;
-    if i > 2
+    if i > 10
         warning('pindrift:ISwave_EA_single_exec',...
             'ISwave_EA_single_exec seems that the solution did not reach complete stabilization after %s repetitions on %s periods',...
             num2str(i), num2str(periods))
