@@ -128,9 +128,9 @@ end
 if ~minimal_mode % disable all this stuff if under parallelization or if explicitly asked to not plot any graphics
 
     % in phase electronic current
-    Jn_inphase = s.p.J_E_func([n_coeff(1)*cos(n_coeff(3)), n_coeff(2)*cos(n_coeff(3)), 0], s.t);
+    Jn_inphase = s.p.J_E_func([n_coeff(1)*abs(cos(n_coeff(3))), n_coeff(2)*cos(n_coeff(3)), 0], s.t);
     % out of phase electronic current
-    Jn_quadrature = s.p.J_E_func([n_coeff(1)*sin(n_coeff(3)), n_coeff(2)*sin(n_coeff(3)), pi/2], s.t);
+    Jn_quadrature = s.p.J_E_func([n_coeff(1)*abs(sin(n_coeff(3))), n_coeff(2)*sin(n_coeff(3)), pi/2], s.t);
 
     if s.p.mui
         fit_Jn_noionic = Jn_noionic(fit_t_index:end);
@@ -141,9 +141,9 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         end
 
         % in phase electronic current
-        Jn_noionic_inphase =  s.p.J_E_func([n_noionic_coeff(1)*cos(n_noionic_coeff(3)), n_noionic_coeff(2)*cos(n_noionic_coeff(3)), 0], s.t);
+        Jn_noionic_inphase =  s.p.J_E_func([n_noionic_coeff(1)*abs(cos(n_noionic_coeff(3))), n_noionic_coeff(2)*cos(n_noionic_coeff(3)), 0], s.t);
         % out of phase electronic current
-        Jn_noionic_quadrature = s.p.J_E_func([n_noionic_coeff(1)*sin(n_noionic_coeff(3)), n_noionic_coeff(2)*sin(n_noionic_coeff(3)), pi/2], s.t);
+        Jn_noionic_quadrature = s.p.J_E_func([n_noionic_coeff(1)*abs(sin(n_noionic_coeff(3))), n_noionic_coeff(2)*sin(n_noionic_coeff(3)), pi/2], s.t);
 
     else
         Jn_noionic_inphase = NaN;
@@ -165,22 +165,33 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         yyaxis left
         hold off
         i=i+1; h(i) = plot(s.t, s.Jn, 'k-', 'LineWidth', 2); % mA
+        legend_array = [legend_array, "Current"];
         hold on
         i=i+1; h(i) = plot(s.t, Utot*1000, 'k--'); % mA
+        legend_array = [legend_array, "Recombination current"];
         i=i+1; h(i) = plot(s.t, -dQ_t * 1000, 'b:', 'LineWidth', 2); % mA
-        %i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(n_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
+        legend_array = [legend_array, "Accumulating current"];
+        i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(n_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
+        legend_array = [legend_array, "Fit of Current"];
         %i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(U_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
+        %legend_array = [legend_array, "Fit of Recombination current"];
         i=i+1; h(i) = plot(s.t, Jn_inphase*1000, 'm-', 'LineWidth', 1, 'Marker', 'o', 'MarkerSize', 7); % mA
+        legend_array = [legend_array, "In phase J"];
         i=i+1; h(i) = plot(s.t, Jn_quadrature*1000, 'm-', 'LineWidth', 1, 'Marker', 'x', 'MarkerSize', 7); % mA
-        legend_array = [legend_array, "Current", "Recombination current", "Accumulating current", "In phase J", "Out of phase J"];
+        legend_array = [legend_array, "Out of phase J"];
         if s.p.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             i=i+1; h(i) = plot(s.t, Ji_disp * 1000, 'g--', 'LineWidth', 2); % mA
+            legend_array = [legend_array, "Ionic displacement current"];
             %i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
+            %legend_array = [legend_array, "Fit of Ionic displacement current"];
             i=i+1; h(i) = plot(s.t, Jn_noionic * 1000, 'c-.', 'LineWidth', 2); % mA
+            legend_array = [legend_array, "Purely electronic current"];
             %i=i+1; h(i) = plot(fit_t, s.p.J_E_func(n_noionic_coeff, fit_t) * 1000, 'kx-'); % mA
+            %legend_array = [legend_array, "Fit of Purely electronic current"];
             i=i+1; h(i) = plot(s.t, Jn_noionic_inphase*1000, 'm--', 'LineWidth', 1, 'Marker', '+', 'MarkerSize', 7); % mA
+            legend_array = [legend_array, "In phase electronic J"];
             i=i+1; h(i) = plot(s.t, Jn_noionic_quadrature*1000, 'm--', 'LineWidth', 1, 'Marker', 's', 'MarkerSize', 7); % mA
-            legend_array = [legend_array, "Ionic displacement current", "Purely electronic current", "In phase electronic J", "Out of phase electronic J"];
+            legend_array = [legend_array, "Out of phase electronic J"];
         end
         ylabel('Current [mA/cm^2]');
         hold off
