@@ -214,6 +214,10 @@ for i = 1:length(structs(1, :))
         % in case the next simulation is run starting from the last time
         % point of this simulation, redefine the starting point
         % otherwise the originally provided solution is used again
+        % in case of big perturbations, to use the last point of previous
+        % solution would make sense even when not using sequential. This is
+        % because the background DC profiles are quite different (because
+        % of big perturbations) from the stable provided input
         if sequential
             asymstruct_start = asymstruct_ISwave;
         end
