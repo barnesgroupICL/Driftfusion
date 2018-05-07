@@ -99,7 +99,7 @@ for i = 1:length(Vapp_array)
         p.Vapp = Vend;
         disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
         asymstruct_Vapp = pindrift(asymstruct_Vapp, p);
-        p.tmax = p.tmax * 10;
+        p.tmax = p.tmax * 5;
     end
     warning('on', 'pindrift:verifyStabilization');
     
