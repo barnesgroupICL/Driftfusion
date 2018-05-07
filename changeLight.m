@@ -38,11 +38,15 @@ function struct_Int = changeLight(struct, newInt, tmax)
 
 p = struct.p;
 p.pulseon = 0;
-p.calcJ = 0;
 p.tmesh_type = 2;
 p.t0 = 1e-10;
 p.tpoints = 30;
 struct_Int = struct;
+if p.OC
+    p.calcJ = 0;
+else
+    p.calcJ = 1;
+end
 
 % set an initial time for stabilization tmax
 if tmax
