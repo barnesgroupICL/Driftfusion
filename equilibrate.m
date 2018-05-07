@@ -31,8 +31,10 @@ function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_
 %   ssol_i_light_SR - open circuit, 1 sun, mobile ionic defects, with SRH
 %
 % Example:
-%   equilibrate()
-%     generate stabilized solutions and save them to base workspace
+%   [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq,...
+%       ssol_i_eq_SR, sol_light, sol_light_SR, sol_i_light, sol_i_light_SR,...
+%       ssol_light, ssol_light_SR, ssol_i_light, ssol_i_light_SR] = equilibrate()
+%     generate stabilized solutions
 %
 % Other m-files required: pindrift, pinParams, mobsetfun
 % Subfunctions: none
@@ -322,7 +324,9 @@ ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
 p.tmax = p.tmax * 10;
 ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
 ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
+ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
 p.tmax = p.tmax * 10;
+ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
 ssol_i_eq_SR = pindrift(ssol_i_eq_SR, p);
 
 ssol_i_eq_SR_p = p; % temporarily save params
