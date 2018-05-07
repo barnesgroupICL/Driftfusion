@@ -1,4 +1,4 @@
-function structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
+function [structCell, VOCs] = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
 %GENINTSTRUCTS - Generates a cell containing structures of solutions at various light intensities
 %
 % Syntax:  structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
@@ -13,6 +13,7 @@ function structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, p
 % Outputs:
 %   STRUCTCELL - a cell containing structs of solutions at various light
 %     intensities
+%   VOCS - an array with the VOC, getting populated just if the input structures were at open circuit
 %
 % Example:
 %   genIntStructs(ssol_i_eq, ssol_i_light, 100, 0.1, 4)
@@ -54,6 +55,7 @@ Int_array = sort(Int_array, 'descend'); % from high intensity to low, beware to 
 
 % pre allocate
 structCell = cell(2, length(Int_array));
+VOCs = NaN(1, length(Int_array));
 
 existingVars = evalin('base', 'who');
 changeLight_tmax = false; % automatic tmax for the first run
@@ -62,12 +64,20 @@ changeLight_tmax = false; % automatic tmax for the first run
 for i = 1:length(Int_array)
     disp([mfilename ' - illumination intensity ' num2str(Int_array(i))])
     name = matlab.lang.makeValidName([inputname(2) '_Int_' num2str(Int_array(i))]);
-    if any(strcmp(existingVars, name)) % check if a structure with the same name already exists
-        struct_Int = evalin('base', name);
-    elseif Int_array(i) == 1 % in dark use the symstruct_eq solution, needed for no ions case where changeLight cannot reach dark
-        struct_Int = struct_light;
-    elseif ~Int_array(i)
+    % check if a structure with the same name AND the same parameters already exists
+    if ~Int_array(i) % in dark use the symstruct_eq solution, needed for no ions case where changeLight cannot reach dark
         struct_Int = struct_eq;
+    elseif Int_array(i) == 1 % 1 sun solution
+        struct_Int = struct_light;
+    elseif any(strcmp(existingVars, name))
+        struct_temp = evalin('base', name);
+        % remove not needed fields before doing comparison (Int is included in the name)
+        struct_temp_p = rmfield(struct_temp.p, {'tmax', 'Int', 'figson', 'calcJ', 't0', 'tpoints', 't'});
+        struct_new_p = rmfield(struct_light.p, {'tmax', 'Int', 'figson', 'calcJ', 't0', 'tpoints', 't'});
+        if isequal(struct_temp_p, struct_new_p)
+            disp([mfilename ' - reusing an existing solution'])
+            struct_Int = struct_temp;
+        end
         % if none of the previous if conditions is true, just use the
         % previously set struct_Int
     end
@@ -82,6 +92,9 @@ for i = 1:length(Int_array)
     structCell{1, i} = struct_Int;
     structCell{2, i} = name;
     assignin('base', name, struct_Int);
+    if isfield(struct_Int, 'Voc')
+        VOCs(i) = struct_Int.Voc(end);
+    end
 end
 
 %------------- END OF CODE --------------
