@@ -91,10 +91,25 @@ for i = 1:length(Vapp_array)
     % go to the new Vapp
     asymstruct_Vapp = pindrift(asymstruct_Vapp, p);
 
+    warning('off', 'pindrift:verifyStabilization');
+    while ~verifyStabilization(asymstruct_Vapp.sol, asymstruct_Vapp.t, 1e-3) % check stability in a strict way
+       % eliminate JV configuration before stabilizing
+        p.JV = 0;
+        % set Vapp as single value
+        p.Vapp = Vend;
+        disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
+        asymstruct_Vapp = pindrift(asymstruct_Vapp, p);
+        p.tmax = p.tmax * 10;
+    end
+    warning('on', 'pindrift:verifyStabilization');
+    
     % restore figson before saving
     asymstruct_Vapp.p.figson = 1;
     % eliminate JV configuration before saving
     asymstruct_Vapp.p.JV = 0;
+    
+    % should be set anyway, but for avoiding risks, set Vapp
+    asymstruct_Vapp.p.Vapp = Vend;
     
     structCell{1, i} = asymstruct_Vapp;
     structCell{2, i} = name;
