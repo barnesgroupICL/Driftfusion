@@ -1,4 +1,4 @@
-function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_light, sol_light_SR, sol_i_light, sol_i_light_SR, ssol_light, ssol_light_SR, ssol_i_light, ssol_i_light_SR] = equilibrate
+function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_light, sol_light_SR, sol_i_light, sol_i_light_SR, ssol_light, ssol_light_SR, ssol_i_light, ssol_i_light_SR] = equilibrate(params)
 %EQUILIBRATE Uses analytical initial conditions and runs to equilibrium and steady state
 % Takes the parameters from pinParams.m file and tries
 % to obtain an equilibrium solution (as if the device has been left for
@@ -8,9 +8,11 @@ function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_
 % ensure there are numerous mesh points where large gradients in the time
 % dimension are present.
 %
-% Syntax:  [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_light, sol_light_SR, sol_i_light, sol_i_light_SR, ssol_light, ssol_light_SR, ssol_i_light, ssol_i_light_SR] = EQUILIBRATE()
+% Syntax:  [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_light, sol_light_SR, sol_i_light, sol_i_light_SR, ssol_light, ssol_light_SR, ssol_i_light, ssol_i_light_SR] = EQUILIBRATE(PARAMS)
 %
 % Inputs:
+%   PARAMS - optional, struct containing the needed parameters as obtained
+%     from pinParams.m
 %
 % Outputs:
 %   sol_eq - short circuit, dark, no mobile ionic defects, no SRH
@@ -40,7 +42,7 @@ function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also pindrift, paramsStruct.
+% See also pindrift, paramsStruct, equilibrate_minimal.
 
 % Author: Phil Calado, Ph.D.
 % Imperial College London
@@ -52,7 +54,7 @@ function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_
 % email address: iochesonome@gmail.com
 % Supervised by: Dr. Piers Barnes, Prof. Jenny Nelson
 % Imperial College London
-% 2015; Last revision: January 2018
+% 2015; Last revision: May 2018
 
 %------------- BEGIN CODE --------------
 
@@ -62,9 +64,15 @@ tic;    % Start stopwatch
 % Setting sol.sol = 0 enables a parameters structure to be read into
 % pindrift but indicates that the initial conditions should be the
 % analytical solutions
-sol0.sol = 0;    
+sol0.sol = 0;
 
-p = pinParams;
+% if a params struct has been provided in input, use it instead of the
+% pinParams file
+if nargin
+    p = params;
+else
+    p = pinParams;
+end
 
 % Store initial parameters
 original_p = p;
