@@ -1,7 +1,7 @@
 function structCell = genVappStructs(asymstruct, Vapp_array)
 %GENVAPPSTRUCTS - Generates a cell containing asymmetric structures of solutions at various applied voltages
 %
-% Syntax:  structCell = genVappStructs(asymstruct, startVapp, endVapp, points)
+% Syntax:  structCell = genVappStructs(asymstruct, Vapp_array)
 %
 % Inputs:
 %   ASYMSTRUCT - a solution asymmetric struct as created by PINDRIFT.
@@ -99,13 +99,12 @@ for i = 1:length(Vapp_array)
         p.Vapp = Vend;
         disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
         asymstruct_Vapp = pindrift(asymstruct_Vapp, p);
-        p.tmax = p.tmax * 10;
+        p.tmax = p.tmax * 5;
     end
     warning('on', 'pindrift:verifyStabilization');
     
     % restore figson before saving
     asymstruct_Vapp.p.figson = 1;
-    
     % eliminate JV configuration before saving
     asymstruct_Vapp.p.JV = 0;
     
