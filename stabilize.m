@@ -1,13 +1,13 @@
-function struct = stabilize(struct)
+function steadystate_struct = stabilize(struct)
 %STABILIZE - Simulates the solution increasing the maximum time until when steady state is reached
 %
-% Syntax:  struct = stabilize(struct)
+% Syntax:  steadystate_struct = stabilize(struct)
 %
 % Inputs:
 %   STRUCT - a solution struct as created by PINDRIFT.
 %
 % Outputs:
-%   STRUCT - a solution struct that reached its steady state
+%   STEADYSTATE_STRUCT - a solution struct that reached its steady state
 %
 % Example:
 %   ssol_i_1S_SR = stabilize(ssol_i_1S_SR);
@@ -36,7 +36,7 @@ struct.p.JV = 0;
 p = struct.p;
 
 % set tpoints, just a few ones are necessary here
-p.tpoints = 10;
+p.tpoints = 5;
 p.tmesh_type = 2; % log spaced time mesh
 
 %% estimate a good tmax
@@ -44,17 +44,17 @@ p.tmesh_type = 2; % log spaced time mesh
 % if it's not; too large and the simulation could fail
 
 % if both mobilities are set
-if struct.p.mui && struct.p.mue_i
-    p.tmax = min(5, 2^(-log10(struct.p.mui)) / 10 + 2^(-log10(struct.p.mue_i)));
+if p.mui && p.mue_i
+    p.tmax = min(5, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i)));
 % if ionic mobility is zero but free charges mobility is set
-elseif struct.p.mue_i
-    p.tmax = min(1e-3, 2^(-log10(struct.p.mue_i)));
+elseif p.mue_i
+    p.tmax = min(1e-3, 2^(-log10(p.mue_i)));
 % if no mobility (or just the ionic one) is set
 else
     p.tmax = 1e-6;
 end
 
-p.t0 = p.tmax / 1e9;
+p.t0 = p.tmax / 1e8;
 
 %% obtain the applied voltage Vapp
 
@@ -78,12 +78,17 @@ end
 
 %% equilibrate until steady state
 
+% initialize the output as the input, if already stable it will stay like
+% this
+steadystate_struct = struct;
+
 % the warnings are not needed here
 warning('off', 'pindrift:verifyStabilization');
 
-while ~verifyStabilization(struct.sol, struct.t, 1e-6) % check stability
+while ~verifyStabilization(steadystate_struct.sol, steadystate_struct.t, 1e-4) % check stability
     disp([mfilename ' - Stabilizing ' inputname(1) ' over ' num2str(p.tmax) ' s with an applied voltage of ' num2str(p.Vapp) ' V']);
-    struct = pindrift(struct, p);
+    % every cycle starts from the last timepoint of the previous cycle
+    steadystate_struct = pindrift(steadystate_struct, p);
     % each round, increase the simulation time by 5 times
     % (increasing it more quickly can cause some simulation to fail)
     p.tmax = p.tmax * 5;
