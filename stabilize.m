@@ -36,7 +36,7 @@ struct.p.JV = 0;
 p = struct.p;
 
 % set tpoints, just a few ones are necessary here
-p.tpoints = 20;
+p.tpoints = 10;
 p.tmesh_type = 2; % log spaced time mesh
 
 %% estimate a good tmax
@@ -45,30 +45,28 @@ p.tmesh_type = 2; % log spaced time mesh
 
 % if both mobilities are set
 if struct.p.mui && struct.p.mue_i
-    p.tmax = min(1e1, 2^(-log10(struct.p.mui)) / 10 + 2^(-log10(struct.p.mue_i)));
-    
+    p.tmax = min(5, 2^(-log10(struct.p.mui)) / 10 + 2^(-log10(struct.p.mue_i)));
 % if ionic mobility is zero but free charges mobility is set
 elseif struct.p.mue_i
     p.tmax = min(1e-3, 2^(-log10(struct.p.mue_i)));
-    
 % if no mobility (or just the ionic one) is set
 else
     p.tmax = 1e-6;
 end
+
+p.t0 = p.tmax / 1e9;
 
 %% obtain the applied voltage Vapp
 
 % in case of open circuit solution, the Vapp is zero
 if p.OC
     p.Vapp = 0;
-
 % otherwise use the existing voltage as Vapp
 else
     % taken from pinAna, using the last timepoint
     n = struct.sol(end, :, 1); % electrons
     P = struct.sol(end, :, 2); % holes
     V = struct.sol(end, :, 4); % electric potential
-    
     % Calculate energy levels and chemical potential         
     V = V - p.EA;
     % take the right extrema for electrons (boundary for ETL) and left
