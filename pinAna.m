@@ -135,7 +135,7 @@ if p.OC == 0
     dJndx = dndt - g + U;
     
     Jn = trapz(p.x, dJndx, 2)*1000*p.e;
-        
+    
     %% Calculates current at every point and all times
     % Note the drift and diffusion currents do not cancel properly here
     if p.calcJ == 1
@@ -237,7 +237,7 @@ else
 end
 
 %% Band Diagram - subplot 1
-FH1 = figure('Name', 'Band Diagram', 'NumberTitle', 'off');
+FH1 = figure('Name', ['Band Diagram - ' inputname(1)], 'NumberTitle', 'off');
 %set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
 PH1 = subplot(3,1,1);
 plot (xnm, Efn(end,:), '--', xnm, Efp(end,:), '--', xnm, Ecb(end, :), xnm, Evb(end ,:));
