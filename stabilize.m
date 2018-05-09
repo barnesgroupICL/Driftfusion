@@ -35,13 +35,17 @@ struct.p.JV = 0;
 % shortcut
 p = struct.p;
 
+% set tpoints, just a few ones are necessary here
+p.tpoints = 20;
+p.tmesh_type = 2; % log spaced time mesh
+
 %% estimate a good tmax
 % a tmax too short would make the solution look stable even
 % if it's not; too large and the simulation could fail
 
 % if both mobilities are set
 if struct.p.mui && struct.p.mue_i
-    p.tmax = min(1, 2^(-log10(struct.p.mui)) / 10 + 2^(-log10(struct.p.mue_i)));
+    p.tmax = min(1e1, 2^(-log10(struct.p.mui)) / 10 + 2^(-log10(struct.p.mue_i)));
     
 % if ionic mobility is zero but free charges mobility is set
 elseif struct.p.mue_i
