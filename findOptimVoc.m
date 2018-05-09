@@ -1,31 +1,33 @@
 function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
-%findOptimVOC - Stabilize an asymmetrical solution quite at Voc to the real open circuit voltage
+%findOptimVOC - Stabilize an asymmetric solution to the real open circuit voltage
 % which is the applied voltage where the current is minimized,
-% starting from the voltage present in the given solution and scanning in a
-% 20 mV range. Needs Optimization Toolbox.
+% starting from the voltage present in the given solution. The suggested
+% workflow is to stabilize a symmetric solution (so that the charges
+% profile are close to OC conditions) and break in a half with
+% asymmetricize. Requires MATLAB's Optimization Toolbox.
 %
 % Syntax:  [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 %
 % Inputs:
-%   ASYMSTRUCT - an asymmetric struct as created by PINDRIFT using the OC
-%     parameter set to 0, ideally breaking a symmetric solution using
-%     asymmetricize function so that the starting Vapp is aready close to
-%     the real VOC.
+%   ASYMSTRUCT - an asymmetric struct as created by PINDRIFT, ideally
+%     breaking a symmetric solution using asymmetricize function so that
+%     the starting Vapp is aready close to the real VOC.
 %
 % Outputs:
 %   ASYMSTRUCT_VOC - an asymmetric struct as created by PINDRIFT using the OC
 %     parameter set to 0 and applied voltage identical to the real open
 %     circuit voltage
+%   VOC - the value of the obtained open circuit voltage
 %
 % Example:
 %   sol_i_light_SR_OC = findOptimVoc(asymmetricize(ssol_i_light_SR, 1))
 %     get closer to the real VOC
 %
-% Other m-files required: pindrift
+% Other m-files required: pindrift, pinAna, verifyStabilization
 % Subfunctions: IgiveCurrentForVoltage
 % MAT-files required: none
 %
-% See also pindrift.
+% See also pindrift, asymmetricize, findVoc, pinAna.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -125,7 +127,7 @@ warning('off', 'pindrift:verifyStabilization');
 while ~verifyStabilization(asymstruct_voc.sol, asymstruct_voc.t, 1e-3) % check stability
     disp([mfilename ' - Stabilizing over ' num2str(asymstruct_voc.p.tmax) ' s']);
     asymstruct_voc = pindrift(asymstruct_voc, asymstruct_voc.p);
-    asymstruct_voc.p.tmax = asymstruct_voc.p.tmax * 10;
+    asymstruct_voc.p.tmax = asymstruct_voc.p.tmax * 5;
 end
 warning('on', 'pindrift:verifyStabilization');
 
