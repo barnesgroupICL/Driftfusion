@@ -1,4 +1,4 @@
-function [Voc, Vapp_arr, Jn, Efn, Efp] = pinAna(solstruct)
+function [Voc, Vapp_arr, Jtot, Efn, Efp] = pinAna(solstruct)
 
 % pinAna analyses the input solution and plots various useful graphs.
 % Many plots are available to the user although currently these are
@@ -91,6 +91,10 @@ end
 
 if p.OC == 0
     %% Current calculation from the continuity equations
+    % This still needs to be looked into properly as presently only the
+    % electron current is accounted for- cannot be used for transient
+    % current calculations.
+    
     for j = 1:size(n, 2)
         
         dndt(:,j) = gradient(n(:,j), p.t);
@@ -125,8 +129,13 @@ if p.OC == 0
     end
     
     dJndx = dndt - g + U;
+    dJpdx = dpdt - g + U;
     
     Jn = trapz(p.x, dJndx, 2)*1000*p.e;
+    Jp = trapz(p.x, dJpdx, 2)*1000*p.e;
+    
+    Jtot = Jn;
+    
     
     %% Calculates current at every point and all times
     % Note the drift and diffusion currents do not cancel properly here
@@ -171,7 +180,7 @@ if p.OC == 0
 
 else
     
-    Jn = 0;
+    Jtot = 0;
     
 end
 
@@ -359,7 +368,7 @@ if p.OC ~= 1 && p.calcJ == 0 || p.OC ~= 1 && p.calcJ == 1
 
 % Particle currents as a function of time
 figure(10);
-plot(p.t, Jn);
+plot(p.t, Jtot);
 legend('J_n')%, 'Jparticle', 'Jdisp')
 xlabel('time [s]');
 ylabel('J [mA cm^{-2}]');
@@ -371,7 +380,7 @@ drawnow;
     if p.JV == 1
 
         figure(11)
-        plot(Vapp_arr, Jn)
+        plot(Vapp_arr, Jtot)
         xlabel('V_{app} [V]')
         ylabel('Current Density [mA cm^-2]');
         grid off;
