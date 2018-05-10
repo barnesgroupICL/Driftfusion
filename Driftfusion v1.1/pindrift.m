@@ -161,7 +161,7 @@ if p.Int ~= 0 && p.OM ==1 || p.Int ~= 0 && p.OM == 2
 % Uniform Generation
 elseif p.OM == 0
       
-      if p.Int ~= 0 && x > p.tp && x < (p.tp+p.ti)    
+      if p.Int ~= 0 && x >= p.tp && x <= (p.tp+p.ti)    
            g = p.Int*p.G0;
       else
            g = 0;
@@ -206,7 +206,7 @@ if x >= 0 && x <= p.tp - p.tscr
       0;
       (p.q/p.eppp)*(-u(1)+u(2)-p.NA+u(3)-p.NI);];
   
-elseif x > p.tp - p.tscr && x <= p.tp
+elseif x > p.tp - p.tscr && x < p.tp
     
  f = [(p.mue_p*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1)));
      (p.muh_p*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2)));     
@@ -219,7 +219,7 @@ elseif x > p.tp - p.tscr && x <= p.tp
       (p.q/p.eppp)*(-u(1)+u(2)+u(3)-p.NI-p.NA);];
  
 % Intrinsic
-elseif x > p.tp && x < p.tp + p.ti
+elseif x >= p.tp && x <= p.tp + p.ti
     
    f = [(p.mue_i*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1)));
      (p.muh_i*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2))); 
@@ -232,7 +232,7 @@ elseif x > p.tp && x < p.tp + p.ti
       (p.q/p.eppi)*(-u(1)+u(2)+u(3)-p.NI);]; 
 
 % n-type
-elseif x >= p.tp + p.ti && x < p.tp + p.ti + p.tscr
+elseif x > p.tp + p.ti && x < p.tp + p.ti + p.tscr
   
  f = [(p.mue_n*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1)));
      (p.muh_n*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2)));      
@@ -280,7 +280,7 @@ end
 if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) == 0
     
     % p-type
-    if x < (p.tp - p.wp)
+    if x <= (p.tp - p.wp)
     
        u0 = [p.htln0;
              p.htlp0;
@@ -288,7 +288,7 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
               0];  
 
     % p-type SCR    
-    elseif  x >= (p.tp - p.wp) && x < p.tp
+    elseif  x > (p.tp - p.wp) && x < p.tp
 
         u0 = [p.N0*exp((p.Efnside + p.EA + p.q*((((p.q*p.NA)/(2*p.eppi))*(x-p.tp+p.wp)^2)))/(p.kB*p.T));                            %ni*exp((Efnside - (-q*((((q*NA)/(2*eppp))*(x-tp+wp)^2))))/(kB*T));
               p.N0*exp(-(p.q*((((p.q*p.NA)/(2*p.eppi))*(x-p.tp+p.wp)^2)) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
@@ -305,7 +305,7 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
                 ((x - p.tp)*((1/p.ti)*(p.Vbi - ((p.q*p.NA*p.wp^2)/(2*p.eppi)) - ((p.q*p.ND*p.wn^2)/(2*p.eppi))))) + ((p.q*p.NA*p.wp^2)/(2*p.eppi)) ;];
 
     % n-type SCR    
-    elseif  x > (p.tp+p.ti) && x <= (p.tp + p.ti + p.wn)
+    elseif  x > (p.tp+p.ti) && x < (p.tp + p.ti + p.wn)
 
         u0 = [p.N0*exp((p.Efnside + p.EA + p.q*((((-(p.q*p.ND)/(2*p.eppi))*(x-p.ti-p.tp-p.wn)^2) + p.Vbi)))/(p.kB*p.T));
               p.N0*exp(-(p.q*((((-(p.q*p.ND)/(2*p.eppi))*(x-p.ti-p.tp-p.wn)^2) + p.Vbi)) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
@@ -313,7 +313,7 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
               (((-(p.q*p.ND)/(2*p.eppi))*(x-p.tp - p.ti -p.wn)^2) + p.Vbi)]; 
 
     % n-type
-    elseif x > (p.tp + p.ti + p.wn) && x <= p.xmax
+    elseif x >= (p.tp + p.ti + p.wn) && x <= p.xmax
 
          u0 = [p.etln0;
                p.etlp0;
