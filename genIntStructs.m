@@ -1,4 +1,4 @@
-function [structCell, VOCs] = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
+function [structCell, V_array, J_array] = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
 %GENINTSTRUCTS - Generates a cell containing structures of solutions at various light intensities
 %
 % Syntax:  structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
@@ -13,7 +13,10 @@ function [structCell, VOCs] = genIntStructs(struct_eq, struct_light, startInt, e
 % Outputs:
 %   STRUCTCELL - a cell containing structs of solutions at various light
 %     intensities
-%   VOCS - an array with the VOC, getting populated just if the input structures were at open circuit
+%   V_ARRAY - an array with the voltages present in the solution, which is
+%     an aproximation of the VOCs, getting populated just if the input
+%     structures were at open circuit
+%   J_ARRAY - an array with the currents present in the solutionJs
 %
 % Example:
 %   genIntStructs(ssol_i_eq, ssol_i_light, 100, 0.1, 4)
@@ -55,7 +58,8 @@ Int_array = sort(Int_array, 'descend'); % from high intensity to low, beware to 
 
 % pre allocate
 structCell = cell(2, length(Int_array));
-VOCs = NaN(1, length(Int_array));
+V_array = NaN(1, length(Int_array));
+J_array = NaN(1, length(Int_array));
 
 existingVars = evalin('base', 'who');
 changeLight_tmax = false; % automatic tmax for the first run
@@ -72,8 +76,8 @@ for i = 1:length(Int_array)
     elseif any(strcmp(existingVars, name))
         struct_temp = evalin('base', name);
         % remove not needed fields before doing comparison (Int is included in the name)
-        struct_temp_p = rmfield(struct_temp.p, {'tmax', 'Int', 'figson', 'calcJ', 't0', 'tpoints', 't'});
-        struct_new_p = rmfield(struct_light.p, {'tmax', 'Int', 'figson', 'calcJ', 't0', 'tpoints', 't'});
+        struct_temp_p = rmfield(struct_temp.p, {'tmax', 'Int', 'figson', 't0', 'tpoints', 't'});
+        struct_new_p = rmfield(struct_light.p, {'tmax', 'Int', 'figson', 't0', 'tpoints', 't'});
         if isequal(struct_temp_p, struct_new_p)
             disp([mfilename ' - reusing an existing solution'])
             struct_Int = struct_temp;
@@ -93,7 +97,10 @@ for i = 1:length(Int_array)
     structCell{2, i} = name;
     assignin('base', name, struct_Int);
     if isfield(struct_Int, 'Voc')
-        VOCs(i) = struct_Int.Voc(end);
+        V_array(i) = struct_Int.Voc(end);
+    end
+    if isfield(struct_Int, 'Jn')
+        J_array(i) = struct_Int.Jn(end);
     end
 end
 

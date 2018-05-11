@@ -50,7 +50,7 @@ end
 
 % use the normal genIntStructs for obtaining a cell with structs at various
 % light intensities
-[badVocStructCell, ~] = genIntStructs(struct_eq, struct_light, startInt, endInt, points);
+[badVocStructCell, ~, ~] = genIntStructs(struct_eq, struct_light, startInt, endInt, points);
 
 % how many solutions have been obtained
 nsolutions = length(badVocStructCell(1,:));
