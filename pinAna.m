@@ -375,10 +375,10 @@ end
 %% Currents as a function of time
 if p.OC ~= 1 && p.calcJ == 0 || p.OC ~= 1 && p.calcJ == 1
 
-% Particle currents as a function of time
+% Currents as a function of time
 figure(10);
 plot(p.t, Jtot(:,end));
-legend('J_n')%, 'Jparticle', 'Jdisp')
+legend('Jparticle');%, 'Jdisp')
 xlabel('time [s]');
 ylabel('J [mA cm^{-2}]');
 set(legend,'FontSize',16);
