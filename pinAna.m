@@ -91,9 +91,6 @@ end
 
 if p.OC == 0
     %% Current calculation from the continuity equations
-    % This still needs to be looked into properly as presently only the
-    % electron current is accounted for- cannot be used for transient
-    % current calculations.
     
     for j = 1:size(n, 2)
         
@@ -131,10 +128,22 @@ if p.OC == 0
     dJndx = dndt - g + U;
     dJpdx = dpdt - g + U;
     
-    Jn = trapz(p.x, dJndx, 2)*1000*p.e;
-    Jp = trapz(p.x, dJpdx, 2)*1000*p.e;
+    % Integrate across the device to get currents at all positions
+    Jn = cumtrapz(p.x, dJndx, 2)*1000*p.e;
+    Jp = cumtrapz(p.x, dJpdx, 2)*1000*p.e;
     
-    Jtot = Jn;
+    Jp = Jp(:,end) - Jp;
+    
+    Jtot = Jn + Jp;
+    
+    %% Currents from the right-hand boundary
+    if p.BC == 3
+                
+        Jn_r = p.sn_ext*(n(:, end) - p.etln0)*1000*-p.e;
+        Jp_r = p.sp_rec*(P(:, end) - p.etlp0)*1000*p.e;
+        Jtot2 = Jn_r + Jp_r;
+        
+    end
     
     
     %% Calculates current at every point and all times
@@ -368,7 +377,7 @@ if p.OC ~= 1 && p.calcJ == 0 || p.OC ~= 1 && p.calcJ == 1
 
 % Particle currents as a function of time
 figure(10);
-plot(p.t, Jtot);
+plot(p.t, Jtot(:,end));
 legend('J_n')%, 'Jparticle', 'Jdisp')
 xlabel('time [s]');
 ylabel('J [mA cm^{-2}]');
@@ -380,7 +389,7 @@ drawnow;
     if p.JV == 1
 
         figure(11)
-        plot(Vapp_arr, Jtot)
+        plot(Vapp_arr, Jtot(:,end))
         xlabel('V_{app} [V]')
         ylabel('Current Density [mA cm^-2]');
         grid off;
@@ -396,10 +405,9 @@ end
 end
 
 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Unused figures
+
 
 %{
 figure(1);
@@ -436,6 +444,13 @@ plot(xnm, Fp(end, :));
 xlabel('Position [nm]');
 ylabel('Electric Field [Vcm^{-1}]');
 grid off;
+
+% Electron and hole currents at all positions from continuity equations
+figure(500)
+plot(p.x, Jn(end, :), p.x, Jp(end, :), p.x, Jtot(end, :))
+legend('Jn', 'Jp', 'Jtot')
+xlabel('Position [nm]')
+ylabel('Current [mAcm-2]')
 
 %}
 
