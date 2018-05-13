@@ -135,8 +135,8 @@ p.eppn = 20*p.epp0;         % Dielectric constant n-type
 % Energy levels
 p.EA = 0;                          % Conduction band energy
 p.IP = -1.6;                       % Valence band energy
-p.PhiC = -0.8;                    % Cathode workfunction
-p.PhiA = -0.8;                    % Anode workfunction
+p.PhiC = -0.15;                    % Cathode workfunction
+p.PhiA = -1.45;                    % Anode workfunction
 p.Eg = p.EA-p.IP;                      % Band Gap
 
 % Effective density of states and doping concentration and band bending
@@ -179,9 +179,9 @@ p.taup_htl = 1e6;    %%%% NOT 0- these variables are in the denominator
 p.taun_i = 1e6;
 p.taup_i = 1e6;
 p.sn_ext = 1e10;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
-p.sn_rec = 1e10;
+p.sn_rec = 0;
 p.sp_ext = 1e10;%sn;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
-p.sp_rec = 1e10;
+p.sp_rec = 0;
 
 % SRH parameters
 % se = 1e-15;             % [cm^2] Electron capture cross-section
