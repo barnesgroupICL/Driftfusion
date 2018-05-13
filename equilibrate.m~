@@ -49,19 +49,19 @@ p.tmax = 1e-9;
 p.t0 = p.tmax/1e4;
 
 %% Switch off mobilities
-p.mue_i = 0;          % electron mobility
-p.muh_i = 0;      % hole mobility
-p.mue_p = 0;
-p.muh_p = 0;
-p.mue_n = 0;
-p.muh_n = 0;
-p.mui = 0;
+p.p_initial.mue_i = 0;          % electron mobility
+p.p_initial.muh_i = 0;      % hole mobility
+p.p_initial.mue_p = 0;
+p.p_initial.muh_p = 0;
+p.p_initial.mue_n = 0;
+p.p_initial.muh_n = 0;
+p.p_initial.mui = 0;
 
 % Switch off extraction and recombination
-p.sn_ext = 0;
-p.sn_rec = 0;
-p.sp_ext = 0;
-p.sp_rec = 0;
+% p.sn_ext = 0;
+% p.sn_rec = 0;
+% p.sp_ext = 0;
+% p.sp_rec = 0;
 
 %% Initial solution with zero mobility
 disp('Initial solution, zero mobility')
@@ -69,18 +69,18 @@ sol = pindrift(sol, p);
 disp('Complete')
 
 % Switch on mobilities
-p.mue_i = p_initial.mue_i;          % electron mobility
-p.muh_i = p_initial.muh_i;      % hole mobility
-p.mue_p = p_initial.mue_p;
-p.muh_p = p_initial.muh_p;
-p.mue_n = p_initial.mue_n;
-p.muh_n = p_initial.muh_n;
-p.mui = 0;
+p.p_initial.mue_i = p_initial.mue_i;          % electron mobility
+p.p_initial.muh_i = p_initial.muh_i;      % hole mobility
+p.p_initial.mue_p = p_initial.mue_p;
+p.p_initial.muh_p = p_initial.muh_p;
+p.p_initial.mue_n = p_initial.mue_n;
+p.p_initial.muh_n = p_initial.muh_n;
+p.p_initial.mui = 0;
 
-p.sn_ext = p_initial.sn_ext;
-p.sn_rec = p_initial.sn_rec;
-p.sp_ext = p_initial.sp_ext;
-p.sp_rec = p_initial.sp_rec;
+% p.p_initial.sn_ext = p_initial.sn_ext;
+% p.p_initial.sn_rec = p_initial.sn_rec;
+% p.p_initial.sp_ext = p_initial.sp_ext;
+% p.p_initial.sp_rec = p_initial.sp_rec;
 
 p.figson = 1;
 p.tmax = 1e-9;
@@ -122,13 +122,13 @@ if option == 3
     p.calcJ = 0;
 
     %% Switch off mobilities
-    p.mue_i = 0;          % electron mobility
-    p.muh_i = 0;      % hole mobility
-    p.mue_p = 0;
-    p.muh_p = 0;
-    p.mue_n = 0;
-    p.muh_n = 0;
-    p.mui = 0;
+    p.p_initial.mue_i = 0;          % electron mobility
+    p.p_initial.muh_i = 0;      % hole mobility
+    p.p_initial.mue_p = 0;
+    p.p_initial.muh_p = 0;
+    p.p_initial.mue_n = 0;
+    p.p_initial.muh_n = 0;
+    p.p_initial.mui = 0;
 
     ssol = pindrift(symsol, p);
     disp('Complete')
@@ -138,13 +138,13 @@ if option == 3
     p.tmax = 1e-6;
     p.t0 = p.tmax/1e3;
     % Switch on mobilities
-    p.mue_i = p_initial.mue_i;          % electron mobility
-    p.muh_i = p_initial.muh_i;      % hole mobility
-    p.mue_p = p_initial.mue_p;
-    p.muh_p = p_initial.muh_p;
-    p.mue_n = p_initial.mue_n;
-    p.muh_n = p_initial.muh_n;
-    p.mui = 0;
+    p.p_initial.mue_i = p_initial.mue_i;          % electron mobility
+    p.p_initial.muh_i = p_initial.muh_i;      % hole mobility
+    p.p_initial.mue_p = p_initial.mue_p;
+    p.p_initial.muh_p = p_initial.muh_p;
+    p.p_initial.mue_n = p_initial.mue_n;
+    p.p_initial.muh_n = p_initial.muh_n;
+    p.p_initial.mui = 0;
 
     ssol = pindrift(ssol, p);
 
@@ -212,13 +212,13 @@ if option == 3
     p.t0 = p.tmax/1e3;
     
     %% Switch off mbilities
-    p.mue_i = 0;          % electron mobility
-    p.muh_i = 0;      % hole mobility
-    p.mue_p = 0;
-    p.muh_p = 0;
-    p.mue_n = 0;
-    p.muh_n = 0;
-    p.mui = 0;
+    p.p_initial.mue_i = 0;          % electron mobility
+    p.p_initial.muh_i = 0;      % hole mobility
+    p.p_initial.mue_p = 0;
+    p.p_initial.muh_p = 0;
+    p.p_initial.mue_n = 0;
+    p.p_initial.muh_n = 0;
+    p.p_initial.mui = 0;
     
     %% OC condition with ions at equilbirium
     disp('Open circuit equilibrium with ions')
@@ -228,13 +228,13 @@ if option == 3
     p.t0 = p.tmax/1e3;
     
     % Switch on mobilities
-    p.mue_i = p_initial.mue_i;          % electron mobility
-    p.muh_i = p_initial.muh_i;      % hole mobility
-    p.mue_p = p_initial.mue_p;
-    p.muh_p = p_initial.muh_p;
-    p.mue_n = p_initial.mue_n;
-    p.muh_n = p_initial.muh_n;
-    p.mui = 0;
+    p.p_initial.mue_i = p_initial.mue_i;          % electron mobility
+    p.p_initial.muh_i = p_initial.muh_i;      % hole mobility
+    p.p_initial.mue_p = p_initial.mue_p;
+    p.p_initial.muh_p = p_initial.muh_p;
+    p.p_initial.mue_n = p_initial.mue_n;
+    p.p_initial.muh_n = p_initial.muh_n;
+    p.p_initial.mui = 0;
     
     ssol = pindrift(ssol, p);
     

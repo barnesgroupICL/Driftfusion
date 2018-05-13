@@ -167,15 +167,15 @@ if p.OC == 0
     Jp = jp*1000*p.e;
     
     % Total current
-    % Jtot = Jn + Jp;
+    JtotM = Jn + Jp;
     
     % plot final fluxes as a function of position
     figure(500)
-    plot(xnm, jn(end, :), xnm, jp(end, :));%, xnm, Jtot(end, :))
+    plot(xnm, Jn(end, :), xnm, Jp(end, :), xnm, JtotM(end, :))
     legend('Jn', 'Jp', 'Jtot')
     xlabel('Position [nm]')
-    ylabel('Flux [cm-2s-1]')
-    %ylabel('Current density [mAcm-2]')
+    %ylabel('Flux [cm-2s-1]')
+    ylabel('Current density [mAcm-2]')
     
     %% Calculates current at every point and all times
     % Note the drift and diffusion currents do not cancel properly here
