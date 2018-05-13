@@ -155,7 +155,8 @@ if p.OC == 0
             
             jn_r = p.sn_ext*(n(:, end) - p.n0etl);
             jp_r = p.sp_rec*(P(:, end) - p.p0etl);
-        
+            
+            Jtot = (-jn_r + jp_r)*1000*p.e;
     end
     
     % Calculate total electron and hole currents from fluxes
@@ -166,7 +167,7 @@ if p.OC == 0
     Jp = jp*1000*p.e;
     
     % Total current
-    Jtot = Jn + Jp;
+    % Jtot = Jn + Jp;
     
     % plot final fluxes as a function of position
     figure(500)
