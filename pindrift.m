@@ -213,8 +213,8 @@ elseif x > p.tp - p.tscr && x <= p.tp
      0;
      DuDx(4);];                                  
 
- s = [ - p.kradhtl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_htl*(u(2)+p.pthtl)) + (p.taup_htl*(u(1)+p.nthtl)))); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
-       - p.kradhtl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_htl*(u(2)+p.pthtl)) + (p.taup_htl*(u(1)+p.nthtl)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
+ s = [ - p.kradhtl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_htl*(u(2)+p.pthtl)) + (p.taup_htl*(u(1)+p.nthtl)))); %- klincon*min((u(1)- n0htl), (u(2)- p0htl)); % 
+       - p.kradhtl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_htl*(u(2)+p.pthtl)) + (p.taup_htl*(u(1)+p.nthtl)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- n0htl), (u(2)- p0htl)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
       0;
       (p.q/p.eppp)*(-u(1)+u(2)+u(3)-p.NI-p.NA);];
  
@@ -239,8 +239,8 @@ elseif x >= p.tp + p.ti && x < p.tp + p.ti + p.tscr
      0;
      DuDx(4)];                                      
 
-s = [ - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
-      - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
+s = [ - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- n0etl), (u(2)- p0etl)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
+      - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- n0etl), (u(2)- p0etl)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
       0;
       (p.q/p.eppn)*(-u(1)+u(2)+u(3)-p.NI+p.ND);];%+ptetl-ntetl)];
 
@@ -252,8 +252,8 @@ elseif x >= p.tp + p.ti + p.tscr && x <= p.xmax
      0;
      DuDx(4)];                                      
 
-s = [ - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
-      - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
+s = [ - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- n0etl), (u(2)- p0etl)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
+      - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- n0etl), (u(2)- p0etl)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
       0;
       (p.q/p.eppn)*(-u(1)+u(2)+p.ND+u(3)-p.NI);];%+ptetl-ntetl)];
 
@@ -282,8 +282,8 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
     % p-type
     if x < (p.tp - p.wp)
     
-       u0 = [p.htln0;
-             p.htlp0;
+       u0 = [p.n0htl;
+             p.p0htl;
               p.NI;
               0];  
 
@@ -315,8 +315,8 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
     % n-type
     elseif x > (p.tp + p.ti + p.wn) && x <= p.xmax
 
-         u0 = [p.etln0;
-               p.etlp0;
+         u0 = [p.n0etl;
+               p.p0etl;
                p.NI;
                p.Vbi];
     end      
@@ -404,7 +404,7 @@ else
     elseif p.BC == 1
         
         pl = [0;
-            (ul(2)-p.htlp0);
+            (ul(2)-p.p0htl);
             0;
             -ul(4);];
         
@@ -413,7 +413,7 @@ else
             1;
             0];
         
-        pr = [(ur(1)-p.etln0);
+        pr = [(ur(1)-p.n0etl);
             0;
             0;
             -ur(4)+p.Vbi-p.Vapp;];
@@ -427,8 +427,8 @@ else
     % equivalent to infinite surface recombination velocity for minority carriers
     elseif p.BC == 2
         
-        pl = [ul(1) - p.htln0;
-            ul(2) - p.htlp0;
+        pl = [ul(1) - p.n0htl;
+            ul(2) - p.p0htl;
             0;
             -ul(4);];
         
@@ -437,8 +437,8 @@ else
             1;
             0];
         
-        pr = [ur(1) - p.etln0;
-            ur(2) - p.etlp0;
+        pr = [ur(1) - p.n0etl;
+            ur(2) - p.p0etl;
             0;
             -ur(4)+p.Vbi-p.Vapp;];
         
@@ -447,7 +447,27 @@ else
             1;
             0];
         
+          elseif p.BC == 3
         
+        pl = [-p.sn_rec*(ul(1) - p.n0htl);
+            -p.sp_ext*(ul(2) - p.p0htl);
+            0;
+            -ul(4);];
+        
+        ql = [1;
+            1;
+            1;
+            0];
+        
+        pr = [p.sn_ext*(ur(1) - p.n0etl);
+            p.sp_rec*(ur(2) - p.p0etl);
+            0;
+            -ur(4)+p.Vbi-p.Vapp;];
+        
+        qr = [1;
+            1;
+            1;
+            0];  
     
     end
 end

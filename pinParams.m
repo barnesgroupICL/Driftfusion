@@ -45,7 +45,7 @@ p.G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
 p.tmax = 1e-3;            % Time
 p.pulseon = 0;            % Switch pulse on TPC or TPV
 p.Vapp = 0;               % Applied bias
-p.BC = 1;                 % Boundary Conditions. Must be set to one for first solution
+p.BC = 2;                 % Boundary Conditions. Must be set to one for first solution
 p.figson = 1;             % Toggle figures on/off
 p.meshx_figon = 0;        % Toggles x-mesh figures on/off
 p.mesht_figon = 0;        % Toggles t-mesh figures on/off
@@ -135,8 +135,8 @@ p.eppn = 20*p.epp0;         % Dielectric constant n-type
 % Energy levels
 p.EA = 0;                          % Conduction band energy
 p.IP = -1.6;                       % Valence band energy
-p.PhiC = -0.15;                    % Cathode workfunction
-p.PhiA = -1.45;                    % Anode workfunction
+p.PhiC = -0.8;                    % Cathode workfunction
+p.PhiA = -0.8;                    % Anode workfunction
 p.Eg = p.EA-p.IP;                      % Band Gap
 
 % Effective density of states and doping concentration and band bending
@@ -152,10 +152,10 @@ p.Ei = 0.5*((p.EA+p.IP)+p.kB*p.T*log(p.N0/p.N0));
 
 % Charge Densities
 p.ni = p.N0*(exp(-p.Eg/(2*p.kB*p.T)));          % Intrinsic carrier density
-p.etln0 = p.N0*exp((p.PhiC-p.EA)/(p.kB*p.T));     % Background density electrons in etl/n-type
-p.etlp0 = p.N0*exp((p.IP-p.PhiC)/(p.kB*p.T));     % Background density holes in etl/n-type
-p.htln0 = p.N0*exp((p.PhiA-p.EA)/(p.kB*p.T));     % Background density electrons in htl/p-type
-p.htlp0 = p.N0*exp((p.IP-p.PhiA)/(p.kB*p.T));     % Background density holes in htl/p-type
+p.n0etl = p.N0*exp((p.PhiC-p.EA)/(p.kB*p.T));     % Background density electrons in etl/n-type
+p.p0etl = p.N0*exp((p.IP-p.PhiC)/(p.kB*p.T));     % Background density holes in etl/n-type
+p.n0htl = p.N0*exp((p.PhiA-p.EA)/(p.kB*p.T));     % Background density electrons in htl/p-type
+p.p0htl = p.N0*exp((p.IP-p.PhiA)/(p.kB*p.T));     % Background density holes in htl/p-type
 
 % Built in potential based on equilibrium Fermi energies of the conatct
 % regions
@@ -178,8 +178,10 @@ p.taun_htl = 1e6;        %%%% USE a high value of (e.g.) 1 to switch off
 p.taup_htl = 1e6;    %%%% NOT 0- these variables are in the denominator
 p.taun_i = 1e6;
 p.taup_i = 1e6;
-p.sn = 0;%1e7;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
-p.sp = 0;%sn;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
+p.sn_ext = 1e10;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
+p.sn_rec = 1e10;
+p.sp_ext = 1e10;%sn;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
+p.sp_rec = 1e10;
 
 % SRH parameters
 % se = 1e-15;             % [cm^2] Electron capture cross-section
