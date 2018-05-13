@@ -138,24 +138,16 @@ if p.OC == 0
         % Blocking contacts
         case 1
             
-%             jn_l = 0;
-%             jp_l = -sncoeff*(P(:, 1) - p.p0htl);
-%             
-%             jn_r = sncoeff*(n(:, end) - p.n0etl);
-%             jp_r = 0;
-        
+            % Need to find a way to calculate the current at the boundaries
+            % from Dirichlet BCs              
+            p.calcJ = 1;    % Quick fix to prevent crash
+            
         case 2
             
             % Need to find a way to calculate the current at the boundaries
-            % from Dirichlet BCs
-%             jn_l = -sncoeff*(n(:, 1) - p.n0htl);
-%             jp_l = -sncoeff*(P(:, 1) - p.p0htl);
-%             
-%             jn_r = sncoeff*(n(:, end) - p.n0etl);
-%             jp_r = sncoeff*(P(:, end) - p.p0etl);             
+            % from Dirichlet BCs                      
+            p.calcJ = 1;    % Quick fix to prevent crash
             
-            
-
         case 3
             
             jn_l = -p.sn_rec*(n(:, 1) - p.n0htl);
