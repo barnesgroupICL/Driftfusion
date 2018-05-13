@@ -1,4 +1,4 @@
-function [JV_dk_f, JV_dk_r, JV_1S_f, JV_1S_r] = doJV(sol_ini, JVscan_rate, mui, Vstart, Vend)
+function [JV_dk_f, JV_dk_r, JV_1S_f, JV_1S_r] = doJV(sol_ini, JVscan_rate, JV_scan_points, mui, Vstart, Vend)
 
 % A procedure for running JV scans using pindrift
 %% Input arguments
@@ -21,6 +21,7 @@ p.mui = mui;
 
 %% JV settings
 p.JV = 1;
+p.JV_scan_points = JV_scan_points;
 p.Vstart = Vstart;
 p.Vend = Vend;
 p.calcJ = 0;
