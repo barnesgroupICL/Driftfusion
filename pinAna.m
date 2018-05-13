@@ -125,12 +125,12 @@ if p.OC == 0
         
     end
     
-    djndx = dndt - g + U;
-    djpdx = dpdt - g + U;
+    djndx = -(dndt - g + U);    % Not certain about the sign here
+    djpdx = -(dpdt - g + U);
     
-    % Integrate across the device to get fluxes at all positions
-    jn = cumtrapz(p.x, djndx, 2);
-    jp = cumtrapz(p.x, djpdx, 2);
+    % Integrate across the device to get delta fluxes at all positions
+    deltajn = cumtrapz(p.x, djndx, 2);
+    deltajp = cumtrapz(p.x, djpdx, 2);
     
     %% Currents from the boundaries
     switch p.BC 
@@ -139,13 +139,13 @@ if p.OC == 0
         case 1
             
             % Need to find a way to calculate the current at the boundaries
-            % from Dirichlet BCs              
+            % when using Dirichlet BCs              
             p.calcJ = 1;    % Quick fix to prevent crash
             
         case 2
             
             % Need to find a way to calculate the current at the boundaries
-            % from Dirichlet BCs                      
+            % when using Dirichlet BCs                      
             p.calcJ = 1;    % Quick fix to prevent crash
             
         case 3
@@ -160,11 +160,11 @@ if p.OC == 0
     end
     
     % Calculate total electron and hole currents from fluxes
-    jn = jn + jn_l;
-    jp = jp + jp_l;
+    jn = jn_l + deltajn;
+    jp = jp_l + deltajp;
     
-    Jn = jn*1000*-p.e;
-    Jp = jp*1000*p.e;
+    Jn = jn*1000*p.e;
+    Jp = jp*1000*-p.e;
     
     % Total current
     JtotM = Jn + Jp;
@@ -178,7 +178,8 @@ if p.OC == 0
     ylabel('Current density [mAcm-2]')
     
     %% Calculates current at every point and all times
-    % Note the drift and diffusion currents do not cancel properly here
+    % Note the drift and diffusion currents do not cancel properly here-
+    % not recommended for calculating the total currents- use BC3 instead
     if p.calcJ == 1
         
         % find the internal current density in the device
@@ -190,8 +191,6 @@ if p.OC == 0
         Jtot = zeros(length(p.t));
         
         for j=1:length(p.t)
-            
-            %tj = t(j);
             
             [nloc,dnlocdx] = pdeval(0,p.x,n(j,:),p.x);
             [ploc,dplocdx] = pdeval(0,p.x,P(j,:),p.x);
