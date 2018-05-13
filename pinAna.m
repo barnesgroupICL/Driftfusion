@@ -132,48 +132,57 @@ if p.OC == 0
     jn = cumtrapz(p.x, djndx, 2);
     jp = cumtrapz(p.x, djpdx, 2);
     
-    % sncoeff is a high coefficient used to calculate fluxes at the
-    % boundaries from
-    sncoeff = 1e14;
-    
     %% Currents from the boundaries
     switch p.BC 
         
         % Blocking contacts
         case 1
             
-            jn_l = 0;
-            jp_l = -sncoeff*(P(:, 1) - p.p0htl);
-            
-            jn_r = sncoeff*(n(:, end) - p.n0etl);
-            jp_r = 0;
+%             jn_l = 0;
+%             jp_l = -sncoeff*(P(:, 1) - p.p0htl);
+%             
+%             jn_r = sncoeff*(n(:, end) - p.n0etl);
+%             jp_r = 0;
         
         case 2
             
             % Need to find a way to calculate the current at the boundaries
             % from Dirichlet BCs
-            jn_l = -sncoeff*(n(:, 1) - p.n0htl);
-            jp_l = -sncoeff*(P(:, 1) - p.p0htl);
+%             jn_l = -sncoeff*(n(:, 1) - p.n0htl);
+%             jp_l = -sncoeff*(P(:, 1) - p.p0htl);
+%             
+%             jn_r = sncoeff*(n(:, end) - p.n0etl);
+%             jp_r = sncoeff*(P(:, end) - p.p0etl);             
             
-            jn_r = sncoeff*(n(:, end) - p.n0etl);
-            jp_r = sncoeff*(P(:, end) - p.p0etl);             
             
+
         case 3
             
-            jn_l = p.sn_rec*(n(:, 1) - p.n0htl);
+            jn_l = -p.sn_rec*(n(:, 1) - p.n0htl);
             jp_l = -p.sp_ext*(P(:, 1) - p.p0htl);
             
-            jn_r = -p.sn_ext*(n(:, end) - p.n0etl);
+            jn_r = p.sn_ext*(n(:, end) - p.n0etl);
             jp_r = p.sp_rec*(P(:, end) - p.p0etl);
         
     end
     
     % Calculate total electron and hole currents from fluxes
-    Jn = (jn + jn_l)*1000*-p.e;
-    Jp = (jp + jp_l)*1000*p.e;
+    jn = jn + jn_l;
+    jp = jp + jp_l;
+    
+    Jn = jn*1000*-p.e;
+    Jp = jp*1000*p.e;
     
     % Total current
     Jtot = Jn + Jp;
+    
+    % plot final fluxes as a function of position
+    figure(500)
+    plot(xnm, jn(end, :), xnm, jp(end, :));%, xnm, Jtot(end, :))
+    legend('Jn', 'Jp', 'Jtot')
+    xlabel('Position [nm]')
+    ylabel('Flux [cm-2s-1]')
+    %ylabel('Current density [mAcm-2]')
     
     %% Calculates current at every point and all times
     % Note the drift and diffusion currents do not cancel properly here
