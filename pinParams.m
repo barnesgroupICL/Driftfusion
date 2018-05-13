@@ -45,7 +45,7 @@ p.G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
 p.tmax = 1e-3;            % Time
 p.pulseon = 0;            % Switch pulse on TPC or TPV
 p.Vapp = 0;               % Applied bias
-p.BC = 2;                 % Boundary Conditions. Must be set to one for first solution
+p.BC = 3;                 % Boundary Conditions. Must be set to one for first solution
 p.figson = 1;             % Toggle figures on/off
 p.meshx_figon = 0;        % Toggles x-mesh figures on/off
 p.mesht_figon = 0;        % Toggles t-mesh figures on/off
@@ -100,7 +100,7 @@ if p.pulseon && ~ p.OC   % Record length for TPC
     p.t0 = 0;%tmax/1000;
     p.tpoints = 400;
     p.deltat = p.tmax/(1e4*p.tpoints);
-    p.calcJ = 2;
+    p.calcJ = 3;
     p.JV = 0;
     
 end
@@ -135,8 +135,8 @@ p.eppn = 20*p.epp0;         % Dielectric constant n-type
 % Energy levels
 p.EA = 0;                          % Conduction band energy
 p.IP = -1.6;                       % Valence band energy
-p.PhiC = -0.8;                    % Cathode workfunction
-p.PhiA = -0.8;                    % Anode workfunction
+p.PhiC = -0.15;                    % Cathode workfunction
+p.PhiA = -1.45;                    % Anode workfunction
 p.Eg = p.EA-p.IP;                      % Band Gap
 
 % Effective density of states and doping concentration and band bending
