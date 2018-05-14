@@ -423,8 +423,9 @@ else
             1;
             0];
         
-    % Non- selective contacts - fixed charge densities for majority and minority carriers
-    % equivalent to infinite surface recombination velocity for minority carriers
+    % Non- selective contacts - fixed charge densities for majority carrier
+    % and flux for minority carriers- use recombination coefficients sn_rec
+    % & sp_rec to set the surface recombination velocity.
     elseif p.BC == 2
         
         pl = [-p.sn_rec*(ul(1) - p.n0htl);
@@ -446,8 +447,13 @@ else
             1;
             1;
             0];
-        
-          elseif p.BC == 3
+    
+        % Flux boundary conditions for both carrier types. Leads to
+        % inaccurate calculation at low currents due to the small
+        % fractional change in majority carrier density at interface. May
+        % be more reliable at high currents than BC2 since does not rely on
+        % integrating continuity equations across the device.
+    elseif p.BC == 3
         
         pl = [-p.sn_rec*(ul(1) - p.n0htl);
             -p.sp_ext*(ul(2) - p.p0htl);
@@ -467,13 +473,12 @@ else
         qr = [1;
             1;
             1;
-            0];  
-    
+            0];
+        
     end
 end
 
 end
-
 
 %% Analysis, graphing-  required to obtain J and Voc
 

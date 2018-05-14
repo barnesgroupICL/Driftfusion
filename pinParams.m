@@ -179,13 +179,11 @@ p.taup_htl = 1e6;    %%%% NOT 0- these variables are in the denominator
 p.taun_i = 1e6;
 p.taup_i = 1e6;
 p.sn_ext = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
-p.sn_rec = 1e8;
-p.sp_ext = 1e8;%sn;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
-p.sp_rec = 1e8;
+p.sn_rec = 0;
+p.sp_ext = 1e8;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
+p.sp_rec = 0;
 
 % SRH parameters
-% se = 1e-15;             % [cm^2] Electron capture cross-section
-% v = 1e9;               % [cm/s] Carrier group velocity. Estimates from: http://www.tf.uni-kiel.de/matwis/amat/semi_en/kap_2/advanced/t2_3_1.html
 p.Etetl = -0.8;            % ((EA-IP)/2+IP)-0.2;      % Deep trap energy- currently a guess!
 p.Ethtl = -0.8;
 p.Eti = -0.8;
