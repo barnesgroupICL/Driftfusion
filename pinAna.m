@@ -173,17 +173,7 @@ if p.OC == 0
     
     % Total current
     Jtot = Jn + Jp;
-    
-    %Jtot = JtotM(:, end);
-    
-    % plot final fluxes as a function of position
-    figure(500)
-    plot(xnm, Jn(end, :), xnm, Jp(end, :), xnm, Jtot(end, :))
-    legend('Jn', 'Jp', 'Jtot')
-    xlabel('Position [nm]')
-    %ylabel('Flux [cm-2s-1]')
-    ylabel('Current density [mAcm-2]')
-    
+      
     %% Calculates current at every point and all times
     % Note the drift and diffusion currents do not cancel properly here-
     % not recommended for calculating the total currents- use BC3 instead
@@ -319,6 +309,16 @@ ylim([0, 1.1*(max(sol(end,:,3))/1e19)]);
 set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
 grid off
+
+%% plot final currents as a function of position
+%{
+figure(500)
+plot(xnm, Jn(end, :), xnm, Jp(end, :), xnm, Jtot(end, :))
+legend('Jn', 'Jp', 'Jtot')
+xlabel('Position [nm]')
+%ylabel('Flux [cm-2s-1]')
+ylabel('Current density [mAcm-2]')
+%}
 
 %% Ionic charge density
 %{
