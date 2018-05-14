@@ -178,9 +178,9 @@ p.taun_htl = 1e6;        %%%% USE a high value of (e.g.) 1 to switch off
 p.taup_htl = 1e6;    %%%% NOT 0- these variables are in the denominator
 p.taun_i = 1e6;
 p.taup_i = 1e6;
-p.sn_ext = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
+p.sn_ext = 1e6;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
 p.sn_rec = 0;
-p.sp_ext = 1e8;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
+p.sp_ext = 1e6;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
 p.sp_rec = 0;
 
 % SRH parameters
