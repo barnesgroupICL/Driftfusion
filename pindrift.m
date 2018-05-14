@@ -502,7 +502,7 @@ if p.Ana == 1
         solstruct.Voc = Voc;
     
     else 
-        solstruct.J = Jtot;
+        solstruct.J = Jtot(:,end);             % Stores current from right-hand boundary
   
     if p.JV == 1
         
