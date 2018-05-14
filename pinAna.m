@@ -138,15 +138,20 @@ if p.OC == 0
         % Blocking contacts
         case 1
             
-            % Need to find a way to calculate the current at the boundaries
-            % when using Dirichlet BCs              
-            p.calcJ = 1;    % Quick fix to prevent crash
+            % Setting jp_l = djpdx(end) ensures that jp_r = 0;
+            jn_l = 0;
+            jp_l = -deltajp(:, end);
+            
+            jn_r = deltajn(:, end);
+            jp_r = 0;
             
         case 2
             
-            % Need to find a way to calculate the current at the boundaries
-            % when using Dirichlet BCs                      
-            p.calcJ = 1;    % Quick fix to prevent crash
+            jn_l = -p.sn_rec*(n(:, 1) - p.n0htl);
+            jp_l = -deltajp(:, end) + p.sp_ext*(P(:, 1) - p.p0htl);
+            
+            jn_r = deltajn(:, end) - p.sn_rec*(n(:, 1) - p.n0htl);
+            jp_r = p.sp_rec*(P(:, end) - p.p0etl);
             
         case 3
             
@@ -156,22 +161,24 @@ if p.OC == 0
             jn_r = p.sn_ext*(n(:, end) - p.n0etl);
             jp_r = p.sp_rec*(P(:, end) - p.p0etl);
             
-            Jtot = (-jn_r + jp_r)*1000*p.e;
+            %Jtot = (-jn_r + jp_r)*1000*p.e;
     end
     
     % Calculate total electron and hole currents from fluxes
     jn = jn_l + deltajn;
     jp = jp_l + deltajp;
     
-    Jn = jn*1000*p.e;
-    Jp = jp*1000*-p.e;
+    Jn = -jn*1000*p.e;
+    Jp = jp*1000*p.e;
     
     % Total current
-    JtotM = Jn + Jp;
+    Jtot = Jn + Jp;
+    
+    %Jtot = JtotM(:, end);
     
     % plot final fluxes as a function of position
     figure(500)
-    plot(xnm, Jn(end, :), xnm, Jp(end, :), xnm, JtotM(end, :))
+    plot(xnm, Jn(end, :), xnm, Jp(end, :), xnm, Jtot(end, :))
     legend('Jn', 'Jp', 'Jtot')
     xlabel('Position [nm]')
     %ylabel('Flux [cm-2s-1]')

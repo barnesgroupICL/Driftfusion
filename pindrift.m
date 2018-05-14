@@ -427,23 +427,23 @@ else
     % equivalent to infinite surface recombination velocity for minority carriers
     elseif p.BC == 2
         
-        pl = [ul(1) - p.n0htl;
+        pl = [-p.sn_rec*(ul(1) - p.n0htl);
             ul(2) - p.p0htl;
             0;
             -ul(4);];
         
-        ql = [0;
+        ql = [1;
             0;
             1;
             0];
         
         pr = [ur(1) - p.n0etl;
-            ur(2) - p.p0etl;
+            p.sp_rec*(ur(2) - p.p0etl);
             0;
             -ur(4)+p.Vbi-p.Vapp;];
         
         qr = [0;
-            0;
+            1;
             1;
             0];
         
@@ -490,14 +490,14 @@ solstruct.p = p;
 
 if p.Ana == 1
     
-    [Voc, Vapp_arr, Jn, ~, ~] = pinAna(solstruct);
+    [Voc, Vapp_arr, Jtot, ~, ~] = pinAna(solstruct);
     
     if p.OC == 1
         
         solstruct.Voc = Voc;
     
     else 
-        solstruct.Jn = Jn;
+        solstruct.J = Jtot;
   
     if p.JV == 1
         

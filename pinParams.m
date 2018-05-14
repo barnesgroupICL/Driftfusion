@@ -45,7 +45,7 @@ p.G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
 p.tmax = 1e-3;            % Time
 p.pulseon = 0;            % Switch pulse on TPC or TPV
 p.Vapp = 0;               % Applied bias
-p.BC = 3;                 % Boundary Conditions. Must be set to one for first solution
+p.BC = 2;                 % Boundary Conditions. Must be set to one for first solution
 p.figson = 1;             % Toggle figures on/off
 p.meshx_figon = 0;        % Toggles x-mesh figures on/off
 p.mesht_figon = 0;        % Toggles t-mesh figures on/off
@@ -178,10 +178,10 @@ p.taun_htl = 1e6;        %%%% USE a high value of (e.g.) 1 to switch off
 p.taup_htl = 1e6;    %%%% NOT 0- these variables are in the denominator
 p.taun_i = 1e6;
 p.taup_i = 1e6;
-p.sn_ext = 1e6;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
-p.sn_rec = 1e6;
-p.sp_ext = 1e6;%sn;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
-p.sp_rec = 1e6;
+p.sn_ext = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
+p.sn_rec = 1e8;
+p.sp_ext = 1e8;%sn;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
+p.sp_rec = 1e8;
 
 % SRH parameters
 % se = 1e-15;             % [cm^2] Electron capture cross-section
