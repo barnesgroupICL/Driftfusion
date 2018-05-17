@@ -1,8 +1,8 @@
-function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, do_graphics)
+function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, do_graphics)
 %ISWAVE_FULL_EXEC - Do Impedance Spectroscopy approximated applying an
 % oscillating voltage (ISwave) in a range of background light intensities
 %
-% Syntax:  ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, BC, frozen_ions, do_graphics)
+% Syntax:  ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, do_graphics)
 %
 % Inputs:
 %   STRUCTS - can be a cell structure containing structs at various background
@@ -13,8 +13,6 @@ function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_poi
 %   FREQ_POINTS - number of points to simulate between STARTFREQ and
 %     ENDFREQ
 %   DELTAV - voltage oscillation amplitude in volts, one mV should be enough
-%   BC - boundary conditions indicating if the contacts are selective, see
-%     PINDRIFT
 %   FROZEN_IONS - logical, after stabilization sets the mobility of
 %     ionic defects to zero
 %   DO_GRAPHICS - logical, whether to graph the individual solutions and
@@ -24,17 +22,12 @@ function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_poi
 %   ISWAVE_RESULTS - a struct containing the most important results of the simulation
 %
 % Example:
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true)
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, false, true)
 %     calculate also with dark background, do not freeze ions, use a
 %     voltage oscillation amplitude of 1 mV, on 23 points from frequencies of 1 GHz to
-%     0.01 Hz, with selective contacts, without calculating ionic current,
-%     without parallelization
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, false, true)
+%     0.01 Hz
+%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, true, true)
 %     as above but freezing ions during voltage oscillation
-%   ISwave_full_exec(genIntStructs(ssol_i_eq, ssol_i_light, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, 1, true, true, true)
-%     calculate ionic current in the middle of the intrinsic
-%   ISwave_full_exec(ssol_i_light_BC2, 1e9, 1e-2, 23, 1e-3, 2, true, false, false)
-%     use non perfectly selective contacts (BC = 2)
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
 %   ISwave_single_analysis, ISwave_full_analysis_nyquist,
@@ -110,14 +103,14 @@ dQ_phase = tmax_matrix;
 
 %% do a serie of IS measurements
 
-disp([mfilename ' - Doing the IS at various light intensities']);
+disp([mfilename ' - Doing the IS']);
 for i = 1:length(structs(1, :))
     struct = structs{1, i};
     Int_array(i) = struct.p.Int;
     % decrease annoiance by figures popping up
     struct.p.figson = 0;
     if struct.p.OC % in case the solution is symmetric, break it in halves
-        asymstruct_Int = asymmetricize(struct, BC); % normal BC 1 should work, also BC 2 can be employed
+        asymstruct_Int = asymmetricize(struct);
     else
         asymstruct_Int = struct;
     end
@@ -131,7 +124,7 @@ for i = 1:length(structs(1, :))
     % will work as a normal for cycle
     parfor (j = 1:length(Freq_array), Inf)
         tempRelTol = RelTol; % convert RelTol variable to a temporary variable, as suggested for parallel loops
-        asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV,...
+        asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV,...
             Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
         % set ISwave_single_analysis minimal_mode to true as under
         % parallelization graphics for single solutions cannot be created
@@ -143,7 +136,7 @@ for i = 1:length(structs(1, :))
             disp([mfilename ' - Int: ' num2str(asymstruct_Int.p.Int) '; Vdc: ' num2str(Vdc_temp) ' V; Freq: ' num2str(Freq_array(j)) ' Hz; Fitted phase is ' num2str(rad2deg(n_coeff(3))) ' degrees, it is extremely small or close to pi/2 or out of 0-pi/2 range, increasing solver accuracy and calculate again'])
             tempRelTol = tempRelTol / 100;
             % start from the oscillating solution, better starting point
-            asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_ISwave, BC,...
+            asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_ISwave,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
@@ -163,7 +156,7 @@ for i = 1:length(structs(1, :))
             disp([mfilename ' - Int: ' num2str(asymstruct_Int.p.Int) '; Vdc: ' num2str(Vdc_temp) ' V; Freq: ' num2str(Freq_array(j)) ' Hz; Fitted phase is ' num2str(rad2deg(n_coeff(3))) ' degrees, it is out of 0-pi/2 range, increasing solver accuracy and calculate again'])
             tempRelTol = tempRelTol / 100;
             % start from the oscillating solution, better starting point
-            asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_ISwave, BC,...
+            asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_ISwave,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, true, false, tempRelTol); % do IS
             % set ISwave_single_analysis minimal_mode is true if parallelize is true
             % repeat analysis on new solution
@@ -243,7 +236,6 @@ ISwave_results.Freq = Freq_matrix;
 ISwave_results.tpoints = 1 + tpoints_per_period * periods;
 ISwave_results.tmax = tmax_matrix;
 ISwave_results.Int = Int_array;
-ISwave_results.BC = BC;
 ISwave_results.deltaV = deltaV;
 ISwave_results.sun_index = sun_index;
 ISwave_results.J_bias = J_bias;

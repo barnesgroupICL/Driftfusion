@@ -91,17 +91,19 @@ for i = 1:length(Int_array)
     struct_Int = changeLight(struct_Int, Int_array(i), changeLight_tmax); % change light intensity
     changeLight_tmax = max(struct_Int.p.tmax / 5, 1e-8); % time to use for next iteration
 
+    if isfield(struct_Int, 'Voc') && isfield(struct_Int, 'Jn')
+        V_array(i) = struct_Int.Voc(end);
+        J_array(i) = struct_Int.Jn(end);
+    else
+        [V_temp, ~, J_temp, ~, ~, ~] = pinAna(struct_Int);
+        V_array(i) = V_temp(end);
+        J_array(i) = J_temp(end);
+    end
     % restore figson before saving
     struct_Int.p.figson = 1;
     structCell{1, i} = struct_Int;
     structCell{2, i} = name;
     assignin('base', name, struct_Int);
-    if isfield(struct_Int, 'Voc')
-        V_array(i) = struct_Int.Voc(end);
-    end
-    if isfield(struct_Int, 'Jn')
-        J_array(i) = struct_Int.Jn(end);
-    end
 end
 
 %------------- END OF CODE --------------

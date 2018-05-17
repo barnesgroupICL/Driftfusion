@@ -15,7 +15,7 @@ p.ti = 500e-7;         % Intrinsic layer thickness; this affects the wp paramete
 p.pii = 100;           % Intrinsic points
 p.tn = 200e-7;         % n-type thickness
 p.pn = 60;             % n-type points
-p.tint = 22e-7;      % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
+p.tint = 20e-7;      % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
 p.pint = 40;         % 0.5x Interfacial points (x_mesh_type = 3)
 p.tscr = 50e-7;
 p.pscr = 50;
@@ -29,13 +29,9 @@ p.xmesh_type = 4;
 p.xmax = p.tp + p.ti + p.tn;      % cm
 
 if p.xmesh_type == 1 || p.xmesh_type == 5
-
     p.x0 = 0;
-
 else
-    
     p.x0 = p.xmax/1e3;
-
 end
 
 % General Parameters
@@ -45,13 +41,12 @@ p.G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
 p.tmax = 1e-3;            % Time
 p.pulseon = 0;            % Switch pulse on TPC or TPV
 p.Vapp = 0;               % Applied bias
-p.BC = 1;                 % Boundary Conditions. Must be set to one for first solution
+p.BC = 3;                 % Boundary Conditions. Must be set to one for first solution
 p.figson = 1;             % Toggle figures on/off
 p.meshx_figon = 0;        % Toggles x-mesh figures on/off
 p.mesht_figon = 0;        % Toggles t-mesh figures on/off
 p.side = 1;               % illumination side 1 = EE, 2 = SE
-p.calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position, calcJ = 2, calculates DD at boundary.
-p.mobset = 1;             % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
+p.calcJ = 4;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position, calcJ = 2, calculates DD at boundary.
 p.JV = 0;                 % Toggle run JV scan on/off
 p.Ana = 1;                % Toggle on/off analysis
 
@@ -106,25 +101,12 @@ if p.pulseon && ~ p.OC   % Record length for TPC
 end
 
 %%%%%%%%%%% MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
-if ~ p.mobset
-   
-    p.mue_i = 0;     % [Vcm-2s-1] electron mobility
-    p.muh_i = 0;     % hole mobility
-    p.mue_p = 0;
-    p.muh_p = 0;
-    p.mue_n = 0;
-    p.muh_n = 0;
-    
-else
-    
-    p.mue_i = 20;          % electron mobility
-    p.muh_i = 20;      % hole mobility
-    p.mue_p = 0.02;
-    p.muh_p = 20;
-    p.mue_n = 20;
-    p.muh_n = 0.02;
-    
-end
+p.mue_i = 20;          % electron mobility
+p.muh_i = 20;      % hole mobility
+p.mue_p = 0.02;
+p.muh_p = 20;
+p.mue_n = 20;
+p.muh_n = 0.02;
 
 p.mui = 1e-10; % ion mobility
 
@@ -172,25 +154,26 @@ p.kradhtl = p.krad;         % [cm3 s-1] HTL Radiative Recombination coefficient
 
 % SRH recmobination in the contact regions, 
 % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-p.taun_etl = 5e-10;         % [s] SRH time constant for electrons
-p.taup_etl = 5e-10;    % [s] SRH time constant for holes
-p.taun_htl = 5e-10;        %%%% USE a high value of (e.g.) 1 to switch off
-p.taup_htl = 5e-10;    %%%% NOT 0- these variables are in the denominator
+p.taun_etl = 5e-10; % [s] SRH time constant for electrons
+p.taup_etl = 5e-10; % [s] SRH time constant for holes
+p.taun_htl = 5e-10; %%%% USE a high value of (e.g.) 1 to switch off
+p.taup_htl = 5e-10; %%%% NOT 0- these variables are in the denominator
 p.taun_i = 1e6;
 p.taup_i = 1e6;
-p.sn = 0;%1e7;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
-p.sp = 0;%sn;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
+% extraction and recombination constants for BC 3
+p.sn_ext = 1e4;
+p.sn_rec = 0;
+p.sp_ext = 1e4;
+p.sp_rec = 0;
 
 % SRH parameters
-% se = 1e-15;             % [cm^2] Electron capture cross-section
-% v = 1e9;               % [cm/s] Carrier group velocity. Estimates from: http://www.tf.uni-kiel.de/matwis/amat/semi_en/kap_2/advanced/t2_3_1.html
-p.Etetl = -0.8;            % ((EA-IP)/2+IP)-0.2;      % Deep trap energy- currently a guess!
+p.Etetl = -0.8; % Deep trap energy- currently a guess!
 p.Ethtl = -0.8;
 p.Eti = -0.8;
-p.ntetl = p.ni*exp((p.Etetl-p.Ei)/(p.kB*p.T));     % Density of CB electrons when Fermi level at trap state energy
-p.ptetl = p.ni*exp((p.Ei-p.Etetl)/(p.kB*p.T));     % Density of VB holes when Fermi level at trap state energy
-p.nthtl = p.ni*exp((p.Ethtl-p.Ei)/(p.kB*p.T));     % Density of CB electrons when Fermi level at trap state energy
-p.pthtl = p.ni*exp((p.Ei-p.Ethtl)/(p.kB*p.T));     % Density of VB holes when Fermi level at trap state energy
+p.ntetl = p.ni*exp((p.Etetl-p.Ei)/(p.kB*p.T)); % Density of CB electrons when Fermi level at trap state energy
+p.ptetl = p.ni*exp((p.Ei-p.Etetl)/(p.kB*p.T)); % Density of VB holes when Fermi level at trap state energy
+p.nthtl = p.ni*exp((p.Ethtl-p.Ei)/(p.kB*p.T)); % Density of CB electrons when Fermi level at trap state energy
+p.pthtl = p.ni*exp((p.Ei-p.Ethtl)/(p.kB*p.T)); % Density of VB holes when Fermi level at trap state energy
 p.nti = p.ni*exp((p.Eti-p.Ei)/(p.kB*p.T));
 p.pti = p.ni*exp((p.Ei-p.Eti)/(p.kB*p.T));
 
@@ -207,10 +190,10 @@ p.RelTol = 1e-3;
 % thickness) is changed.
 % ti 400e-7 wp 25e-7;
 % ti 500e-7 wp 22e-7;
-p.wp = p.tint; %((-ti*NA*q) + ((NA^0.5)*(q^0.5)*(((ti^2)*NA*q) + (4*eppi*Vbi))^0.5))/(2*NA*q);
+p.wp = 22e-7; %((-ti*NA*q) + ((NA^0.5)*(q^0.5)*(((ti^2)*NA*q) + (4*eppi*Vbi))^0.5))/(2*NA*q);
 p.wn = p.wp;
 
-p.wscr = p.wp + p.ti + p.wn;    % width of space charge region
+p.wscr = p.wp + p.ti + p.wn; % width of space charge region
 
 % Doped region Fermi levels
 p.Efnside = - p.Vbi - p.EA + ((p.kB*p.T)/p.q) * log(p.ND/p.N0);
@@ -226,15 +209,6 @@ if p.JV == 1
     
 end
 
-
-% % Pack parameters in to structure 'params'
-% varlist = who('*')';
-% varstr = strjoin(varlist, ',');
-% 
-% varcell = who('*')';                    % Store variables names in cell array
-% varcell = ['fieldnames', varcell];      % adhere to syntax for v2struct
-% 
-% params = v2struct(varcell);
 params = p; %saves writing params all the time
 
 end

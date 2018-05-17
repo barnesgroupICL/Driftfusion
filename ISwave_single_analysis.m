@@ -15,7 +15,7 @@ function [n_coeff, i_coeff, U_coeff, dQ_coeff, n_noionic_coeff] = ISwave_single_
 % Outputs:
 %  
 % Example:
-%   ISwave_single_analysis(ISwave_EA_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, false, 1e-4), false, true)
+%   ISwave_single_analysis(ISwave_EA_single_exec(asymmetricize(ssol_i_light), 2e-3, 1e6, 20, 40, true, false, 1e-4), false, true)
 %     do plot
 %
 % Other m-files required: ISwave_subtracting_analysis,
@@ -45,6 +45,16 @@ set(0, 'defaultLineLineWidth', 2);
 % evil shortcut
 s = asymstruct_ISwave;
 
+% verify if the simulation broke, in that case return NaNs
+if size(asymstruct_ISwave.sol, 1) < asymstruct_ISwave.p.tpoints
+    n_coeff = [NaN, NaN, NaN];
+    i_coeff = [NaN, NaN, NaN];
+    U_coeff = [NaN, NaN, NaN];
+    dQ_coeff = [NaN, NaN, NaN];
+    n_noionic_coeff = [NaN, NaN, NaN];
+    return;
+end
+
 % round should not be needed here
 % s.p.Vapp_params(4) should be pulsatance
 periods = round(s.p.tmax * s.p.Vapp_params(4) / (2 * pi));
@@ -56,8 +66,8 @@ fit_t = s.t(fit_t_index:end)';
 fit_J = s.Jn(fit_t_index:end) / 1000; % in Ampere
 % obtain recombination current
 [~, ~, ~, ~, ~, U] = pinAna(s);
-Utot = trapz(s.p.x, U, 2)*s.p.e;
-fit_U = Utot(fit_t_index:end); % in Ampere
+
+fit_U = U(fit_t_index:end) / 1000; % in Ampere
 
 % remove some tilting from fit_J to get better fit and better demodulation in case of
 % unstabilized solutions. In case of noisy solutions this could work badly
@@ -167,7 +177,7 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         i=i+1; h(i) = plot(s.t, s.Jn, 'k-', 'LineWidth', 2); % mA
         legend_array = [legend_array, "Current"];
         hold on
-        i=i+1; h(i) = plot(s.t, Utot*1000, 'k--'); % mA
+        i=i+1; h(i) = plot(s.t, U, 'k--'); % mA
         legend_array = [legend_array, "Recombination current"];
         i=i+1; h(i) = plot(s.t, -dQ_t * 1000, 'b:', 'LineWidth', 2); % mA
         legend_array = [legend_array, "Accumulating current"];

@@ -1,11 +1,10 @@
-function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
+function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
 %ISWAVE_SINGLE_EXEC - Do a single Impedance Spectroscopy (ISwave) experiment
 %
-% Syntax:  asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
+% Syntax:  asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
 %
 % Inputs:
 %   ASYMSTRUCT_INT - a single asymmetric struct as created by PINDRIFT.
-%   BC - boundary conditions during voltage oscillation
 %   DELTAV - voltage oscillation amplitude in volts
 %   FREQ - voltage oscillation frequency
 %   PERIODS - number of periods to be simulated
@@ -25,7 +24,7 @@ function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, BC, deltaV, f
 %     oscillating voltage
 %
 % Example:
-%   ISwave_EA_single_exec(asymmetricize(ssol_i_light, 1), 1, 2e-3, 1e6, 20, 40, true, true, 1e-6)
+%   ISwave_EA_single_exec(asymmetricize(ssol_i_light), 2e-3, 1e6, 20, 40, true, true, 1e-6)
 %     simulate an oscillating voltage at 1 MHz and 2 mV of amplitude, with
 %     selective contacts, 20 periods and 40 time points per period,
 %     calculating the ionic current and using a starting relative tolerance
@@ -59,11 +58,11 @@ p.tpoints = 1 + tpoints_per_period * periods;
 if EA
     p.calcJ = 0; % in ElectroAbsorbance simulation we don't need the electrical current value
 else
-    p.calcJ = 1; % in Impedance Spectroscopy we need the current at the electrodes
+    % a meaningful value of calcJ should be set from pinParams
+    % in Impedance Spectroscopy we need the current at the electrodes
     p.Ana = 1;
 end
 
-p.BC = BC; % usually BC 1 is ok, 2 can be used
 p.RelTol = RelTol; % in case some were defined, for increasing accuracy
 
 %% define applied voltage and fitting functions

@@ -20,10 +20,10 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 %   VOC - the value of the obtained open circuit voltage
 %
 % Example:
-%   sol_i_light_SR_OC = findOptimVoc(asymmetricize(ssol_i_light_SR, 1))
+%   sol_i_light_SR_OC = findOptimVoc(asymmetricize(ssol_i_light_SR))
 %     get closer to the real VOC
 %
-% Other m-files required: pindrift, pinAna, verifyStabilization
+% Other m-files required: pindrift, pinAna, stabilize
 % Subfunctions: IgiveCurrentForVoltage
 % MAT-files required: none
 %
@@ -39,25 +39,35 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 
 %------------- BEGIN CODE --------------
 
+assert(logical(asymstruct.p.calcJ), [mfilename ' - calcJ needs to be set and different from zero']);
+
 asymstruct.p.figson = 0;
 asymstruct.p.tpoints = 10;
 asymstruct.p.Ana = 1;
-asymstruct.p.calcJ = 1;
 asymstruct.p.JV = 0;
+
+% find residual current
+[~, ~, originalCurrent, ~, ~, ~] = pinAna(asymstruct);
+
+disp([mfilename ' - Original voltage: ' num2str(asymstruct.p.Vapp, 8) ' V; original current: ' num2str(originalCurrent(end)) ' mA/cm2'])
+
+if ~originalCurrent(end) % if the original current is exactly zero
+    warning([mfilename ' - The initial residual current is zero, no better VOC can be found'])
+    asymstruct_voc = asymstruct;
+    Voc = asymstruct.p.Vapp;
+    return;
+end
 
 % set an initial time for stabilization tmax
 if asymstruct.p.mui
-    asymstruct.p.tmax = min(5e1, 2^(-log10(asymstruct.p.mui)) / 10 + 2^(-log10(asymstruct.p.mue_i)));
+    asymstruct.p.tmax = min(5e0, 2^(-log10(asymstruct.p.mui)) / 10 + 2^(-log10(asymstruct.p.mue_i)));
 else
-    asymstruct.p.tmax = min(5e1, 2^(-log10(asymstruct.p.mue_i)));
+    asymstruct.p.tmax = min(1e-2, 2^(-log10(asymstruct.p.mue_i)));
 end
 
 asymstruct.p.t0 = asymstruct.p.tmax / 1e6;
 
 %% estimate search range, assuming that a higher voltage causes a more positive current
-
-% find residual current
-[~, ~, originalCurrent, ~, ~, ~] = pinAna(asymstruct);
 
 % preallocate with the value from input solution
 previousCurrent = originalCurrent(end);
@@ -95,7 +105,7 @@ disp([mfilename ' - Search range: ' num2str(dVlimit) ' V'])
 fun = @(Vapp) IgiveCurrentForVoltage(asymstruct, Vapp);
 
 % StepTolerance is usually what stops the minimization here
-options = optimoptions('fmincon', 'StepTolerance', 1e-7, 'FunctionTolerance', 1e-13, 'OptimalityTolerance', 1e-13, 'Algorithm', 'active-set');
+options = optimoptions('fmincon', 'StepTolerance', 1e-7, 'FunctionTolerance', 1e-13, 'OptimalityTolerance', 1e-13, 'Algorithm', 'active-set', 'Display', 'notify');
 
 % the starting point is the currently present voltage
 % the constraints does not work when using the default interior-point
@@ -107,7 +117,8 @@ Voc = fmincon(fun, asymstruct.p.Vapp, [1; -1], [asymstruct.p.Vapp + dVlimit; -(a
 asymstruct.p.tpoints = 30;
 asymstruct.p.JV = 2; % mode for arbitrary Vapp profiles
 Vstart = asymstruct.p.Vapp; % current applied voltage
-Vend = Voc; % new Voc    
+Vend = Voc; % new Voc
+asymstruct.p.tmax = asymstruct.p.tmax / 10;
 % the third parameter is the time point when the change from the old
 % voltage to the new one happens
 asymstruct.p.Vapp_params = [Vstart, Vend, 10 * asymstruct.p.t0];
@@ -123,18 +134,14 @@ asymstruct_voc.p.JV = 0;
 % should be set anyway, but for avoiding risks, set Vapp
 asymstruct_voc.p.Vapp = Vend;
 
-warning('off', 'pindrift:verifyStabilization');
-while ~verifyStabilization(asymstruct_voc.sol, asymstruct_voc.t, 1e-3) % check stability
-    disp([mfilename ' - Stabilizing over ' num2str(asymstruct_voc.p.tmax) ' s']);
-    asymstruct_voc = pindrift(asymstruct_voc, asymstruct_voc.p);
-    asymstruct_voc.p.tmax = asymstruct_voc.p.tmax * 5;
-end
-warning('on', 'pindrift:verifyStabilization');
+asymstruct_voc = stabilize(asymstruct_voc); % go to steady state
 
 % save Vend also in Vapp field of the struct
 asymstruct_voc.Vapp = Vend;
 % restore figson
 asymstruct_voc.p.figson = 1;
+
+disp([mfilename ' - VOC found at ' num2str(Vend, 8) ' V, a residual current of ' num2str(asymstruct_voc.Jn(end)) ' mA/cm2 is present'])
 
 end
 

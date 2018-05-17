@@ -40,9 +40,9 @@ asymstruct_Vapp = asymstruct;
 
 % estimate a good tmax
 if asymstruct_Vapp.p.mui
-    tmax_temp = min(1e3, 2^(-log10(asymstruct_Vapp.p.mui)) / 10 + 2^(-log10(asymstruct_Vapp.p.mue_i)));
+    tmax_temp = min(1e1, 2^(-log10(asymstruct_Vapp.p.mui)) / 10 + 2^(-log10(asymstruct_Vapp.p.mue_i)));
 else
-    tmax_temp = min(1, 2^(-log10(asymstruct_Vapp.p.mue_i)));
+    tmax_temp = min(1e-2, 2^(-log10(asymstruct_Vapp.p.mue_i)));
 end
 
 % usually the solution in short circuit is given in input, so start from
@@ -90,27 +90,22 @@ for i = 1:length(Vapp_array)
 
     % go to the new Vapp
     asymstruct_Vapp = pindrift(asymstruct_Vapp, p);
-
-    warning('off', 'pindrift:verifyStabilization');
-    while ~verifyStabilization(asymstruct_Vapp.sol, asymstruct_Vapp.t, 1e-3) % check stability in a strict way
-       % eliminate JV configuration before stabilizing
-        p.JV = 0;
-        % set Vapp as single value
-        p.Vapp = Vend;
-        disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
-        asymstruct_Vapp = pindrift(asymstruct_Vapp, p);
-        p.tmax = p.tmax * 5;
-    end
-    warning('on', 'pindrift:verifyStabilization');
     
-    % restore figson before saving
-    asymstruct_Vapp.p.figson = 1;
-    % eliminate JV configuration before saving
-    asymstruct_Vapp.p.JV = 0;
+    %% stabilize
     
     % should be set anyway, but for avoiding risks, set Vapp
     asymstruct_Vapp.p.Vapp = Vend;
+    % eliminate JV configuration before saving (useless as stabilize would eliminate it anyway...)
+    asymstruct_Vapp.p.JV = 0;
     
+    asymstruct_Vapp = stabilize(asymstruct_Vapp); % go to steady state
+    
+    % restore figson before saving
+    asymstruct_Vapp.p.figson = 1;
+
+    % re-establish the original calcJ
+    asymstruct_Vapp.p.calcJ = asymstruct.p.calcJ;
+
     structCell{1, i} = asymstruct_Vapp;
     structCell{2, i} = name;
     assignin('base', name, asymstruct_Vapp);

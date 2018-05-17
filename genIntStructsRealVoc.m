@@ -1,4 +1,4 @@
-function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, struct_light, startInt, endInt, points, BC)
+function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, struct_light, startInt, endInt, points)
 %GENINTSTRUCTSREALVOC - Generates a cell containing structures of solutions at various light intensities at an accurate VOC
 % This script just uses other three scripts: genIntStructs, findOptimVoc
 % and asymmetricize. Both symmetric and asymmetric solutions are supported
@@ -13,8 +13,6 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, struct_
 %   STARTINT - higher requested illumination.
 %   ENDINT - lower requested illumination.
 %   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
-%   BC - in case symmetric solutions were given in input, the boundary
-%     conditions set for the wanted asymmetric solutions has to be specified
 %
 % Outputs:
 %   GOODVOCASYMSTRUCTCELL - a cell containing structs of asymmetric solutions at various light
@@ -70,7 +68,7 @@ for i = 1:nsolutions
     % in case the solution is symmetric, break it in halves
     if badVocStructCell{1, i}.p.OC
         disp([mfilename ' - asymmetricize solution at illumination intensity ' num2str(badVocStructCell{1, i}.p.Int)])
-        asymstruct_Int = asymmetricize(badVocStructCell{1, i}, BC); % normal BC 1 should work, also BC 2 can be employed
+        asymstruct_Int = asymmetricize(badVocStructCell{1, i});
     else
         asymstruct_Int = badVocStructCell{1, i};
     end

@@ -20,7 +20,7 @@ function struct_Int = changeLight(struct, newInt, tmax)
 %   changeLight(ssol_i_light, 1e-3, 0)
 %     as above, but estimate a good time for stabilization
 %
-% Other m-files required: pindrift, verifyStabilization
+% Other m-files required: pindrift, stabilize
 % Subfunctions: none
 % MAT-files required: none
 %
@@ -42,20 +42,15 @@ p.tmesh_type = 2;
 p.t0 = 1e-10;
 p.tpoints = 30;
 struct_Int = struct;
-if p.OC
-    p.calcJ = 0;
-else
-    p.calcJ = 1;
-end
 
 % set an initial time for stabilization tmax
 if tmax
     tmax_temp = tmax;
 else % if tmax was zero, estimate a good one
     if p.mui
-        tmax_temp = min(1e3, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i)));
+        tmax_temp = min(1, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i)));
     else
-        tmax_temp = min(1, 2^(-log10(p.mue_i)));
+        tmax_temp = min(1e-3, 2^(-log10(p.mue_i)));
     end
 end
 p.tmax = tmax_temp;
@@ -84,13 +79,6 @@ for i = 2:length(Int_array)
 end
 
 %% stabilize
-warning('off', 'pindrift:verifyStabilization');
-while ~verifyStabilization(struct_Int.sol, struct_Int.t, 1e-8) % check stability in a strict way
-    p.tmax = tmax_temp;
-    disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
-    struct_Int = pindrift(struct_Int, p);
-    tmax_temp = p.tmax * 5;
-end
-warning('on', 'pindrift:verifyStabilization');
+struct_Int = stabilize(struct_Int); % go to steady state
 
 %------------- END OF CODE --------------

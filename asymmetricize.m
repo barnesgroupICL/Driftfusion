@@ -1,15 +1,13 @@
-function asymstruct = asymmetricize(symstruct, BC)
+function asymstruct = asymmetricize(symstruct)
 %ASYMMETRICIZE - Break a symmetrical solution in two halves and stabilize the
 % asymmetrical model at pseudo-OC conditions applying Vapp equal to Voc
 % taken from the symmetrical solution
 %
-% Syntax:  asymstruct = asymmetricize(symstruct, BC)
+% Syntax:  asymstruct = asymmetricize(symstruct)
 %
 % Inputs:
 %   SYMSTRUCT - a symmetric struct as created by PINDRIFT using the OC
 %     parameter set to 1
-%   BC - boudary conditions to be used for the new solution, as defined in
-%     PINPARAMS and PINDRIFT
 %
 % Outputs:
 %   ASYMSTRUCT - an asymmetric struct as created by PINDRIFT using the OC
@@ -17,10 +15,10 @@ function asymstruct = asymmetricize(symstruct, BC)
 %     voltage taken from the input SYMSTRUCT
 %
 % Example:
-%   sol_i_light_OC = asymmetricize(ssol_i_light, 1)
+%   sol_i_light_OC = asymmetricize(ssol_i_light)
 %     take the first half of symmetrical solution at open circuit
 %
-% Other m-files required: pindrift
+% Other m-files required: pindrift, stabilize
 % Subfunctions: none
 % MAT-files required: none
 %
@@ -32,25 +30,28 @@ function asymstruct = asymmetricize(symstruct, BC)
 % email address: iochesonome@gmail.com
 % Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
 % Imperial College London
-% October 2017; Last revision: November 2017
+% October 2017; Last revision: May 2018
 
 %------------- BEGIN CODE --------------
 
 p = symstruct.p;
 p.OC = 0; % without setting OC to 0 BC gets ignored, OC 0 is needed for the asymmetric solution
-p.BC = BC;
 p.tpoints = 10; % rough, just for re-stabilization at Vapp
 p.Ana = 0;
 
 % get the Voc value in the middle of the symmetrical solution at the final time step
-Voc = symstruct.Voc(end);
-p.Vapp = Voc; % use potential value in the middle as new applied voltage, this is needed for BC 0
+if isfield(symstruct, 'Voc')
+    Voc = symstruct.Voc;
+else
+    [Voc, ~, ~, ~, ~, ~] = pinAna(symstruct);
+end
+p.Vapp = Voc(end); % use potential value in the middle as new applied voltage
 
 % set an initial time for stabilization tmax
 if p.mui
-    p.tmax = min(1e1, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i)));
+    p.tmax = min(1e0, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i)));
 else
-    p.tmax = min(1e1, 2^(-log10(p.mue_i)));
+    p.tmax = min(1e-3, 2^(-log10(p.mue_i)));
 end
 
 %% halve the solution
@@ -59,13 +60,14 @@ sol_ic.sol = symstruct.sol(end, 1:centerIndex, :); % take the first spatial half
 sol_ic.x = symstruct.x(1:centerIndex); % providing just sol to pindrift is not enough, a more complete structure is needed, including at least x mesh
 
 %% stabilize the divided solution
-asymstruct = pindrift(sol_ic, p); % should already be stable, this run of pindrift should be fast...
 
-warning('off', 'pindrift:verifyStabilization');
-while ~verifyStabilization(asymstruct.sol, asymstruct.t, 1e-3) % check stability in a strict way
-    disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
+p.BC = 1; % safe boundary conditions for breaking solutions
+asymstruct = pindrift(sol_ic, p); % should already be stable, this run of pindrift should be fast...
+if symstruct.p.BC ~= 1 % in case the boundary conditions set was not 1, go to the correct BC
+    p.BC = symstruct.p.BC; % re-establish the original BC
     asymstruct = pindrift(asymstruct, p);
 end
-warning('on', 'pindrift:verifyStabilization');
+
+asymstruct = stabilize(asymstruct); % go to steady state
 
 %------------- END OF CODE --------------
