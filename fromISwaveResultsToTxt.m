@@ -96,6 +96,17 @@ toBeSavedZphase = [headerFrequencyIntVdc; unitsPhase; dataZphase];
 
 toBeSavedZphaseIonic = [headerFrequencyIntVdc; unitsPhase; dataZphaseIonic];
 
+%% set NaNs to NaN
+
+toBeSavedCap = fillmissing(toBeSavedCap, 'constant', "NaN");
+toBeSavedCapIonic = fillmissing(toBeSavedCapIonic, 'constant', "NaN");
+toBeSavedCapRec = fillmissing(toBeSavedCapRec, 'constant', "NaN");
+toBeSavedCapAcc = fillmissing(toBeSavedCapAcc, 'constant', "NaN");
+toBeSavedNyquist = fillmissing(toBeSavedNyquist, 'constant', "NaN");
+toBeSavedZabs = fillmissing(toBeSavedZabs, 'constant', "NaN");
+toBeSavedZphase = fillmissing(toBeSavedZphase, 'constant', "NaN");
+toBeSavedZphaseIonic = fillmissing(toBeSavedZphaseIonic, 'constant', "NaN");
+
 %% save csv
 
 fid_cap = fopen([prefix '-cap.txt'], 'wt+');
