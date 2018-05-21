@@ -79,7 +79,7 @@ if p.pulseon && p.OC       % Record length for TPV
     p.tmax = 100e-6;
     p.t0 = tmax/1e6;
     p.tpoints = 400;
-    p.deltat = tmax/(1e6*tpoints);
+    p.deltat = p.tmax/(1e6*p.tpoints);
     p.JV = 0;
     p.calcJ = 0;
 
