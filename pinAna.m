@@ -34,7 +34,7 @@ i_n_index = find(i_n_array, 1);
 if p.OC
     Voc = Efn(:, round(p.xpoints/2)) - Efp(:, 1); % Open Circuit Voltage
 else
-    Voc = NaN;
+    Voc = p.Vapp;
 end
 
 %% TPV
