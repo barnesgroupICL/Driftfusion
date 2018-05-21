@@ -49,7 +49,7 @@ toBeSavedBand = [string(headerBand); string(unitsBand); string(data_band)];
 
 %% save csv
 
-fid_ionic_acc = fopen([prefix '-ss-ionic_app.txt'], 'wt+');
+fid_ionic_acc = fopen([prefix '-ss-ionic_acc.txt'], 'wt+');
 fid_ionic_depl = fopen([prefix '-ss-ionic_depl.txt'], 'wt+');
 fid_band = fopen([prefix '-ss-band_diagram.txt'], 'wt+');
 
