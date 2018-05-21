@@ -39,6 +39,9 @@ p = struct.p;
 p.tpoints = 10;
 p.tmesh_type = 2; % log spaced time mesh
 
+% disable Ana, as the ploting done in pinAna results in an error if the simulation doesn't reach the final time point
+p.Ana = 0;
+
 %% estimate a good tmax
 % a tmax too short would make the solution look stable even
 % if it's not; too large and the simulation could fail
@@ -81,7 +84,7 @@ while failed || ~verifyStabilization(steadystate_struct.sol, steadystate_struct.
     if size(steadystate_struct.sol, 1) == steadystate_struct.p.tpoints
         % each round, increase the simulation time by 5 times
         % (increasing it more quickly can cause some simulation to fail)
-        p.tmax = p.tmax * 5;
+        p.tmax = min(p.tmax * 5, 1e4);
         p.t0 = p.tmax / 1e8;
         failed = false;
     else
@@ -92,6 +95,9 @@ while failed || ~verifyStabilization(steadystate_struct.sol, steadystate_struct.
     end
 
 end
+
+% restore original pinAna value
+steadystate_struct.p.Ana = struct.p.Ana;
 
 % re-enable the warnings
 warning('on', 'pindrift:verifyStabilization');
