@@ -164,7 +164,7 @@ disp('Closed circuit equilibrium with ions')
 p.OC = 0;
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
-p.p_initial.mui = 1e-6;           % Ions are accelerated to reach equilibrium
+p.mui = 1e-6;           % Ions are accelerated to reach equilibrium
 
 sol = pindrift(sol_eq, p);
 
@@ -222,7 +222,7 @@ if option == 3
     
     %% OC condition with ions at equilbirium
     disp('Open circuit equilibrium with ions')
-    ssol = pindrift(symsol, p);
+    ssol_sym = pindrift(symsol, p);
     
     p.tmax = 1e-9;
     p.t0 = p.tmax/1e3;
@@ -236,17 +236,17 @@ if option == 3
     p.muh_n = p_initial.muh_n;
     p.mui = 0;
     
-    ssol = pindrift(ssol, p);
+    ssol = pindrift(ssol_sym, p);
     
     % Switch on ion mobility to ensure equilibrium has been reached
     p.tmax = 1e-9;
     p.t0 = p.tmax/1e3;
-    p.p_initial.mui = 1e-6;
+    p.mui = 1e-6;
     
     ssol = pindrift(ssol, p);
     
-    p.tmax = 1e-2;
-    p.t0 = p.tmax/1e3;
+    p.tmax = 1;
+    p.t0 = p.tmax/1e6;
     
     ssol_i_eq = pindrift(ssol, p);
     
