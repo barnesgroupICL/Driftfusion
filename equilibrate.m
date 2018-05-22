@@ -180,10 +180,10 @@ if option == 2 || option == 3
     
     %% Ion equilibrium with surface recombination
     disp('Switching on surface recombination')
-    p.taun_etl = 1e-10;
-    p.taup_etl = 1e-10;
-    p.taun_htl = 1e-10;
-    p.taup_htl = 1e-10;
+    p.taun_etl = p_initial.taun_etl;
+    p.taup_etl = p_initial.taup_etl;
+    p.taun_htl = p_initial.taun_htl;
+    p.taup_htl = p_initial.taup_htl;
     
     p.calcJ = 0;
     p.tmax = 1e-6;
@@ -253,10 +253,10 @@ if option == 3
     disp('Complete')
     
     %% Ions, OC Surface recombination
-    p.taun_etl = 1e-10;
-    p.taup_etl = 1e-10;
-    p.taun_htl = 1e-10;
-    p.taup_htl = 1e-10;
+    p.taun_etl = p_initial.taun_etl;
+    p.taup_etl = p_initial.taup_etl;
+    p.taun_htl = p_initial.taun_htl;
+    p.taup_htl = p_initial.taup_htl;
     
     p.tmax = 1e-3;
     p.t0 = p.tmax/1e6;
@@ -265,7 +265,7 @@ if option == 3
     
     %% 1 Sun quasi equilibrium
     disp('1 Sun quasi equilibrium')
-    tmax = 1e-3;
+    p.tmax = 1e-3;
     p.t0 = p.tmax/1e6;
     p.Int = 1;
     
