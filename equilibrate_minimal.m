@@ -244,7 +244,7 @@ disp("Illuminated, mobile ions, short circuit, surface recombination")
 p = sol_i_eq_SR_p;
 p.Int = original_p.Int;
 
-sol_i_1S_SR = pindrift(sol_i_eq_SR, p);
+sol_i_1S_SR = changeLight(sol_i_eq_SR, p.Int, false);
 sol_i_1S_SR = stabilize(sol_i_1S_SR);
 
 %% Illuminated, mobile ions, open circuit, surface recombination
@@ -252,8 +252,7 @@ disp("Illuminated, mobile ions, open circuit, surface recombination")
 p = ssol_i_eq_SR_p;
 p.Int = original_p.Int;
 
-p.tmax = p.tmax / 1e1;
-ssol_i_1S_SR = pindrift(ssol_i_eq_SR, p);
+ssol_i_1S_SR = changeLight(ssol_i_eq_SR, p.Int, false);
 ssol_i_1S_SR = stabilize(ssol_i_1S_SR);
 
 %% re-enamble figson, pinAna and calcJ options
