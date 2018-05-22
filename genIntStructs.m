@@ -1,11 +1,10 @@
-function [structCell, V_array, J_array] = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
-%GENINTSTRUCTS - Generates a cell containing structures of solutions at various light intensities
+function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points)
+%GENINTSTRUCTS - Generates a cell containing structures of solutions at various light intensities, starting from the one in dark
 %
 % Syntax:  structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
 %
 % Inputs:
 %   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions, or a logic false for not having the dark.
-%   STRUCT_LIGHT - a solution struct as created by PINDRIFT with 1 sun illumination.
 %   STARTINT - higher requested illumination.
 %   ENDINT - lower requested illumination.
 %   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
@@ -19,10 +18,8 @@ function [structCell, V_array, J_array] = genIntStructs(struct_eq, struct_light,
 %   J_ARRAY - an array with the currents present in the solutionJs
 %
 % Example:
-%   genIntStructs(ssol_i_eq, ssol_i_light, 100, 0.1, 4)
+%   genIntStructs(ssol_i_eq, 100, 0.1, 4)
 %     prepare solutions at 100, 10, 1, 0.1 and 0 illumination intensities
-%   genIntStructs(false, ssol_i_light, 100, 0.1, 4)
-%     as above but without the solution at 0 illumination (dark)
 %
 % Other m-files required: changeLight, pindrift
 % Subfunctions: none
@@ -40,56 +37,36 @@ function [structCell, V_array, J_array] = genIntStructs(struct_eq, struct_light,
 
 %------------- BEGIN CODE --------------
 
-struct_Int = struct_light;
+struct_Int = struct_eq;
 
 % define light intensity values, always decreasing
 Int_array = logspace(log10(startInt), log10(endInt), points);
-Int_array = [Int_array, 1]; % 1 sun should always be included, it will be always provided in input as second argument
-% if stabilized dark solution is provided in input, calculate the point at dark
+% as stabilized dark solution is provided in input, calculate the point at dark
 % conditions using that solution
-if isa(struct_eq, 'struct') % dark calculation can be disabled using "false" as first command argument
-    Int_array = [Int_array, 0];
-    % decrease annoiance by figures popping up
-    struct_eq.p.figson = 0;
-end
+Int_array = [Int_array, 0];
+% decrease annoiance by figures popping up
+struct_eq.p.figson = 0;
 
-Int_array = unique(Int_array); % remove duplicates
-Int_array = sort(Int_array, 'descend'); % from high intensity to low, beware to not use changeLight for reaching dark as logspace to zero doesn't work
+Int_array = sort(Int_array, 'ascend'); % from high intensity to low, beware to not use changeLight for reaching dark as logspace to zero doesn't work
 
 % pre allocate
 structCell = cell(2, length(Int_array));
 V_array = NaN(1, length(Int_array));
 J_array = NaN(1, length(Int_array));
 
-existingVars = evalin('base', 'who');
 changeLight_tmax = false; % automatic tmax for the first run
 
 %% generate solutions
 for i = 1:length(Int_array)
     disp([mfilename ' - illumination intensity ' num2str(Int_array(i))])
-    name = matlab.lang.makeValidName([inputname(2) '_Int_' num2str(Int_array(i))]);
-    % check if a structure with the same name AND the same parameters already exists
-    if ~Int_array(i) % in dark use the symstruct_eq solution, needed for no ions case where changeLight cannot reach dark
-        struct_Int = struct_eq;
-    elseif Int_array(i) == 1 % 1 sun solution
-        struct_Int = struct_light;
-    elseif any(strcmp(existingVars, name))
-        struct_temp = evalin('base', name);
-        % remove not needed fields before doing comparison (Int is included in the name)
-        struct_temp_p = rmfield(struct_temp.p, {'tmax', 'Int', 'figson', 't0', 'tpoints', 't'});
-        struct_new_p = rmfield(struct_light.p, {'tmax', 'Int', 'figson', 't0', 'tpoints', 't'});
-        if isequal(struct_temp_p, struct_new_p)
-            disp([mfilename ' - reusing an existing solution'])
-            struct_Int = struct_temp;
-        end
-        % if none of the previous if conditions is true, just use the
-        % previously set struct_Int
-    end
+    name = matlab.lang.makeValidName([inputname(1) '_Int_' num2str(Int_array(i))]);
     % decrease annoiance by figures popping up
     struct_Int.p.figson = 0;
-    % in any case (even the one not considered by the if), stabilize at the new intensity
-    struct_Int = changeLight(struct_Int, Int_array(i), changeLight_tmax); % change light intensity
-    changeLight_tmax = max(struct_Int.p.tmax / 5, 1e-8); % time to use for next iteration
+    % in any case except dark (it would work, should not be needed), stabilize at the new intensity
+    if Int_array(i)
+        struct_Int = changeLight(struct_Int, Int_array(i), changeLight_tmax); % change light intensity
+        changeLight_tmax = max(struct_Int.p.tmax / 5, 1e-8); % time to use for next iteration
+    end
 
     if isfield(struct_Int, 'Voc') && isfield(struct_Int, 'Jn')
         V_array(i) = struct_Int.Voc(end);
