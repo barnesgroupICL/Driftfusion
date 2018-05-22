@@ -1,4 +1,4 @@
-function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, struct_light, startInt, endInt, points)
+function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startInt, endInt, points)
 %GENINTSTRUCTSREALVOC - Generates a cell containing structures of solutions at various light intensities at an accurate VOC
 % This script just uses other three scripts: genIntStructs, findOptimVoc
 % and asymmetricize. Both symmetric and asymmetric solutions are supported
@@ -9,7 +9,6 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, struct_
 %
 % Inputs:
 %   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions, or a logic false for not having the dark.
-%   STRUCT_LIGHT - a solution struct as created by PINDRIFT with 1 sun illumination.
 %   STARTINT - higher requested illumination.
 %   ENDINT - lower requested illumination.
 %   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
@@ -20,10 +19,8 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, struct_
 %   VOCS - an array with the VOC, getting populated just if the input structures were at open circuit
 %
 % Example:
-%   structs_voc = genIntStructsRealVoc(ssol_i_eq_SR, ssol_i_1S_SR, 1, 1e-3, 7)
+%   structs_voc = genIntStructsRealVoc(ssol_i_eq_SR, 1, 1e-3, 7)
 %     prepare solutions at 100, 10, 1, 0.1 and 0 illumination intensities
-%   structs_voc = genIntStructsRealVoc(false, ssol_i_1S_SR, 100, 0.1, 4)
-%     as above but without the solution at 0 illumination (dark)
 %
 % Other m-files required: changeLight, pindrift, genIntStructs,
 %   asymmetricize, findOptimVoc
@@ -42,13 +39,13 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, struct_
 
 %------------- BEGIN CODE --------------
 
-if ~struct_light.p.OC && ~struct_light.p.Vapp
-    disp([mfilename ' - the input solution is in short circuit! The genIntStructsRealVoc runs much faster when solutions close to VOC are provided!']);
+if ~struct_eq.p.OC
+    disp([mfilename ' - the input solution is in short circuit! ' mfilename ' runs much faster when starting from OC conditions!']);
 end
 
 % use the normal genIntStructs for obtaining a cell with structs at various
 % light intensities
-[badVocStructCell, ~, ~] = genIntStructs(struct_eq, struct_light, startInt, endInt, points);
+[badVocStructCell, ~, ~] = genIntStructs(struct_eq, startInt, endInt, points);
 
 % how many solutions have been obtained
 nsolutions = length(badVocStructCell(1,:));
