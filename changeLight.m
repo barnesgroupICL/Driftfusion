@@ -61,7 +61,7 @@ if p.Int
     oldInt = p.Int;
     steps = 1 + ceil(abs(log10(newInt / oldInt)));
 else
-    oldInt = 1e-4;
+    oldInt = 1e-3;
     steps = 1 + ceil(max(1, log10(newInt / oldInt)));
 end
 
@@ -73,7 +73,7 @@ Int_array = logspace(log10(oldInt), log10(newInt), steps);
 % each step, so stabilization is not verified here
 
 % skip first value in the array as is the initial Int (and does not get through pindrift again) or, in case the input
-% was in dark, the first value is 1e-4 and gets skipped
+% was in dark, the first value is 1e-3 and gets skipped
 for i = 2:length(Int_array)
     disp([mfilename ' - Go from light intensity ' num2str(p.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(p.tmax) ' s'])
     p.Int = Int_array(i); % set new light intensity
