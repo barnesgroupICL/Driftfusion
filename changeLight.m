@@ -71,7 +71,9 @@ Int_array = logspace(log10(oldInt), log10(newInt), steps);
 %% change light in steps
 % not needed to reach a good stabilized solution in
 % each step, so stabilization is not verified here
-% skip first value in the array as is the initial Int
+
+% skip first value in the array as is the initial Int (and does not get through pindrift again) or, in case the input
+% was in dark, the first value is 1e-4 and gets skipped
 for i = 2:length(Int_array)
     disp([mfilename ' - Go from light intensity ' num2str(p.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(p.tmax) ' s'])
     p.Int = Int_array(i); % set new light intensity
