@@ -141,7 +141,7 @@ asymstruct_voc.Vapp = Vend;
 % restore figson
 asymstruct_voc.p.figson = 1;
 
-disp([mfilename ' - VOC found at ' num2str(Vend, 8) ' V, a residual current of ' num2str(asymstruct_voc.Jn(end)) ' mA/cm2 is present'])
+disp([mfilename ' - VOC found at ' num2str(Vend, 8) ' V'])
 
 end
 
