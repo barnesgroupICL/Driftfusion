@@ -46,15 +46,22 @@ p.Ana = 0;
 % a tmax too short would make the solution look stable even
 % if it's not; too large and the simulation could fail
 
+min_tmax_ions = 1;
+min_tmax_freecharges = 1e-3;
+min_tmax_allfrozen = 1e-6;
+
 % if both mobilities are set
 if p.mui && p.mue_i
-    p.tmax = min([1, p.tmax*1e5, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i))]);
+    p.tmax = min([min_tmax_ions, p.tmax*1e4, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i))]);
+    min_tmax = min_tmax_ions;
 % if ionic mobility is zero but free charges mobility is set
 elseif p.mue_i
-    p.tmax = min([1e-3, p.tmax*1e5, 2^(-log10(p.mue_i))]);
+    p.tmax = min([min_tmax_freecharges, p.tmax*1e4, 2^(-log10(p.mue_i))]);
+    min_tmax = min_tmax_freecharges;
 % if no mobility (or just the ionic one) is set
 else
-    p.tmax = 1e-6;
+    p.tmax = min_tmax_allfrozen;
+    min_tmax = min_tmax_allfrozen;
 end
 
 p.t0 = p.tmax / 1e8;
@@ -65,33 +72,43 @@ p.t0 = p.tmax / 1e8;
 % this
 steadystate_struct = struct;
 
+forceStabilization = false;
 % checks if the input structure reached the final time point
-if size(steadystate_struct.sol, 1) == steadystate_struct.p.tpoints
-    failed = false;
-else
+if size(steadystate_struct.sol, 1) ~= steadystate_struct.p.tpoints
     % in case the provided solution did not reach the final time point,
     % force stabilization
-    failed = true;
+    forceStabilization = true;
+end
+% check if the prefious step was run over sufficient time. In case it was
+% not, the solution could seem stable to verifyStabilization just because
+% the solution did not evolve much in a time that was very short
+if struct.p.tmax < p.tmax
+    forceStabilization = true;
 end
 
 % the warnings are not needed here
 warning('off', 'pindrift:verifyStabilization');
 
-while failed || ~verifyStabilization(steadystate_struct.sol, steadystate_struct.t, 1e-3) % check stability
+while forceStabilization || ~verifyStabilization(steadystate_struct.sol, steadystate_struct.t, 1e-3) % check stability
     disp([mfilename ' - Stabilizing ' inputname(1) ' over ' num2str(p.tmax) ' s with an applied voltage of ' num2str(p.Vapp) ' V']);
     % every cycle starts from the last timepoint of the previous cycle
     steadystate_struct = pindrift(steadystate_struct, p);
-    if size(steadystate_struct.sol, 1) == steadystate_struct.p.tpoints
+    if size(steadystate_struct.sol, 1) ~= steadystate_struct.p.tpoints % simulation failed
+        % if the stabilization breaks (does not reach the final time point), reduce the tmax
+        p.tmax = p.tmax / 10;
+        p.t0 = p.tmax / 1e8;
+        forceStabilization = true;
+    elseif p.tmax < min_tmax % did not run yet up to minimum time
+        % if the simulation time was not enough, force next step
+        p.tmax = min(p.tmax * 5, 1e4);
+        p.t0 = p.tmax / 1e8;
+        forceStabilization = true;
+    else % normal run
         % each round, increase the simulation time by 5 times
         % (increasing it more quickly can cause some simulation to fail)
         p.tmax = min(p.tmax * 5, 1e4);
         p.t0 = p.tmax / 1e8;
-        failed = false;
-    else
-        % if the stabilization breaks (does not reach the final time point), reduce the tmax
-        p.tmax = p.tmax / 10;
-        p.t0 = p.tmax / 1e8;
-        failed = true;
+        forceStabilization = false;
     end
 
 end
