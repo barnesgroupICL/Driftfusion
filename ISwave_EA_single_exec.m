@@ -91,7 +91,7 @@ asymstruct_ISwave = pindrift(asymstruct_Int, p);
 % if just the first solution is requested setting reach_stability to
 % false, break after the first cycle
 i = 0;
-while ~verifyStabilization(asymstruct_ISwave.sol, asymstruct_ISwave.t, (periods - 2) / periods) && reach_stability
+while ~verifyStabilization(asymstruct_ISwave.sol, asymstruct_ISwave.t, round(periods / 2) / periods) && reach_stability
     disp([mfilename ' - solution was not stabilized, trying again'])
     asymstruct_ISwave = pindrift(asymstruct_ISwave, p);
     i = i+1;
