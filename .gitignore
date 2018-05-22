@@ -1,6 +1,9 @@
 
 # Created by https://www.gitignore.io/api/osx,windows
 
+pinParams.m
+*.~m
+
 ### OSX ###
 *.DS_Store
 .AppleDouble
@@ -51,4 +54,3 @@ $RECYCLE.BIN/
 
 
 # End of https://www.gitignore.io/api/osx,windows
-*.m~
