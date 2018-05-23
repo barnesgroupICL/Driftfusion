@@ -67,6 +67,9 @@ for i = 1:length(sol_matrix(1, 1, :))
         warning('pindrift:verifyStabilization',...
             'Comparing final solutions at %s s and %s s showed that the %s distribution did not reach stability. Consider trying with a greater tmax.',...
             num2str(t_array(time_index)), num2str(t_array(end)), names(i));
+    
+    else
+        display(['Stabilisation verified, variable ', num2str(i)]);
     end
     all_stable = all_stable && stable;
 end
