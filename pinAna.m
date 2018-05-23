@@ -135,6 +135,14 @@ if p.OC == 0
     %% Currents from the boundaries
     switch p.BC 
         
+        case 0
+            
+            jn_l = 0;
+            jp_l = 0;
+            
+            jn_r = 0;
+            jp_r = 0;           
+            
         % Blocking contacts
         case 1
             
