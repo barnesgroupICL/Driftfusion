@@ -43,7 +43,7 @@ p.Vapp = 0;
 p.Int = 0;
 p.pulseon = 0; 
 p.OC = 0;
-p.p_initial.BC = p_initial.BC;
+p.BC = p_initial.BC;
 p.tmesh_type = 2;
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e4;
@@ -96,6 +96,9 @@ p.tmax = 1e-2;
 p.t0 = p.tmax/1e10;
 
 sol_eq = pindrift(sol, p);
+
+verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
+
 disp('Complete')
 
 if option == 3
@@ -103,10 +106,10 @@ if option == 3
     %% Set up solution for open circuit
     disp('Switching boundary conditions to zero flux')
     %p.Ana = 0;
-    p.p_initial.BC = 0;
+    p.BC = 0;
     p.tmax = 1e-9;
-    p.t0 = p.tmax/1e3;
-    
+    p.t0 = p.tmax/1e3;    
+
     sol = pindrift(sol_eq, p);
     disp('Complete')
     
@@ -117,7 +120,7 @@ if option == 3
 
     %% Equilibrium solution with mirrored cell and OC boundary conditions, mobility zero
     disp('Initial equilibrium open circuit solution')
-    p.p_initial.BC = p_initial.BC;
+    p.BC = p_initial.BC;
     p.OC = 1;
     p.calcJ = 0;
 
@@ -152,6 +155,8 @@ if option == 3
     p.tmax = 1e-2;
     p.t0 = p.tmax/1e3;
 
+    verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
+    
     ssol_eq = pindrift(ssol, p);
     disp('Complete')
 
@@ -173,6 +178,8 @@ p.calcJ = 2;
 p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
 
+verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
+
 sol_i_eq = pindrift(sol, p);
 disp('Complete')
 
@@ -188,6 +195,8 @@ if option == 2 || option == 3
     p.calcJ = 0;
     p.tmax = 1e-6;
     p.t0 = p.tmax/1e3;
+    
+    verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
     
     sol_i_eq_SR = pindrift(sol_i_eq, p);
     disp('Complete')
@@ -248,6 +257,8 @@ if option == 3
     p.tmax = 1;
     p.t0 = p.tmax/1e6;
     
+    verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
+    
     ssol_i_eq = pindrift(ssol, p);
     
     disp('Complete')
@@ -261,6 +272,8 @@ if option == 3
     p.tmax = 1e-3;
     p.t0 = p.tmax/1e6;
     
+    verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
+    
     ssol_i_eq_SR = pindrift(ssol_i_eq , p);
     
     %% 1 Sun quasi equilibrium
@@ -268,6 +281,8 @@ if option == 3
     p.tmax = 1e-3;
     p.t0 = p.tmax/1e6;
     p.Int = 1;
+    
+    verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
     
     ssol_i_1S_SR = pindrift(ssol_i_eq_SR, p);
     
