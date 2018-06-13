@@ -78,7 +78,7 @@ p.J_E_func = @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + 2 * pi * freq * t)
 p.J_E_func_tilted = @(coeff, t, tilting, t_middle) p.J_E_func(coeff, t) + tilting * (t - t_middle);
 % double frequency for E squared fitting, useful for Stark spectroscopy
 % (ElectroAbsorption EA) simulation
-p.E2_func = @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + 4 * pi * freq * t);
+p.E2_func = @(coeff, t) coeff(1) + coeff(2) * sin(-pi/2 + coeff(3) + 4 * pi * freq * t);
 
 %% first run
 disp([mfilename ' - Int: ' num2str(p.Int) '; Vdc: ' num2str(Efn(end, end) - Efp(end, 1)) ' V; Freq: ' num2str(freq) ' Hz']);

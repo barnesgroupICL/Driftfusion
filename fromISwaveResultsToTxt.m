@@ -1,6 +1,5 @@
 function fromISwaveResultsToTxt(ISwave_results, prefix)
-% save the main data from an ISwave_struct created by ISwave_full_exec* to
-% txt files, ideally easy to import with Origin (from OriginLab)
+% save the main data from an ISwave_results struct created by ISwave_full_exec* to txt files, ideally easy to import with Origin (from OriginLab)
 
 %% create header
 
@@ -36,7 +35,7 @@ end
 unitsCap = ['Hz', repelem("F/cm\+(2)", length(legendImpedance))];
 unitsNyquist = ['Hz', repelem("\g(W)·cm\+(2)", 2*length(legendImpedance))];
 unitsZabs = ['Hz', repelem("\g(W)·cm\+(2)", length(legendImpedance))];
-unitsPhase = ['Hz', repelem("degrees", length(legendImpedance))];
+unitsPhase = ['Hz', repelem("rad", length(legendImpedance))];
 
 %% get data
 
