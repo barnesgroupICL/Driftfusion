@@ -2,7 +2,7 @@ function [Voc, Vapp_arr, Jtot, Efn, Efp] = pinAna(solstruct)
 
 % pinAna analyses the input solution and plots various useful graphs.
 % Many plots are available to the user although currently these are
-% commented out. In future 
+% commented out. In future
 
 % Simple structure names
 sol = solstruct.sol;
@@ -17,11 +17,11 @@ P = sol(:,:,2);     % holes
 a = sol(:,:,3);     % mobile ions
 V = sol(:,:,4);     % electric potential
 
-% Calculate energy levels and chemical potential         
+% Calculate energy levels and chemical potential
 V = V - p.EA;                                % Electric potential
 Ecb = p.EA-V-p.EA;                             % Conduction band potential
 Evb = p.IP-V-p.EA;                             % Valence band potential
-Efn = real(-V+p.Ei+(p.kB*p.T/p.q)*log(n/p.ni));      % Electron quasi-Fermi level 
+Efn = real(-V+p.Ei+(p.kB*p.T/p.q)*log(n/p.ni));      % Electron quasi-Fermi level
 Efp = real(-V+p.Ei-(p.kB*p.T/p.q)*log(P/p.ni));      % Hole quasi-Fermi level
 Phin = real(p.Ei+(p.kB*p.T/p.q)*log(n/p.ni)-p.EA);     % Chemical Potential electron
 Phip = real(p.Ei-(p.kB*p.T/p.q)*log(P/p.ni)-p.EA);
@@ -35,7 +35,7 @@ iBM = ones(length(p.t), p.xpoints)*diag(p.x >= p.tp & p.x <= (p.tp + p.ti));
 nBM = ones(length(p.t), p.xpoints)*diag(p.x > p.tp + p.ti);
 
 nstat = zeros(1, p.xpoints);                                  % Static charge array
-nstat = (-p.NA-p.NI)*pBM + (-p.NI*iBM) + (p.ND-p.NI)*nBM; %(-NA+pthtl-nthtl-NI)*pBM + (-NI*iBM) + (ND+ptetl-ntetl-NI)*nBM;   
+nstat = (-p.NA-p.NI)*pBM + (-p.NI*iBM) + (p.ND-p.NI)*nBM; %(-NA+pthtl-nthtl-NI)*pBM + (-NI*iBM) + (ND+ptetl-ntetl-NI)*nBM;
 rhoc = (-n + P + a + nstat);     % Net charge density calculated from adding individual charge densities
 
 % Remove static ionic charge from contacts for plotting
@@ -45,39 +45,39 @@ a = a - (p.NI*pBM + p.NI*nBM);
 Urec = 0;% (krad((n*p)-ni^2) + sn*(n-n0htl)).*nBM + (krad((n*p)-ni^2)+ sp*(p-p0etl)).*pBM;
 
 if p.OC == 1
-    
+
     Voc = Efn(:, round(p.xpoints/2)) - Efp(:, 1);                    % Open Circuit Voltage
     Voc_chem = Phin(:, round(p.xpoints/2)) - Phip(:, 1);              % Chemical componenet
     Voc_V = V(:, round(p.xpoints/2)) - V(:, 1);
 
 else
-    
+
     Voc = nan;
-    
+
 end
 
 %% TPV
 if p.OC == 1  && p.pulseon == 1                 % AC coupled mode
-   
+
     Voc = Voc - Voc(1, :);                  % Removes baseline from TPV
-    p.t = p.t-(p.pulsestart+p.pulselen);            % Zero point adjustment                               
+    p.t = p.t-(p.pulsestart+p.pulselen);            % Zero point adjustment
 end
 
 %% TPC
-if p.OC == 0 && p.pulseon == 1 
+if p.OC == 0 && p.pulseon == 1
 
-    p.t = p.t-(p.pulsestart+p.pulselen);                    % TPC Zero point adjustment   
+    p.t = p.t-(p.pulsestart+p.pulselen);                    % TPC Zero point adjustment
 
 end
 
-Potp = V(end, :);                                   % Potential 
+Potp = V(end, :);                                   % Potential
 
 rhoctot = trapz(p.x, rhoc, 2)/p.xmax;       % Integrated net charge
 
 rho_a = a - p.NI;                         % Net ionic charge
 rho_a_tot = trapz(p.x, rho_a, 2)/p.xmax;    % Total Net ion charge
 
-ntot = trapz(p.x, n, 2);                  % Integrated electron density 
+ntot = trapz(p.x, n, 2);                  % Integrated electron density
 ptot = trapz(p.x, P, 2);                  % Integrated hole density
 
 switch p.JV % Current voltage array
@@ -91,102 +91,102 @@ end
 
 if p.OC == 0
     %% Current calculation from the continuity equations
-    
+
     for j = 1:size(n, 2)
-        
+
         dndt(:,j) = gradient(n(:,j), p.t);
         dpdt(:,j) = gradient(P(:,j), p.t);
-        
+
     end
-    
+
     dndtInt = trapz(p.x, dndt, 2);
     dpdtInt = trapz(p.x, dpdt, 2);
-    
+
     %% Recombination
     Ubtb = p.krad*(n.*P - p.ni^2);
     Usrh = ((n.*P-p.ni^2)./((p.taun_htl.*(P+p.pthtl)) + (p.taup_htl.*(n+p.nthtl)))).*pBM...
         +((n.*P-p.ni^2)./((p.taun_etl.*(P+p.ptetl)) + (p.taup_etl.*(n+p.ntetl)))).*nBM;
-    
+
     U = Ubtb + Usrh;
-    
+
     %% Generation
     % Uniform Generation
     if p.OM == 0
-        
+
         if p.Int ~= 0
-            
+
             g = p.Int*p.G0*iBM;
-            
+
         else
-            
+
             g = 0;
-            
+
         end
-        
+
     end
-    
+
     djndx = -(dndt - g + U);    % Not certain about the sign here
     djpdx = -(dpdt - g + U);
-    
+
     % Integrate across the device to get delta fluxes at all positions
     deltajn = cumtrapz(p.x, djndx, 2);
     deltajp = cumtrapz(p.x, djpdx, 2);
-    
+
     %% Currents from the boundaries
-    switch p.BC 
-        
+    switch p.BC
+
         case 0
-            
+
             jn_l = 0;
             jp_l = 0;
-            
+
             jn_r = 0;
-            jp_r = 0;           
-            
+            jp_r = 0;
+
         % Blocking contacts
         case 1
-            
+
             % Setting jp_l = djpdx(end) ensures that jp_r = 0;
             jn_l = 0;
             jp_l = -deltajp(:, end);
-            
+
             jn_r = deltajn(:, end);
             jp_r = 0;
-            
+
         case 2
-            
+
             jn_l = -p.sn_rec*(n(:, 1) - p.n0htl);
-            jp_l = -deltajp(:, end) + p.sp_ext*(P(:, 1) - p.p0htl);
-            
+            jp_l = -deltajp(:, end) + p.sp_ext*(P(:, 1) - p.p0etl);
+
             jn_r = deltajn(:, end) - p.sn_rec*(n(:, 1) - p.n0htl);
             jp_r = p.sp_rec*(P(:, end) - p.p0etl);
-            
+
         case 3
-            
+
             jn_l = -p.sn_rec*(n(:, 1) - p.n0htl);
             jp_l = -p.sp_ext*(P(:, 1) - p.p0htl);
-            
+
             jn_r = p.sn_ext*(n(:, end) - p.n0etl);
             jp_r = p.sp_rec*(P(:, end) - p.p0etl);
-            
+
             %Jtot = (-jn_r + jp_r)*1000*p.e;
     end
-    
+
     % Calculate total electron and hole currents from fluxes
     jn = jn_l + deltajn;
     jp = jp_l + deltajp;
-    
+
     Jn = -jn*1000*p.e;
     Jp = jp*1000*p.e;
-    
+
     % Total current
     Jtot = Jn + Jp;
-      
+
     %% Calculates current at every point and all times
     % Note the drift and diffusion currents do not cancel properly here-
     % not recommended for calculating the total currents- use BC3 instead
     if p.calcJ == 1
-        
+
         % find the internal current density in the device
         Jndiff = zeros(length(p.t), length(p.x));
         Jndrift = zeros(length(p.t), length(p.x));
@@ -194,53 +194,53 @@ if p.OC == 0
         Jpdrift = zeros(length(p.t), length(p.x));
         Jpart = zeros(length(p.t), length(p.x));
         Jtot = zeros(length(p.t));
-        
+
         for j=1:length(p.t)
-            
+
             [nloc,dnlocdx] = pdeval(0,p.x,n(j,:),p.x);
             [ploc,dplocdx] = pdeval(0,p.x,P(j,:),p.x);
             [iloc,dilocdx] = pdeval(0,p.x,a(j,:),p.x);
             [Vloc, dVdx] = pdeval(0,p.x,V(j,:),p.x);
-            
+
             % Particle currents
             Jndiff(j,:) = (p.mue_i*p.kB*p.T*dnlocdx)*(1000*p.q);
             Jndrift(j,:) = (-p.mue_i*nloc.*dVdx)*(1000*p.q);
-            
+
             Jpdiff(j,:) = (-p.muh_i*p.kB*p.T*dplocdx)*(1000*p.q);
             Jpdrift(j,:) = (-p.muh_i*ploc.*dVdx)*(1000*p.q);
-            
+
             Jidiff(j,:) = (-p.mui*p.kB*p.T*dilocdx)*(1000*p.q);
             Jidrift(j,:) = (-p.mui*iloc.*dVdx)*(1000*p.q);
-            
+
             % Particle current
             Jpart(j,:) = Jndiff(j,:) + Jndrift(j,:) + Jpdiff(j,:) + Jpdrift(j,:) + Jidiff(j,:) + Jidrift(j,:);
-            
+
             % Electric Field
             dVdxt(j,:) = dVdx;
-            
+
         end
-        
+
     end
 
 else
-    
+
     Jtot = 0;
-    
+
 end
 
 %% GRAPHING %%
 
 %% Spatial mesh
 if p.meshx_figon == 1
-    
+
     xmir = p.x;
     pxmir = 1:1:length(p.x);
-    
+
     figure(1010);
     plot(xmir, pxmir, '.');
     xlabel('Position');
     ylabel('Point');
-    
+
 end
 
 
@@ -249,7 +249,7 @@ if p.mesht_figon == 1
 
     tmir = p.t;
     ptmir = 1:1:length(p.t);
-    
+
     figure(200);
     plot(tmir, ptmir, '.');
     xlabel('Time');
@@ -259,24 +259,24 @@ end
 
 %% General figures
 if p.figson == 1
-    
+
     % Open circuit voltage
       if p.OC == 1
-        
+
         figure(7);
         plot (p.t, Voc);
-        xlabel('Time [s]');   
+        xlabel('Time [s]');
         ylabel('Voltage [V]');
 
       end
 
 % Defines end points for the graphing
 if p.OC == 1
-    
+
     xnmend = round(xnm(end)/2);
-    
+
 else
-    
+
     xnmend = xnm(end);
 end
 
@@ -288,7 +288,7 @@ plot (xnm, Efn(end,:), '--', xnm, Efp(end,:), '--', xnm, Ecb(end, :), xnm, Evb(e
 %legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
 set(legend,'FontSize',12);
 %xlabel('Position [nm]');
-ylabel('Energy [eV]'); 
+ylabel('Energy [eV]');
 xlim([0, xnmend]);
 ylim([-3, 0.5]);
 set(legend,'FontSize',12);
@@ -438,7 +438,7 @@ drawnow;
         xlabel('V_{app} [V]')
         ylabel('Current Density [mA cm^-2]');
         grid off;
-    
+
     end
 
 end
@@ -510,7 +510,7 @@ ylabel(Ax1(2),{'Recombination';'Rate [cm^{-3}s^{-1}]'}) % right y-axis
 %set(Ax1(2),'YScale','log')
 set(Ax1(1),'Position', [0.1 0.11 0.7 0.8]);
 set(Ax1(2),'Position', [0.1 0.11 0.7 0.8]);
-set(Ax1(1),'ycolor',[0.1, 0.1, 0.1]) 
+set(Ax1(1),'ycolor',[0.1, 0.1, 0.1])
 set(Ax1(2),'ycolor',[0, 0.4470, 0.7410])
 set(h1,'color',[0.1, 0.1, 0.1])
 set(h2, 'color',[0, 0.4470, 0.7410])
@@ -531,7 +531,7 @@ ylabel(Ax2(2),'Chemical Potential [V]') % right y-axis
 % get current (active) axes property
 set(Ax2(1),'Position', [0.13 0.11 0.775-.08 0.815]);
 set(Ax2(2),'Position', [0.13 0.11 0.775-.08 0.815]);
-set(Ax2(1),'ycolor',[0.1, 0.1, 0.1]) 
+set(Ax2(1),'ycolor',[0.1, 0.1, 0.1])
 set(Ax2(2),'ycolor',[0.8500, 0.3250, 0.0980])
 set(h3,'color',[0.1, 0.1, 0.1])
 grid off;
@@ -546,10 +546,10 @@ grid off;
 % set(AX(2),'Yscale','linear');
 % set(legend,'FontSize',20);
 % set(legend,'EdgeColor',[1 1 1]);
-% set(AX(1), 'Position',[0.18 0.18 0.7 0.70]);     % left, bottom, width, height       
+% set(AX(1), 'Position',[0.18 0.18 0.7 0.70]);     % left, bottom, width, height
 % set(AX(2), 'Position',[0.18 0.18 0.7 0.70]);
 % box on
-% set(AX(1), 'YMinorTick','on');     % left, bottom, width, height       
+% set(AX(1), 'YMinorTick','on');     % left, bottom, width, height
 % set(AX(2), 'XMinorTick','on','YMinorTick','on');
 % set(AX(1),'xlim',[190 250]);
 % set(AX(2),'xlim',[190 250]);
