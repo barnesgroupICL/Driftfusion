@@ -84,7 +84,9 @@ figure('Name', 'IS at light intensities. Dashed: ionic; dotted: recombination; d
             % capacitance calculated from the recombination amount
             plot(IS_results.Freq(i, :), IS_results.cap_U(i, :)', 'Color', Int_colors(i, :), 'LineStyle', ':', 'LineWidth', 1.5);
         end
-        plot(IS_results.Freq(i, :), IS_results.cap_dQ(i, :)', 'Color', Int_colors(i, :), 'Marker', '+', 'MarkerSize', 9, 'LineStyle', '-.', 'LineWidth', 1);
+        if isfield(IS_results, 'cap_dQ') % not present in ISstep simulation
+            plot(IS_results.Freq(i, :), IS_results.cap_dQ(i, :)', 'Color', Int_colors(i, :), 'Marker', '+', 'MarkerSize', 9, 'LineStyle', '-.', 'LineWidth', 1);
+        end
     end
     ax = gca;
     ax.XScale = 'log'; % for putting the scale in log
