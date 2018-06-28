@@ -158,6 +158,7 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
     else
         Jn_noionic_inphase = NaN;
         Jn_noionic_quadrature = NaN;
+        n_noionic_coeff = [NaN, NaN, NaN];
     end
 
     Vapp = s.p.Vapp_func(s.p.Vapp_params, s.t);
