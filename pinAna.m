@@ -120,7 +120,8 @@ if ~p.OC
             % Displacement Current at right hand side
             Jdispr = (p.e*1000)*p.eppn*-gradient(dVdxt(:, end), p.t);
 
-            Jtot = Jpartr + Jdispr;
+            % this is wrong
+            %Jtot = Jpartr + Jdispr;
         case 2
             % Current calculation from the continuity equations
             [~, dndt] = gradient(n, p.x, p.t);
