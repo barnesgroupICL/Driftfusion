@@ -451,7 +451,7 @@ else
     % extract coefficient, rec-= surface recombination coefficient
     elseif p.BC == 3
        pl = [-p.sn_rec*(ul(1) - p.htln0);
-            -p.sn_ext*(ul(2) - p.htlp0);
+            -p.sp_ext*(ul(2) - p.htlp0);
             0;
             -ul(4);];
         
@@ -460,7 +460,7 @@ else
             1;
             0];
         
-        pr = [p.sp_ext*(ur(1) - p.etln0);
+        pr = [p.sn_ext*(ur(1) - p.etln0);
             p.sp_rec*(ur(2) - p.etlp0);
             0;
             -ur(4)+p.Vbi-p.Vapp;];
