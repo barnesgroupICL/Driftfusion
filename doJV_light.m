@@ -54,7 +54,7 @@ hold on
 % disp('Complete.')
 %% 1 Sun quasi equilibrium solution
 
-disp('1 Sun quasi-equilibrium solution')
+disp([num2str(Int), ' Sun quasi-equilibrium solution'])
 p.JV = 0;
 p.mui = 0;          % Switch ion mobility off for illumination step
 p.Int = Int;
