@@ -93,7 +93,7 @@ figure('Name', 'IS at light intensities. Dashed: ionic; dotted: recombination; d
     ax.YScale = 'log'; % for putting the scale in log
     xlim(xlim_array)
     xlabel('Frequency [Hz]');
-    ylabel('\omega^{-1}·Im(Z^{-1}) [F/cm^2]');
+    ylabel('\omega^{-1} x Im(Z^{-1}) [F/cm^2]');
     legend(flipud(h), legend_flip)
     legend boxoff
 
