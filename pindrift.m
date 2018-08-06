@@ -197,26 +197,26 @@ if x >= 0 && x <= p.tp - p.tscr
  f = [(p.mue_p*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1)));
      (p.muh_p*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2)));     
      0;                                         % Ion mobility is switched off in the contact regions
-     DuDx(4);];                                  
+     p.eppp*DuDx(4);];                                  
  
  % source terms - for electrons and hole the first term is radiative rec,
  % second term is SRH recombination
  s = [ - p.kradhtl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_htl*(u(2)+p.pthtl)) + (p.taup_htl*(u(1)+p.nthtl))));
        - p.kradhtl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_htl*(u(2)+p.pthtl)) + (p.taup_htl*(u(1)+p.nthtl))));
       0;
-      (p.q/p.eppp)*(-u(1)+u(2)-p.NA+u(3)-p.NI);];
+      (p.q/p.epp0)*(-u(1)+u(2)-p.NA+u(3)-p.NI);];
   
 elseif x > p.tp - p.tscr && x < p.tp
     
  f = [(p.mue_p*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1)));
      (p.muh_p*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2)));     
      0;
-     DuDx(4);];                                  
+     p.eppp*DuDx(4);];                                  
 
  s = [ - p.kradhtl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_htl*(u(2)+p.pthtl)) + (p.taup_htl*(u(1)+p.nthtl)))); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
        - p.kradhtl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_htl*(u(2)+p.pthtl)) + (p.taup_htl*(u(1)+p.nthtl)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun_htl*(u(2)+pthtl)) + (taup_htl*(u(1)+nthtl))));
       0;
-      (p.q/p.eppp)*(-u(1)+u(2)+u(3)-p.NI-p.NA);];
+      (p.q/p.epp0)*(-u(1)+u(2)+u(3)-p.NI-p.NA);];
  
 % Intrinsic
 elseif x >= p.tp && x <= p.tp + p.ti
@@ -224,12 +224,12 @@ elseif x >= p.tp && x <= p.tp + p.ti
    f = [(p.mue_i*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1)));
      (p.muh_i*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2))); 
      (p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3))); 
-     DuDx(4);];                                     
+     p.eppi*DuDx(4);];                                     
 
  s = [g - p.krad*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_i*(u(2)+p.pti)) + (p.taup_i*(u(1)+p.nti)))); 
       g - p.krad*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_i*(u(2)+p.pti)) + (p.taup_i*(u(1)+p.nti))));
       0;
-      (p.q/p.eppi)*(-u(1)+u(2)+u(3)-p.NI);]; 
+      (p.q/p.epp0)*(-u(1)+u(2)+u(3)-p.NI);]; 
 
 % n-type
 elseif x > p.tp + p.ti && x < p.tp + p.ti + p.tscr
@@ -237,12 +237,12 @@ elseif x > p.tp + p.ti && x < p.tp + p.ti + p.tscr
  f = [(p.mue_n*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1)));
      (p.muh_n*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2)));      
      0;
-     DuDx(4)];                                      
+     p.eppn*DuDx(4)];                                      
 
 s = [ - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
       - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
       0;
-      (p.q/p.eppn)*(-u(1)+u(2)+u(3)-p.NI+p.ND);];%+ptetl-ntetl)];
+      (p.q/p.epp0)*(-u(1)+u(2)+u(3)-p.NI+p.ND);];%+ptetl-ntetl)];
 
   % n-type
 elseif x >= p.tp + p.ti + p.tscr && x <= p.xmax
@@ -250,12 +250,12 @@ elseif x >= p.tp + p.ti + p.tscr && x <= p.xmax
  f = [(p.mue_n*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1)));
      (p.muh_n*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2)));      
      0;
-     DuDx(4)];                                      
+     p.eppn*DuDx(4)];                                      
 
 s = [ - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
       - p.kradetl*((u(1)*u(2))-(p.ni^2)) - (((u(1)*u(2))-p.ni^2)/((p.taun_etl*(u(2)+p.ptetl)) + (p.taup_etl*(u(1)+p.ntetl))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun_etl*(u(2)+ptetl)) + (taup_etl*(u(1)+ntetl))));
       0;
-      (p.q/p.eppn)*(-u(1)+u(2)+p.ND+u(3)-p.NI);];%+ptetl-ntetl)];
+      (p.q/p.epp0)*(-u(1)+u(2)+p.ND+u(3)-p.NI);];%+ptetl-ntetl)];
 
 end
 
@@ -290,27 +290,27 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
     % p-type SCR    
     elseif  x > (p.tp - p.wp) && x < p.tp
 
-        u0 = [p.N0*exp((p.Efnside + p.EA + p.q*((((p.q*p.NA)/(2*p.eppp))*(x-p.tp+p.wp)^2)))/(p.kB*p.T));                            %ni*exp((Efnside - (-q*((((q*NA)/(2*eppp))*(x-tp+wp)^2))))/(kB*T));
-              p.N0*exp(-(p.q*((((p.q*p.NA)/(2*p.eppp))*(x-p.tp+p.wp)^2)) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
+        u0 = [p.N0*exp((p.Efnside + p.EA + p.q*((((p.q*p.NA)/(2*p.eppp*p.epp0))*(x-p.tp+p.wp)^2)))/(p.kB*p.T));                            %ni*exp((Efnside - (-q*((((q*NA)/(2*eppp))*(x-tp+wp)^2))))/(kB*T));
+              p.N0*exp(-(p.q*((((p.q*p.NA)/(2*p.eppp*p.epp0))*(x-p.tp+p.wp)^2)) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
               p.NI;
-              (((p.q*p.NA)/(2*p.eppp))*(x-p.tp+p.wp)^2)];
+              (((p.q*p.NA)/(2*p.eppp*p.epp0))*(x-p.tp+p.wp)^2)];
 
     % Intrinsic
 
     elseif x >= p.tp && x <= p.tp+ p.ti
 
-        u0 =  [p.N0*exp((p.Efnside + p.EA + p.q*(((x - p.tp)*((1/p.ti)*(p.Vbi - ((p.q*p.NA*p.wp^2)/(2*p.eppi)) - ((p.q*p.ND*p.wn^2)/(2*p.eppi))))) + ((p.q*p.NA*p.wp^2)/(2*p.eppi))))/(p.kB*p.T));
-                p.N0*exp(-(p.q*(((x - p.tp)*((1/p.ti)*(p.Vbi - ((p.q*p.NA*p.wp^2)/(2*p.eppi)) - ((p.q*p.ND*p.wn^2)/(2*p.eppi))))) + ((p.q*p.NA*p.wp^2)/(2*p.eppi))) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
+        u0 =  [p.N0*exp((p.Efnside + p.EA + p.q*(((x - p.tp)*((1/p.ti)*(p.Vbi - ((p.q*p.NA*p.wp^2)/(2*p.eppi*p.epp0)) - ((p.q*p.ND*p.wn^2)/(2*p.eppi*p.epp0))))) + ((p.q*p.NA*p.wp^2)/(2*p.eppi*p.epp0))))/(p.kB*p.T));
+                p.N0*exp(-(p.q*(((x - p.tp)*((1/p.ti)*(p.Vbi - ((p.q*p.NA*p.wp^2)/(2*p.eppi*p.epp0)) - ((p.q*p.ND*p.wn^2)/(2*p.eppi*p.epp0))))) + ((p.q*p.NA*p.wp^2)/(2*p.eppi*p.epp0))) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
                 p.NI;
-                ((x - p.tp)*((1/p.ti)*(p.Vbi - ((p.q*p.NA*p.wp^2)/(2*p.eppi)) - ((p.q*p.ND*p.wn^2)/(2*p.eppi))))) + ((p.q*p.NA*p.wp^2)/(2*p.eppi)) ;];
+                ((x - p.tp)*((1/p.ti)*(p.Vbi - ((p.q*p.NA*p.wp^2)/(2*p.eppi*p.epp0)) - ((p.q*p.ND*p.wn^2)/(2*p.eppi*p.epp0))))) + ((p.q*p.NA*p.wp^2)/(2*p.eppi*p.epp0)) ;];
 
     % n-type SCR    
     elseif  x > (p.tp+p.ti) && x < (p.tp + p.ti + p.wn)
 
-        u0 = [p.N0*exp((p.Efnside + p.EA + p.q*((((-(p.q*p.ND)/(2*p.eppn))*(x-p.ti-p.tp-p.wn)^2) + p.Vbi)))/(p.kB*p.T));
-              p.N0*exp(-(p.q*((((-(p.q*p.ND)/(2*p.eppn))*(x-p.ti-p.tp-p.wn)^2) + p.Vbi)) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
+        u0 = [p.N0*exp((p.Efnside + p.EA + p.q*((((-(p.q*p.ND)/(2*p.eppn*p.epp0))*(x-p.ti-p.tp-p.wn)^2) + p.Vbi)))/(p.kB*p.T));
+              p.N0*exp(-(p.q*((((-(p.q*p.ND)/(2*p.eppn*p.epp0))*(x-p.ti-p.tp-p.wn)^2) + p.Vbi)) + p.EA + p.Eg + p.Efpside)/(p.kB*p.T));
               p.NI;
-              (((-(p.q*p.ND)/(2*p.eppn))*(x-p.tp - p.ti -p.wn)^2) + p.Vbi)]; 
+              (((-(p.q*p.ND)/(2*p.eppn*p.epp0))*(x-p.tp - p.ti -p.wn)^2) + p.Vbi)]; 
 
     % n-type
     elseif x >= (p.tp + p.ti + p.wn) && x <= p.xmax

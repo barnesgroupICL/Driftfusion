@@ -110,9 +110,9 @@ p.muh_n = 0.02;
 
 p.mui = 1e-10; % ion mobility
 
-p.eppp = 20*p.epp0;         % Dielectric constant p-type
-p.eppi = 20*p.epp0;         % Dielectric constant intrinsic
-p.eppn = 20*p.epp0;         % Dielectric constant n-type
+p.eppp = 20;         % Dielectric constant p-type
+p.eppi = 20;         % Dielectric constant intrinsic
+p.eppn = 20;         % Dielectric constant n-type
  
 % Energy levels
 p.EA = 0;                          % Conduction band energy
