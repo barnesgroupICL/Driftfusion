@@ -1,4 +1,4 @@
-function BeerLambert(params, x, source_type)
+function gx = BeerLambert(params, x, source_type)
 % n & k loader taken from Stanford Transfer Matrix Code
 
 % Constants
@@ -12,10 +12,13 @@ Eph = h*c./(lambda*1e-9);    % Photon energy in Joules
 % Load in index of refraction for each material
 n = zeros(size(layers,2),size(lambda,2));
 k = zeros(size(layers,2),size(lambda,2));
-for index = 1:size(layers,2)
-    [n(index,:), k(index,:)] = LoadRefrIndex(layers{index},lambda);
+try
+    for index = 1:size(layers,2)
+        [n(index,:), k(index,:)] = LoadRefrIndex(layers{index},lambda);
+    end
+catch
+    error('Material name in stack does not match that in the Index of Refraction Library. Please check the names contained in the ''stack'' cell of the parameters object are correct.')
 end
-
 % temporarily set I0 to one for all wavelengths
 %I0 = ones(1, length(lambda))*10e-6;
 
