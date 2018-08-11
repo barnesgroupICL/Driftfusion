@@ -1,4 +1,13 @@
-function [Voc, Vapp_arr, Jtot] = pinAna(solstruct)
+function [Voc, Vapp_arr, Jtot] = pinAna(varargin)
+
+% tarr is a time time array for the time you wish to plot
+if length(varargin) == 1
+    solstruct = varargin{1};
+    tarr = solstruct.t(end);
+elseif length(varargin) == 2
+    solstruct = varargin{1};
+    tarr = varargin{2};    
+end
 
 % Plotting defaults
 set(0,'DefaultLineLinewidth',1);
@@ -173,8 +182,21 @@ switch P.OM
  
     case 1
         
-        % Beer-Lambert - not currently implemented
-        g = P.Int*repmat(gx.AM15', length(t), 1);
+        gxAM15 = P.Int*repmat(gx.AM15', length(t), 1);
+          
+        if P.pulseon == 1
+            
+            las = repmat(gx.las', length(t), 1);
+            pulset = ones(length(x), length(t))*diag(t >= P.pulsestart & t < P.pulselen + P.pulsestart);
+            pulset = pulset';
+            gxlas = las.*pulset;
+            
+        else
+            gxlas = 0;
+            
+        end
+        
+        g = gxAM15 + gxlas;
         
     case 2 
         % Transfer Matrix
@@ -324,11 +346,16 @@ end
 
 %%%%% FIGURES %%%%%
 
+for i=1:length(tarr)
+    
+    timepoint = find(t <= tarr(i));
+    parr(i) = timepoint(end);
+
 % Band Diagram
 FH1 = figure(1);
 %set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
 PH1 = subplot(3,1,1);
-plot (xnm, Efn(end,:), '--', xnm, Efp(end,:), '--', xnm, Ecb(end, :), xnm, Evb(end ,:));
+plot (xnm, Efn(parr(i),:), '--', xnm, Efp(parr(i),:), '--', xnm, Ecb(parr(i), :), xnm, Evb(parr(i) ,:));
 %legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
 set(legend,'FontSize',12);
 %xlabel('Position [nm]');
@@ -340,10 +367,12 @@ set(legend,'EdgeColor',[1 1 1]);
 grid off;
 drawnow;
 
+hold on
+
 % Final Charge Densities
 %figure(2)
 PH2 = subplot(3,1,2);
-semilogy(xnm, n(end, :), xnm, p(end, :));
+semilogy(xnm, n(parr(i), :), xnm, p(parr(i), :));
 ylabel('{\itn, p} [cm^{-3}]')
 %legend('\itn', '\itp')
 %xlabel('Position [nm]')
@@ -353,29 +382,28 @@ set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
 grid off
 
+hold on
+
 PH3 = subplot(3,1,3);
-plot(xnm, (a(end,:))/1e19, 'black');
+plot(xnm, (a(parr(i),:))/1e19, 'black');
 ylabel('{\ita} [x10^{19} cm^{-3}]');
 xlabel('Position [nm]');
 xlim([0, xnmend]);
-ylim([0, 1.1*(max(sol(end,:,3))/1e19)]);
+ylim([0, 1.1*(max(sol(parr(i),:,3))/1e19)]);
 set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
 grid off
 
+hold on
+
+% Current vs position
 figure(4)
-plot(xnm, Jn(end, :), xnm, Jp(end, :), xnm, Jtot(end, :))
+plot(xnm, Jn(parr(i), :), xnm, Jp(parr(i), :), xnm, Jtot(parr(i), :))
 xlabel('Position [nm]')
 ylabel('Current density [mAcm-2]')
 
-% % Stacked plot formatting  [left, bottom, width, height] 
-% 
-% SP2 = get(PH2, 'pos');
-% SP2(2) = SP2(4) + 400;
-% 
-% SP3 = get(PH3, 'pos');
-% SP3(2) = SP3(4) + 800;
-% 
+hold on
+
 % figure(5)
 % plot(xnm, rhoc(end, :))
 % ylabel('Net Charge Density [cm^{-3}]')
@@ -413,7 +441,7 @@ ylabel('Current density [mAcm-2]')
 if P.calcJ == 1
 
 figure(8);
-plot(xnm,Jndiff(end, :),xnm,Jndrift(end, :),xnm,Jpdiff(end, :),xnm,Jpdrift(end, :),xnm,Jidiff(end, :),xnm,Jidrift(end, :),xnm,Jpart(end, :));
+plot(xnm,Jndiff(parr(i), :),xnm,Jndrift(parr(i), :),xnm,Jpdiff(parr(i), :),xnm,Jpdrift(parr(i), :),xnm,Jidiff(parr(i), :),xnm,Jidrift(parr(i), :),xnm,Jpart(parr(i), :));
 legend('Jn diff','Jn drift','Jp diff','Jp drift','Ji diff','Ji drift','Total J');
 xlabel('Position [nm]');
 ylabel('Current Density [mA cm^-2]');
@@ -422,6 +450,8 @@ set(legend,'EdgeColor',[1 1 1]);
 xlim([0, xnmend]);
 grid off;
 drawnow;
+
+hold on
 
 %{
 % Electric Field
@@ -433,6 +463,18 @@ title('Electric Field');
 %}
 
 end
+
+end
+
+figure(1)
+subplot(3,1,1);
+hold off
+subplot(3,1,2);
+hold off
+subplot(3,1,3);
+hold off
+figure(4)
+hold off
 
 if P.calcJ == 0 || P.calcJ == 1
     
