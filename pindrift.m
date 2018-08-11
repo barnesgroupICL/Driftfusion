@@ -127,7 +127,15 @@ if p.OM == 1
     else
         gx.AM15 = 0;
     end
-
+    
+    % laser pulse
+    if p.pulseon == 1
+        gx.las = beerlambert(p, x, 'laser', p.laserlambda, 0);
+    else
+        gx.las = 0;
+    end
+    
+    
 % Transfer Matrix
 elseif p.OM == 2 && p.Int ~= 0
  
@@ -176,10 +184,27 @@ end
 
 % Beer Lambert or Transfer Matrix 1 Sun
 %% NOT CURRENTLY WORKING
-if p.Int ~= 0 && p.OM == 1
+if p.OM == 1
+    %AM15
+    if p.Int ~= 0 
+        gxAM15 = p.Int*interp1(xmesh, gx.AM15, x);
+    else
+        gxAM15 = 0;
+    end
+    %Pulse
+    if p.pulseon == 1   % Applies pulse for duration set by user
+        if  t >= p.pulsestart && t < p.pulselen + p.pulsestart
+            gxlas = interp1(xmesh, gx.las, x);
+        else
+            gxlas = 0;
+        end
+    else
+        gxlas = 0;
+    end
     
-    g = p.Int*interp1(xmesh, gx.AM15, x);
-
+    g = gxAM15 + gxlas;
+        
+    
 elseif p.Int ~= 0 && p.OM == 2
      
       if x > p.tp && x < (p.tp+p.ti) 

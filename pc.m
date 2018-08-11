@@ -126,9 +126,9 @@ classdef pc
         k_defect_n = 0;
         
         %% Pulse settings
-        LaserLambda = 638;      % Pulse wavelength (Currently implemetned with OM2 (Transfer Matrix only)
+        laserlambda = 638;      % Pulse wavelength (Currently implemetned with OM2 (Transfer Matrix only)
         pulselen = 1e-6;        % Transient pulse length
-        pulsepow = 100;         % Pulse power [mW cm-2] OM2 (Transfer Matrix only)
+        pulsepow = 10;          % Pulse power [mW cm-2] OM2 (Transfer Matrix only)
         pulsestart = 1e-7;
         
         %% Current voltage scan parameters
