@@ -37,14 +37,16 @@ elseif length(varargin) == 2
     
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
         
-        p = varargin{1, 1}.p;
-        icsol = varargin{1, 1}.sol;
-        icx = varargin{1, 1}.x;
+        input_solstruct = varargin{1, 1};
+        p = input_solstruct.p;
+        icsol = input_solstruct.sol;
+        icx = input_solstruct.x;
     
     else
-    
-        icsol = varargin{1, 1}.sol;
-        icx = varargin{1, 1}.x;
+        
+        input_solstruct = varargin{1, 1};
+        icsol = input_solstruct.sol;
+        icx = input_solstruct.x;
         p = varargin{2};
     
     end
@@ -109,17 +111,28 @@ xnm = x*1e7;
 
 t = meshgen_t(p);
 
-% Tweak solver options - limit maximum time step size during integration.
-options = odeset('MaxStep', 0.1*abs(p.tmax - p.t0), 'RelTol', p.RelTol, 'AbsTol', p.AbsTol);
+%% Generation
+% Beer Lambert
+if p.OM == 1
+    
+    xmesh = x;  % Duplicates x the xmesh for interpolation later- there may be an easier way to do this since the beer lambert code matches the mesh.
+    
+    % AM15 bias light
+    if p.Int ~= 0 % OM = Optical Model
+        if input_solstruct.gx.AM15 == 0        % Only call BEERLAMBERT if no AM15 solution exists 
+            gx.AM15 = beerlambert(p, x, 'AM15', 0, 0);
+        else
+            gx.AM15 = input_solstruct.gx.AM15;    % Use previous AM15 generation profile to avoid recalculation
+        end
+    else
+        gx.AM15 = 0;
+    end
 
-% Generation
-p.genspace = x(x > p.dcum(1) & x < p.dcum(2));    % Active layer points for interpolation- this could all be implemented better but ea
- 
-if p.OM == 1 && p.Int ~= 0 % OM = Optical Model
-    %% BEER-LAMBERT  NOT CURRENTLY AVAILABLE
-    warning('Beer Lambert generation not currently available')
-   
+% Transfer Matrix
 elseif p.OM == 2 && p.Int ~= 0
+ 
+    p.genspace = x(x > p.dcum(1) & x < p.dcum(2));    % Active layer points for interpolation- this could all be implemented better but ea
+    
     %% TRANSFER MATRIX NOT CURRENTLY AVAILABLE
     % Call Transfer Matrix code: [Gx1, Gx2] = TMPC1(layers, thicknesses, activeLayer1, activeLayer2)
     [Gx1S, GxLas] = TMPC1({'TiO2' 'MAPICl' 'Spiro'}, [p.d(1) p.d(2) p.d(3)], 2, 2, p.laserlambda, p.pulsepow);
@@ -128,11 +141,16 @@ elseif p.OM == 2 && p.Int ~= 0
   
 end
 
-% Call solver - inputs with '@' are function handles to the subfunctions
+%% Solver options
+% MaxStep = limit maximum time step size during integration
+options = odeset('MaxStep', 0.1*abs(p.tmax - p.t0), 'RelTol', p.RelTol, 'AbsTol', p.AbsTol);
+
+%% Call solver
+% inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
 sol = pdepe(p.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 
-% --------------------------------------------------------------------------
+%% Subfunctions
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
 function [c,f,s,iterations] = pdex4pde(x,t,u,DuDx)
 
@@ -158,7 +176,11 @@ end
 
 % Beer Lambert or Transfer Matrix 1 Sun
 %% NOT CURRENTLY WORKING
-if p.Int ~= 0 && p.OM == 2
+if p.Int ~= 0 && p.OM == 1
+    
+    g = p.Int*interp1(xmesh, gx.AM15, x);
+
+elseif p.Int ~= 0 && p.OM == 2
      
       if x > p.tp && x < (p.tp+p.ti) 
           g = p.Int*interp1(p.genspace, Gx1S, (x-p.tp));
@@ -544,6 +566,11 @@ end
 solstruct.sol = sol;            
 solstruct.x = x; 
 solstruct.t = t;
+
+% include generation profile when beer lambert is included
+if p.OM == 1
+    solstruct.gx = gx;
+end
 
 % Store parameters structure
 solstruct.p = p;
