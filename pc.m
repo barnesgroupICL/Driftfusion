@@ -248,24 +248,7 @@ classdef pc
                 end
             end
         end
-        
-        function params = set.BC(params, value)
-            if params.BC == 2
-                warning('Currents are not correctly calculated using BC = 2, use BC = 3 instead')
-                prompt = 'Press ''q'' to quit any key to continue:q';
-                str = input(prompt,'s');
-                if isempty(str)
-                    str = 'Y';
-                end
-                
-                if str == 'q'
-                    return
-                end
-                
-            end
-        end
-        
-        
+               
         % Band gap energies
         function value = get.Eg(params)
             
@@ -282,10 +265,7 @@ classdef pc
         
         % Boltzmann conversion factor electrons
         function value = get.Bn(params)
-            
-            %Bn = [1, (params.N0(2)/params.N0(1))*exp((params.EA(1)-params.EA(2))/(params.kB*params.T)), (params.N0(3)/params.N0(1))*exp((params.EA(1)-params.EA(3))/(params.kB*params.T))];
-            %Bn = [(params.N0(1)/params.N0(3))*exp((params.EA(3)-params.EA(1))/(params.kB*params.T)), (params.N0(2)/params.N0(3))*exp((params.EA(3)-params.EA(2))/(params.kB*params.T)), 1];
-            
+                
             value = [(params.N0(1)/params.N0(2))*exp((params.EA(2)-params.EA(1))/(params.kB*params.T)), 1,...
                 (params.N0(3)/params.N0(2))*exp((params.EA(2)-params.EA(3))/(params.kB*params.T))];
             
