@@ -1,4 +1,4 @@
-function [JV_dk_f, JV_dk_r, JV_1S_f, JV_1S_r] = doJV(sol_ini, JVscan_rate, JVscan_pnts, mui, Vstart, Vend, option)
+function [JV_dk_f, JV_dk_r, JV_1S_f, JV_1S_r] = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mui, Vstart, Vend, option)
 disp('Current voltage scan')
 
 % A procedure for running JV scans using pindrift
@@ -44,7 +44,7 @@ if option ==1 || option ==3
         
         figure(11)
         %xlim([0, 1.3]);
-        ylim([-20, 20]);
+        ylim([-30, 30]);
         hold on
         
         disp('Complete.')
@@ -69,7 +69,7 @@ if option ==2 || option ==3
         disp('1 Sun quasi-equilibrium solution')
         p.JV = 0;
         p.mui = 0;          % Switch ion mobility off for illumination step
-        p.Int = 1;
+        p.Int = Intensity;
         
         % Log time mesh
         p.tmesh_type = 2;
