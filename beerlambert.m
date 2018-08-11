@@ -1,12 +1,31 @@
-function gx = BeerLambert(params, x, source_type)
+function Gentot = beerlambert(params, x, source_type, laserlambda, figson)
+
+%% arguments
+% laserlambda = pulse wavelength only applied when 'laser' is chosen as the source 
+
 % n & k loader taken from Stanford Transfer Matrix Code
 
 % Constants
 h = 6.626e-34;
 c = 2.998e8;
 
-layers = params.stack;
 lambda = 300:767;          % wavelength range - currently limited by database MUST BE IN nm
+
+layers = params.stack;
+
+switch source_type
+    
+    case 'AM15'
+        
+        I0 = lightsource('AM15', lambda);
+        
+    case 'laser'
+        
+        I0 = zeros(length(lambda));
+        I0(laserlambda-lambda(1)) = 1e-3*params.pulsepow;   % convert to wcm-2
+        
+end
+        
 Eph = h*c./(lambda*1e-9);    % Photon energy in Joules
 
 % Load in index of refraction for each material
@@ -19,17 +38,12 @@ try
 catch
     error('Material name in stack does not match that in the Index of Refraction Library. Please check the names contained in the ''stack'' cell of the parameters object are correct.')
 end
-% temporarily set I0 to one for all wavelengths
-%I0 = ones(1, length(lambda))*10e-6;
-
-I0 = lightsource('AM15', lambda);
 
 xarr = [0, params.d];
 xcum = [0, params.dcum];
 
 % calculate absorption coefficient from k
 for i = 1:length(layers)
-
     alpha(i,:) = 4*pi*k(i,:)./(lambda*1e-7);    % alpha in cm-1
 end
 
@@ -40,7 +54,6 @@ for i =1:length(xarr)-1
   
     % Iterate across wavelengths
     for j = 1:length(lambda)
-
     
         x1 = sum(xarr(1:i));
         x2 = sum(xarr(1:(i+1)));
@@ -68,24 +81,27 @@ end
         I0 = I(p2, :);  % Set I0 for new layer
 end
 
-
 Gentot = trapz(lambda, Gen, 2);
 
-figure(1)
+if figson == 1
+
+figure(31)
 surf(lambda, x, I)
 xlabel('Wavelength [nm]')
 ylabel('Position [nm]')
 zlabel('Intensity [Wcm-3]')
 
-figure(2)
+figure(32)
 surf(lambda, x, Gen)
 xlabel('Wavelength [nm]')
 ylabel('Position [nm]')
 zlabel('Gen rate [cm-3s-1]')
 
-figure(3)
+figure(33)
 plot(x, Gentot)
 xlabel('Position [nm]')
 ylabel('Gen rate [cm-2s-1]')
+
+end
 
 end
