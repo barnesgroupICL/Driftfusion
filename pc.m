@@ -65,7 +65,7 @@ classdef pc
         % Current only uniform generation functionality is avaiable- this will be
         % updated in future versions.
         % 0 = Uniform Generation
-        OM  = 0;
+        OM  = 1;
         
         %%%%%%% MESHES %%%%%%
         % xmesh_type specification - see xmesh_gen
