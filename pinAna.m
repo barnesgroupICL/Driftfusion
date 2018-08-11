@@ -14,6 +14,7 @@ sol = solstruct.sol;
 P = solstruct.p;
 x = solstruct.x;
 t = solstruct.t;
+gx = solstruct.gx;
 
 P.x = x;
 P.t = t;        % For backwards compatibility
@@ -173,7 +174,7 @@ switch P.OM
     case 1
         
         % Beer-Lambert - not currently implemented
-        g = P.Int*P.alpha*P.I0*exp(-P.alpha*(x-P.tp));
+        g = P.Int*repmat(gx.AM15', length(t), 1);
         
     case 2 
         % Transfer Matrix
