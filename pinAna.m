@@ -47,15 +47,15 @@ V = sol(:,:,4);
 %% Binary matrices defining regions of the device
 
     % p-type binary matrix
-    pBM = ones(length(t), P.xpoints)*diag(x <= P.tp);
+    pBM = ones(length(t), P.xpoints)*diag(x <= P.dcum(1));
     % p-i interface binary matrix
-    piBM = ones(length(t), P.xpoints)*diag(x > (P.tp) & x <= (P.tp + P.tint));       
+    piBM = ones(length(t), P.xpoints)*diag(x > (P.dcum(1)) & x <= (P.dcum(1) + P.tint));       
     % Intrinsic binary matrix
-    iBM = ones(length(t), P.xpoints)*diag(x > P.tp & x < P.tp + P.ti);
+    iBM = ones(length(t), P.xpoints)*diag(x > P.dcum(1) & x < P.dcum(2));
     % i-n interface binary matrix II
-    inBM = ones(length(t), P.xpoints)*diag(x >= P.tp + P.ti - P.tint & x < P.tp + P.ti);
+    inBM = ones(length(t), P.xpoints)*diag(x >= P.dcum(2) - P.tint & x < P.dcum(2));
     % n-type binary matrix
-    nBM = ones(length(t), P.xpoints)*diag(x >= P.tp +P.ti  & x <= P.xmax);
+    nBM = ones(length(t), P.xpoints)*diag(x >= P.dcum(2) & x <= P.xmax);
 
 n1 = n*P.Bn(1); 
 p1 = p*P.Bp(1);
@@ -206,7 +206,7 @@ switch P.OM
             
         else
             
-            g = P.Int*interp1(P.genspace, solstruct.Gx1S, (x-P.tp));
+            g = P.Int*interp1(P.genspace, solstruct.Gx1S, (x-P.dcum(1)));
             
         end       
       

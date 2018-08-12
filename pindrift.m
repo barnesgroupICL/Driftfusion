@@ -207,8 +207,8 @@ if p.OM == 1
     
 elseif p.Int ~= 0 && p.OM == 2
      
-      if x > p.tp && x < (p.tp+p.ti) 
-          g = p.Int*interp1(p.genspace, Gx1S, (x-p.tp));
+      if x > p.dcum(1) && x < (p.dcum(2)) 
+          g = p.Int*interp1(p.genspace, Gx1S, (x-p.dcum(1)));
 
       else
           g = 0;
@@ -217,8 +217,8 @@ elseif p.Int ~= 0 && p.OM == 2
     % Add pulse
     if p.pulseon == 1
         if  t >= 10e-6 && t < p.pulselen + 10e-6
-           if x > p.tp && x < (p.tp+p.ti)
-                lasg = p.pulseint*interp1(p.genspace, GxLas, (x-p.tp));
+           if x > p.dcum(1) && x < (p.dcum(2))
+                lasg = p.pulseint*interp1(p.genspace, GxLas, (x-p.dcum(1)));
                 g = g + lasg;
            end
         end
@@ -227,7 +227,7 @@ elseif p.Int ~= 0 && p.OM == 2
 % Uniform Generation
 elseif p.OM == 0
       
-      if p.Int ~= 0 && x > p.tp && x < (p.tp+p.ti)    
+      if p.Int ~= 0 && x > p.dcum(1) && x < (p.dcum(2))    
            g = p.Int*p.G0;
       else
            g = 0;
@@ -395,27 +395,27 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
 %             p.NI;
 %             Eif(2)];
         
-%     elseif x >=  p.tp + p.ti 
+%     elseif x >=  p.dcum(2) 
 %      
 %               
 %     u0  = [n0(3)/(p.N0(3)/p.N0(1))*exp((p.EA(1)-p.EA(3))/(p.kB*p.T));
 %            p0(3)/(p.N0(3)/p.N0(1))*exp((p.IP(3)-p.IP(1))/(p.kB*p.T));
 
-    if x <=  p.tp
+    if x <=  p.dcum(1)
     
      u0  = [n0(1)/Bn(1);
             p0(1)/Bp(1);
             p.NI;
             p.E0(1)];
         
-    elseif x > p.tp  && x < p.tp + p.ti
+    elseif x > p.dcum(1)  && x < p.dcum(2)
 
      u0  = [ni(2)/Bn(2);
             ni(2)/Bp(2);
             p.NI;
             Eif(2)];
         
-    elseif x >=  p.tp + p.ti
+    elseif x >=  p.dcum(2)
                    
     u0  = [n0(3)/Bn(3);
            p0(3)/Bp(3);
@@ -602,7 +602,7 @@ solstruct.p = p;
 
 if p.OM == 2 && p.Int ~= 0
     
-    solstruct.g = p.Int*interp1(p.genspace, Gx1S, (x-p.tp));
+    solstruct.g = p.Int*interp1(p.genspace, Gx1S, (x-p.dcum(1)));
     
 end
 

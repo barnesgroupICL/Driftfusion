@@ -14,15 +14,11 @@ classdef pc
         e = 1.61917e-19;         % Elementary charge in Coulombs.
         
         % Device Dimensions [cm]
-        d = [100e-7, 400e-7, 100e-7];       % Layer dimensions array
-        dcum = cumsum(pc.d);
+        d = [100e-7, 400e-7, 100e-7];       % Layer thickness array
+        parr = [100, 200, 100];             % Spatial mesh points array
         
-        tp = pc.d(1);        % p-type layer thickness
-        pp = 100;            % p-type layer points
-        ti = pc.d(2);        % Intrinsic layer thickness; this affects the wp parameter
-        pii = 200;          % Intrinsic points
-        tn = pc.d(3);        % n-type thickness
-        pn = 100;            % n-type points
+        dcum = cumsum(pc.d);                % cumulative thickness        
+                 
         tint = 1e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 10;          % 0.5x Interfacial points (x_mesh_type = 3)
         tscr = 50e-7;       % Approx space charge region thickness
@@ -51,7 +47,7 @@ classdef pc
         G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
         pulseon = 0;            % Switch pulse on TPC or TPV
         Vapp = 0;               % Applied bias
-        BC = 3;                 % Boundary Conditions. Must be set to one for first solution
+        BC = 2;                 % Boundary Conditions. Must be set to one for first solution
         figson = 1;             % Toggle figures on/off
         meshx_figon = 0;        % Toggles x-mesh figures on/off
         mesht_figon = 0;        % Toggles t-mesh figures on/off
@@ -365,20 +361,20 @@ classdef pc
         %% Space charge layer widths
         function value = get.wp (params)
             
-            value = ((-params.ti*params.NA(1)*params.q) + ((params.NA(1)^0.5)*(params.q^0.5)*(((params.ti^2)*params.NA(1)*params.q) + (4*params.epp(2)*params.Vbi))^0.5))/(2*params.NA(1)*params.q);
+            value = ((-params.d(2)*params.NA(1)*params.q) + ((params.NA(1)^0.5)*(params.q^0.5)*(((params.d(2)^2)*params.NA(1)*params.q) + (4*params.epp(2)*params.Vbi))^0.5))/(2*params.NA(1)*params.q);
             
         end
         
         function value = get.wn (params)
             
-            value = ((-params.ti*params.ND(3)*params.q) + ((params.ND(3)^0.5)*(params.q^0.5)*(((params.ti^2)*params.ND(3)*params.q) + (4*params.epp(2)*params.Vbi))^0.5))/(2*params.ND(3)*params.q);
+            value = ((-params.d(2)*params.ND(3)*params.q) + ((params.ND(3)^0.5)*(params.q^0.5)*(((params.d(2)^2)*params.ND(3)*params.q) + (4*params.epp(2)*params.Vbi))^0.5))/(2*params.ND(3)*params.q);
             
         end
         
         % wscr - space charge region width
         function value = get.wscr(params)
             
-            value = params.wp + params.ti + params.wn;         % cm
+            value = params.wp + params.d(2) + params.wn;         % cm
             
         end
         
