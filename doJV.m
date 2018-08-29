@@ -1,4 +1,4 @@
-function [JV_dk_f, JV_dk_r, JV_1S_f, JV_1S_r] = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mui, Vstart, Vend, option)
+function JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mui, Vstart, Vend, option)
 disp('Current voltage scan')
 
 % A procedure for running JV scans using pindrift
@@ -12,7 +12,7 @@ disp('Current voltage scan')
 % Vend          = scan end voltage
 % option        1 = dark only, 2 = light only, 3 = dark & light
 
-[JV_dk_f, JV_dk_r, JV_1S_f, JV_1S_r] = deal(0);
+[JV.dk_f, JV.dk_r, JV.ill_f, JV.ill_r] = deal(0);
 
 % Read parameters structure into structure P
 p = sol_ini.p;
@@ -40,7 +40,7 @@ if option ==1 || option ==3
         %% Dark forward scan
         
         disp('Dark forward scan...')
-        JV_dk_f = pindrift(sol_ini, p);
+        JV.dk_f = pindrift(sol_ini, p);
         
         figure(11)
         %xlim([0, 1.3]);
@@ -56,7 +56,7 @@ if option ==1 || option ==3
         p.Vend = Vstart;
         p.JV = 1;
         
-        JV_dk_r = pindrift(JV_dk_f, p);
+        JV.dk_r = pindrift(JV.dk_f, p);
         
         disp('Complete.')
         
@@ -94,7 +94,7 @@ if option ==2 || option ==3
         p.tmesh_type = 1;
         p.tpoints = p.JVscan_pnts;
         
-        JV_1S_f = pindrift(sol_i_1S, p);
+        JV.JV.ill_f = pindrift(sol_i_1S, p);
         
         disp('Complete.')
         
@@ -104,7 +104,7 @@ if option ==2 || option ==3
         p.Vstart = Vend;
         p.Vend = Vstart;
         
-        JV_1S_r = pindrift(JV_1S_f, p);
+        JV.JV.ill_r = pindrift(JV.JV.ill_f, p);
         disp('Complete.')
         
         figure(11)
