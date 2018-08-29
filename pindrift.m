@@ -67,9 +67,13 @@ end
         ND = p.ND;
         Vbi = p.Vbi;
         n0 = p.n0;
+        nleft = p.nleft;
+        nright = p.nright;
         ni = p.ni;
         nt = p.nt;     
         p0 = p.p0;
+        pleft = p.pleft;
+        pright = p.pright;
         pt = p.pt;
         wn = p.wn;
         wp = p.wp;
@@ -351,8 +355,8 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
 %     % p-type
 %     if x < (tp+tscr - wp)
 %     
-%        u0 =  [n0(1);
-%              p0(1);
+%        u0 =  [nleft;
+%              pleft;
 %              0;
 %              0];  
 % 
@@ -382,8 +386,8 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
 % 
 %     elseif x >= (tp + tscr + wn +ti )
 % 
-%          u0 = [n0(3);
-%                p0(3);
+%          u0 = [nright;
+%                pright;
 %                0;
 %                Vbi];
 % 
@@ -398,13 +402,13 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
 %     elseif x >=  p.dcum(2) 
 %      
 %               
-%     u0  = [n0(3)/(p.N0(3)/p.N0(1))*exp((p.EA(1)-p.EA(3))/(p.kB*p.T));
-%            p0(3)/(p.N0(3)/p.N0(1))*exp((p.IP(3)-p.IP(1))/(p.kB*p.T));
+%     u0  = [nright/(p.N0(3)/p.N0(1))*exp((p.EA(1)-p.EA(3))/(p.kB*p.T));
+%            pright/(p.N0(3)/p.N0(1))*exp((p.IP(3)-p.IP(1))/(p.kB*p.T));
 
     if x <=  p.dcum(1)
     
-     u0  = [n0(1)/Bn(1);
-            p0(1)/Bp(1);
+     u0  = [nleft/Bn(1);
+            pleft/Bp(1);
             p.NI;
             p.E0(1)];
         
@@ -417,8 +421,8 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
         
     elseif x >=  p.dcum(2)
                    
-    u0  = [n0(3)/Bn(3);
-           p0(3)/Bp(3);
+    u0  = [nright/Bn(3);
+           pright/Bp(3);
            p.NI;
            p.E0(3)];
     
@@ -508,7 +512,7 @@ else
 
       
         pl = [0;
-            (ul(2)*Bp(1)-p0(1));
+            (ul(2)*Bp(1)-pleft);
             0;
             -ul(4);];
         
@@ -517,7 +521,7 @@ else
             1;
             0];
         
-        pr = [(ur(1)*Bn(3)-n0(3));
+        pr = [(ur(1)*Bn(3)-nright);
             0;
             0;
             -ur(4)+Vbi-p.Vapp;];
@@ -532,8 +536,8 @@ else
     % & sp_rec to set the surface recombination velocity. pdepe
     elseif p.BC == 2
       
-        pl = [-p.sn_l*(ul(1)*Bn(1) - n0(1));
-            ul(2)*Bp(1) - p0(1);
+        pl = [-p.sn_l*(ul(1)*Bn(1) - nleft);
+            ul(2)*Bp(1) - pleft;
             0;
             -ul(4);];
         
@@ -542,8 +546,8 @@ else
             1;
             0];
         
-        pr = [ur(1)*Bn(3) - n0(3);
-            p.sp_r*(ur(2)*Bp(3) - p0(3));
+        pr = [ur(1)*Bn(3) - nright;
+            p.sp_r*(ur(2)*Bp(3) - pright);
             0;
             -ur(4)+Vbi-p.Vapp;];
         
@@ -559,8 +563,8 @@ else
         % integrating continuity equations across the device.
     elseif p.BC == 3
       
-        pl = [-p.sn_l*(ul(1)*Bn(1) - n0(1));
-            -p.sp_l*(ul(2)*Bp(1) - p0(1));
+        pl = [-p.sn_l*(ul(1)*Bn(1) - nleft);
+            -p.sp_l*(ul(2)*Bp(1) - pleft);
             0;
             -ul(4);];
         
@@ -569,8 +573,8 @@ else
             1;
             0];
         
-        pr = [p.sn_r*(ur(1)*Bn(3) - n0(3));
-            p.sp_r*(ur(2)*Bp(3) - p0(3));
+        pr = [p.sn_r*(ur(1)*Bn(3) - nright);
+            p.sp_r*(ur(2)*Bp(3) - pright);
             0;
             -ur(4)+Vbi-p.Vapp;];
         
