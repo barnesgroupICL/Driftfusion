@@ -76,15 +76,15 @@ classdef pc
         %%%%%%%%%%% MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
         %% Layer description- currently for optical properties only
         % See Index of Refraction library for choices- names must be exactly the same but '_n', '_k' should be omitted
-        stack = {'SiO2', 'MAPICl', 'SiO2'}
+        stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels
-        EA = [0, -0.2, -0.4];   %1.9 + [-2.5, -3.7, -4.1];%[0, -0.4, -0.6];       %1.9 + [-1.9, -3.7, -4.1];
-        IP = [-1.6, -1.8, -2.0];%   1.9 + [-4.9, -5.3, -6.0];%    %1.9 + [-4.9, -5.3, -7.4];
+        EA = [-3.0, -3.7, -4.0];%   %1.9 + [-1.9, -3.7, -4.1];
+        IP = [-5.2, -5.3, -6.0];%    %1.9 + [-4.9, -5.3, -7.4];
         
         % Workfunction energies
-        PhiA = -1.4;    %-1.4;    %
-        PhiC = -0.6;    %-0.6;    %
+        PhiA = -5.1;    %-1.4;    %
+        PhiC = -4.5;    %-0.6;    %
         % Conversion factors
         
         % Effective Density Of States (eDOS) PVSK (Reenen, 2015)
@@ -95,12 +95,12 @@ classdef pc
         NI = 1e19;                      % [cm-3]
         
         % Mobilities
-        mue = [1, 1, 1];         % electron mobility p-type [cm2V-1s-1]
-        muh = [1, 1, 1];         % hole mobility p-type [cm2V-1s-1]
+        mue = [1e-3, 1, 1e-3];         % electron mobility p-type [cm2V-1s-1]
+        muh = [1e-3, 1, 1e-3];         % hole mobility p-type [cm2V-1s-1]
         mui = 1e-10;              % ion mobility
         
         % Dielectric constants
-        epp = [10, 10, 10];
+        epp = [4, 12, 4];
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
@@ -108,8 +108,8 @@ classdef pc
         kradp = 1e-12;         % [cm3 s-1] ETL Radiative Recombination coefficient
         kradn = 1e-12;         % [cm3 s-1] HTL Radiative Recombination coefficient
         
-        taun = [1e-8, 1e6, 1e-8];           % [s] SRH time constant for electrons
-        taup = [1e-8, 1e6, 1e-8];           % [s] SRH time constant for holes
+        taun = [1e-8, 1e6, 1e6];           % [s] SRH time constant for electrons
+        taup = [1e-8, 1e6, 1e6];           % [s] SRH time constant for holes
         
         % Surface recombination and extraction coefficients
         sn_r = 1e10;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
