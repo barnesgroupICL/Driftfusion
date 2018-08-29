@@ -22,7 +22,7 @@ classdef pc
         tint = 1e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 10;          % 0.5x Interfacial points (x_mesh_type = 3)
         tscr = 50e-7;       % Approx space charge region thickness
-        pscr = 100;          % No of points in space charge region
+        pscr = 80;          % No of points in space charge region
         pepe = 20;          % electrode interface points
         te = 10e-7;         % electrode interface thickness
         tmin = 1e-7;        % start value for log meshes
@@ -79,12 +79,15 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels
-        EA = [-3.0, -3.7, -4.0];%   %1.9 + [-1.9, -3.7, -4.1];
-        IP = [-5.2, -5.3, -6.0];%    %1.9 + [-4.9, -5.3, -7.4];
+        EA = [-3.0, -3.8, -4.2];%   %1.9 + [-1.9, -3.7, -4.1];
+        IP = [-5.2, -5.4, -6.0];%    %1.9 + [-4.9, -5.3, -7.4]; 
+        
+        %% Equilibrium Fermi energies - defines doping density
+        E0 = [-5.1, -4.6, -5.1];
         
         % Workfunction energies
         PhiA = -5.1;    %-1.4;    %
-        PhiC = -4.5;    %-0.6;    %
+        PhiC = -4.3;    %-0.6;    %
         % Conversion factors
         
         % Effective Density Of States (eDOS) PVSK (Reenen, 2015)
@@ -95,8 +98,8 @@ classdef pc
         NI = 1e19;                      % [cm-3]
         
         % Mobilities
-        mue = [1e-3, 1, 1e-3];         % electron mobility p-type [cm2V-1s-1]
-        muh = [1e-3, 1, 1e-3];         % hole mobility p-type [cm2V-1s-1]
+        mue = [1, 1, 1];         % electron mobility p-type [cm2V-1s-1]
+        muh = [1, 1, 1];         % hole mobility p-type [cm2V-1s-1]
         mui = 1e-10;              % ion mobility
         
         % Dielectric constants
@@ -157,7 +160,6 @@ classdef pc
         
         Bn
         Bp
-        E0
         Eg
         Eif
         Et
@@ -165,9 +167,13 @@ classdef pc
         ND
         Vbi
         n0
+        nleft
+        nright
         ni
         nt          % Density of CB electrons when Fermi level at trap state energy
         p0
+        pleft
+        pright
         pt           % Density of VB holes when Fermi level at trap state energy
         wn
         wp
@@ -286,25 +292,25 @@ classdef pc
             
         end
         
-        % Doped Equilibrium Fermi Energies
-        function value = get.E0(params)
-            
-            value = [params.EA(1) + (params.kB*params.T/params.q)*log(params.n0(1)/params.N0(1)),...
-                params.EA(2) + (params.kB*params.T/params.q)*log(params.n0(2)/params.N0(2)),...
-                params.EA(3) + (params.kB*params.T/params.q)*log(params.n0(3)/params.N0(3))];
-            
-        end
+%         % Doped Equilibrium Fermi Energies
+%         function value = get.E0(params)
+%             
+%             value = [params.EA(1) + (params.kB*params.T/params.q)*log(params.n0(1)/params.N0(1)),...
+%                 params.EA(2) + (params.kB*params.T/params.q)*log(params.n0(2)/params.N0(2)),...
+%                 params.EA(3) + (params.kB*params.T/params.q)*log(params.n0(3)/params.N0(3))];
+%             
+%         end
         
         % Donor densities
         function value = get.ND(params)
             
-            value = [0, 0, params.N0(3)*exp((params.PhiC-params.EA(3))/(params.kB*params.T))];
+            value = [0, 0, params.N0(3)*exp((params.E0(3)-params.EA(3))/(params.kB*params.T))];
             
         end
         % Donor densities
         function value = get.NA(params)
             
-            value = [params.N0(1)*exp((params.IP(1)-params.PhiA)/(params.kB*params.T)), 0, 0];
+            value = [params.N0(1)*exp((params.IP(1)-params.E0(1))/(params.kB*params.T)), 0, 0];
             
         end
         
@@ -319,18 +325,48 @@ classdef pc
         % Equilibrium electron diensities
         function value = get.n0(params)
             
-            value = [params.N0(1)*exp((params.PhiA-params.EA(1))/(params.kB*params.T)),...
-                params.ni(2),...
-                params.N0(3)*exp((params.PhiC-params.EA(3))/(params.kB*params.T))];     % Background density electrons in htl/p-type
+            value = [params.N0(1)*exp((params.E0(1)-params.EA(1))/(params.kB*params.T)),...
+                params.N0(2)*exp((params.E0(2)-params.EA(2))/(params.kB*params.T)),...
+                params.N0(3)*exp((params.E0(3)-params.EA(3))/(params.kB*params.T))];     % Background density electrons in htl/p-type
             
         end
+              
         
         function value = get.p0(params)
             
-            value = [params.N0(1)*exp((params.IP(1)-params.PhiA)/(params.kB*params.T)),...
-                params.ni(2),...
-                params.N0(3)*exp((params.IP(3)-params.PhiC)/(params.kB*params.T))];     % Background density holes in htl/p-type
+            value = [params.N0(1)*exp((params.IP(1)-params.E0(1))/(params.kB*params.T)),...
+                params.N0(2)*exp((params.IP(2)-params.E0(2))/(params.kB*params.T)),...
+                params.N0(3)*exp((params.IP(3)-params.E0(3))/(params.kB*params.T))];     % Background density holes in htl/p-type
             
+        end
+        
+        
+        % Boundary electron and hole densities - based on the workfunction
+        % of the electrodes
+        function value = get.nleft(params)
+            
+            value = params.N0(1)*exp((params.PhiA-params.EA(1))/(params.kB*params.T));
+        
+        end
+        
+                % Boundary electron and hole densities
+        function value = get.nright(params)
+            
+            value = params.N0(2)*exp((params.PhiC-params.EA(3))/(params.kB*params.T));
+        
+        end
+        
+                % Boundary electron and hole densities
+        function value = get.pleft(params)
+            
+            value = params.N0(1)*exp((params.IP(1)-params.PhiA)/(params.kB*params.T));
+        
+        end
+        
+        function value = get.pright(params)
+            
+            value = params.N0(3)*exp((params.IP(3)-params.PhiC)/(params.kB*params.T));
+        
         end
         
         %% SRH parameters
