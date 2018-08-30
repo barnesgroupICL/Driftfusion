@@ -211,7 +211,7 @@ if p.OM == 1
     
 elseif p.Int ~= 0 && p.OM == 2
      
-      if x > p.dcum(1) && x < (p.dcum(2)) 
+      if x > p.dcum(1) && x <= (p.dcum(2)) 
           g = p.Int*interp1(p.genspace, Gx1S, (x-p.dcum(1)));
 
       else
@@ -231,7 +231,7 @@ elseif p.Int ~= 0 && p.OM == 2
 % Uniform Generation
 elseif p.OM == 0
       
-      if p.Int ~= 0 && x > p.dcum(1) && x < (p.dcum(2))    
+      if p.Int ~= 0 && x > p.dcum(1) && x <= (p.dcum(2))    
            g = p.Int*p.G0;
       else
            g = 0;
@@ -272,7 +272,7 @@ if x <= p.dcum(1)
       (p.q/p.epp0)*(-(u(1)*Bn(1))+(u(2)*Bp(1))-NA(1)+ND(1)-p.NI+u(3));];
 
 % Intrinsic Recombination zone
-elseif x >  p.dcum(1) && x <= p.dcum(1) +p.tint
+elseif x >  p.dcum(1) && x <= p.dcum(1) +p.dint
 % Virtual charge carrier densities based on Fermi level equilibrium
 f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
      (Bp(2)*p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2))));     
@@ -285,7 +285,7 @@ f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
       (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-p.NI+u(3));]; 
 
 % Intrinsic
-elseif x >  p.dcum(1) +p.tint && x < p.dcum(2) - p.tint
+elseif x >  p.dcum(1) +p.dint && x <= p.dcum(2) - p.dint
 % Virtual charge carrier densities based on Fermi level equilibrium
 f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
      (Bp(2)*p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2))));     
@@ -298,7 +298,7 @@ f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
       (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-p.NI+u(3));]; 
  
 % Intrinsic Recombination zone
-elseif x >=  p.dcum(2) - p.tint && x < p.dcum(2) 
+elseif x >  p.dcum(2) - p.dint && x <= p.dcum(2) 
 % Virtual charge carrier densities based on Fermi level equilibrium
 f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
      (Bp(2)*p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2))));     
@@ -311,7 +311,7 @@ f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
       (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-p.NI+u(3));]; 
   
 % n-type
-elseif x >= p.dcum(2) &&  x <= p.xmax
+elseif x > p.dcum(2) &&  x <= p.xmax
     
 f = [(Bn(3)*p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
      (Bp(3)*p.muh(3)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2))));      
@@ -353,7 +353,7 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
 %          Ei]; 
 %      
 %     % p-type
-%     if x < (tp+tscr - wp)
+%     if x < (tp+dscr - wp)
 %     
 %        u0 =  [nleft;
 %              pleft;
@@ -361,30 +361,30 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
 %              0];  
 % 
 %     % p-type SCR    
-%     elseif  x >= (tp+tscr - wp) && x < (tp+tscr)
+%     elseif  x >= (tp+dscr - wp) && x < (tp+dscr)
 % 
-%         u0 = [N0(1)*exp(q*(Efnside + EAp + q*((((q*NA)/(2*p.epp(2)*p.epp0))*(x-tp-tscr+wp)^2)))/(kB*T));                            %ni*exp((Efnside - (-q*((((q*NA)/(2*epp(1)))*(x-tp+wp)^2))))/(kB*T));
-%               N0(1)*exp(-q*(q*((((q*NA)/(2*p.epp(2)*p.epp0))*(x-tp-tscr+wp)^2)) + EAp + Egp + Efpside)/(kB*T)) ;
+%         u0 = [N0(1)*exp(q*(Efnside + EAp + q*((((q*NA)/(2*p.epp(2)*p.epp0))*(x-tp-dscr+wp)^2)))/(kB*T));                            %ni*exp((Efnside - (-q*((((q*NA)/(2*epp(1)))*(x-tp+wp)^2))))/(kB*T));
+%               N0(1)*exp(-q*(q*((((q*NA)/(2*p.epp(2)*p.epp0))*(x-tp-dscr+wp)^2)) + EAp + Egp + Efpside)/(kB*T)) ;
 %               0;
-%               (((q*NA)/(2*p.epp(2)*p.epp0))*(x-tp-tscr+wp)^2)];
+%               (((q*NA)/(2*p.epp(2)*p.epp0))*(x-tp-dscr+wp)^2)];
 % 
 %     % Intrinsic
 % 
-%     elseif x >= tp+tscr && x < tp+ ti+tscr
-%         u0 =  [N0(2)*exp(q*(Efnside + EAp + q*(((x - tp-tscr)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) - ((q*ND*wn^2)/(2*p.epp(2)*p.epp0))))) + ((q*NA*wp^2)/(2*p.epp(2)*p.epp0))))/(kB*T));
-%                 N0(2)*exp(-q*(q*(((x - tp-tscr)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) - ((q*ND*wn^2)/(2*p.epp(2)*p.epp0))))) + ((q*NA*wp^2)/(2*p.epp(2)*p.epp0))) + EAp + Egp + Efpside)/(kB*T)) ;
+%     elseif x >= tp+dscr && x < tp+ ti+dscr
+%         u0 =  [N0(2)*exp(q*(Efnside + EAp + q*(((x - tp-dscr)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) - ((q*ND*wn^2)/(2*p.epp(2)*p.epp0))))) + ((q*NA*wp^2)/(2*p.epp(2)*p.epp0))))/(kB*T));
+%                 N0(2)*exp(-q*(q*(((x - tp-dscr)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) - ((q*ND*wn^2)/(2*p.epp(2)*p.epp0))))) + ((q*NA*wp^2)/(2*p.epp(2)*p.epp0))) + EAp + Egp + Efpside)/(kB*T)) ;
 %                NI;
-%                 ((x - tp-tscr)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) - ((q*ND*wn^2)/(2*p.epp(2)*p.epp0))))) + ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) ;];
+%                 ((x - tp-dscr)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) - ((q*ND*wn^2)/(2*p.epp(2)*p.epp0))))) + ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) ;];
 % 
 % %      % n-type SCR    
-%     elseif  x >= (tp+tscr+ti) && x < (tp +tscr + wn +ti)
+%     elseif  x >= (tp+dscr+ti) && x < (tp +dscr + wn +ti)
 % 
-%         u0 = [N0(3)*exp(q*(Efnside + EAn*((x-tscr-ti-tp)^2)/wn^2 + EAp*((x-tscr-ti-tp-wn)^2)+ q*(((-(q*ND)/(2*p.epp(2)*p.epp0)*(x-tscr-ti-tp-wn)^2 )+ Vbi)))/(kB*T));
-%               N0(3)*exp(-q*(q*((((-(q*ND)/(2*p.epp(2)*p.epp0))*(x-tscr-ti-tp-wn)^2) + Vbi)) + EAn*(x-tscr-ti-tp)^2/wn^2 + EAp*(x-tscr-ti-tp-wn)^2+ + Egp + Efpside)/(kB*T));
+%         u0 = [N0(3)*exp(q*(Efnside + EAn*((x-dscr-ti-tp)^2)/wn^2 + EAp*((x-dscr-ti-tp-wn)^2)+ q*(((-(q*ND)/(2*p.epp(2)*p.epp0)*(x-dscr-ti-tp-wn)^2 )+ Vbi)))/(kB*T));
+%               N0(3)*exp(-q*(q*((((-(q*ND)/(2*p.epp(2)*p.epp0))*(x-dscr-ti-tp-wn)^2) + Vbi)) + EAn*(x-dscr-ti-tp)^2/wn^2 + EAp*(x-dscr-ti-tp-wn)^2+ + Egp + Efpside)/(kB*T));
 %               0; 
-%               (((-(q*ND)/(2*p.epp(2)*p.epp0))*(x-tp-ti - tscr -wn)^2) + Vbi)];
+%               (((-(q*ND)/(2*p.epp(2)*p.epp0))*(x-tp-ti - dscr -wn)^2) + Vbi)];
 % 
-%     elseif x >= (tp + tscr + wn +ti )
+%     elseif x >= (tp + dscr + wn +ti )
 % 
 %          u0 = [nright;
 %                pright;
@@ -412,14 +412,14 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
             p.NI;
             p.E0(1)];
         
-    elseif x > p.dcum(1)  && x < p.dcum(2)
+    elseif x > p.dcum(1)  && x <= p.dcum(2)
 
      u0  = [ni(2)/Bn(2);
             ni(2)/Bp(2);
             p.NI;
             Eif(2)];
         
-    elseif x >=  p.dcum(2)
+    elseif x >  p.dcum(2)
                    
     u0  = [nright/Bn(3);
            pright/Bp(3);
