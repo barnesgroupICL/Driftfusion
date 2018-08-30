@@ -40,7 +40,7 @@ if option ==1 || option ==3
         %% Dark forward scan
         
         disp('Dark forward scan...')
-        JV.dk_f = pindrift(sol_ini, p);
+        JV.dk.f = pindrift(sol_ini, p);
         
         figure(11)
         %xlim([0, 1.3]);
@@ -56,7 +56,7 @@ if option ==1 || option ==3
         p.Vend = Vstart;
         p.JV = 1;
         
-        JV.dk_r = pindrift(JV.dk_f, p);
+        JV.dk.r = pindrift(JV.dk.f, p);
         
         disp('Complete.')
         
@@ -94,7 +94,7 @@ if option ==2 || option ==3
         p.tmesh_type = 1;
         p.tpoints = p.JVscan_pnts;
         
-        JV.JV.ill_f = pindrift(sol_i_1S, p);
+        JV.ill.f = pindrift(sol_i_1S, p);
         
         disp('Complete.')
         
@@ -104,7 +104,7 @@ if option ==2 || option ==3
         p.Vstart = Vend;
         p.Vend = Vstart;
         
-        JV.JV.ill_r = pindrift(JV.JV.ill_f, p);
+        JV.ill.r = pindrift(JV.ill.f, p);
         disp('Complete.')
         
         figure(11)
