@@ -49,13 +49,13 @@ V = sol(:,:,4);
     % p-type binary matrix
     pBM = ones(length(t), P.xpoints)*diag(x <= P.dcum(1));
     % p-i interface binary matrix
-    piBM = ones(length(t), P.xpoints)*diag(x > (P.dcum(1)) & x <= (P.dcum(1) + P.tint));       
+    piBM = ones(length(t), P.xpoints)*diag(x > (P.dcum(1)) & x <= (P.dcum(1) + P.dint));       
     % Intrinsic binary matrix
-    iBM = ones(length(t), P.xpoints)*diag(x > P.dcum(1) & x < P.dcum(2));
+    iBM = ones(length(t), P.xpoints)*diag(x > P.dcum(1) & x <= P.dcum(2));
     % i-n interface binary matrix II
-    inBM = ones(length(t), P.xpoints)*diag(x >= P.dcum(2) - P.tint & x < P.dcum(2));
+    inBM = ones(length(t), P.xpoints)*diag(x > P.dcum(2) - P.dint & x <= P.dcum(2));
     % n-type binary matrix
-    nBM = ones(length(t), P.xpoints)*diag(x >= P.dcum(2) & x <= P.xmax);
+    nBM = ones(length(t), P.xpoints)*diag(x > P.dcum(2) & x <= P.xmax);
 
 n1 = n*P.Bn(1); 
 p1 = p*P.Bp(1);
@@ -246,19 +246,19 @@ end
                 
             case 2
                 
-                jn_l = -P.sn_l*(n(:, 1) - P.n0(1));
-                jp_l = -deltajp(:, end) + P.sp_r*(p(:, end) - P.p0(end));
+                jn_l = -P.sn_l*(n(:, 1) - P.nleft);
+                jp_l = -deltajp(:, end) + P.sp_r*(p(:, end) - P.pright);
                 
-                jn_r = deltajn(:, end) - P.sn_l*(n(:, 1) - P.n0(1));
-                jp_r = P.sp_r*(p(:, end) - P.p0(end));
+                jn_r = deltajn(:, end) - P.sn_l*(n(:, 1) - P.nleft);
+                jp_r = P.sp_r*(p(:, end) - P.pright);
                 
             case 3
                 
-                jn_l = -P.sn_l*(n(:, 1) - P.n0(1));
-                jp_l = -P.sp_l*(p(:, 1) - P.p0(1));
+                jn_l = -P.sn_l*(n(:, 1) - P.nleft);
+                jp_l = -P.sp_l*(p(:, 1) - P.pleft);
                 
-                jn_r = P.sn_r*(n(:, end) - P.n0(end));
-                jp_r = P.sp_r*(p(:, end) - P.p0(end));
+                jn_r = P.sn_r*(n(:, end) - P.nright);
+                jp_r = P.sp_r*(p(:, end) - P.pright);
                 
         end
     end
