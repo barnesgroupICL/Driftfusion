@@ -14,18 +14,18 @@ classdef pc
         e = 1.61917e-19;         % Elementary charge in Coulombs.
         
         % Device Dimensions [cm]
-        d = [100e-7, 400e-7, 100e-7];       % Layer thickness array
-        parr = [100, 200, 100];             % Spatial mesh points array
+        d = [100e-7, 400e-7, 80e-7];       % Layer thickness array
+        parr = [100, 200, 80];             % Spatial mesh points array
         
         dcum = cumsum(pc.d);                % cumulative thickness        
                  
-        tint = 1e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
+        dint = 1e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 10;          % 0.5x Interfacial points (x_mesh_type = 3)
-        tscr = 50e-7;       % Approx space charge region thickness
-        pscr = 80;          % No of points in space charge region
+        dscr = 50e-7;       % Approx space charge region thickness
+        pscr = 100;          % No of points in space charge region
         pepe = 20;          % electrode interface points
         te = 10e-7;         % electrode interface thickness
-        tmin = 1e-7;        % start value for log meshes
+        dmin = 1e-7;        % start value for log meshes
         
         % Define spatial cordinate system
         % m=0 cartesian
@@ -47,9 +47,9 @@ classdef pc
         G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
         pulseon = 0;            % Switch pulse on TPC or TPV
         Vapp = 0;               % Applied bias
-        BC = 2;                 % Boundary Conditions. Must be set to one for first solution
+        BC = 3;                 % Boundary Conditions. Must be set to one for first solution
         figson = 1;             % Toggle figures on/off
-        meshx_figon = 0;        % Toggles x-mesh figures on/off
+        meshx_figon = 1;        % Toggles x-mesh figures on/off
         mesht_figon = 0;        % Toggles t-mesh figures on/off
         side = 1;               % illumination side 1 = EE, 2 = SE
         calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
@@ -79,8 +79,8 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels
-        EA = [-3.0, -3.8, -4.2];%   %1.9 + [-1.9, -3.7, -4.1];
-        IP = [-5.2, -5.4, -6.0];%    %1.9 + [-4.9, -5.3, -7.4]; 
+        EA = [-3.0, -3.8, -4.0];%   %1.9 + [-1.9, -3.7, -4.1];
+        IP = [-5.2, -5.4, -5.8];%    %1.9 + [-4.9, -5.3, -7.4]; 
         
         %% Equilibrium Fermi energies - defines doping density
         E0 = [-5.1, -4.6, -5.1];
@@ -98,8 +98,8 @@ classdef pc
         NI = 1e19;                      % [cm-3]
         
         % Mobilities
-        mue = [1, 1, 1];         % electron mobility p-type [cm2V-1s-1]
-        muh = [1, 1, 1];         % hole mobility p-type [cm2V-1s-1]
+        mue = [1e-3, 1, 1e-3];         % electron mobility p-type [cm2V-1s-1]
+        muh = [1e-3, 1, 1e-3];         % hole mobility p-type [cm2V-1s-1]
         mui = 1e-10;              % ion mobility
         
         % Dielectric constants
@@ -111,8 +111,8 @@ classdef pc
         kradp = 1e-12;         % [cm3 s-1] ETL Radiative Recombination coefficient
         kradn = 1e-12;         % [cm3 s-1] HTL Radiative Recombination coefficient
         
-        taun = [1e-8, 1e6, 1e6];           % [s] SRH time constant for electrons
-        taup = [1e-8, 1e6, 1e6];           % [s] SRH time constant for holes
+        taun = [1e-9, 1e6, 1e6];           % [s] SRH time constant for electrons
+        taup = [1e-9, 1e6, 1e6];           % [s] SRH time constant for holes
         
         % Surface recombination and extraction coefficients
         sn_r = 1e10;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
@@ -214,10 +214,10 @@ classdef pc
             %   from 1 to 4, and if so, changes PARAMS.xmesh_type to VALUE.
             %   Otherwise, a warning is shown. Runs automatically whenever
             %   xmesh_type is changed.
-            if any([1 2 3 4] == value)
+            if any(1:1:9 == value)
                 params.xmesh_type = value;
             else
-                error('PARAMS.xmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_X cannot generate a mesh if this is not the case.')
+                error('PARAMS.xmesh_type should be an integer from 1 to 9 inclusive. MESHGEN_X cannot generate a mesh if this is not the case.')
             end
         end
         
