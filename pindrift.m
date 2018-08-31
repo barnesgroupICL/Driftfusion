@@ -612,7 +612,7 @@ end
 
 if p.Ana == 1
     
-    [Voc, Vapp_arr, Jtotr] = pinAna(solstruct, t(end));
+    [Voc, Vapp_arr, Jtotr] = pinana(solstruct, t(end));
     
     if p.OC == 1
         
