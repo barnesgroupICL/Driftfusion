@@ -1,4 +1,4 @@
-function [Voc, Vapp_arr, Jtot] = pinAna(varargin)
+function [Voc, Vapp_arr, Jtot] = pinana(varargin)
 
 % tarr is a time time array for the time you wish to plot
 if length(varargin) == 1
@@ -23,7 +23,10 @@ sol = solstruct.sol;
 P = solstruct.p;
 x = solstruct.x;
 t = solstruct.t;
-gx = solstruct.gx;
+
+if P.OM == 1
+    gx = solstruct.gx;
+end
 
 P.x = x;
 P.t = t;        % For backwards compatibility
