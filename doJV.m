@@ -12,7 +12,7 @@ disp('Current voltage scan')
 % Vend          = scan end voltage
 % option        1 = dark only, 2 = light only, 3 = dark & light
 
-[JV.dk_f, JV.dk_r, JV.ill_f, JV.ill_r] = deal(0);
+[JV.dk.f, JV.dk.r, JV.ill.f, JV.ill.r] = deal(0);
 
 % Read parameters structure into structure P
 p = sol_ini.p;
@@ -41,11 +41,6 @@ if option ==1 || option ==3
         
         disp('Dark forward scan...')
         JV.dk.f = pindrift(sol_ini, p);
-        
-        figure(11)
-        %xlim([0, 1.3]);
-        ylim([-30, 30]);
-        hold on
         
         disp('Complete.')
         
@@ -110,6 +105,8 @@ if option ==2 || option ==3
         figure(11)
         hold off
         disp('JV scan complete.')
+        
+        plotJV(JV, option)
 end
 
 end
