@@ -1,4 +1,4 @@
-function [sol_eq, sol_i_eq, sol_i_eq_SR] = equilibrate
+function soleq = equilibrate
 % Uses analytical initial conditions and runs to equilibrium
 % Note that tmax is consistently adjusted to appropriate values for to
 % ensure there are numerous mesh points where large gradients in the time
@@ -88,7 +88,7 @@ p.calcJ = 0;
 p.tmax = 1e-2;
 p.t0 = p.tmax/1e10;
 
-sol_eq = pindrift(sol, p);
+soleq.eq = pindrift(sol, p);
 disp('Complete')
 
 % 
@@ -99,7 +99,7 @@ disp('Complete')
 % p.tmax = 1e-9;
 % p.t0 = p.tmax/1e3;
 % 
-% sol = pindrift(sol_eq, p);
+% sol = pindrift(soleq.eq, p);
 % disp('Complete')
 % 
 % %% Symmetricise the solution
@@ -156,14 +156,14 @@ p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
 p.mui = 1e-6;           % Ions are accelerated to reach equilibrium
 
-sol = pindrift(sol_eq, p);
+sol = pindrift(soleq.eq, p);
 
 % Much longer second step to ensure that ions have migrated
 p.calcJ = 0;
 p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
 
-sol_i_eq = pindrift(sol, p);
+soleq.i = pindrift(sol, p);
 disp('Complete')
 
 %% Ion equilibrium with surface recombination
@@ -175,7 +175,7 @@ p.calcJ = 0;
 p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
 
-sol_i_eq_SR = pindrift(sol_i_eq, p);
+soleq.i_sr = pindrift(soleq.i, p);
 disp('Complete')
 
 % % Switch off SR
@@ -184,7 +184,7 @@ disp('Complete')
 % 
 % %% Symmetricise closed circuit condition
 % disp('Symmetricise equilibriumion solution')
-% symsol = symmetricize(sol_i_eq);
+% symsol = symmetricize(soleq.i);
 % disp('Complete')
 % 
 % p.OC = 1;
