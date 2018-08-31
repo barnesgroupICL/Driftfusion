@@ -19,10 +19,10 @@ classdef pc
         
         dcum = cumsum(pc.d);                % cumulative thickness        
                  
-        dint = 1e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
+        dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 10;          % 0.5x Interfacial points (x_mesh_type = 3)
         dscr = 50e-7;       % Approx space charge region thickness
-        pscr = 100;          % No of points in space charge region
+        pscr = 80;          % No of points in space charge region
         pepe = 20;          % electrode interface points
         te = 10e-7;         % electrode interface thickness
         dmin = 1e-7;        % start value for log meshes
@@ -61,7 +61,7 @@ classdef pc
         % Current only uniform generation functionality is avaiable- this will be
         % updated in future versions.
         % 0 = Uniform Generation
-        OM  = 1;
+        OM = 0;
         
         %%%%%%% MESHES %%%%%%
         % xmesh_type specification - see xmesh_gen
@@ -83,24 +83,30 @@ classdef pc
         IP = [-5.2, -5.4, -5.8];%    %1.9 + [-4.9, -5.3, -7.4]; 
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-5.1, -4.6, -5.1];
+        E0 = [-5.1, -4.6, -4.9];
         
         % Workfunction energies
         PhiA = -5.1;    %-1.4;    %
         PhiC = -4.3;    %-0.6;    %
         % Conversion factors
         
-        % Effective Density Of States (eDOS) PVSK (Reenen, 2015)
+        % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
-        N0 = [1e20, 1e20, 1e20];
+        N0 = [1.5e18, 6e18, 1e18];
         
+        % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
+        % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
+        % PCBM eDOS:
+                
         %%%%% MOBILE ION DEFECT DENSITY %%%%%
-        NI = 1e19;                      % [cm-3]
+        NI = 1e19;                      % [cm-3] ?A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
         
         % Mobilities
-        mue = [1e-3, 1, 1e-3];         % electron mobility p-type [cm2V-1s-1]
-        muh = [1e-3, 1, 1e-3];         % hole mobility p-type [cm2V-1s-1]
-        mui = 1e-10;              % ion mobility
+        mue = [1, 1, 1];         % electron mobility [cm2V-1s-1]
+        muh = [1, 1, 1];         % hole mobility [cm2V-1s-1]
+        mui = 1e-10;                   % ion mobility [cm2V-1s-1]
+        
+        % PEDOT e- mobility: https://aip.scitation.org/doi/10.1063/1.4824104 hole mobility p-type [cm2V-1s-1]
         
         % Dielectric constants
         epp = [4, 12, 4];
@@ -111,14 +117,14 @@ classdef pc
         kradp = 1e-12;         % [cm3 s-1] ETL Radiative Recombination coefficient
         kradn = 1e-12;         % [cm3 s-1] HTL Radiative Recombination coefficient
         
-        taun = [1e-9, 1e6, 1e6];           % [s] SRH time constant for electrons
-        taup = [1e-9, 1e6, 1e6];           % [s] SRH time constant for holes
+        taun = [1e-9, 1e6, 1e-6];           % [s] SRH time constant for electrons
+        taup = [1e-9, 1e6, 1e-6];           % [s] SRH time constant for holes
         
         % Surface recombination and extraction coefficients
-        sn_r = 1e10;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
-        sn_l = 1e10;
-        sp_r = 1e10;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
-        sp_l = 1e10;
+        sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
+        sn_l = 1e8;
+        sp_r = 1e8;             % [cm s-1] hole surface recombination velocity (rate constant for recombination at interface)
+        sp_l = 1e8;
         
         % Defect recombination rate coefficient - not currently used
         k_defect_p = 0;
@@ -195,7 +201,7 @@ classdef pc
             end
             
             % Warn if xmesh_type is not correct
-            if ~ any(1:1:9 == params.xmesh_type)
+            if ~ any(1:1:10 == params.xmesh_type)
                 warning('PARAMS.xmesh_type should be an integer from 1 to 9 inclusive. MESHGEN_X cannot generate a mesh if this is not the case.')
             end
             
