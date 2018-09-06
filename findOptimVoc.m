@@ -100,6 +100,10 @@ disp([mfilename ' - Search range: ' num2str(dVlimit) ' V'])
 
 %% do the search
 
+% the tmax obtained in the previous step could be too big and make some next step to fail
+asymstruct.p.tmax = asymstruct.p.tmax / 10;
+asymstruct.p.t0 = asymstruct.p.t0 / 10;
+
 % here asymstruct is a fixed input, while Vapp is the input that will be
 % optimized
 fun = @(Vapp) IgiveCurrentForVoltage(asymstruct, Vapp);
@@ -178,7 +182,8 @@ warning('off', 'pindrift:verifyStabilization');
 while ~verifyStabilization(asymstruct_newVapp.sol, asymstruct_newVapp.t, 1e-2) % check stability
     disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
     asymstruct_newVapp = pindrift(asymstruct_newVapp, p);
-    p.tmax = p.tmax * 10;
+    p.tmax = p.tmax * 5;
+    p.t0 = p.t0 * 5;
 end
 warning('on', 'pindrift:verifyStabilization');
 
