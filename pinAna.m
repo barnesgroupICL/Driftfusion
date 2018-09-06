@@ -1,4 +1,4 @@
-function [Voc, Vapp_arr, Jtot, Efn, Efp, U] = pinAna(solstruct)
+function [Voc, Vapp_arr, Jtot, Efn, Efp, U_overt] = pinAna(solstruct)
 % pinAna analyses the input solution and plots various useful graphs.
 % Many plots are available to the user although currently these are
 % commented out. In future
@@ -60,17 +60,22 @@ end
 
 %% Recombination
 % separate charges by layer, the interfacial point will be present
-% in more than one layer
+% in more than one layer, useful for the integral limits
 n_h = n(:, 1:p_i_index);
 P_h = P(:, 1:p_i_index);
 n_i = n(:, p_i_index:i_n_index);
 P_i = P(:, p_i_index:i_n_index);
 n_e = n(:, i_n_index:end);
 P_e = P(:, i_n_index:end);
-U_h = trapz(p.x(1:p_i_index), p.kradhtl*(n_h.*P_h - p.ni^2) + (n_h.*P_h-p.ni^2)./(p.taun_htl.*(P_h+p.pthtl) + p.taup_htl.*(n_h+p.nthtl)), 2);
-U_i = trapz(p.x(p_i_index:i_n_index), p.krad*(n_i.*P_i - p.ni^2) + (n_i.*P_i-p.ni^2)./(p.taun_i.*(P_i+p.pti) + p.taup_i.*(n_i+p.nti)), 2);
-U_e = trapz(p.x(i_n_index:end), p.kradetl*(n_e.*P_e - p.ni^2) + (n_e.*P_e-p.ni^2)./(p.taun_etl.*(P_e+p.ptetl) + p.taup_etl.*(n_e+p.ntetl)), 2);
-U = 1000*p.e*(U_h + U_i + U_e);
+U_h = p.kradhtl*(n_h.*P_h - p.ni^2) + (n_h.*P_h-p.ni^2)./(p.taun_htl.*(P_h+p.pthtl) + p.taup_htl.*(n_h+p.nthtl));
+U_h_overt = trapz(p.x(1:p_i_index), U_h, 2);
+U_i = p.krad*(n_i.*P_i - p.ni^2) + (n_i.*P_i-p.ni^2)./(p.taun_i.*(P_i+p.pti) + p.taup_i.*(n_i+p.nti));
+U_i_overt = trapz(p.x(p_i_index:i_n_index), U_i, 2);
+U_e = p.kradetl*(n_e.*P_e - p.ni^2) + (n_e.*P_e-p.ni^2)./(p.taun_etl.*(P_e+p.ptetl) + p.taup_etl.*(n_e+p.ntetl));
+U_e_overt = trapz(p.x(i_n_index:end), U_e, 2);
+% assign the interfacial points as in pindrift
+U = 1000*p.e*[U_h(:, 1:end-1), U_i, U_e(:, 2:end)];
+U_overt = 1000*p.e*(U_h_overt + U_i_overt + U_e_overt);
 
 %% Current J
 
@@ -120,8 +125,8 @@ if ~p.OC
             % Displacement Current at right hand side
             Jdispr = (p.e*1000)*p.eppn*-gradient(dVdxt(:, end), p.t);
 
-            % this is wrong
-            %Jtot = Jpartr + Jdispr;
+            % this is WRONG
+            Jtot = Jpartr + Jdispr;
         case 2
             % Current calculation from the continuity equations
             [~, dndt] = gradient(n, p.x, p.t);
@@ -137,7 +142,7 @@ if ~p.OC
                 end
             end
 
-            Jtot = dndt_tot - g_tot + U;
+            Jtot = dndt_tot - g_tot + U_overt;
 
         case 3
             % like calcJ 1 but calculating just at right end boundary
@@ -343,9 +348,9 @@ if p.figson == 1
     
     %% Currents as a function of position
     if p.calcJ == 1 || p.calcJ == 5
-        figure(8);
-            plot(xnm,Jndiff(end, :),xnm,Jndrift(end, :),xnm,Jpdiff(end, :),xnm,Jpdrift(end, :),xnm,Jidiff(end, :),xnm,Jidrift(end, :),xnm,Jpart(end, :));
-            legend('Jn diff','Jn drift','Jp diff','Jp drift','Ji diff','Ji drift','Total J');
+        figure('Name', ['Current - ' inputname(1)], 'NumberTitle', 'off');
+            plot(xnm,Jndiff(end, :),xnm,Jndrift(end, :),xnm,Jpdiff(end, :),xnm,Jpdrift(end, :),xnm,Jidiff(end, :),xnm,Jidrift(end, :),xnm,Jpart(end, :), xnm, U(end, :));
+            legend('Jn diff','Jn drift','Jp diff','Jp drift','Ji diff','Ji drift','Total J', 'Rec');
             xlabel('Position [nm]');
             ylabel('Current Density [mA cm^-2]');
             set(legend,'FontSize',12);
@@ -359,7 +364,7 @@ if p.figson == 1
     if p.calcJ
         % Particle currents as a function of time
         figure(10);
-            plot(p.t, Jtot);
+            plot(solstruct.t, Jtot);
             legend('J_n')
             xlabel('time [s]');
             ylabel('J [mA cm^{-2}]');
