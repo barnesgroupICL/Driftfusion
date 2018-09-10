@@ -1,4 +1,4 @@
-function [Voc, Vapp_arr, Jtot, Efn, Efp, U_overt] = pinAna(solstruct)
+function [Voc, Vapp_arr, Jtot, Efn, Efp, U_overt, Ef] = pinAna(solstruct)
 % pinAna analyses the input solution and plots various useful graphs.
 % Many plots are available to the user although currently these are
 % commented out. In future
@@ -22,6 +22,7 @@ Ecb = p.EA-V-p.EA; % Conduction band potential
 Evb = p.IP-V-p.EA; % Valence band potential
 Efn = real(-V+p.Ei+(p.kB*p.T/p.q)*log(n/p.ni)); % Electron quasi-Fermi level
 Efp = real(-V+p.Ei-(p.kB*p.T/p.q)*log(P/p.ni)); % Hole quasi-Fermi level
+Ef = (n.*Efn + P.*Efp)./(n+P);
 
 % interfacial points
 p_i_array = ismembertol(p.x, p.tp);
@@ -32,14 +33,14 @@ p_i_index = find(p_i_array, 1);
 i_n_index = find(i_n_array, 1);
 
 if p.OC
-    Voc = Efn(:, round(p.xpoints/2)) - Efp(:, 1); % Open Circuit Voltage
+    Voc = Ef(:, round(p.xpoints/2)) - Ef(:, 1); % Open Circuit Voltage
 else
     Voc = p.Vapp;
 end
 
 %% TPV
 if p.OC && p.pulseon % AC coupled mode
-    Voc = Voc - Voc(1, :); % Removes baseline from TPV
+    Voc = Voc - Voc(1); % Removes baseline from TPV
     p.t = p.t-(p.pulsestart+p.pulselen); % Zero point adjustment
 end
 
@@ -294,7 +295,7 @@ if p.figson == 1
     % Open circuit voltage
     if p.OC == 1
         figure(7);
-            plot (p.t, Voc);
+            plot (p.t(1:length(sol(:,1,1))), Voc);
             xlabel('Time [s]');
             ylabel('Voltage [V]');
     end
