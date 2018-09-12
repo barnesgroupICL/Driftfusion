@@ -125,8 +125,8 @@ if p.OC == 0
 
     end
 
-    djndx = -(dndt - g + U);    % Not certain about the sign here
-    djpdx = -(dpdt - g + U);
+    djndx = -dndt + g - U;
+    djpdx = -dpdt + g - U;
 
     % Integrate across the device to get delta fluxes at all positions
     deltajn = cumtrapz(p.x, djndx, 2);
@@ -445,6 +445,11 @@ end
 drawnow
 
 end
+
+plot(xnm ,Jn(end, :), xnm ,Jp(end, :), xnm ,Jtot(end, :))
+xlabel('Position [nm]');
+ylabel('Current Density [A cm^-2]');
+legend('Jn', 'Jp', 'Jtot')
 
 end
 
