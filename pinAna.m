@@ -156,11 +156,11 @@ if p.OC == 0
         case 2
 
             jn_l = -p.sn_rec*(n(:, 1) - p.n0htl);
-            jp_l = -deltajp(:, end) + p.sp_ext*(P(:, 1) - p.p0etl);
+            jp_l = -deltajp(:, end) + p.sp_ext*(P(:, end) - p.p0etl);
 
             jn_r = deltajn(:, end) - p.sn_rec*(n(:, 1) - p.n0htl);
             jp_r = p.sp_rec*(P(:, end) - p.p0etl);
-
+     
         case 3
 
             jn_l = -p.sn_rec*(n(:, 1) - p.n0htl);
@@ -168,16 +168,15 @@ if p.OC == 0
 
             jn_r = p.sn_ext*(n(:, end) - p.n0etl);
             jp_r = p.sp_rec*(P(:, end) - p.p0etl);
-
-            %Jtot = (-jn_r + jp_r)*1000*p.e;
+            
     end
 
     % Calculate total electron and hole currents from fluxes
     jn = jn_l + deltajn;
     jp = jp_l + deltajp;
 
-    Jn = -jn*1000*p.e;
-    Jp = jp*1000*p.e;
+    Jn = -jn*p.e;
+    Jp = jp*p.e;
 
     % Total current
     Jtot = Jn + Jp;
@@ -399,7 +398,7 @@ if p.calcJ == 1
     plot(xnm,Jndiff(end, :),xnm,Jndrift(end, :),xnm,Jpdiff(end, :),xnm,Jpdrift(end, :),xnm,Jidiff(end, :),xnm,Jidrift(end, :),xnm,Jpart(end, :));
     legend('Jn diff','Jn drift','Jp diff','Jp drift','Ji diff','Ji drift','Total J');
     xlabel('Position [nm]');
-    ylabel('Current Density [mA cm^-2]');
+    ylabel('Current Density [A cm^-2]');
     set(legend,'FontSize',12);
     set(legend,'EdgeColor',[1 1 1]);
     xlim([0, xnmend]);
@@ -419,13 +418,13 @@ end
 
 %% Currents as a function of time
 if p.OC ~= 1 && p.calcJ == 0 || p.OC ~= 1 && p.calcJ == 1
-
+    
 % Currents as a function of time
 figure(10);
 plot(p.t, Jtot(:,end));
 legend('Jparticle');%, 'Jdisp')
 xlabel('time [s]');
-ylabel('J [mA cm^{-2}]');
+ylabel('J [A cm^{-2}]');
 set(legend,'FontSize',16);
 set(legend,'EdgeColor',[1 1 1]);
 grid off;
@@ -436,7 +435,7 @@ drawnow;
         figure(11)
         plot(Vapp_arr, Jtot(:,end))
         xlabel('V_{app} [V]')
-        ylabel('Current Density [mA cm^-2]');
+        ylabel('Current Density [A cm^-2]');
         grid off;
 
     end
