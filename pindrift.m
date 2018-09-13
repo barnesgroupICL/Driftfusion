@@ -259,7 +259,7 @@ c = [1
      0];
 
 % p-type
-if x <= p.dcum(1)
+if x <= p.dcum(1) - p.dint
  
    f = [(Bn(1)*p.mue(1)*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1)));
      (Bp(1)*p.muh(1)*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2)));     
@@ -271,11 +271,11 @@ if x <= p.dcum(1)
       0;
       (p.q/p.epp0)*(-(u(1)*Bn(1))+(u(2)*Bp(1))-NA(1)+ND(1)-p.NI+u(3));];
 
-% Intrinsic Recombination zone
-elseif x >  p.dcum(1) && x <= p.dcum(1) +p.dint
+% p-i Interface
+elseif x >  p.dcum(1) -p.dint && x <= p.dcum(1) +p.dint
 % Virtual charge carrier densities based on Fermi level equilibrium
-f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
-     (Bp(2)*p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2))));     
+f = [(Bn(2)*p.mue(2)*((u(1)*(-DuDx(4)+p.dEAdx(1)-(p.dN0dx(1)*p.kB*p.T/mean([p.N0(2) p.N0(1)])))+(p.kB*p.T*DuDx(1)))));
+     (Bp(2)*p.muh(2)*((u(2)*(DuDx(4)-p.dIPdx(1)+(p.dN0dx(1)*p.kB*p.T/mean([p.N0(2) p.N0(1)]))))+(p.kB*p.T*DuDx(2))));     
      (p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3)));
      p.epp(2)*DuDx(4);];                                      
 
@@ -297,12 +297,12 @@ f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
       0;
       (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-p.NI+u(3));]; 
  
-% Intrinsic Recombination zone
-elseif x >  p.dcum(2) - p.dint && x <= p.dcum(2) 
+% i-n Interface
+elseif x >  p.dcum(2) - p.dint && x <= p.dcum(2) +p.dint
 % Virtual charge carrier densities based on Fermi level equilibrium
-f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
-     (Bp(2)*p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2))));     
-     (p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3)));
+f = [Bn(2)*p.mue(2)*((u(1)*(-DuDx(4)+p.dEAdx(2)-(p.dN0dx(2)*p.kB*p.T/mean([p.N0(3) p.N0(2)]))))+(p.kB*p.T*DuDx(1)));
+     Bp(2)*p.muh(2)*((u(2)*(DuDx(4)-p.dIPdx(2)+(p.dN0dx(2)*p.kB*p.T/mean([p.N0(3) p.N0(2)]))))+(p.kB*p.T*DuDx(2)));     
+     p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3));
      p.epp(2)*DuDx(4);];                                      
 
  s = [g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2)) - (((u(1)*Bn(3)*u(2)*Bp(2))-ni(2)^2)/((p.taun(3)*(u(2)*Bp(2)+pt(2))) + (p.taup(3)*(u(1)*Bn(3)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
@@ -311,7 +311,7 @@ f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
       (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-p.NI+u(3));]; 
   
 % n-type
-elseif x > p.dcum(2) &&  x <= p.xmax
+elseif x > p.dcum(2) +p.dint &&  x <= p.xmax
     
 f = [(Bn(3)*p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
      (Bp(3)*p.muh(3)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2))));      

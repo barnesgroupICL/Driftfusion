@@ -15,14 +15,14 @@ classdef pc
         
         % Device Dimensions [cm]
         d = [100e-7, 400e-7, 80e-7];       % Layer thickness array
-        parr = [100, 200, 80];             % Spatial mesh points array
+        parr = [50, 200, 40];             % Spatial mesh points array
         
         dcum = cumsum(pc.d);                % cumulative thickness        
                  
-        dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
-        pint = 10;          % 0.5x Interfacial points (x_mesh_type = 3)
+        dint = 4e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
+        pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
         dscr = 50e-7;       % Approx space charge region thickness
-        pscr = 80;          % No of points in space charge region
+        pscr = 100;          % No of points in space charge region
         pepe = 20;          % electrode interface points
         te = 10e-7;         % electrode interface thickness
         dmin = 1e-7;        % start value for log meshes
@@ -61,7 +61,7 @@ classdef pc
         % Current only uniform generation functionality is avaiable- this will be
         % updated in future versions.
         % 0 = Uniform Generation
-        OM = 0;
+        OM = 1;
         
         %%%%%%% MESHES %%%%%%
         % xmesh_type specification - see xmesh_gen
@@ -83,23 +83,23 @@ classdef pc
         IP = [-5.2, -5.4, -5.8];%    %1.9 + [-4.9, -5.3, -7.4]; 
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-5.1, -4.6, -4.9];
+        E0 = [-5.0, -4.6, -4.9];
         
         % Workfunction energies
         PhiA = -5.1;    %-1.4;    %
         PhiC = -4.3;    %-0.6;    %
-        % Conversion factors
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
-        N0 = [1.5e18, 6e18, 1e18];
+        %N0 = [1.5e18, 6e18, 1e18];
+        N0 = [1e19, 1e19, 1e19];
         
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
                 
         %%%%% MOBILE ION DEFECT DENSITY %%%%%
-        NI = 1e19;                      % [cm-3] ?A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
+        NI = 1e18;                      % [cm-3] ?A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
         
         % Mobilities
         mue = [1, 1, 1];         % electron mobility [cm2V-1s-1]
@@ -109,6 +109,7 @@ classdef pc
         % PEDOT e- mobility: https://aip.scitation.org/doi/10.1063/1.4824104 hole mobility p-type [cm2V-1s-1]
         
         % Dielectric constants
+        %epp = [4, 12, 4];
         epp = [4, 12, 4];
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
@@ -164,6 +165,9 @@ classdef pc
     %%  Properties whose values depend on other properties (see 'get' methods).
     properties (Dependent)
         
+        dEAdx
+        dIPdx
+        dN0dx
         Bn
         Bp
         Eg
@@ -274,9 +278,9 @@ classdef pc
         % Boltzmann conversion factor electrons
         function value = get.Bn(params)
                 
-            value = [(params.N0(1)/params.N0(2))*exp((params.EA(2)-params.EA(1))/(params.kB*params.T)), 1,...
-                (params.N0(3)/params.N0(2))*exp((params.EA(2)-params.EA(3))/(params.kB*params.T))];
-            
+%             value = [(params.N0(1)/params.N0(2))*exp((params.EA(2)-params.EA(1))/(params.kB*params.T)), 1,...
+%                 (params.N0(3)/params.N0(2))*exp((params.EA(2)-params.EA(3))/(params.kB*params.T))];
+               value = [1,1,1];
         end
         
         % Boltzmann conversion factor holes
@@ -284,9 +288,10 @@ classdef pc
             
             %Bp = [1, (params.N0(2)/params.N0(1))*exp((params.IP(2)-params.IP(1))/(params.kB*params.T)), (params.N0(3)/params.N0(1))*exp((params.IP(3)-params.IP(1))/(params.kB*params.T))];
             %Bp = [(params.N0(1)/params.N0(3))*exp((params.IP(1)-params.IP(3))/(params.kB*params.T)), (params.N0(2)/params.N0(3))*exp((params.IP(2)-params.IP(3))/(params.kB*params.T)), 1];
-            value = [(params.N0(1)/params.N0(2))*exp((params.IP(1)-params.IP(2))/(params.kB*params.T)), 1,...
-                (params.N0(3)/params.N0(2))*exp((params.IP(3)-params.IP(2))/(params.kB*params.T))];
-            
+%             value = [(params.N0(1)/params.N0(2))*exp((params.IP(1)-params.IP(2))/(params.kB*params.T)), 1,...
+%                 (params.N0(3)/params.N0(2))*exp((params.IP(3)-params.IP(2))/(params.kB*params.T))];
+%             
+                value = [1,1,1];
         end
         
         % Intrinsic Fermi Energies
@@ -306,7 +311,27 @@ classdef pc
 %                 params.EA(3) + (params.kB*params.T/params.q)*log(params.n0(3)/params.N0(3))];
 %             
 %         end
+        % Conduction band gradients at interfaces
+        function value = get.dEAdx(params)
+            
+            value = [(params.EA(2)-params.EA(1))/(2*params.dint), (params.EA(3)-params.EA(2))/(2*params.dint)];
+         
+        end
+                
+        %Valence band gradients at interfaces
+        function value = get.dIPdx(params)
+            
+            value = [(params.IP(2)-params.IP(1))/(2*params.dint), (params.IP(3)-params.IP(2))/(2*params.dint)];
+         
+        end
         
+        % eDOS gradients at interfaces 
+        function value = get.dN0dx(params)
+            
+            value = [(params.N0(2)-params.N0(1))/(2*params.dint), (params.N0(3)-params.N0(2))/(2*params.dint)];
+         
+        end
+
         % Donor densities
         function value = get.ND(params)
             

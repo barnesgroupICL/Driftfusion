@@ -60,17 +60,94 @@ V = sol(:,:,4);
     % n-type binary matrix
     nBM = ones(length(t), P.xpoints)*diag(x > P.dcum(2) & x <= P.xmax);
 
-n1 = n*P.Bn(1); 
-p1 = p*P.Bp(1);
+    
+% For graded bands
+    % p-type binary matrix
+    pBM2 = ones(length(t), P.xpoints)*diag(x <= P.dcum(1)-P.dint);
+    % p-i interface binary matrix
+    piBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(1) -P.dint & x <= P.dcum(1) + P.dint);       
+    % Intrinsic binary matrix
+    iBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(1) + P.dint & x <= P.dcum(2) - P.dint);
+    % i-n interface binary matrix II
+    inBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(2) - P.dint & x <= P.dcum(2) + P.dint);
+    % n-type binary matrix
+    nBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(2)  + P.dint & x <= P.xmax);
 
-n2 = n*P.Bn(2);
-p2 = p*P.Bp(2);
+    
+for k=1:P.tpoints
 
-n3 = n*P.Bn(3);
-p3 = p*P.Bp(3);
+    j = 1;
+    jj= 1;
 
-n = pBM.*n1 + iBM.*n2 + nBM.*n3;
-p = pBM.*p1 + iBM.*p2 + nBM.*p3;
+    for i=1:P.xpoints
+        
+%         if P.OC == 1 && x(i) >= ceil(P.xmax/2)
+%             
+%             i = P.xpoints - i + 1;
+%             
+%         end
+        
+        if x(i) > P.dcum(1) - P.dint && x(i) <= P.dcum(1)
+
+            EApi1(k, i) = P.EA(1) + j*(P.dint/P.pint)*P.dEAdx(1);
+            IPpi1(k, i) = P.IP(1) + j*(P.dint/P.pint)*P.dIPdx(1);
+
+            j = j+1;
+
+        else
+
+            EApi1(k, i) = 0;
+            IPpi1(k, i) = 0;
+
+        end
+
+
+        if x(i) > P.dcum(1) && x(i) <= P.dcum(1)+P.dint
+
+            EApi2(k, i) = P.EA(1) + j*(P.dint/P.pint)*P.dEAdx(1);
+            IPpi2(k, i) = P.IP(1) + j*(P.dint/P.pint)*P.dIPdx(1);
+            j = j+1;
+
+        else
+
+            EApi2(k, i) = 0;
+            IPpi2(k, i) = 0;
+        end          
+        
+        
+        if x(i) > P.dcum(2) -P.dint && x(i) <= P.dcum(2)
+
+            EAin1(k, i) = P.EA(2) +jj*(P.dint/P.pint)*P.dEAdx(2);
+            IPin1(k, i) = P.IP(2) +jj*(P.dint/P.pint)*P.dIPdx(2);
+
+            jj = jj+1;
+
+        else 
+
+            EAin1(k, i) = 0;
+            IPin1(k, i) = 0;
+                
+        end
+        
+        if x(i) > P.dcum(2) && x(i) <= P.dcum(2) + P.dint
+
+            EAin2(k, i) = P.EA(2)+jj*(P.dint/P.pint)*P.dEAdx(2);
+            IPin2(k, i) = P.IP(2)+jj*(P.dint/P.pint)*P.dIPdx(2);
+
+            jj = jj+1;
+
+        else %x(i) > P.dcum(2) +P.dint && x(i) <= P.dcum(2) + P.dint;
+
+            EAin2(k, i) = 0;
+            IPin2(k, i) = 0;
+                
+       end
+        
+    end
+    
+end  
+    
+
 
 %nstat = zeros(1, xpoints);                                  % Static charge array
 nstat = (-P.NA(1)+P.ND(1))*pBM  + (-P.NA(2) + P.ND(2))*nBM + (-P.NA(3) + P.ND(3))*nBM;
@@ -80,11 +157,11 @@ rhoc = (-n + p + nstat);     % Net charge density calculated from adding individ
 astat = ((-P.NI)*pBM + (-P.NI)*nBM);
 a = a + astat;
 
-EA = P.EA(1)*pBM + P.EA(2)*iBM + P.EA(3)*nBM;
-IP = P.IP(1)*pBM + P.IP(2)*iBM + P.IP(3)*nBM;
+EA = P.EA(1)*pBM2 +  EApi1 + EApi2 + P.EA(2)*iBM2 + EAin1 + EAin2 + P.EA(3)*nBM2;
+IP = P.IP(1)*pBM2 + IPpi1 + IPpi2 + P.IP(2)*iBM2 + IPin1 + IPin2 + P.IP(3)*nBM2;
+N0 = P.N0(1)*pBM  + P.N0(2)*iBM + P.N0(3)*nBM;
 Ei = P.Eif(1)*pBM  + P.Eif(2)*iBM + P.Eif(3)*nBM;
 ni = P.ni(1)*pBM  + P.ni(2)*iBM + P.ni(3)*nBM;
-N0 = P.N0(1)*pBM  + P.N0(2)*iBM + P.N0(3)*nBM;
 
 Ecb = EA-V;                                 % Conduction band potential
 Evb = IP-V;                                 % Valence band potential
