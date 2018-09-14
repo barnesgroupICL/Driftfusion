@@ -269,23 +269,42 @@ if x <= p.dcum(1) - p.dint
  s = [ - p.kradp*((u(1)*Bn(1)*u(2)*Bp(1))-(ni(1)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptp)) + (taup(1)*(u(1)+ntp)))); %; %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
        - p.kradp*((u(1)*Bn(1)*u(2)*Bp(1))-(ni(1)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptp)) + (taup(1)*(u(1)+ntp)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+pthtl)) + (taup(1)*(u(1)+nthtl))));
       0;
-      (p.q/p.epp0)*(-(u(1)*Bn(1))+(u(2)*Bp(1))-NA(1)+ND(1)-p.NI+u(3));];
+      (p.q/p.epp0)*(-(u(1)*Bn(1))+(u(2)*Bp(1))-NA(1)+ND(1));];
 
 % p-i Interface
 elseif x >  p.dcum(1) -p.dint && x <= p.dcum(1) +p.dint
-    
-N0inter = p.N0(1) + (p.dN0dx(1) * (x - (p.dcum(1) - p.dint)));
-    
+
+xprime = x - (p.dcum(1) - p.dint);
+N0_inter = p.N0(1) + (p.dN0dx(1) * xprime);
+deppdx = (p.epp(2) - p.epp(1))/(2*p.dint);
+epp_inter = p.epp(1) + (deppdx*xprime);
+ 
+% mobilities
+dmuedx = (p.mue(2) - p.mue(1))/(2*p.dint);
+mue_inter = p.mue(1) + (dmuedx*xprime);
+dmuhdx = (p.muh(2) - p.muh(1))/(2*p.dint);
+muh_inter = p.muh(1) + (dmuhdx*xprime);
+
+% doping
+dNAdx = (p.NA(2) - p.NA(1))/(2*p.dint);
+NA_inter = p.NA(1) + dNAdx*xprime;
+dNDdx = (p.ND(2) - p.ND(1))/(2*p.dint);
+ND_inter = p.ND(1) + dNDdx*xprime;
+
+% ions
+dNIdx = p.NI/(2*p.dint);
+NI_inter = 0 + (dNIdx*xprime);  
+
 % Virtual charge carrier densities based on Fermi level equilibrium
-f = [Bn(2)*p.mue(2)*((u(1)*(-DuDx(4)+p.dEAdx(1)-(p.dN0dx(1)*p.kB*p.T/N0inter)))+(p.kB*p.T*DuDx(1)));
-     Bp(2)*p.muh(2)*((u(2)*(DuDx(4)-p.dIPdx(1)-(p.dN0dx(1)*p.kB*p.T/N0inter)))+(p.kB*p.T*DuDx(2)));     
+f = [Bn(2)*mue_inter*((u(1)*(-DuDx(4)+p.dEAdx(1)-(p.dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
+     Bp(2)*muh_inter*((u(2)*(DuDx(4)-p.dIPdx(1)-(p.dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
      p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3));
-     p.epp(2)*DuDx(4);];                                      
+     epp_inter*DuDx(4);];                                      
 
  s = [g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2)) - (((u(1)*Bn(2)*u(2)*Bp(1))-ni(2)^2)/((p.taun(1)*(u(2)*Bp(1)+pt(2))) + (p.taup(1)*(u(1)*Bn(2)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2)) - (((u(1)*Bn(2)*u(2)*Bp(1))-ni(2)^2)/((p.taun(1)*(u(2)*Bp(1)+pt(2))) + (p.taup(1)*(u(1)*Bn(2)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       0;
-      (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-p.NI+u(3));]; 
+      (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
 
 % Intrinsic
 elseif x >  p.dcum(1) +p.dint && x <= p.dcum(2) - p.dint
@@ -298,24 +317,43 @@ f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
  s = [g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+pthtl)) + (taup(1)*(u(1)+nthtl)))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+pthtl)) + (taup(1)*(u(1)+nthtl)))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       0;
-      (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-p.NI+u(3));]; 
+      (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-p.NI+u(3)+ND(2)-NA(2));]; 
  
 % i-n Interface
 elseif x >  p.dcum(2) - p.dint && x <= p.dcum(2) +p.dint
-    
-N0inter = p.N0(2) +  (p.dN0dx(2) * (x - (p.dcum(2) - p.dint)));
 
-    
+% Grading
+xprime = x - (p.dcum(2) - p.dint);          % co-ordinate shift
+N0_inter = p.N0(2) +  (p.dN0dx(2)*xprime);
+deppdx = (p.epp(3) - p.epp(2))/(2*p.dint);
+epp_inter = p.epp(2) + (deppdx*xprime);
+
+% mobilities
+dmuedx = (p.mue(3) - p.mue(2))/(2*p.dint);
+mue_inter = p.mue(2) + (dmuedx*xprime);
+dmuhdx = (p.muh(3) - p.muh(2))/(2*p.dint);
+muh_inter = p.muh(2) + (dmuhdx*xprime);
+
+% doping
+dNAdx = (p.NA(3) - p.NA(2))/(2*p.dint);
+NA_inter = p.NA(2) + dNAdx*xprime;
+dNDdx = (p.ND(3) - p.ND(2))/(2*p.dint);
+ND_inter = p.ND(2) + dNDdx*xprime;
+
+% ions
+dNIdx = -p.NI/(2*p.dint);
+NI_inter = p.NI + (dNIdx*xprime);  
+
 % Virtual charge carrier densities based on Fermi level equilibrium
-f = [Bn(2)*p.mue(2)*((u(1)*(-DuDx(4)+p.dEAdx(2)-(p.dN0dx(2)*p.kB*p.T/N0inter)))+(p.kB*p.T*DuDx(1)));
-     Bp(2)*p.muh(2)*((u(2)*(DuDx(4)-p.dIPdx(2)-(p.dN0dx(2)*p.kB*p.T/N0inter)))+(p.kB*p.T*DuDx(2)));     
+f = [Bn(2)*mue_inter*((u(1)*(-DuDx(4)+p.dEAdx(2)-(p.dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
+     Bp(2)*muh_inter*((u(2)*(DuDx(4)-p.dIPdx(2)-(p.dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
      p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3));
-     p.epp(2)*DuDx(4);];                                      
+     epp_inter*DuDx(4);];                                      
 
  s = [g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2)) - (((u(1)*Bn(3)*u(2)*Bp(2))-ni(2)^2)/((p.taun(3)*(u(2)*Bp(2)+pt(2))) + (p.taup(3)*(u(1)*Bn(3)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2)) - (((u(1)*Bn(3)*u(2)*Bp(2))-ni(2)^2)/((p.taun(3)*(u(2)*Bp(2)+pt(2))) + (p.taup(3)*(u(1)*Bn(3)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       0;
-      (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-p.NI+u(3));]; 
+      (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
   
 % n-type
 elseif x > p.dcum(2) +p.dint &&  x <= p.xmax
@@ -328,7 +366,7 @@ f = [(Bn(3)*p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
 s = [ - p.kradn*((u(1)*Bn(3)*u(2)*Bp(3))-(ni(3)^2));% - (((u(1)*Bn(3)*u(2)*Bp(3))-ni(3)^2)/((p.taun(3)*(u(2)*Bp(3)+ptn)) + (taup(3)*(u(1)*Bn(3)+ntn))));  %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun(3)*(u(2)+ptetl)) + (taup(3)*(u(1)+ntetl))));
       - p.kradn*((u(1)*Bn(3)*u(2)*Bp(3))-(ni(3)^2));% - (((u(1)*Bn(3)*u(2)*Bp(3))-ni(3)^2)/((p.taun(1)*(u(2)*Bp(3)+ptn)) + (taup(1)*(u(1)*Bn(3)+ntn))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun(3)*(u(2)+ptetl)) + (taup(3)*(u(1)+ntetl))));
       0;
-      (p.q/p.epp0)*(-(u(1)*Bn(3))+(u(2)*Bp(3))-p.NI+u(3)+ND(3)-NA(3));];
+      (p.q/p.epp0)*(-(u(1)*Bn(3))+(u(2)*Bp(3))+ND(3)-NA(3));];
 
 end
 
@@ -412,25 +450,42 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
 %     u0  = [nright/(p.N0(3)/p.N0(1))*exp((p.EA(1)-p.EA(3))/(p.kB*p.T));
 %            pright/(p.N0(3)/p.N0(1))*exp((p.IP(3)-p.IP(1))/(p.kB*p.T));
 
-    if x <=  p.dcum(1)
+    if x <=  p.dcum(1) - p.dint
     
      u0  = [nleft/Bn(1);
             pleft/Bp(1);
-            p.NI;
+            0;
             p.E0(1)];
         
-    elseif x > p.dcum(1)  && x <= p.dcum(2)
+    elseif x > p.dcum(1) - p.dint && x <= p.dcum(1) + p.dint
+    
+    xprime = x - (p.dcum(1) - p.dint);
+    dNIdx = p.NI/(2*p.dint);
+    NI_inter = 0 + (dNIdx*xprime);     
+          
+    u0 = [nleft; pleft; NI_inter; p.E0(1)];
+        
+    elseif x > p.dcum(1) + p.dint && x <= p.dcum(2) - p.dint
 
      u0  = [ni(2)/Bn(2);
             ni(2)/Bp(2);
             p.NI;
             Eif(2)];
         
-    elseif x >  p.dcum(2)
+    elseif x > p.dcum(2) - p.dint && x<= p.dcum(2) + p.dint
+    
+    % graded ions
+    xprime = x - (p.dcum(2) - p.dint);
+    dNIdx = -p.NI/(2*p.dint);
+    NI_inter = p.NI + (dNIdx*xprime);     
+        
+    u0  = [nright; pright; NI_inter; p.E0(3);];
+        
+    elseif x >  p.dcum(2) + p.dint
                    
     u0  = [nright/Bn(3);
            pright/Bp(3);
-           p.NI;
+           0;
            p.E0(3)];
     
     end
