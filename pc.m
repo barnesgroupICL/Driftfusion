@@ -49,7 +49,7 @@ classdef pc
         Vapp = 0;               % Applied bias
         BC = 3;                 % Boundary Conditions. Must be set to one for first solution
         figson = 1;             % Toggle figures on/off
-        meshx_figon = 1;        % Toggles x-mesh figures on/off
+        meshx_figon = 0;        % Toggles x-mesh figures on/off
         mesht_figon = 0;        % Toggles t-mesh figures on/off
         side = 1;               % illumination side 1 = EE, 2 = SE
         calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
@@ -79,20 +79,21 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels
-        EA = [-3.0, -3.8, -4.0];%   %1.9 + [-1.9, -3.7, -4.1];
-        IP = [-5.2, -5.4, -5.8];%    %1.9 + [-4.9, -5.3, -7.4]; 
+        EA = [-3.8, -3.8,-3.8]%EA = [-3.0, -3.8, -4.0];%   %1.9 + [-1.9, -3.7, -4.1];
+        IP = [-5.4, -5.4, -5.4] %IP = [-5.2, -5.4, -5.8];%    %1.9 + [-4.9, -5.3, -7.4]; 
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-5.0, -4.6, -4.9];
+        %E0 = [-5.0, -4.6, -4.9];
+        E0 = [-5.25, -4.6, -3.95];
         
         % Workfunction energies
-        PhiA = -5.1;    %-1.4;    %
-        PhiC = -4.3;    %-0.6;    %
+        PhiA = -5.25;   %-5.1;    %-1.4;    %
+        PhiC = -3.95;    %-4.3;    %-0.6;    %
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
         %N0 = [1.5e18, 6e18, 1e18];
-        N0 = [1e19, 1e19, 1e19];
+        N0 = [1e20, 1e18, 1e20];
         
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
@@ -110,7 +111,8 @@ classdef pc
         
         % Dielectric constants
         %epp = [4, 12, 4];
-        epp = [4, 12, 4];
+        %epp = [4, 12, 4];
+        epp = [12,12,12];
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
@@ -383,7 +385,7 @@ classdef pc
                 % Boundary electron and hole densities
         function value = get.nright(params)
             
-            value = params.N0(2)*exp((params.PhiC-params.EA(3))/(params.kB*params.T));
+            value = params.N0(3)*exp((params.PhiC-params.EA(3))/(params.kB*params.T));
         
         end
         
