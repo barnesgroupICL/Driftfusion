@@ -147,7 +147,8 @@ disp('Complete')
 % ssol_eq = pindrift(ssol, p);
 % disp('Complete')
 
-%{
+
+
 
 %% Equilibrium solutions with ion mobility switched on
 %% Closed circuit conditions
