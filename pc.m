@@ -70,7 +70,7 @@ classdef pc
         % Parameters for time mesh
         tmax = 1e-12;               % Max time value
         t0 = 1e-16;                 % Initial log mesh time value
-        tpoints = 200;              % Number of time points
+        tpoints = 100;              % Number of time points
         tmesh_type = 2;             % Mesh type- for use with meshgen_t
         
         %%%%%%%%%%% MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
@@ -79,22 +79,21 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels
-        EA = [-3.8, -3.8,-3.8]%EA = [-3.0, -3.8, -4.0];%   %1.9 + [-1.9, -3.7, -4.1];
-        IP = [-5.4, -5.4, -5.4] %IP = [-5.2, -5.4, -5.8];%    %1.9 + [-4.9, -5.3, -7.4]; 
+        EA = [-3.0, -3.8, -4.0];%   %1.9 + [-1.9, -3.7, -4.1];
+        IP = [-5.2, -5.4, -5.8];%    %1.9 + [-4.9, -5.3, -7.4]; 
         
         %% Equilibrium Fermi energies - defines doping density
-        %E0 = [-5.0, -4.6, -4.9];
-        E0 = [-5.25, -4.6, -3.95];
+        E0 = [-5.0, -4.6, -4.9];
+        %E0 = [-5.25, -4.6, -3.95];
         
         % Workfunction energies
-        PhiA = -5.25;   %-5.1;    %-1.4;    %
-        PhiC = -3.95;    %-4.3;    %-0.6;    %
+        PhiA = -5.1;    %-1.4;    %
+        PhiC = -4.3;    %-0.6;    %
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
-        %N0 = [1.5e18, 6e18, 1e18];
-        N0 = [1e20, 1e18, 1e20];
-        
+        N0 = [1.5e18, 6e18, 1e19];
+                
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
@@ -103,8 +102,8 @@ classdef pc
         NI = 1e18;                      % [cm-3] ?A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
         
         % Mobilities
-        mue = [1, 1, 1];         % electron mobility [cm2V-1s-1]
-        muh = [1, 1, 1];         % hole mobility [cm2V-1s-1]
+        mue = [1e-3, 1, 1e-3];         % electron mobility [cm2V-1s-1]
+        muh = [1e-3, 1, 1e-3];         % hole mobility [cm2V-1s-1]
         mui = 1e-10;                   % ion mobility [cm2V-1s-1]
         
         % PEDOT e- mobility: https://aip.scitation.org/doi/10.1063/1.4824104 hole mobility p-type [cm2V-1s-1]
@@ -112,7 +111,7 @@ classdef pc
         % Dielectric constants
         %epp = [4, 12, 4];
         %epp = [4, 12, 4];
-        epp = [12,12,12];
+        epp = [4,12,4];
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
