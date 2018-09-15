@@ -14,18 +14,19 @@ classdef pc
         e = 1.61917e-19;         % Elementary charge in Coulombs.
         
         % Device Dimensions [cm]
-        d = [100e-7, 400e-7, 80e-7];       % Layer thickness array
-        parr = [50, 200, 40];             % Spatial mesh points array
+        d = [22e-7, 510e-7, 60e-7];       % Layer thickness array
+        parr = [10, 200, 20];             % Spatial mesh points array
         
         dcum = cumsum(pc.d);                % cumulative thickness        
                  
-        dint = 4e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
+        dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
-        dscr = 50e-7;       % Approx space charge region thickness
-        pscr = 100;          % No of points in space charge region
+        dscr = 20e-7;       % Approx space charge region thickness
+        pscr = 40;          % No of points in space charge region
         pepe = 20;          % electrode interface points
         te = 10e-7;         % electrode interface thickness
         dmin = 1e-7;        % start value for log meshes
+        deltax = 1e-7;
         
         % Define spatial cordinate system
         % m=0 cartesian
@@ -44,12 +45,12 @@ classdef pc
         %%%%%%% GENERAL CONTROL PARAMETERS %%%%%%%%%%
         OC = 0;                 % Closed circuit = 0, Open Circuit = 1
         Int = 0;                % Bias Light intensity (Suns Eq.)
-        G0 = 2.5e21;            % Uniform generation rate @ 1 Sun
+        G0 = 2.6409e+21;        % Uniform generation rate @ 1 Sun
         pulseon = 0;            % Switch pulse on TPC or TPV
         Vapp = 0;               % Applied bias
         BC = 3;                 % Boundary Conditions. Must be set to one for first solution
         figson = 1;             % Toggle figures on/off
-        meshx_figon = 0;        % Toggles x-mesh figures on/off
+        meshx_figon = 1;        % Toggles x-mesh figures on/off
         mesht_figon = 0;        % Toggles t-mesh figures on/off
         side = 1;               % illumination side 1 = EE, 2 = SE
         calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
@@ -61,7 +62,7 @@ classdef pc
         % Current only uniform generation functionality is avaiable- this will be
         % updated in future versions.
         % 0 = Uniform Generation
-        OM = 1;
+        OM = 0;
         
         %%%%%%% MESHES %%%%%%
         % xmesh_type specification - see xmesh_gen
@@ -79,48 +80,47 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels
-        EA = [-3.0, -3.8, -4.0];%   %1.9 + [-1.9, -3.7, -4.1];
-        IP = [-5.2, -5.4, -5.8];%    %1.9 + [-4.9, -5.3, -7.4]; 
+        %PEDOT:PSS        
+        EA = [-3.5, -3.8, -3.8];%   %1.9 + [-1.9, -3.7, -4.1];
+        IP = [-5.1, -5.4, -6.2];%    %1.9 + [-4.9, -5.3, -7.4]; 
+        
+        % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-5.0, -4.6, -4.9];
+        E0 = [-4.7, -4.6, -3.9];
         %E0 = [-5.25, -4.6, -3.95];
         
         % Workfunction energies
-        PhiA = -5.1;    %-1.4;    %
-        PhiC = -4.3;    %-0.6;    %
+        PhiA = -5.0;    %-1.4;    %
+        PhiC = -3.9;    %-0.6;    %
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
         N0 = [1.5e18, 6e18, 1e19];
-                
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
                 
         %%%%% MOBILE ION DEFECT DENSITY %%%%%
-        NI = 1e18;                      % [cm-3] ?A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
+        NI = 1e18;                      % [cm-3] A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
         
         % Mobilities
-        mue = [1e-3, 1, 1e-3];         % electron mobility [cm2V-1s-1]
-        muh = [1e-3, 1, 1e-3];         % hole mobility [cm2V-1s-1]
+        mue = [1e-4, 1, 1e-3];         % electron mobility [cm2V-1s-1]
+        muh = [1e-4, 1, 1e-3];         % hole mobility [cm2V-1s-1]
         mui = 1e-10;                   % ion mobility [cm2V-1s-1]
-        
+        % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT e- mobility: https://aip.scitation.org/doi/10.1063/1.4824104 hole mobility p-type [cm2V-1s-1]
         
         % Dielectric constants
-        %epp = [4, 12, 4];
-        %epp = [4, 12, 4];
         epp = [4,12,4];
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        kradi = 1e-12;         % [cm3 s-1] Bulk Radiative Recombination coefficient [nominally 1e-10]
-        kradp = 1e-12;         % [cm3 s-1] ETL Radiative Recombination coefficient
-        kradn = 1e-12;         % [cm3 s-1] HTL Radiative Recombination coefficient
+        krad = [5.97e-10, 3.60e-12, 3.60e-12, 3.60e-12, 2.48e-24];         % [cm3 s-1] Radiative Recombination coefficient [nominally 1e-10]
+        % p-type/pi-interface/intrinsic/in-interface/n-type
         
-        taun = [1e-9, 1e6, 1e-6];           % [s] SRH time constant for electrons
-        taup = [1e-9, 1e6, 1e-6];           % [s] SRH time constant for holes
+        taun = [1e6, 1e-6, 1e6];           % [s] SRH time constant for electrons
+        taup = [1e6, 1e-6, 1e6];           % [s] SRH time constant for holes
         
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
