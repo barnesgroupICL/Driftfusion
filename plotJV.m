@@ -7,14 +7,14 @@ figure(11)
 ylim([-30, 30]);
 hold on
 
-if option == any([1, 3])
+if option == 1 || option == 3
     pinana(JV.dk.f);
     pinana(JV.dk.r);
     
 end
 
-if option == any([2, 3])
-    pinana(JV.ill.f);
+if option == 2 || option == 3
+    pinana(JV.ill.f);   
     pinana(JV.ill.r);
 end
 
