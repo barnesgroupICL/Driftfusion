@@ -261,15 +261,15 @@ c = [1
 % p-type
 if x <= p.dcum(1) - p.dint
  
-   f = [(Bn(1)*p.mue(1)*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1)));
-     (Bp(1)*p.muh(1)*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2)));     
+   f = [p.mue(1)*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1));
+     p.muh(1)*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2));     
      0;
      p.epp(1)*DuDx(4);];                                  
 
- s = [ - p.kradp*((u(1)*Bn(1)*u(2)*Bp(1))-(ni(1)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptp)) + (taup(1)*(u(1)+ntp)))); %; %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
-       - p.kradp*((u(1)*Bn(1)*u(2)*Bp(1))-(ni(1)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptp)) + (taup(1)*(u(1)+ntp)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+pthtl)) + (taup(1)*(u(1)+nthtl))));
+ s = [ - p.krad(1)*((u(1)*u(2))-(ni(1)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptp)) + (taup(1)*(u(1)+ntp)))); %; %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
+       - p.krad(1)*((u(1)*u(2))-(ni(1)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptp)) + (taup(1)*(u(1)+ntp)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+pthtl)) + (taup(1)*(u(1)+nthtl))));
       0;
-      (p.q/p.epp0)*(-(u(1)*Bn(1))+(u(2)*Bp(1))-NA(1)+ND(1));];
+      (p.q/p.epp0)*(-(u(1))+(u(2))-NA(1)+ND(1));];
 
 % p-i Interface
 elseif x >  p.dcum(1) -p.dint && x <= p.dcum(1) +p.dint
@@ -278,7 +278,11 @@ xprime = x - (p.dcum(1) - p.dint);
 N0_inter = p.N0(1) + (p.dN0dx(1) * xprime);
 deppdx = (p.epp(2) - p.epp(1))/(2*p.dint);
 epp_inter = p.epp(1) + (deppdx*xprime);
- 
+
+%intrinsic carrier density (for recombination)
+dnidx = (p.ni(2) - p.ni(1))/(2*p.dint);
+ni_inter = p.ni(1) + dnidx*xprime;
+
 % mobilities
 dmuedx = (p.mue(2) - p.mue(1))/(2*p.dint);
 mue_inter = p.mue(1) + (dmuedx*xprime);
@@ -296,28 +300,28 @@ dNIdx = p.NI/(2*p.dint);
 NI_inter = 0 + (dNIdx*xprime);  
 
 % Virtual charge carrier densities based on Fermi level equilibrium
-f = [Bn(2)*mue_inter*((u(1)*(-DuDx(4)+p.dEAdx(1)-(p.dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
-     Bp(2)*muh_inter*((u(2)*(DuDx(4)-p.dIPdx(1)-(p.dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
+f = [mue_inter*((u(1)*(-DuDx(4)+p.dEAdx(1)-(p.dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
+     muh_inter*((u(2)*(DuDx(4)-p.dIPdx(1)-(p.dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
      p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3));
      epp_inter*DuDx(4);];                                      
 
- s = [g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2)) - (((u(1)*Bn(2)*u(2)*Bp(1))-ni(2)^2)/((p.taun(1)*(u(2)*Bp(1)+pt(2))) + (p.taup(1)*(u(1)*Bn(2)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2)) - (((u(1)*Bn(2)*u(2)*Bp(1))-ni(2)^2)/((p.taun(1)*(u(2)*Bp(1)+pt(2))) + (p.taup(1)*(u(1)*Bn(2)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+ s = [g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+      g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       0;
-      (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
+      (p.q/p.epp0)*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
 
 % Intrinsic
 elseif x >  p.dcum(1) +p.dint && x <= p.dcum(2) - p.dint
 % Virtual charge carrier densities based on Fermi level equilibrium
-f = [(Bn(2)*p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
-     (Bp(2)*p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2))));     
+f = [p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
+     p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));     
      (p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3)));
      p.epp(2)*DuDx(4);];                                      
 
- s = [g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+pthtl)) + (taup(1)*(u(1)+nthtl)))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+pthtl)) + (taup(1)*(u(1)+nthtl)))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+ s = [g - p.krad(3)*((u(1)*u(2))-(ni(2)^2)) - (((u(1)*u(2))-ni(2)^2)/((p.taun(2)*(u(2)+pt(2))) + (p.taup(2)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+      g - p.krad(3)*((u(1)*u(2))-(ni(2)^2)) - (((u(1)*u(2))-ni(2)^2)/((p.taun(2)*(u(2)+pt(2))) + (p.taup(2)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       0;
-      (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-p.NI+u(3)+ND(2)-NA(2));]; 
+      (p.q/p.epp0)*(-(u(1))+(u(2))-p.NI+u(3)+ND(2)-NA(2));]; 
  
 % i-n Interface
 elseif x >  p.dcum(2) - p.dint && x <= p.dcum(2) +p.dint
@@ -327,6 +331,10 @@ xprime = x - (p.dcum(2) - p.dint);          % co-ordinate shift
 N0_inter = p.N0(2) +  (p.dN0dx(2)*xprime);
 deppdx = (p.epp(3) - p.epp(2))/(2*p.dint);
 epp_inter = p.epp(2) + (deppdx*xprime);
+
+%intrinsic carrier density (for recombination)
+dnidx = (p.ni(3) - p.ni(2))/(2*p.dint);
+ni_inter = p.ni(2) + dnidx*xprime;
 
 % mobilities
 dmuedx = (p.mue(3) - p.mue(2))/(2*p.dint);
@@ -345,28 +353,28 @@ dNIdx = -p.NI/(2*p.dint);
 NI_inter = p.NI + (dNIdx*xprime);  
 
 % Virtual charge carrier densities based on Fermi level equilibrium
-f = [Bn(2)*mue_inter*((u(1)*(-DuDx(4)+p.dEAdx(2)-(p.dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
-     Bp(2)*muh_inter*((u(2)*(DuDx(4)-p.dIPdx(2)-(p.dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
+f = [mue_inter*((u(1)*(-DuDx(4)+p.dEAdx(2)-(p.dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
+     muh_inter*((u(2)*(DuDx(4)-p.dIPdx(2)-(p.dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
      p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3));
      epp_inter*DuDx(4);];                                      
 
- s = [g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2)) - (((u(1)*Bn(3)*u(2)*Bp(2))-ni(2)^2)/((p.taun(3)*(u(2)*Bp(2)+pt(2))) + (p.taup(3)*(u(1)*Bn(3)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      g - p.kradi*((u(1)*Bn(2)*u(2)*Bp(2))-(ni(2)^2)) - (((u(1)*Bn(3)*u(2)*Bp(2))-ni(2)^2)/((p.taun(3)*(u(2)*Bp(2)+pt(2))) + (p.taup(3)*(u(1)*Bn(3)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+ s = [g - p.krad(4)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(3)*(u(2)+pt(2))) + (p.taup(3)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+      g - p.krad(4)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(3)*(u(2)+pt(2))) + (p.taup(3)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       0;
-      (p.q/p.epp0)*(-(u(1)*Bn(2))+(u(2)*Bp(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
+      (p.q/p.epp0)*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
   
 % n-type
 elseif x > p.dcum(2) +p.dint &&  x <= p.xmax
     
-f = [(Bn(3)*p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1))));
-     (Bp(3)*p.muh(3)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2))));      
+f = [p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
+     p.muh(3)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));      
      0;
      p.epp(3)*DuDx(4)];                                      
 
-s = [ - p.kradn*((u(1)*Bn(3)*u(2)*Bp(3))-(ni(3)^2));% - (((u(1)*Bn(3)*u(2)*Bp(3))-ni(3)^2)/((p.taun(3)*(u(2)*Bp(3)+ptn)) + (taup(3)*(u(1)*Bn(3)+ntn))));  %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun(3)*(u(2)+ptetl)) + (taup(3)*(u(1)+ntetl))));
-      - p.kradn*((u(1)*Bn(3)*u(2)*Bp(3))-(ni(3)^2));% - (((u(1)*Bn(3)*u(2)*Bp(3))-ni(3)^2)/((p.taun(1)*(u(2)*Bp(3)+ptn)) + (taup(1)*(u(1)*Bn(3)+ntn))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun(3)*(u(2)+ptetl)) + (taup(3)*(u(1)+ntetl))));
+s = [ - p.krad(5)*((u(1)*u(2))-(ni(3)^2));% - (((u(1)*u(2))-ni(3)^2)/((p.taun(3)*(u(2)+ptn)) + (taup(3)*(u(1)+ntn))));  %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun(3)*(u(2)+ptetl)) + (taup(3)*(u(1)+ntetl))));
+      - p.krad(5)*((u(1)*u(2))-(ni(3)^2));% - (((u(1)*u(2))-ni(3)^2)/((p.taun(1)*(u(2)+ptn)) + (taup(1)*(u(1)+ntn))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun(3)*(u(2)+ptetl)) + (taup(3)*(u(1)+ntetl))));
       0;
-      (p.q/p.epp0)*(-(u(1)*Bn(3))+(u(2)*Bp(3))+ND(3)-NA(3));];
+      (p.q/p.epp0)*(-(u(1))+(u(2))+ND(3)-NA(3));];
 
 end
 
@@ -574,7 +582,7 @@ else
 
       
         pl = [0;
-            (ul(2)*Bp(1)-pleft);
+            (ul(2)-pleft);
             0;
             -ul(4);];
         
@@ -583,7 +591,7 @@ else
             1;
             0];
         
-        pr = [(ur(1)*Bn(3)-nright);
+        pr = [(ur(1)-nright);
             0;
             0;
             -ur(4)+Vbi-p.Vapp;];
@@ -598,8 +606,8 @@ else
     % & sp_rec to set the surface recombination velocity. pdepe
     elseif p.BC == 2
       
-        pl = [-p.sn_l*(ul(1)*Bn(1) - nleft);
-            ul(2)*Bp(1) - pleft;
+        pl = [-p.sn_l*(ul(1) - nleft);
+            ul(2) - pleft;
             0;
             -ul(4);];
         
@@ -608,8 +616,8 @@ else
             1;
             0];
         
-        pr = [ur(1)*Bn(3) - nright;
-            p.sp_r*(ur(2)*Bp(3) - pright);
+        pr = [ur(1) - nright;
+            p.sp_r*(ur(2) - pright);
             0;
             -ur(4)+Vbi-p.Vapp;];
         
@@ -625,8 +633,8 @@ else
         % integrating continuity equations across the device.
     elseif p.BC == 3
       
-        pl = [-p.sn_l*(ul(1)*Bn(1) - nleft);
-            -p.sp_l*(ul(2)*Bp(1) - pleft);
+        pl = [-p.sn_l*(ul(1) - nleft);
+            -p.sp_l*(ul(2) - pleft);
             0;
             -ul(4);];
         
@@ -635,8 +643,8 @@ else
             1;
             0];
         
-        pr = [p.sn_r*(ur(1)*Bn(3) - nright);
-            p.sp_r*(ur(2)*Bp(3) - pright);
+        pr = [p.sn_r*(ur(1) - nright);
+            p.sp_r*(ur(2) - pright);
             0;
             -ur(4)+Vbi-p.Vapp;];
         
