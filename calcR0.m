@@ -1,4 +1,4 @@
-function [JV_ana, R0, k_rad, Voc, G0] = calcR0(Eg, t, EgArr, Jsc_vs_Eg)
+function [JV_ana, R0, k_rad, Voc, G0] = calcR0(Eg, N0, t, EgArr, Jsc_vs_Eg)
 
 params = pc;
 
@@ -46,9 +46,9 @@ R0 = J0_fd./t;
 
 J0 = J0_fd*q*1e3;
 
-ni = params.ni;             % cm-3
+ni = N0*(exp(-Eg/(2*Vth)));             % cm-3
 
-k_rad = R0/(ni(2)^2);      % cm3s-1
+k_rad = R0/(ni^2);      % cm3s-1
 
 V = -0.4:0.001:1.2;
 
