@@ -1,6 +1,7 @@
-function sol = changetau(sol_in, taun, taup)
+function sol = changetau(sol_in, krad, taun, taup)
 
 p = sol_in.p;
+p.krad = krad;
 p.taun = taun;
 p.taup = taup;
 
