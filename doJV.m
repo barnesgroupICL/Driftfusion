@@ -109,5 +109,21 @@ if option ==2 || option ==3
         plotJV(JV, option)
 end
 
+p = find(JV.ill.f.Vapp >= 0);
+p = p(1);
+JV.Jsc_f = JV.ill.f.Jtotr(p, end)
+
+p = find(JV.ill.r.Vapp <= 0);
+p = p(1);
+JV.Jsc_r = JV.ill.r.Jtotr(p, end)
+
+p = find(JV.ill.f.Jtotr(:, end) >= 0);
+p = p(1)
+JV.Voc_f = JV.ill.f.Vapp(p)
+
+p = find(JV.ill.r.Jtotr(:, end) <= 0);
+p = p(1)
+JV.Voc_r = JV.ill.r.Vapp(p)
+
 end
 
