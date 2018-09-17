@@ -15,7 +15,7 @@ classdef pc
         
         % Device Dimensions [cm]
         d = [22e-7, 510e-7, 60e-7];       % Layer thickness array
-        parr = [10, 200, 20];             % Spatial mesh points array
+        parr = [10, 200, 40];             % Spatial mesh points array
         
         dcum = cumsum(pc.d);                % cumulative thickness        
                  
@@ -87,7 +87,7 @@ classdef pc
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-4.7, -4.6, -3.9];
+        E0 = [-4.3, -4.6, -3.9];
         %E0 = [-5.25, -4.6, -3.95];
         
         % Workfunction energies
@@ -96,7 +96,7 @@ classdef pc
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
-        N0 = [1.5e18, 6e18, 1e19];
+        N0 = [1e20, 6e18, 1e19];
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
@@ -110,18 +110,18 @@ classdef pc
         muh = [1e-4, 1, 1e-3];         % hole mobility [cm2V-1s-1]
         mui = 1e-10;                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
-        % PEDOT e- mobility: https://aip.scitation.org/doi/10.1063/1.4824104 hole mobility p-type [cm2V-1s-1]
+        % PEDOT e- mobility: 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
         
         % Dielectric constants
         epp = [4,12,4];
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        krad = [5.97e-10, 3.6e-12, 3.6e-12, 3.6e-12, 2.48e-24];%[5.97e-10, 3.60e-12, 3.60e-12, 3.60e-12, 2.48e-24];         % [cm3 s-1] Radiative Recombination coefficient [nominally 1e-10]
+        krad = [8.3e-11, 1.0e-11, 1.0e-11, 1.0e-11, 6.8e-11];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
         
-        taun = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for electrons
-        taup = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for holes
+        taun = [1e-10, 1e-6, 1e-6];           % [s] SRH time constant for electrons
+        taup = [1e-10, 1e-6, 1e-6];           % [s] SRH time constant for holes
         
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
