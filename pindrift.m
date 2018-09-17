@@ -59,6 +59,9 @@ end
 
         Bn = p.Bn;
         Bp = p.Bp;
+        dEAdx = p.dEAdx;
+        dIPdx = p.dIPdx;
+        dN0dx = p.dN0dx;
         E0 = p.E0;
         Eg = p.Eg;
         Eif = p.Eif;
@@ -275,7 +278,7 @@ if x <= p.dcum(1) - p.dint
 elseif x >  p.dcum(1) -p.dint && x <= p.dcum(1) +p.dint
 
 xprime = x - (p.dcum(1) - p.dint);
-N0_inter = p.N0(1) + (p.dN0dx(1) * xprime);
+N0_inter = p.N0(1) + (dN0dx(1) * xprime);
 deppdx = (p.epp(2) - p.epp(1))/(2*p.dint);
 epp_inter = p.epp(1) + (deppdx*xprime);
 
@@ -300,8 +303,8 @@ dNIdx = p.NI/(2*p.dint);
 NI_inter = 0 + (dNIdx*xprime);  
 
 % Virtual charge carrier densities based on Fermi level equilibrium
-f = [mue_inter*((u(1)*(-DuDx(4)+p.dEAdx(1)-(p.dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
-     muh_inter*((u(2)*(DuDx(4)-p.dIPdx(1)-(p.dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
+f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
+     muh_inter*((u(2)*(DuDx(4)-dIPdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
      p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3));
      epp_inter*DuDx(4);];                                      
 
@@ -328,7 +331,7 @@ elseif x >  p.dcum(2) - p.dint && x <= p.dcum(2) +p.dint
 
 % Grading
 xprime = x - (p.dcum(2) - p.dint);          % co-ordinate shift
-N0_inter = p.N0(2) +  (p.dN0dx(2)*xprime);
+N0_inter = p.N0(2) +  (dN0dx(2)*xprime);
 deppdx = (p.epp(3) - p.epp(2))/(2*p.dint);
 epp_inter = p.epp(2) + (deppdx*xprime);
 
@@ -353,8 +356,8 @@ dNIdx = -p.NI/(2*p.dint);
 NI_inter = p.NI + (dNIdx*xprime);  
 
 % Virtual charge carrier densities based on Fermi level equilibrium
-f = [mue_inter*((u(1)*(-DuDx(4)+p.dEAdx(2)-(p.dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
-     muh_inter*((u(2)*(DuDx(4)-p.dIPdx(2)-(p.dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
+f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
+     muh_inter*((u(2)*(DuDx(4)-dIPdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
      p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3));
      epp_inter*DuDx(4);];                                      
 
