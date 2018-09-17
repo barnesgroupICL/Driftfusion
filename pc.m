@@ -50,7 +50,7 @@ classdef pc
         Vapp = 0;               % Applied bias
         BC = 3;                 % Boundary Conditions. Must be set to one for first solution
         figson = 1;             % Toggle figures on/off
-        meshx_figon = 1;        % Toggles x-mesh figures on/off
+        meshx_figon = 0;        % Toggles x-mesh figures on/off
         mesht_figon = 0;        % Toggles t-mesh figures on/off
         side = 1;               % illumination side 1 = EE, 2 = SE
         calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
@@ -103,6 +103,7 @@ classdef pc
                 
         %%%%% MOBILE ION DEFECT DENSITY %%%%%
         NI = 1e18;                      % [cm-3] A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
+        a_max = 1.21e22;                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
         mue = [1e-4, 1, 1e-3];         % electron mobility [cm2V-1s-1]
@@ -116,11 +117,11 @@ classdef pc
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        krad = [5.97e-10, 3.60e-12, 3.60e-12, 3.60e-12, 2.48e-24];         % [cm3 s-1] Radiative Recombination coefficient [nominally 1e-10]
+        krad = [5.97e-10, 3.6e-12, 3.6e-12, 3.6e-12, 2.48e-24];%[5.97e-10, 3.60e-12, 3.60e-12, 3.60e-12, 2.48e-24];         % [cm3 s-1] Radiative Recombination coefficient [nominally 1e-10]
         % p-type/pi-interface/intrinsic/in-interface/n-type
         
-        taun = [1e6, 1e-6, 1e6];           % [s] SRH time constant for electrons
-        taup = [1e6, 1e-6, 1e6];           % [s] SRH time constant for holes
+        taun = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for electrons
+        taup = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for holes
         
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
@@ -133,7 +134,7 @@ classdef pc
         k_defect_n = 0;
         
         %% Pulse settings
-        laserlambda = 638;      % Pulse wavelength (Currently implemetned with OM2 (Transfer Matrix only)
+        laserlambda = 638;      % Pulse wavelength (Currently implemented with OM2 (Transfer Matrix only)
         pulselen = 1e-6;        % Transient pulse length
         pulsepow = 10;          % Pulse power [mW cm-2] OM2 (Transfer Matrix only)
         pulsestart = 1e-7;
