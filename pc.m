@@ -120,8 +120,8 @@ classdef pc
         krad = [8.3e-11, 1.0e-11, 1.0e-11, 1.0e-11, 6.8e-11];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
         
-        taun = [1e-10, 1e-6, 1e-6];           % [s] SRH time constant for electrons
-        taup = [1e-10, 1e-6, 1e-6];           % [s] SRH time constant for holes
+        taun = [1e-9, 1e-6, 1e-6];           % [s] SRH time constant for electrons
+        taup = [1e-9, 1e-6, 1e-6];           % [s] SRH time constant for holes
         
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
