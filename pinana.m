@@ -486,12 +486,12 @@ set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
 grid off
 
-% ion plots
-figure(3)
-plot(xnm, a(parr(i),:), xnm, NImat(parr(i), :), xnm, rhoa(parr(i), :))
-xlabel('Position [nm]');
-xlim([0, xnmend]);
-legend('a', 'static', 'rho_a');
+% % ion plots
+% figure(3)
+% plot(xnm, a(parr(i),:), xnm, NImat(parr(i), :), xnm, rhoa(parr(i), :))
+% xlabel('Position [nm]');
+% xlim([0, xnmend]);
+% legend('a', 'static', 'rho_a');
 
 % Current vs position
 figure(4)
