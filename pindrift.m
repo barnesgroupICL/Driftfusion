@@ -158,7 +158,7 @@ end
 
 %% Solver options
 % MaxStep = limit maximum time step size during integration
-options = odeset('MaxStep', 0.1*abs(p.tmax - p.t0), 'RelTol', p.RelTol, 'AbsTol', p.AbsTol);
+options = odeset('MaxStep', 0.1*abs(p.tmax - p.t0), 'RelTol', p.RelTol, 'AbsTol', p.AbsTol, 'NonNegative', [1,1,1,0]);
 
 %% Call solver
 % inputs with '@' are function handles to the subfunctions
@@ -301,11 +301,14 @@ ND_inter = p.ND(1) + dNDdx*xprime;
 % ions
 dNIdx = p.NI/(2*p.dint);
 NI_inter = 0 + (dNIdx*xprime);  
+% ion DOS
+da_maxdx = p.a_max/(2*p.dint);
+a_max_inter = 0 + da_maxdx*xprime;
 
 % Virtual charge carrier densities based on Fermi level equilibrium
 f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
      muh_inter*((u(2)*(DuDx(4)-dIPdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
-     p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3));
+     p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(a_max_inter-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
      epp_inter*DuDx(4);];                                      
 
  s = [g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
@@ -318,7 +321,7 @@ elseif x >  p.dcum(1) +p.dint && x <= p.dcum(2) - p.dint
 % Virtual charge carrier densities based on Fermi level equilibrium
 f = [p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
      p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));     
-     (p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3)));
+     p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(p.a_max-u(3))))));   % Nerst-Planck-Poisson approach ref: Borukhov 1997
      p.epp(2)*DuDx(4);];                                      
 
  s = [g - p.krad(3)*((u(1)*u(2))-(ni(2)^2)) - (((u(1)*u(2))-ni(2)^2)/((p.taun(2)*(u(2)+pt(2))) + (p.taup(2)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
@@ -353,12 +356,15 @@ ND_inter = p.ND(2) + dNDdx*xprime;
 
 % ions
 dNIdx = -p.NI/(2*p.dint);
-NI_inter = p.NI + (dNIdx*xprime);  
+NI_inter = p.NI + (dNIdx*xprime);
+% ion DOS
+da_maxdx = -p.a_max/(2*p.dint);
+a_max_inter = p.a_max + da_maxdx*xprime;
 
 % Virtual charge carrier densities based on Fermi level equilibrium
 f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
      muh_inter*((u(2)*(DuDx(4)-dIPdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
-     p.mui*(u(3)*DuDx(4)+p.kB*p.T*DuDx(3));
+     p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(a_max_inter-u(3)))))); % Nerst-Planck-Poisson approach ref: Borukhov 1997
      epp_inter*DuDx(4);];                                      
 
  s = [g - p.krad(4)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(3)*(u(2)+pt(2))) + (p.taup(3)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
