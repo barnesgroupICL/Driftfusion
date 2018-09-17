@@ -38,7 +38,7 @@ p.taup = [1e6, 1e6, 1e6];      % [s] SRH time constant for holes
 p.tmesh_type = 2;
 p.tpoints = 40;
 
-p.Ana = 1;
+p.Ana = 0;
 p.JV = 0;
 p.Vapp = 0;
 p.Int = 0;
