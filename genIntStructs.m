@@ -1,4 +1,4 @@
-function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points)
+function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
 %GENINTSTRUCTS - Generates a cell containing structures of solutions at various light intensities, starting from the one in dark
 %
 % Syntax:  structCell = genIntStructs(struct_eq, startInt, endInt, points)
@@ -8,6 +8,8 @@ function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, end
 %   STARTINT - higher requested illumination.
 %   ENDINT - lower requested illumination.
 %   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
+%   INCLUDE_DARK - logical, if to include the dark solution in the output
+%     structure
 %
 % Outputs:
 %   STRUCTCELL - a cell containing structs of solutions at various light
@@ -18,7 +20,7 @@ function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, end
 %   J_ARRAY - an array with the currents present in the solutionJs
 %
 % Example:
-%   genIntStructs(ssol_i_eq, 100, 0.1, 4)
+%   genIntStructs(ssol_i_eq, 100, 0.1, 4, true)
 %     prepare solutions at 100, 10, 1, 0.1 and 0 illumination intensities
 %
 % Other m-files required: changeLight, pindrift
@@ -41,9 +43,11 @@ struct_Int = struct_eq;
 
 % define light intensity values, always decreasing
 Int_array = logspace(log10(startInt), log10(endInt), points);
-% as stabilized dark solution is provided in input, calculate the point at dark
-% conditions using that solution
-Int_array = [Int_array, 0];
+% if include_dark, the input dark solution is included as-it-comes in the
+% output structure
+if include_dark
+    Int_array = [Int_array, 0];
+end
 % decrease annoiance by figures popping up
 struct_eq.p.figson = 0;
 
@@ -80,7 +84,6 @@ for i = 1:length(Int_array)
     struct_Int.p.figson = 1;
     structCell{1, i} = struct_Int;
     structCell{2, i} = name;
-    assignin('base', name, struct_Int);
 end
 
 %------------- END OF CODE --------------
