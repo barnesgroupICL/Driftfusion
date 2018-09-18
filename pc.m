@@ -77,7 +77,7 @@ classdef pc
         %%%%%%%%%%% MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
         %% Layer description- currently for optical properties only
         % See Index of Refraction library for choices- names must be exactly the same but '_n', '_k' should be omitted
-        stack = {'PEDOT', 'MAPICl', 'PCBM'}
+        stack = {'PS', 'MAPICl', 'PCBM'}
         
         %% Energy levels
         %PEDOT:PSS        
