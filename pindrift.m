@@ -81,7 +81,8 @@ end
         wn = p.wn;
         wp = p.wp;
         wscr = p.wscr;
-
+        dmax = p.dcum(end);
+        
 %%%% Spatial mesh %%%%
 if length(varargin) == 0 || max(max(max(varargin{1, 1}.sol))) == 0
     
@@ -93,7 +94,7 @@ if length(varargin) == 0 || max(max(max(varargin{1, 1}.sol))) == 0
         % Mirror the mesh for symmetric model - symmetry point is an additional
         % point at device length + 1e-7
         x1 = x;
-        x2 = p.dcum(end) - fliplr(x) + x(end);
+        x2 = dmax - fliplr(x) + x(end);
         x2 = x2(2:end);                 % Delete initial point to ensure symmetry
         x = [x1, x2];
         
@@ -113,7 +114,7 @@ if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.
 end
 
 p.xpoints = length(x);
-%p.dcum(end) = x(end);
+%dmax = x(end);
 xnm = x*1e7;        
 
 t = meshgen_t(p);
@@ -172,9 +173,9 @@ function [c,f,s,iterations] = pdex4pde(x,t,u,DuDx)
 % Open circuit condition- symmetric model
 if (p.OC ==1)
     
-    if x > p.dcum(end)/2
+    if x > dmax/2
 
-        x = p.dcum(end) - x;
+        x = dmax - x;
         gradcoeff = -1;
        
     else
@@ -214,7 +215,7 @@ if p.OM == 1
     
 elseif p.Int ~= 0 && p.OM == 2
      
-      if x > p.dcum(1) && x <= (p.dcum(2)) 
+      if x > p.dcum(1) && x <= p.dcum(2)
           g = p.Int*interp1(p.genspace, Gx1S, (x-p.dcum(1)));
 
       else
@@ -224,7 +225,7 @@ elseif p.Int ~= 0 && p.OM == 2
     % Add pulse
     if p.pulseon == 1
         if  t >= 10e-6 && t < p.pulselen + 10e-6
-           if x > p.dcum(1) && x < (p.dcum(2))
+           if x > p.dcum(1) && x < p.dcum(2)
                 lasg = p.pulseint*interp1(p.genspace, GxLas, (x-p.dcum(1)));
                 g = g + lasg;
            end
@@ -234,7 +235,7 @@ elseif p.Int ~= 0 && p.OM == 2
 % Uniform Generation
 elseif p.OM == 0
       
-      if p.Int ~= 0 && x > p.dcum(1) && x <= (p.dcum(2))    
+      if p.Int ~= 0 && x > p.dcum(1) && x <= p.dcum(2)  
            g = p.Int*p.G0;
       else
            g = 0;
@@ -373,7 +374,7 @@ f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
   
 % n-type
-elseif x > p.dcum(2) +p.dint &&  x <= p.dcum(end)
+elseif x > p.dcum(2) +p.dint &&  x <= dmax
     
 f = [p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
      p.muh(3)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));      
@@ -397,9 +398,9 @@ function u0 = pdex4ic(x)
 % Open circuit condition- symmetric model
 if (p.OC ==1)
     
-    if x > p.dcum(end)/2
+    if x > dmax/2
 
-        x = p.dcum(end) - x;
+        x = dmax - x;
 
     end
     
@@ -691,7 +692,7 @@ end
 
 if p.Ana == 1
     
-    [Voc, Vapp_arr, Jtotr] = pinana(solstruct, t(end));
+    [PL, Voc, Vapp_arr, Jtotr] = pinana(solstruct, t(end));
     
     if p.OC == 1
         
