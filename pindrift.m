@@ -93,7 +93,7 @@ if length(varargin) == 0 || max(max(max(varargin{1, 1}.sol))) == 0
         % Mirror the mesh for symmetric model - symmetry point is an additional
         % point at device length + 1e-7
         x1 = x;
-        x2 = p.xmax - fliplr(x) + x(end);
+        x2 = p.dcum(end) - fliplr(x) + x(end);
         x2 = x2(2:end);                 % Delete initial point to ensure symmetry
         x = [x1, x2];
         
@@ -113,7 +113,7 @@ if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.
 end
 
 p.xpoints = length(x);
-p.xmax = x(end);
+%p.dcum(end) = x(end);
 xnm = x*1e7;        
 
 t = meshgen_t(p);
@@ -172,9 +172,9 @@ function [c,f,s,iterations] = pdex4pde(x,t,u,DuDx)
 % Open circuit condition- symmetric model
 if (p.OC ==1)
     
-    if x > p.xmax/2
+    if x > p.dcum(end)/2
 
-        x = p.xmax - x;
+        x = p.dcum(end) - x;
         gradcoeff = -1;
        
     else
@@ -373,7 +373,7 @@ f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
   
 % n-type
-elseif x > p.dcum(2) +p.dint &&  x <= p.xmax
+elseif x > p.dcum(2) +p.dint &&  x <= p.dcum(end)
     
 f = [p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
      p.muh(3)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));      
@@ -397,9 +397,9 @@ function u0 = pdex4ic(x)
 % Open circuit condition- symmetric model
 if (p.OC ==1)
     
-    if x > p.xmax/2
+    if x > p.dcum(end)/2
 
-        x = p.xmax - x;
+        x = p.dcum(end) - x;
 
     end
     
