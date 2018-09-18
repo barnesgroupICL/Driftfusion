@@ -569,8 +569,6 @@ subplot(3,1,2);
 hold off
 subplot(3,1,3);
 hold off
-figure(3)
-hold off
 figure(4)
 hold off
 

@@ -14,8 +14,8 @@ classdef pc
         e = 1.61917e-19;         % Elementary charge in Coulombs.
         
         % Device Dimensions [cm]
-        d = [22e-7, 510e-7, 60e-7];       % Layer thickness array
-        parr = [10, 200, 40];             % Spatial mesh points array
+        d = [50e-7, 510e-7, 60e-7];       % Layer thickness array
+        parr = [40, 200, 40];             % Spatial mesh points array
         
         dcum = cumsum(pc.d);                % cumulative thickness        
                  
@@ -63,7 +63,7 @@ classdef pc
         % updated in future versions.
         % 0 = Uniform Generation
         OM = 0;
-        
+                
         %%%%%%% MESHES %%%%%%
         % xmesh_type specification - see xmesh_gen
         xmesh_type = 3;
@@ -81,13 +81,13 @@ classdef pc
         
         %% Energy levels
         %PEDOT:PSS        
-        EA = [-3.5, -3.8, -3.8];%   %1.9 + [-1.9, -3.7, -4.1];
+        EA = [-3.0, -3.8, -3.8];%   %1.9 + [-1.9, -3.7, -4.1];
         IP = [-5.1, -5.4, -6.2];%    %1.9 + [-4.9, -5.3, -7.4]; 
-        
+        % PEDOT: Tripathi2015
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-4.3, -4.6, -3.9];
+        E0 = [-5.0, -4.6, -3.9];
         %E0 = [-5.25, -4.6, -3.95];
         
         % Workfunction energies
@@ -96,7 +96,7 @@ classdef pc
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
-        N0 = [1e19, 6e18, 1e19];
+        N0 = [1e19, 1e19, 1e19];
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
@@ -106,8 +106,9 @@ classdef pc
         a_max = 1.21e22;                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
-        mue = [1e-4, 20, 1e-3];         % electron mobility [cm2V-1s-1]
-        muh = [1e-4, 20, 1e-3];         % hole mobility [cm2V-1s-1]
+        mue = [1e-2, 20, 1e-3];         % electron mobility [cm2V-1s-1]
+        muh = [1e-2, 20, 1e-3];         % hole mobility [cm2V-1s-1]
+
         mui = 1e-10;                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT e- mobility: 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
@@ -117,11 +118,11 @@ classdef pc
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        krad = [8.3e-11, 1.0e-11, 1.0e-11, 1.0e-11, 6.8e-11];  % [cm3 s-1] Radiative Recombination coefficient
+        krad = [6.3e-11, 1.0e-11, 1.0e-11, 1.0e-11, 6.8e-11];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
         
-        taun = [1e-9, 1e-6, 1e-6];           % [s] SRH time constant for electrons
-        taup = [1e-9, 1e-6, 1e-6];           % [s] SRH time constant for holes
+        taun = [1e-13, 1e-6, 1e-6];           % [s] SRH time constant for electrons
+        taup = [1e-13, 1e-6, 1e-6];           % [s] SRH time constant for holes
         
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
