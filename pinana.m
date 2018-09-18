@@ -58,7 +58,7 @@ V = sol(:,:,4);
     % i-n interface binary matrix II
     inBM = ones(length(t), P.xpoints)*diag(x > P.dcum(2) - P.dint & x <= P.dcum(2));
     % n-type binary matrix
-    nBM = ones(length(t), P.xpoints)*diag(x > P.dcum(2) & x <= P.xmax);
+    nBM = ones(length(t), P.xpoints)*diag(x > P.dcum(2) & x <= P.dcum(end));
 
     
 % For graded bands
@@ -71,7 +71,7 @@ V = sol(:,:,4);
     % i-n interface binary matrix II
     inBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(2) - P.dint & x <= P.dcum(2) + P.dint);
     % n-type binary matrix
-    nBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(2)  + P.dint & x <= P.xmax);
+    nBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(2)  + P.dint & x <= P.dcum(end));
 
     
 for k=1:P.tpoints
@@ -81,7 +81,7 @@ for k=1:P.tpoints
 
     for i=1:P.xpoints
         
-%         if P.OC == 1 && x(i) >= ceil(P.xmax/2)
+%         if P.OC == 1 && x(i) >= ceil(P.dcum(end)/2)
 %             
 %             i = P.xpoints - i + 1;
 %             
@@ -213,10 +213,10 @@ end
 
 Potp = V(end, :);
 
-rhoctot = trapz(x, rhoc, 2)/P.xmax;   % Net charge
+rhoctot = trapz(x, rhoc, 2)/P.dcum(end);   % Net charge
 
 Irho = a - P.NI;                  % Net ionic charge
-Irhotot = trapz(x, Irho, 2)/P.xmax;   % Total Net ion charge
+Irhotot = trapz(x, Irho, 2)/P.dcum(end);   % Total Net ion charge
 
 ntot = trapz(x, n, 2);     % Total 
 ptot = trapz(x, p, 2);
