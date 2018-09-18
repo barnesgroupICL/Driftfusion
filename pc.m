@@ -96,7 +96,7 @@ classdef pc
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
-        N0 = [1e20, 6e18, 1e19];
+        N0 = [1e19, 6e18, 1e19];
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
@@ -113,7 +113,7 @@ classdef pc
         % PEDOT e- mobility: 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
         
         % Dielectric constants
-        epp = [4,12,4];
+        epp = [4,23,4];
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
