@@ -1,4 +1,4 @@
-function [Voc, Vapp_arr, Jtot] = pinana(varargin)
+function [PL, Voc, Vapp_arr, Jtot] = pinana(varargin)
 
 % tarr is a time time array for the time you wish to plot
 if length(varargin) == 1
@@ -255,6 +255,9 @@ Usrh = ((n.*p*P.Bp(1) - P.ni(2)^2)./((P.taun(1).*(p*P.Bp(1)+P.pt(2))) + (P.taup(
         
 U = Ubtb + Usrh;
 
+%Active layer PL intensity
+PL = P.krad(3)*(n.*p - P.ni(2)^2).*iBM2;
+PLint = trapz(x, PL, 2);
 % Generation
 
 % Uniform Generation
@@ -376,7 +379,6 @@ Jpdrift = zeros(length(t), length(x));
 Jpart = zeros(length(t), length(x));
 Jtot = zeros(length(t));   
 
-
 for j=1:length(t)
     
     [nloc,dnlocdx] = pdeval(0,x,n(j,:),x);    
@@ -443,6 +445,9 @@ for i=1:length(tarr)
     timepoint = find(t <= tarr(i));
     parr(i) = timepoint(end);
 
+    % Pl intensity at time point
+    PLint(parr(i)) 
+       
 % Band Diagram
 FH1 = figure(1);
 %set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
@@ -485,6 +490,12 @@ xlim([0, xnmend]);
 set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
 grid off
+
+%PL
+figure(3)
+plot(xnm, PL(parr(i),:))
+xlabel('Position [nm]');
+ylabel('PL Intensity');
 
 % % ion plots
 % figure(3)
