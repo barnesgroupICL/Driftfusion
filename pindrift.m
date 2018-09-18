@@ -122,11 +122,6 @@ t = meshgen_t(p);
 % Beer Lambert
 if p.OM == 1
     
-    if max(max(max(varargin{1, 1}.sol))) == 0
-        gx.AM15 = 0;
-        gx.las = 0;
-    end
-
     xmesh = x;  % Duplicates x the xmesh for interpolation later- there may be an easier way to do this since the beer lambert code matches the mesh.
     
     % AM15 bias light
@@ -195,6 +190,7 @@ else
 end
 
 % Beer Lambert or Transfer Matrix 1 Sun
+%% NOT CURRENTLY WORKING
 if p.OM == 1
     %AM15
     if p.Int ~= 0 
@@ -214,7 +210,8 @@ if p.OM == 1
     end
     
     g = gxAM15 + gxlas;
-            
+        
+    
 elseif p.Int ~= 0 && p.OM == 2
      
       if x > p.dcum(1) && x <= (p.dcum(2)) 
