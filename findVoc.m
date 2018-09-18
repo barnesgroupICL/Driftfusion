@@ -26,11 +26,8 @@ Suns = 1;               % Intensity
 JVscan_rate = 1;        %Vs-1
 
 %% Save Surface rec coefficients
-
-taun_etl = p.taun_etl;       % [s] SRH time constant for electrons
-taup_etl = p.taup_etl;      % [s] SRH time constant for holes
-taun_htl = p.taun_htl; 
-taup_htl = p.taup_htl;
+taun = p.taun;       % [s] SRH time constant for electrons
+taup = p.taup;
 % 
 % % Switch off surface rec
 % p.taun_etl = 1e6;       % [s] SRH time constant for electrons
@@ -84,7 +81,7 @@ sol = pindrift(sol, p);
 
 disp('Complete')
 
-fx0 = sol.Jn(end)
+fx0 = sol.Jtotr(end, end);
 
 xrun = x0;
 yrun = fx0;
@@ -93,7 +90,7 @@ fx1 = 1;%                 % Set any initial vale > 0.01
 
 figure(111)
 
-while abs(fx1) > tol;
+while abs(fx1) > tol
     
     i = 1;
     
@@ -128,7 +125,7 @@ while abs(fx1) > tol;
     sol = pindrift(sol, p);
     
     disp('Complete')
-    fx1 = sol.Jn(end);
+    fx1 = sol.Jtotr(end, end);
 % 
 %     p.tmesh_type = 2;
 %     p.tmax = 1e-9;
