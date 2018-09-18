@@ -79,8 +79,7 @@ classdef pc
         % See Index of Refraction library for choices- names must be exactly the same but '_n', '_k' should be omitted
         stack = {'PS', 'MAPICl', 'PCBM'}
         
-        %% Energy levels
-        %PEDOT:PSS        
+        %% Energy levels    
         EA = [-3.5, -3.8, -3.8];%   %1.9 + [-1.9, -3.7, -4.1];
         IP = [-5.1, -5.4, -6.2];%    %1.9 + [-4.9, -5.3, -7.4]; 
         
@@ -96,7 +95,7 @@ classdef pc
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
-        N0 = [1e19, 6e18, 1e19];
+        N0 = [1e19, 1e19, 1e19];
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
