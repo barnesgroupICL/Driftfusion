@@ -4,7 +4,7 @@ function plotJV(JV, option)
 % JV is a structure containing dark and illuminated JVs
 
 figure(11)
-xlim([0, 1.1])
+xlim([0, 1.15])
 ylim([-25, 5]);
 hold on
 
