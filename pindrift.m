@@ -267,12 +267,12 @@ if x <= p.dcum(1) - p.dint
    f = [p.mue(1)*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1));
      p.muh(1)*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2));     
      0;
-     p.epp(1)*DuDx(4);];                                  
+     (p.epp(1)/max(p.epp))*DuDx(4);];                                  
 
  s = [ - p.krad(1)*((u(1)*u(2))-(ni(1)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptp)) + (taup(1)*(u(1)+ntp)))); %; %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
        - p.krad(1)*((u(1)*u(2))-(ni(1)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptp)) + (taup(1)*(u(1)+ntp)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+pthtl)) + (taup(1)*(u(1)+nthtl))));
       0;
-      (p.q/p.epp0)*(-(u(1))+(u(2))-NA(1)+ND(1));];
+      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NA(1)+ND(1));];
 
 % p-i Interface
 elseif x >  p.dcum(1) -p.dint && x <= p.dcum(1) +p.dint
@@ -309,12 +309,12 @@ a_max_inter = 0 + da_maxdx*xprime;
 f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
      muh_inter*((u(2)*(DuDx(4)-dIPdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
      p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(a_max_inter-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
-     epp_inter*DuDx(4);];                                      
+     (epp_inter/max(p.epp))*DuDx(4);];                                      
 
  s = [g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       0;
-      (p.q/p.epp0)*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
+      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
 
 % Intrinsic
 elseif x >  p.dcum(1) +p.dint && x <= p.dcum(2) - p.dint
@@ -322,12 +322,12 @@ elseif x >  p.dcum(1) +p.dint && x <= p.dcum(2) - p.dint
 f = [p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
      p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));     
      p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(p.a_max-u(3))))));   % Nerst-Planck-Poisson approach ref: Borukhov 1997
-     p.epp(2)*DuDx(4);];                                      
+     (p.epp(2)/max(p.epp))*DuDx(4);];                                      
 
  s = [g - p.krad(3)*((u(1)*u(2))-(ni(2)^2)) - (((u(1)*u(2))-ni(2)^2)/((p.taun(2)*(u(2)+pt(2))) + (p.taup(2)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       g - p.krad(3)*((u(1)*u(2))-(ni(2)^2)) - (((u(1)*u(2))-ni(2)^2)/((p.taun(2)*(u(2)+pt(2))) + (p.taup(2)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       0;
-      (p.q/p.epp0)*(-(u(1))+(u(2))-p.NI+u(3)+ND(2)-NA(2));]; 
+      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-p.NI+u(3)+ND(2)-NA(2));]; 
  
 % i-n Interface
 elseif x >  p.dcum(2) - p.dint && x <= p.dcum(2) +p.dint
@@ -365,12 +365,12 @@ a_max_inter = p.a_max + da_maxdx*xprime;
 f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
      muh_inter*((u(2)*(DuDx(4)-dIPdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
      p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(a_max_inter-u(3)))))); % Nerst-Planck-Poisson approach ref: Borukhov 1997
-     epp_inter*DuDx(4);];                                      
+     (epp_inter/max(p.epp))*DuDx(4);];                                      
 
  s = [g - p.krad(4)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(3)*(u(2)+pt(2))) + (p.taup(3)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       g - p.krad(4)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(3)*(u(2)+pt(2))) + (p.taup(3)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       0;
-      (p.q/p.epp0)*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
+      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
   
 % n-type
 elseif x > p.dcum(2) +p.dint &&  x <= p.xmax
@@ -378,12 +378,12 @@ elseif x > p.dcum(2) +p.dint &&  x <= p.xmax
 f = [p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
      p.muh(3)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));      
      0;
-     p.epp(3)*DuDx(4)];                                      
+     (p.epp(3)/max(p.epp))*DuDx(4)];                                      
 
 s = [ - p.krad(5)*((u(1)*u(2))-(ni(3)^2));% - (((u(1)*u(2))-ni(3)^2)/((p.taun(3)*(u(2)+ptn)) + (taup(3)*(u(1)+ntn))));  %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun(3)*(u(2)+ptetl)) + (taup(3)*(u(1)+ntetl))));
       - p.krad(5)*((u(1)*u(2))-(ni(3)^2));% - (((u(1)*u(2))-ni(3)^2)/((p.taun(1)*(u(2)+ptn)) + (taup(1)*(u(1)+ntn))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun(3)*(u(2)+ptetl)) + (taup(3)*(u(1)+ntetl))));
       0;
-      (p.q/p.epp0)*(-(u(1))+(u(2))+ND(3)-NA(3));];
+      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))+ND(3)-NA(3));];
 
 end
 

@@ -106,8 +106,9 @@ classdef pc
         a_max = 1.21e22;                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
-        mue = [1e-3, 1, 1e-3];         % electron mobility [cm2V-1s-1]
-        muh = [1e-3, 1, 1e-3];         % hole mobility [cm2V-1s-1]
+        mue = [1e-2, 20, 1e-3];         % electron mobility [cm2V-1s-1]
+        muh = [1e-2, 20, 1e-3];         % hole mobility [cm2V-1s-1]
+
         mui = 1e-10;                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT e- mobility: 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
