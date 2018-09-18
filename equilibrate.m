@@ -1,8 +1,13 @@
-function soleq = equilibrate
+function soleq = equilibrate(varargin)
 % Uses analytical initial conditions and runs to equilibrium
 % Note that tmax is consistently adjusted to appropriate values for to
 % ensure there are numerous mesh points where large gradients in the time
 % dimension are present
+if length(varargin) == 1
+    p = varargin{1,1};
+else
+    p = pc;
+end
 
 tic;    % Start stopwatch
 
@@ -12,7 +17,6 @@ tic;    % Start stopwatch
 % analytical solutions
 sol.sol = 0;    
 
-p = pc;
 p_original = p;
 
 % Store initial mobility of intrinsic layer- note all mobilities will be
@@ -65,9 +69,9 @@ disp('Initial solution, zero mobility')
 sol = pindrift(sol, p);
 disp('Complete')
 
-% Switch on mobilities
-p.mue = p_original.mue;          % electron mobility
-p.muh = p_original.muh;      % hole mobility
+% Switch on mobilities - easy numbers first
+p.mue = [1e-2, 1e-2, 1e-2];          % electron mobility
+p.muh = [1e-2, 1e-2, 1e-2];      % hole mobility
 p.mui = 0;
 
 p.sn_l = p_original.sn_l;
@@ -81,6 +85,12 @@ p.t0 = p.tmax/1e3;
 
 %% Soluition with mobility switched on
 disp('Solution with mobility switched on')
+sol = pindrift(sol, p);
+
+% switch to desired mobilities
+p.mue = p_original.mue;          % electron mobility
+p.muh = p_original.muh;      % hole mobility
+
 sol = pindrift(sol, p);
 
 p.Ana = 1;
