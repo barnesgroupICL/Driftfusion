@@ -1,13 +1,8 @@
-function soleq = equilibrate(varargin)
+function soleq = equilibrate
 % Uses analytical initial conditions and runs to equilibrium
 % Note that tmax is consistently adjusted to appropriate values for to
 % ensure there are numerous mesh points where large gradients in the time
 % dimension are present
-if length(varargin) == 1
-    p = varargin{1,1};
-else
-    p = pc;
-end
 
 tic;    % Start stopwatch
 
@@ -17,6 +12,7 @@ tic;    % Start stopwatch
 % analytical solutions
 sol.sol = 0;    
 
+p = pc;
 p_original = p;
 
 % Store initial mobility of intrinsic layer- note all mobilities will be
