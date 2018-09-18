@@ -81,13 +81,13 @@ classdef pc
         
         %% Energy levels
         %PEDOT:PSS        
-        EA = [-2.1, -3.8, -3.8];%   %1.9 + [-1.9, -3.7, -4.1];
+        EA = [-3.0, -3.8, -3.8];%   %1.9 + [-1.9, -3.7, -4.1];
         IP = [-5.1, -5.4, -6.2];%    %1.9 + [-4.9, -5.3, -7.4]; 
-        
+        % PEDOT: Tripathi2015
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-5.0, -4.6, -4.1];
+        E0 = [-5.0, -4.6, -3.9];
         %E0 = [-5.25, -4.6, -3.95];
         
         % Workfunction energies
@@ -96,7 +96,7 @@ classdef pc
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
-        N0 = [1e19, 6e18, 1e19];
+        N0 = [1e19, 1e19, 1e19];
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
@@ -118,11 +118,11 @@ classdef pc
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        krad = [1.3e-12, 1.0e-11, 1.0e-11, 1.0e-11, 6.8e-11];  % [cm3 s-1] Radiative Recombination coefficient
+        krad = [6.3e-11, 1.0e-11, 1.0e-11, 1.0e-11, 6.8e-11];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
         
-        taun = [1e-11, 1e-6, 1e-6];           % [s] SRH time constant for electrons
-        taup = [1e-11, 1e-6, 1e-6];           % [s] SRH time constant for holes
+        taun = [1e-10, 1e-6, 1e-6];           % [s] SRH time constant for electrons
+        taup = [1e-10, 1e-6, 1e-6];           % [s] SRH time constant for holes
         
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
