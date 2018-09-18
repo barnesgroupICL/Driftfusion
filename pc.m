@@ -3,8 +3,7 @@ classdef pc
     % Parameters Class
     
     properties (Constant)
-        % Set device properties
-        % These cannot be altered for subsequent solutions once set
+        % These cannot be altered
         
         % Physical constants
         
@@ -12,13 +11,19 @@ classdef pc
         epp0 = 552434;           % Epsilon_0 [e^2 eV^-1 cm^-1] - Checked (02-11-15)
         q = 1;                   % Charge of the species in units of e.
         e = 1.61917e-19;         % Elementary charge in Coulombs.
+       
+        
+    end
+    
+    properties
+        
+        % Temperature [K]
+        T = 300;
         
         % Device Dimensions [cm]
         d = [20e-7, 510e-7, 60e-7];       % Layer thickness array
         parr = [10, 200, 40];             % Spatial mesh points array
-        
-        dcum = cumsum(pc.d);                % cumulative thickness        
-                 
+                         
         dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
         dscr = 18e-7;       % Approx space charge region thickness
@@ -33,14 +38,6 @@ classdef pc
         % m=1 cylindrical polar coordinates
         % m=2 spherical polar coordinates
         m = 0;
-        
-    end
-    
-    properties
-        % Sets the default values
-        
-        % Temperature [K]
-        T = 300;
         
         %%%%%%% GENERAL CONTROL PARAMETERS %%%%%%%%%%
         OC = 0;                 % Closed circuit = 0, Open Circuit = 1
@@ -144,10 +141,6 @@ classdef pc
         JVscan_rate = 1;        % JV scan rate (Vs-1)
         JVscan_pnts = 100;
         
-        % xmax changes dependent on SC or OC - this may be changed in
-        % future versions
-        xmax = sum(pc.d);
-        
         %% Dynamically created variables
         genspace = [];
         x = [];
@@ -166,6 +159,7 @@ classdef pc
     %%  Properties whose values depend on other properties (see 'get' methods).
     properties (Dependent)
         
+        dcum
         dEAdx
         dIPdx
         dN0dx
@@ -261,7 +255,12 @@ classdef pc
                 end
             end
         end
-               
+        
+        % Cumulative thickness
+        function value = get.dcum(params)
+                value = cumsum(params.d);                % cumulative thickness     
+        end
+        
         % Band gap energies
         function value = get.Eg(params)
             
