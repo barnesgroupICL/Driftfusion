@@ -116,7 +116,7 @@ classdef pc
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        krad = [8.3e-11, 1.0e-11, 1.0e-11, 1.0e-11, 6.8e-11];  % [cm3 s-1] Radiative Recombination coefficient
+        krad = [8.3e-11, 3.6e-12, 3.6e-12, 3.6e-12, 6.8e-11];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
         
         taun = [1e-9, 1e-6, 1e-6];           % [s] SRH time constant for electrons
