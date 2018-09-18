@@ -14,14 +14,14 @@ classdef pc
         e = 1.61917e-19;         % Elementary charge in Coulombs.
         
         % Device Dimensions [cm]
-        d = [22e-7, 510e-7, 60e-7];       % Layer thickness array
+        d = [20e-7, 510e-7, 60e-7];       % Layer thickness array
         parr = [10, 200, 40];             % Spatial mesh points array
         
         dcum = cumsum(pc.d);                % cumulative thickness        
                  
         dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
-        dscr = 20e-7;       % Approx space charge region thickness
+        dscr = 18e-7;       % Approx space charge region thickness
         pscr = 40;          % No of points in space charge region
         pepe = 20;          % electrode interface points
         te = 10e-7;         % electrode interface thickness
@@ -86,7 +86,7 @@ classdef pc
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-4.3, -4.6, -3.9];
+        E0 = [-4.7, -4.6, -3.9];
         %E0 = [-5.25, -4.6, -3.95];
         
         % Workfunction energies
