@@ -443,16 +443,16 @@ end
 for i=1:length(tarr)
     
     timepoint = find(t <= tarr(i));
-    parr(i) = timepoint(end);
+    pparr(i) = timepoint(end);
 
     % Pl intensity at time point
-    PLint(parr(i)) 
+    PLint(pparr(i)) 
        
 % Band Diagram
 FH1 = figure(1);
 %set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
 PH1 = subplot(3,1,1);
-plot (xnm, Efn(parr(i),:), '--', xnm, Efp(parr(i),:), '--', xnm, Ecb(parr(i), :), xnm, Evb(parr(i) ,:));
+plot (xnm, Efn(pparr(i),:), '--', xnm, Efp(pparr(i),:), '--', xnm, Ecb(pparr(i), :), xnm, Evb(pparr(i) ,:));
 %legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
 set(legend,'FontSize',12);
 %xlabel('Position [nm]');
@@ -469,7 +469,7 @@ hold on
 % Final Charge Densities
 %figure(2)
 PH2 = subplot(3,1,2);
-semilogy(xnm, n(parr(i), :), xnm, p(parr(i), :));
+semilogy(xnm, n(pparr(i), :), xnm, p(pparr(i), :));
 ylabel('{\itn, p} [cm^{-3}]')
 %legend('\itn', '\itp')
 %xlabel('Position [nm]')
@@ -482,31 +482,31 @@ grid off
 hold on
 
 PH3 = subplot(3,1,3);
-plot(xnm, (rhoa(parr(i),:))/1e19, 'black');
+plot(xnm, (rhoa(pparr(i),:))/1e19, 'black');
 ylabel('{\it\rho a} [x10^{19} cm^{-3}]');
 xlabel('Position [nm]');
 xlim([0, xnmend]);
-%ylim([0, 1.1*(max(sol(parr(i),:,3))/1e19)]);
+%ylim([0, 1.1*(max(sol(pparr(i),:,3))/1e19)]);
 set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
 grid off
 
 %PL
 figure(3)
-plot(xnm, PL(parr(i),:))
+plot(xnm, PL(pparr(i),:))
 xlabel('Position [nm]');
 ylabel('PL Intensity');
 
 % % ion plots
 % figure(3)
-% plot(xnm, a(parr(i),:), xnm, NImat(parr(i), :), xnm, rhoa(parr(i), :))
+% plot(xnm, a(pparr(i),:), xnm, NImat(pparr(i), :), xnm, rhoa(pparr(i), :))
 % xlabel('Position [nm]');
 % xlim([0, xnmend]);
 % legend('a', 'static', 'rho_a');
 
 % Current vs position
 figure(4)
-plot(xnm, Jn(parr(i), :), xnm, Jp(parr(i), :), xnm, Jtot(parr(i), :))
+plot(xnm, Jn(pparr(i), :), xnm, Jp(pparr(i), :), xnm, Jtot(pparr(i), :))
 xlabel('Position [nm]')
 ylabel('Current density [mAcm-2]')
 hold on
@@ -548,7 +548,7 @@ hold on
 if P.calcJ == 1
 
 figure(8);
-plot(xnm,Jndiff(parr(i), :),xnm,Jndrift(parr(i), :),xnm,Jpdiff(parr(i), :),xnm,Jpdrift(parr(i), :),xnm,Jidiff(parr(i), :),xnm,Jidrift(parr(i), :),xnm,Jpart(parr(i), :));
+plot(xnm,Jndiff(pparr(i), :),xnm,Jndrift(pparr(i), :),xnm,Jpdiff(pparr(i), :),xnm,Jpdrift(pparr(i), :),xnm,Jidiff(pparr(i), :),xnm,Jidrift(pparr(i), :),xnm,Jpart(pparr(i), :));
 legend('Jn diff','Jn drift','Jp diff','Jp drift','Ji diff','Ji drift','Total J');
 xlabel('Position [nm]');
 ylabel('Current Density [mA cm^-2]');
