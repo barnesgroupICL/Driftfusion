@@ -22,7 +22,7 @@ classdef pc
         
         % Device Dimensions [cm]
         d = [60e-7, 510e-7, 60e-7];       % Layer thickness array
-        parr = [40, 200, 40];             % Spatial mesh points array
+        parr = [60, 200, 60];             % Spatial mesh points array
                          
         dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
@@ -47,7 +47,7 @@ classdef pc
         Vapp = 0;               % Applied bias
         BC = 3;                 % Boundary Conditions. Must be set to one for first solution
         figson = 1;             % Toggle figures on/off
-        meshx_figon = 0;        % Toggles x-mesh figures on/off
+        meshx_figon = 1;        % Toggles x-mesh figures on/off
         mesht_figon = 0;        % Toggles t-mesh figures on/off
         side = 1;               % illumination side 1 = EE, 2 = SE
         calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
@@ -63,7 +63,7 @@ classdef pc
         
         %%%%%%% MESHES %%%%%%
         % xmesh_type specification - see xmesh_gen
-        xmesh_type = 3;
+        xmesh_type = 2;
         
         % Parameters for time mesh
         tmax = 1e-12;               % Max time value
