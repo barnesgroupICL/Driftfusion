@@ -21,13 +21,13 @@ classdef pc
         T = 300;
         
         % Device Dimensions [cm]
-        d = [60e-7, 510e-7, 60e-7];       % Layer thickness array
-        parr = [60, 200, 60];             % Spatial mesh points array
+        d = [200e-7, 400e-7, 50e-7];       % Layer thickness array
+        parr = [100, 200, 20];             % Spatial mesh points array
                          
         dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
-        dscr = 18e-7;       % Approx space charge region thickness
-        pscr = 40;          % No of points in space charge region
+        dscr = 30e-7;       % Approx space charge region thickness
+        pscr = 60;          % No of points in space charge region
         pepe = 20;          % electrode interface points
         te = 10e-7;         % electrode interface thickness
         dmin = 1e-7;        % start value for log meshes
@@ -47,7 +47,7 @@ classdef pc
         Vapp = 0;               % Applied bias
         BC = 3;                 % Boundary Conditions. Must be set to one for first solution
         figson = 1;             % Toggle figures on/off
-        meshx_figon = 1;        % Toggles x-mesh figures on/off
+        meshx_figon = 0;        % Toggles x-mesh figures on/off
         mesht_figon = 0;        % Toggles t-mesh figures on/off
         side = 1;               % illumination side 1 = EE, 2 = SE
         calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
@@ -63,7 +63,7 @@ classdef pc
         
         %%%%%%% MESHES %%%%%%
         % xmesh_type specification - see xmesh_gen
-        xmesh_type = 2;
+        xmesh_type = 3;
         
         % Parameters for time mesh
         tmax = 1e-12;               % Max time value
@@ -74,21 +74,21 @@ classdef pc
         %%%%%%%%%%% MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
         %% Layer description- currently for optical properties only
         % See Index of Refraction library for choices- names must be exactly the same but '_n', '_k' should be omitted
-        stack = {'PS', 'MAPICl', 'PCBM'}
+        stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels    
-        EA = [-3.5, -3.8, -3.8];%   %1.9 + [-1.9, -3.7, -4.1];
-        IP = [-5.1, -5.4, -6.2];%    %1.9 + [-4.9, -5.3, -7.4]; 
+        EA = [-1.9, -3.8, -4.1];
+        IP = [-4.9, -5.4, -7.4];
         
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-4.3, -4.6, -3.9];
+        E0 = [-4.8, -4.6, -4.2];
         %E0 = [-5.25, -4.6, -3.95];
         
         % Workfunction energies
-        PhiA = -5.0;    %-1.4;    %
-        PhiC = -3.9;    %-0.6;    %
+        PhiA = -4.8;
+        PhiC = -4.2;
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
@@ -102,22 +102,30 @@ classdef pc
         a_max = 1.21e22;                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
-        mue = [6e-5, 20, 1e-3];         % electron mobility [cm2V-1s-1]
-        muh = [6e-5, 20, 1e-3];         % hole mobility [cm2V-1s-1]
+        mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
+        muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
         mui = 1e-10;                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
-        % PEDOT e- mobility: 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
+        % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
+        % TiO2 mue = 0.09?Bak2008
+        % Spiro muh = 0.02 cm2V-1s-1 Hawash2018
         
         % Dielectric constants
-        epp = [4,23,4];
+        epp = [4,23,12];
+        % TiO2?Wypych2014
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        krad = [8.3e-11, 3.6e-12, 3.6e-12, 3.6e-12, 6.8e-11];  % [cm3 s-1] Radiative Recombination coefficient
+        krad = [3.1797e-11, 3.6e-12, 3.6e-12, 3.6e-12, 1.5366e-10];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
-        
-        taun = [2e-10, 1e-6, 1e-6];           % [s] SRH time constant for electrons
-        taup = [2e-10, 1e-6, 1e-6];           % [s] SRH time constant for holes
+                
+        % SRH trap energies- currently set to mid gap - always set
+        % respective to energy levels to avoid conflicts
+        % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))           
+        Et =[-4.6, -4.6, -4.6];
+    
+        taun = [1e-9, 1e-6, 1e-12];           % [s] SRH time constant for electrons
+        taup = [1e-9, 1e-6, 1e-12];           % [s] SRH time constant for holes
         
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
@@ -167,7 +175,6 @@ classdef pc
         Bp
         Eg
         Eif
-        Et
         NA
         ND
         Vbi
@@ -210,6 +217,15 @@ classdef pc
                     error(msg);
                 end
             end
+            
+            % warn if trap energies are outside of band gpa energies
+            for i = 1:length(params.Et)
+                if params.Et(i) >= params.EA(2) || params.Et(i) <= params.IP(2)
+                    msg = 'Trap energies must exist within layer 2 band gap.';
+                    error(msg);
+                end
+            end
+            
         end
         
         function params = set.xmesh_type(params, value)
@@ -401,15 +417,7 @@ classdef pc
         end
         
         %% SRH parameters
-        
-        % SRH trap energies- currently set to mid gap - always set
-        % respective to energy levels to avoid conflicts
-        % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-        function value = get.Et(params)
-            
-            value = [params.EA(2)-(params.Eg(2)/2), params.EA(2)-(params.Eg(2)/2), params.EA(2)-(params.Eg(2)/2)];
-            
-        end
+
         
         % nt_p - Density of CB electrons when Fermi level at trap state energy
         function value = get.nt(params)
