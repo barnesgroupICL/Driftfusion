@@ -113,7 +113,7 @@ while forceStabilization || ~verifyStabilization(steadystate_struct.sol, steadys
 
 end
 
-% restore original pinAna value
+% restore original Ana value
 steadystate_struct.p.Ana = struct.p.Ana;
 
 % re-enable the warnings
