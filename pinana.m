@@ -446,7 +446,7 @@ for i=1:length(tarr)
     pparr(i) = timepoint(end);
 
     % Pl intensity at time point
-    PLint(pparr(i)) 
+    PLint(pparr(i));
        
 % Band Diagram
 FH1 = figure(1);
@@ -530,20 +530,17 @@ hold on
 % grid off
 
 % 
-% if P.OM == 1 && P.Int~=0 || P.OM == 2 && P.Int~=0
-% 
-% NOT CURRETN IMPLEMENTED
-% genspacenm = genspace * 1e7;
-% 
-% figure(7);
-% plot(genspacenm, Gx1S, genspacenm, GxLas)
-% ylabel('Generation Rate [cm^{3}s^{-1}]');
-% xlabel('Position [nm]');
-% legend('1 Sun', '638 nm');
-% xlim([0, genspacenm(end)]);
-% grid off
-% 
-% end
+if P.OM == 1 && P.Int~=0 || P.OM == 2 && P.Int~=0
+
+figure(7);
+plot(xnm, gx.AM15)
+ylabel('Generation Rate [cm^{3}s^{-1}]');
+xlabel('Position [nm]');
+legend('1 Sun');
+xlim([0, xnm(end)]);
+grid off
+
+end
 
 if P.calcJ == 1
 
