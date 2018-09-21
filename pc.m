@@ -12,7 +12,6 @@ classdef pc
         q = 1;                   % Charge of the species in units of e.
         e = 1.61917e-19;         % Elementary charge in Coulombs.
        
-        
     end
     
     properties
@@ -290,26 +289,7 @@ classdef pc
             value = params.PhiC - params.PhiA;
             
         end
-        
-        % Boltzmann conversion factor electrons
-        function value = get.Bn(params)
                 
-%             value = [(params.N0(1)/params.N0(2))*exp((params.EA(2)-params.EA(1))/(params.kB*params.T)), 1,...
-%                 (params.N0(3)/params.N0(2))*exp((params.EA(2)-params.EA(3))/(params.kB*params.T))];
-               value = [1,1,1];
-        end
-        
-        % Boltzmann conversion factor holes
-        function value = get.Bp(params)
-            
-            %Bp = [1, (params.N0(2)/params.N0(1))*exp((params.IP(2)-params.IP(1))/(params.kB*params.T)), (params.N0(3)/params.N0(1))*exp((params.IP(3)-params.IP(1))/(params.kB*params.T))];
-            %Bp = [(params.N0(1)/params.N0(3))*exp((params.IP(1)-params.IP(3))/(params.kB*params.T)), (params.N0(2)/params.N0(3))*exp((params.IP(2)-params.IP(3))/(params.kB*params.T)), 1];
-%             value = [(params.N0(1)/params.N0(2))*exp((params.IP(1)-params.IP(2))/(params.kB*params.T)), 1,...
-%                 (params.N0(3)/params.N0(2))*exp((params.IP(3)-params.IP(2))/(params.kB*params.T))];
-%             
-                value = [1,1,1];
-        end
-        
         % Intrinsic Fermi Energies
         function value = get.Eif(params)
             
@@ -319,14 +299,6 @@ classdef pc
             
         end
         
-%         % Doped Equilibrium Fermi Energies
-%         function value = get.E0(params)
-%             
-%             value = [params.EA(1) + (params.kB*params.T/params.q)*log(params.n0(1)/params.N0(1)),...
-%                 params.EA(2) + (params.kB*params.T/params.q)*log(params.n0(2)/params.N0(2)),...
-%                 params.EA(3) + (params.kB*params.T/params.q)*log(params.n0(3)/params.N0(3))];
-%             
-%         end
         % Conduction band gradients at interfaces
         function value = get.dEAdx(params)
             
