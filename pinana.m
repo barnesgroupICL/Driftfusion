@@ -250,8 +250,8 @@ Ubtb = P.krad(1)*(n.*p - P.ni(1)^2).*pBM2 +...
     P.krad(4)*(n.*p - P.ni(2)^2).*inBM2 +...
     P.krad(5)*(n.*p - P.ni(3)^2).*nBM2;
 
-Usrh = ((n.*p*P.Bp(1) - P.ni(2)^2)./((P.taun(1).*(p*P.Bp(1)+P.pt(2))) + (P.taup(1).*(n+P.nt(2))))).*piBM...
-            + ((n*P.Bn(3).*p- P.ni(2)^2)./((P.taun(3).*(p+P.pt(2))) + (P.taup(3).*(n*P.Bn(3)+P.nt(2))))).*inBM;
+Usrh = ((n.*p - P.ni(2)^2)./((P.taun(1).*(p+P.pt(2))) + (P.taup(1).*(n+P.nt(2))))).*piBM...
+            + ((n.*p- P.ni(2)^2)./((P.taun(3).*(p+P.pt(2))) + (P.taup(3).*(n+P.nt(2))))).*inBM;
         
 U = Ubtb + Usrh;
 
@@ -482,8 +482,8 @@ grid off
 hold on
 
 PH3 = subplot(3,1,3);
-plot(xnm, (rhoa(pparr(i),:))/1e19, 'black');
-ylabel('{\it\rho a} [x10^{19} cm^{-3}]');
+plot(xnm, (rhoa(pparr(i),:))/1e18, 'black');
+ylabel('{\it\rho a} [x10^{18} cm^{-3}]');
 xlabel('Position [nm]');
 xlim([0, xnmend]);
 %ylim([0, 1.1*(max(sol(pparr(i),:,3))/1e19)]);
