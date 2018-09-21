@@ -57,8 +57,6 @@ end
 % Prevents recalculation of dependent properties by pdepe defined in Methods
 % Can also use AbortSet in class def
 
-        Bn = p.Bn;
-        Bp = p.Bp;
         dEAdx = p.dEAdx;
         dIPdx = p.dIPdx;
         dN0dx = p.dN0dx;
@@ -470,8 +468,8 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
 
     if x <=  p.dcum(1) - p.dint
     
-     u0  = [nleft/Bn(1);
-            pleft/Bp(1);
+     u0  = [nleft;
+            pleft;
             0;
             p.E0(1)];
         
@@ -485,8 +483,8 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
         
     elseif x > p.dcum(1) + p.dint && x <= p.dcum(2) - p.dint
 
-     u0  = [ni(2)/Bn(2);
-            ni(2)/Bp(2);
+     u0  = [ni(2);
+            ni(2);
             p.NI;
             Eif(2)];
         
@@ -501,8 +499,8 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
         
     elseif x >  p.dcum(2) + p.dint
                    
-    u0  = [nright/Bn(3);
-           pright/Bp(3);
+    u0  = [nright;
+           pright;
            0;
            p.E0(3)];
     
