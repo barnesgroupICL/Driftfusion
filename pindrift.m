@@ -56,7 +56,8 @@ end
 %% Unpack dependent properties
 % Prevents recalculation of dependent properties by pdepe defined in Methods
 % Can also use AbortSet in class def
-
+        
+        dcum = p.dcum;
         dEAdx = p.dEAdx;
         dIPdx = p.dIPdx;
         dN0dx = p.dN0dx;
@@ -282,8 +283,8 @@ deppdx = (p.epp(2) - p.epp(1))/(2*p.dint);
 epp_inter = p.epp(1) + (deppdx*xprime);
 
 %intrinsic carrier density (for recombination)
-dnidx = (p.ni(2) - p.ni(1))/(2*p.dint);
-ni_inter = p.ni(1) + dnidx*xprime;
+dnidx = (ni(2) - ni(1))/(2*p.dint);
+ni_inter = ni(1) + dnidx*xprime;
 
 % mobilities
 dmuedx = (p.mue(2) - p.mue(1))/(2*p.dint);
@@ -292,10 +293,10 @@ dmuhdx = (p.muh(2) - p.muh(1))/(2*p.dint);
 muh_inter = p.muh(1) + (dmuhdx*xprime);
 
 % doping
-dNAdx = (p.NA(2) - p.NA(1))/(2*p.dint);
-NA_inter = p.NA(1) + dNAdx*xprime;
-dNDdx = (p.ND(2) - p.ND(1))/(2*p.dint);
-ND_inter = p.ND(1) + dNDdx*xprime;
+dNAdx = (NA(2) - NA(1))/(2*p.dint);
+NA_inter = NA(1) + dNAdx*xprime;
+dNDdx = (ND(2) - ND(1))/(2*p.dint);
+ND_inter = ND(1) + dNDdx*xprime;
 
 % ions
 dNIdx = p.NI/(2*p.dint);
@@ -338,8 +339,8 @@ deppdx = (p.epp(3) - p.epp(2))/(2*p.dint);
 epp_inter = p.epp(2) + (deppdx*xprime);
 
 %intrinsic carrier density (for recombination)
-dnidx = (p.ni(3) - p.ni(2))/(2*p.dint);
-ni_inter = p.ni(2) + dnidx*xprime;
+dnidx = (ni(3) - ni(2))/(2*p.dint);
+ni_inter = ni(2) + dnidx*xprime;
 
 % mobilities
 dmuedx = (p.mue(3) - p.mue(2))/(2*p.dint);
@@ -348,10 +349,10 @@ dmuhdx = (p.muh(3) - p.muh(2))/(2*p.dint);
 muh_inter = p.muh(2) + (dmuhdx*xprime);
 
 % doping
-dNAdx = (p.NA(3) - p.NA(2))/(2*p.dint);
-NA_inter = p.NA(2) + dNAdx*xprime;
-dNDdx = (p.ND(3) - p.ND(2))/(2*p.dint);
-ND_inter = p.ND(2) + dNDdx*xprime;
+dNAdx = (NA(3) - NA(2))/(2*p.dint);
+NA_inter = NA(2) + dNAdx*xprime;
+dNDdx = (ND(3) - ND(2))/(2*p.dint);
+ND_inter = ND(2) + dNDdx*xprime;
 
 % ions
 dNIdx = -p.NI/(2*p.dint);
