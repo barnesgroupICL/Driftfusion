@@ -121,7 +121,7 @@ classdef pc
         % SRH trap energies- currently set to mid gap - always set
         % respective to energy levels to avoid conflicts
         % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))           
-        Et =[-4.6, -4.6, -4.6];
+        Et =[-4.8, -4.6, -4.4];
     
         taun = [1e-9, 1e-6, 1e-12];           % [s] SRH time constant for electrons
         taup = [1e-9, 1e-6, 1e-12];           % [s] SRH time constant for holes
@@ -170,8 +170,6 @@ classdef pc
         dEAdx
         dIPdx
         dN0dx
-        Bn
-        Bp
         Eg
         Eif
         NA
@@ -192,7 +190,6 @@ classdef pc
         x0              % Initial spatial mesh value
         
     end
-    
     
     methods
         
@@ -290,7 +287,7 @@ classdef pc
             
         end
                 
-        % Intrinsic Fermi Energies
+        % Intrinsic Fermi Energies (Botzmann)
         function value = get.Eif(params)
             
             value = [0.5*((params.EA(1)+params.IP(1))+params.kB*params.T*log(params.N0(1)/params.N0(1))),...
@@ -323,17 +320,17 @@ classdef pc
         % Donor densities
         function value = get.ND(params)
             
-            value = [0, 0, params.N0(3)*exp((params.E0(3)-params.EA(3))/(params.kB*params.T))];
+            value = [0, 0, F.fdn(params.N0(3), params.EA(3), params.E0(3), params.T)];
             
         end
         % Donor densities
         function value = get.NA(params)
             
-            value = [params.N0(1)*exp((params.IP(1)-params.E0(1))/(params.kB*params.T)), 0, 0];
+            value = [F.fdp(params.N0(1), params.IP(1), params.E0(1), params.T), 0, 0];
             
         end
         
-        % Intrinsic carrier densities
+        % Intrinsic carrier densities - Boltzmann for now
         function value = get.ni(params)
             
             value = [params.N0(1)*(exp(-params.Eg(1)/(2*params.kB*params.T))),...
@@ -341,68 +338,63 @@ classdef pc
                 params.N0(3)*(exp(-params.Eg(3)/(2*params.kB*params.T)))];
             
         end
-        % Equilibrium electron diensities
+        % Equilibrium electron densities
         function value = get.n0(params)
             
-            value = [params.N0(1)*exp((params.E0(1)-params.EA(1))/(params.kB*params.T)),...
-                params.N0(2)*exp((params.E0(2)-params.EA(2))/(params.kB*params.T)),...
-                params.N0(3)*exp((params.E0(3)-params.EA(3))/(params.kB*params.T))];     % Background density electrons in htl/p-type
-            
+            value = [F.fdn(params.N0(1), params.EA(1), params.E0(1), params.T),...
+                F.fdn(params.N0(2), params.EA(2), params.E0(2), params.T),...
+                F.fdn(params.N0(3), params.EA(3), params.E0(3), params.T)];           
         end
-              
-        
+                     
         function value = get.p0(params)
             
-            value = [params.N0(1)*exp((params.IP(1)-params.E0(1))/(params.kB*params.T)),...
-                params.N0(2)*exp((params.IP(2)-params.E0(2))/(params.kB*params.T)),...
-                params.N0(3)*exp((params.IP(3)-params.E0(3))/(params.kB*params.T))];     % Background density holes in htl/p-type
+            value = [F.fdp(params.N0(1), params.IP(1), params.E0(1), params.T),...
+                F.fdp(params.N0(2), params.IP(2), params.E0(2), params.T),...
+                F.fdp(params.N0(3), params.IP(3), params.E0(3), params.T)];          % Background density holes in htl/p-type
             
         end
-        
-        
+                
         % Boundary electron and hole densities - based on the workfunction
         % of the electrodes
         function value = get.nleft(params)
             
-            value = params.N0(1)*exp((params.PhiA-params.EA(1))/(params.kB*params.T));
+            value = F.fdn(params.N0(1), params.EA(1), params.PhiA, params.T);
         
         end
         
                 % Boundary electron and hole densities
         function value = get.nright(params)
             
-            value = params.N0(3)*exp((params.PhiC-params.EA(3))/(params.kB*params.T));
+            value = F.fdn(params.N0(3), params.EA(3), params.PhiC, params.T);
         
         end
         
                 % Boundary electron and hole densities
         function value = get.pleft(params)
             
-            value = params.N0(1)*exp((params.IP(1)-params.PhiA)/(params.kB*params.T));
+            value = F.fdp(params.N0(1), params.IP(1), params.PhiA, params.T);
         
         end
         
         function value = get.pright(params)
             
-            value = params.N0(3)*exp((params.IP(3)-params.PhiC)/(params.kB*params.T));
+            value = F.fdp(params.N0(3), params.IP(3), params.PhiC, params.T);
         
         end
         
         %% SRH parameters
-
-        
         % nt_p - Density of CB electrons when Fermi level at trap state energy
         function value = get.nt(params)
             
-            value = params.ni.*exp((params.Et-params.Eif)/(params.kB*params.T));       % cm
-            
+            value = F.fdn(params.N0, params.EA, params.Et, params.T);
+                        
         end
         
         % pt_p - Density of VB holes when Fermi level at trap state energy
         function value = get.pt(params)
             
-            value =  params.ni.*exp((params.Eif-params.Et)/(params.kB*params.T));      % cm
-            
+            value =  F.fdp(params.N0, params.IP, params.Et, params.T);
+
         end
         
         %% Space charge layer widths
