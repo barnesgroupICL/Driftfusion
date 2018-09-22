@@ -80,13 +80,13 @@ end
         wn = p.wn;
         wp = p.wp;
         wscr = p.wscr;
-        dmax = p.dcum(end);
+        dmax = dcum(end);
+        x_ini = p.x_ini;
         
 %%%% Spatial mesh %%%%
 if length(varargin) == 0 || max(max(max(varargin{1, 1}.sol))) == 0
     
-    % Edit meshes in mesh gen
-    x = meshgen_x(p);
+    x = x_ini;
     
         if p.OC == 1
         
@@ -105,7 +105,6 @@ else
     
 end
 
-% Define the x points to give the initial
 if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
     
     icx = x;
@@ -113,7 +112,6 @@ if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.
 end
 
 p.xpoints = length(x);
-%dmax = x(end);
 xnm = x*1e7;        
 
 t = meshgen_t(p);
@@ -146,7 +144,7 @@ if p.OM == 1
 % Transfer Matrix
 elseif p.OM == 2 && p.Int ~= 0
  
-    p.genspace = x(x > p.dcum(1) & x < p.dcum(2));    % Active layer points for interpolation- this could all be implemented better but ea
+    p.genspace = x(x > dcum(1) & x < dcum(2));    % Active layer points for interpolation- this could all be implemented better but ea
     
     %% TRANSFER MATRIX NOT CURRENTLY AVAILABLE
     % Call Transfer Matrix code: [Gx1, Gx2] = TMPC1(layers, thicknesses, activeLayer1, activeLayer2)
@@ -214,8 +212,8 @@ if p.OM == 1
     
 elseif p.Int ~= 0 && p.OM == 2
      
-      if x > p.dcum(1) && x <= p.dcum(2)
-          g = p.Int*interp1(p.genspace, Gx1S, (x-p.dcum(1)));
+      if x > dcum(1) && x <= dcum(2)
+          g = p.Int*interp1(p.genspace, Gx1S, (x-dcum(1)));
 
       else
           g = 0;
@@ -224,8 +222,8 @@ elseif p.Int ~= 0 && p.OM == 2
     % Add pulse
     if p.pulseon == 1
         if  t >= 10e-6 && t < p.pulselen + 10e-6
-           if x > p.dcum(1) && x < p.dcum(2)
-                lasg = p.pulseint*interp1(p.genspace, GxLas, (x-p.dcum(1)));
+           if x > dcum(1) && x < dcum(2)
+                lasg = p.pulseint*interp1(p.genspace, GxLas, (x-dcum(1)));
                 g = g + lasg;
            end
         end
@@ -234,7 +232,7 @@ elseif p.Int ~= 0 && p.OM == 2
 % Uniform Generation
 elseif p.OM == 0
       
-      if p.Int ~= 0 && x > p.dcum(1) && x <= p.dcum(2)  
+      if p.Int ~= 0 && x > dcum(1) && x <= dcum(2)  
            g = p.Int*p.G0;
       else
            g = 0;
@@ -262,7 +260,7 @@ c = [1
      0];
 
 % p-type
-if x <= p.dcum(1) - p.dint
+if x <= dcum(1) - p.dint
  
    f = [p.mue(1)*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1));
      p.muh(1)*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2));     
@@ -275,9 +273,9 @@ if x <= p.dcum(1) - p.dint
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NA(1)+ND(1));];
 
 % p-i Interface
-elseif x >  p.dcum(1) -p.dint && x <= p.dcum(1) +p.dint
+elseif x >  dcum(1) -p.dint && x <= dcum(1) +p.dint
 
-xprime = x - (p.dcum(1) - p.dint);
+xprime = x - (dcum(1) - p.dint);
 N0_inter = p.N0(1) + (dN0dx(1) * xprime);
 deppdx = (p.epp(2) - p.epp(1))/(2*p.dint);
 epp_inter = p.epp(1) + (deppdx*xprime);
@@ -317,7 +315,7 @@ f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
 
 % Intrinsic
-elseif x >  p.dcum(1) +p.dint && x <= p.dcum(2) - p.dint
+elseif x >  dcum(1) +p.dint && x <= dcum(2) - p.dint
 % Virtual charge carrier densities based on Fermi level equilibrium
 f = [p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
      p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));     
@@ -330,10 +328,10 @@ f = [p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-p.NI+u(3)+ND(2)-NA(2));]; 
  
 % i-n Interface
-elseif x >  p.dcum(2) - p.dint && x <= p.dcum(2) +p.dint
+elseif x >  dcum(2) - p.dint && x <= dcum(2) +p.dint
 
 % Grading
-xprime = x - (p.dcum(2) - p.dint);          % co-ordinate shift
+xprime = x - (dcum(2) - p.dint);          % co-ordinate shift
 N0_inter = p.N0(2) +  (dN0dx(2)*xprime);
 deppdx = (p.epp(3) - p.epp(2))/(2*p.dint);
 epp_inter = p.epp(2) + (deppdx*xprime);
@@ -373,7 +371,7 @@ f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
   
 % n-type
-elseif x > p.dcum(2) +p.dint &&  x <= dmax
+elseif x > dcum(2) +p.dint &&  x <= dmax
     
 f = [p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
      p.muh(3)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));      
@@ -461,44 +459,44 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
 %             p.NI;
 %             Eif(2)];
         
-%     elseif x >=  p.dcum(2) 
+%     elseif x >=  dcum(2) 
 %      
 %               
 %     u0  = [nright/(p.N0(3)/p.N0(1))*exp((p.EA(1)-p.EA(3))/(p.kB*p.T));
 %            pright/(p.N0(3)/p.N0(1))*exp((p.IP(3)-p.IP(1))/(p.kB*p.T));
 
-    if x <=  p.dcum(1) - p.dint
+    if x <=  dcum(1) - p.dint
     
      u0  = [nleft;
             pleft;
             0;
             p.E0(1)];
         
-    elseif x > p.dcum(1) - p.dint && x <= p.dcum(1) + p.dint
+    elseif x > dcum(1) - p.dint && x <= dcum(1) + p.dint
     
-    xprime = x - (p.dcum(1) - p.dint);
+    xprime = x - (dcum(1) - p.dint);
     dNIdx = p.NI/(2*p.dint);
     NI_inter = 0 + (dNIdx*xprime);     
           
     u0 = [nleft; pleft; NI_inter; p.E0(1)];
         
-    elseif x > p.dcum(1) + p.dint && x <= p.dcum(2) - p.dint
+    elseif x > dcum(1) + p.dint && x <= dcum(2) - p.dint
 
      u0  = [ni(2);
             ni(2);
             p.NI;
             Eif(2)];
         
-    elseif x > p.dcum(2) - p.dint && x<= p.dcum(2) + p.dint
+    elseif x > dcum(2) - p.dint && x<= dcum(2) + p.dint
     
     % graded ions
-    xprime = x - (p.dcum(2) - p.dint);
+    xprime = x - (dcum(2) - p.dint);
     dNIdx = -p.NI/(2*p.dint);
     NI_inter = p.NI + (dNIdx*xprime);     
         
     u0  = [nright; pright; NI_inter; p.E0(3);];
         
-    elseif x >  p.dcum(2) + p.dint
+    elseif x >  dcum(2) + p.dint
                    
     u0  = [nright;
            pright;
@@ -685,7 +683,7 @@ solstruct.p = p;
 
 if p.OM == 2 && p.Int ~= 0
     
-    solstruct.g = p.Int*interp1(p.genspace, Gx1S, (x-p.dcum(1)));
+    solstruct.g = p.Int*interp1(p.genspace, Gx1S, (x-dcum(1)));
     
 end
 
