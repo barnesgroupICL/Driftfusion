@@ -188,8 +188,9 @@ classdef pc
         wp
         wscr            % Space charge region width
         x0              % Initial spatial mesh value
+        x_ini
         
-    end
+    end 
     
     methods
         
@@ -267,6 +268,10 @@ classdef pc
                 end
             end
         end
+        % xmesh
+        function value = get.x_ini(params)
+            value = meshgen_x(params);
+        end
         
         % Cumulative thickness
         function value = get.dcum(params)
@@ -296,7 +301,10 @@ classdef pc
             
         end
         
-        % Conduction band gradients at interfaces
+        % Electron affinity array
+        
+        
+        % Electron affinity gradients at interfaces
         function value = get.dEAdx(params)
             
             value = [(params.EA(2)-params.EA(1))/(2*params.dint), (params.EA(3)-params.EA(2))/(2*params.dint)];
@@ -417,7 +425,6 @@ classdef pc
             
         end
         
-        %%
-        
     end
+        
 end
