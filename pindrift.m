@@ -81,24 +81,17 @@ end
         wp = p.wp;
         wscr = p.wscr;
         dmax = p.dcum(end);
+        xx = p.xx;
+        dev = p.dev;
         
 %%%% Spatial mesh %%%%
 if length(varargin) == 0 || max(max(max(varargin{1, 1}.sol))) == 0
     
-    % Edit meshes in mesh gen
+    % Generate mesh - had problems with using the mesh generated in pc-
+    % leads to very slow solving time - mesh must be being regnerated
+    % constantly
     x = meshgen_x(p);
     
-        if p.OC == 1
-        
-        % Mirror the mesh for symmetric model - symmetry point is an additional
-        % point at device length + 1e-7
-        x1 = x;
-        x2 = dmax - fliplr(x) + x(end);
-        x2 = x2(2:end);                 % Delete initial point to ensure symmetry
-        x = [x1, x2];
-        
-        end
-
 else
           
     x = icx;
@@ -214,8 +207,8 @@ if p.OM == 1
     
 elseif p.Int ~= 0 && p.OM == 2
      
-      if x > p.dcum(1) && x <= p.dcum(2)
-          g = p.Int*interp1(p.genspace, Gx1S, (x-p.dcum(1)));
+      if x > dcum(1) && x <= dcum(2)
+          g = p.Int*interp1(p.genspace, Gx1S, (x-dcum(1)));
 
       else
           g = 0;
@@ -224,8 +217,8 @@ elseif p.Int ~= 0 && p.OM == 2
     % Add pulse
     if p.pulseon == 1
         if  t >= 10e-6 && t < p.pulselen + 10e-6
-           if x > p.dcum(1) && x < p.dcum(2)
-                lasg = p.pulseint*interp1(p.genspace, GxLas, (x-p.dcum(1)));
+           if x > dcum(1) && x < dcum(2)
+                lasg = p.pulseint*interp1(p.genspace, GxLas, (x-dcum(1)));
                 g = g + lasg;
            end
         end
@@ -234,7 +227,7 @@ elseif p.Int ~= 0 && p.OM == 2
 % Uniform Generation
 elseif p.OM == 0
       
-      if p.Int ~= 0 && x > p.dcum(1) && x <= p.dcum(2)  
+      if p.Int ~= 0 && x > dcum(1) && x <= dcum(2)  
            g = p.Int*p.G0;
       else
            g = 0;
@@ -256,13 +249,53 @@ end
 
 % Prefactors set to 1 for time dependent components - can add other
 % functions if you want to include the multiple trapping model
+i = find(p.xx <= x);
+i = i(end);
+
 c = [1
      1
      1
      0];
+ %{
+% Virtual charge carrier densities based on Fermi level equilibrium
+f = [dev.mue(i)*((u(1)*(-DuDx(4)+dev.gradEA(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(p.kB*p.T*DuDx(1)));
+     dev.muh(i)*((u(2)*(DuDx(4)-dev.gradIP(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(p.kB*p.T*DuDx(2)));     
+     dev.muion(i)*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(dev.DOSion(i)-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
+     (dev.epp(i)/max(p.epp))*DuDx(4);];                                         
+ 
+ s = [g - dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2));% - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+      g - dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2));% - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+      0;
+      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-dev.NA(i)+dev.ND(i));]; 
 
+%}  
+  % Virtual charge carrier densities based on Fermi level equilibrium
+f = [p.mobset*dev.mue(i)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
+     p.mobset*dev.muh(i)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));     
+     0;       % Nerst-Planck-Poisson approach ref: Borukhov 1997
+     (dev.epp(i)/max(p.epp))*DuDx(4);];                                         
+ 
+ s = [ - dev.krad(i)*(u(1)*u(2)-(dev.ni(i)^2));% - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+       - dev.krad(i)*(u(1)*u(2)-(dev.ni(i)^2));% - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+      0;
+      (p.q/(max(p.epp)*p.epp0))*(-u(1)+u(2)-dev.NA(i)+dev.ND(i));]; 
+  
+%   
+%   % Virtual charge carrier densities based on Fermi level equilibrium
+% f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
+%      muh_inter*((u(2)*(DuDx(4)-dIPdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
+%      p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(a_max_inter-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
+%      (epp_inter/max(p.epp))*DuDx(4);];                                      
+% 
+%  s = [g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+%       g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+%       0;
+%       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
+%   
+%{
+  
 % p-type
-if x <= p.dcum(1) - p.dint
+if x <= dcum(1) - p.dint
  
    f = [p.mue(1)*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1));
      p.muh(1)*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2));     
@@ -275,9 +308,9 @@ if x <= p.dcum(1) - p.dint
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NA(1)+ND(1));];
 
 % p-i Interface
-elseif x >  p.dcum(1) -p.dint && x <= p.dcum(1) +p.dint
+elseif x >  dcum(1) -p.dint && x <= dcum(1) +p.dint
 
-xprime = x - (p.dcum(1) - p.dint);
+xprime = x - (dcum(1) - p.dint);
 N0_inter = p.N0(1) + (dN0dx(1) * xprime);
 deppdx = (p.epp(2) - p.epp(1))/(2*p.dint);
 epp_inter = p.epp(1) + (deppdx*xprime);
@@ -317,7 +350,7 @@ f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
 
 % Intrinsic
-elseif x >  p.dcum(1) +p.dint && x <= p.dcum(2) - p.dint
+elseif x >  dcum(1) +p.dint && x <= dcum(2) - p.dint
 % Virtual charge carrier densities based on Fermi level equilibrium
 f = [p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
      p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));     
@@ -330,10 +363,10 @@ f = [p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-p.NI+u(3)+ND(2)-NA(2));]; 
  
 % i-n Interface
-elseif x >  p.dcum(2) - p.dint && x <= p.dcum(2) +p.dint
+elseif x >  dcum(2) - p.dint && x <= dcum(2) +p.dint
 
 % Grading
-xprime = x - (p.dcum(2) - p.dint);          % co-ordinate shift
+xprime = x - (dcum(2) - p.dint);          % co-ordinate shift
 N0_inter = p.N0(2) +  (dN0dx(2)*xprime);
 deppdx = (p.epp(3) - p.epp(2))/(2*p.dint);
 epp_inter = p.epp(2) + (deppdx*xprime);
@@ -373,7 +406,7 @@ f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
   
 % n-type
-elseif x > p.dcum(2) +p.dint &&  x <= dmax
+elseif x > dcum(2) +p.dint &&  x <= dmax
     
 f = [p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
      p.muh(3)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));      
@@ -386,119 +419,56 @@ s = [ - p.krad(5)*((u(1)*u(2))-(ni(3)^2));% - (((u(1)*u(2))-ni(3)^2)/((p.taun(3)
       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))+ND(3)-NA(3));];
 
 end
-
+%}
 end
 
 % --------------------------------------------------------------------------
-
 % Define initial conditions.
 function u0 = pdex4ic(x)
 
-% Open circuit condition- symmetric model
-if (p.OC ==1)
-    
-    if x > dmax/2
-
-        x = dmax - x;
-
-    end
-    
-end
+i = 1;
 
 if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) == 0
  
-    
-%         % Intrinsic
-%     u0  = [ni;
-%          ni;
-%          NI;
-%          Ei]; 
-%      
-%     % p-type
-%     if x < (tp+dscr - wp)
-%     
-%        u0 =  [nleft;
-%              pleft;
-%              0;
-%              0];  
-% 
-%     % p-type SCR    
-%     elseif  x >= (tp+dscr - wp) && x < (tp+dscr)
-% 
-%         u0 = [N0(1)*exp(q*(Efnside + EAp + q*((((q*NA)/(2*p.epp(2)*p.epp0))*(x-tp-dscr+wp)^2)))/(kB*T));                            %ni*exp((Efnside - (-q*((((q*NA)/(2*epp(1)))*(x-tp+wp)^2))))/(kB*T));
-%               N0(1)*exp(-q*(q*((((q*NA)/(2*p.epp(2)*p.epp0))*(x-tp-dscr+wp)^2)) + EAp + Egp + Efpside)/(kB*T)) ;
-%               0;
-%               (((q*NA)/(2*p.epp(2)*p.epp0))*(x-tp-dscr+wp)^2)];
-% 
-%     % Intrinsic
-% 
-%     elseif x >= tp+dscr && x < tp+ ti+dscr
-%         u0 =  [N0(2)*exp(q*(Efnside + EAp + q*(((x - tp-dscr)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) - ((q*ND*wn^2)/(2*p.epp(2)*p.epp0))))) + ((q*NA*wp^2)/(2*p.epp(2)*p.epp0))))/(kB*T));
-%                 N0(2)*exp(-q*(q*(((x - tp-dscr)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) - ((q*ND*wn^2)/(2*p.epp(2)*p.epp0))))) + ((q*NA*wp^2)/(2*p.epp(2)*p.epp0))) + EAp + Egp + Efpside)/(kB*T)) ;
-%                NI;
-%                 ((x - tp-dscr)*((1/ti)*(Vbi - ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) - ((q*ND*wn^2)/(2*p.epp(2)*p.epp0))))) + ((q*NA*wp^2)/(2*p.epp(2)*p.epp0)) ;];
-% 
-% %      % n-type SCR    
-%     elseif  x >= (tp+dscr+ti) && x < (tp +dscr + wn +ti)
-% 
-%         u0 = [N0(3)*exp(q*(Efnside + EAn*((x-dscr-ti-tp)^2)/wn^2 + EAp*((x-dscr-ti-tp-wn)^2)+ q*(((-(q*ND)/(2*p.epp(2)*p.epp0)*(x-dscr-ti-tp-wn)^2 )+ Vbi)))/(kB*T));
-%               N0(3)*exp(-q*(q*((((-(q*ND)/(2*p.epp(2)*p.epp0))*(x-dscr-ti-tp-wn)^2) + Vbi)) + EAn*(x-dscr-ti-tp)^2/wn^2 + EAp*(x-dscr-ti-tp-wn)^2+ + Egp + Efpside)/(kB*T));
-%               0; 
-%               (((-(q*ND)/(2*p.epp(2)*p.epp0))*(x-tp-ti - dscr -wn)^2) + Vbi)];
-% 
-%     elseif x >= (tp + dscr + wn +ti )
-% 
-%          u0 = [nright;
-%                pright;
-%                0;
-%                Vbi];
-% 
-%     end
+i = find(p.xx <= x);
+i = i(end);
 
-% 
-%      u0  = [ni(2)/(p.N0(2)/p.N0(1))*exp((p.EA(1)-p.EA(2))/(p.kB*p.T));
-%             ni(2)/(p.N0(2)/p.N0(1))*exp((p.IP(2)-p.IP(1))/(p.kB*p.T));
-%             p.NI;
-%             Eif(2)];
-        
-%     elseif x >=  p.dcum(2) 
-%      
-%               
-%     u0  = [nright/(p.N0(3)/p.N0(1))*exp((p.EA(1)-p.EA(3))/(p.kB*p.T));
-%            pright/(p.N0(3)/p.N0(1))*exp((p.IP(3)-p.IP(1))/(p.kB*p.T));
 
-    if x <=  p.dcum(1) - p.dint
+u0 = [dev.n0(i);
+    dev.p0(i);
+    0;
+    dev.E0(i)];
+%{
+    if x <=  dcum(1) - p.dint
     
      u0  = [nleft;
             pleft;
             0;
             p.E0(1)];
         
-    elseif x > p.dcum(1) - p.dint && x <= p.dcum(1) + p.dint
+    elseif x > dcum(1) - p.dint && x <= dcum(1) + p.dint
     
-    xprime = x - (p.dcum(1) - p.dint);
-    dNIdx = p.NI/(2*p.dint);
-    NI_inter = 0 + (dNIdx*xprime);     
-          
-    u0 = [nleft; pleft; NI_inter; p.E0(1)];
+    u0 = [nleft;
+        pleft;
+        0; 
+       p.E0(1)];
         
-    elseif x > p.dcum(1) + p.dint && x <= p.dcum(2) - p.dint
+    elseif x > dcum(1) + p.dint && x <= dcum(2) - p.dint
 
      u0  = [ni(2);
             ni(2);
-            p.NI;
+            0;%p.Nion(2);
             Eif(2)];
         
-    elseif x > p.dcum(2) - p.dint && x<= p.dcum(2) + p.dint
+    elseif x > dcum(2) - p.dint && x<= dcum(2) + p.dint 
+    Nionnow = dev.Nion(ii);
     
-    % graded ions
-    xprime = x - (p.dcum(2) - p.dint);
-    dNIdx = -p.NI/(2*p.dint);
-    NI_inter = p.NI + (dNIdx*xprime);     
+    u0  = [nright;
+        pright;
+        0;
+        p.E0(3);];
         
-    u0  = [nright; pright; NI_inter; p.E0(3);];
-        
-    elseif x >  p.dcum(2) + p.dint
+    elseif x >  dcum(2) + p.dint
                    
     u0  = [nright;
            pright;
@@ -507,7 +477,7 @@ if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.
     
     end
 
-
+%}
      elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) ~= 0
     % insert previous solution and interpolate the x points
     u0 = [interp1(icx,icsol(end,:,1),x)
@@ -685,13 +655,13 @@ solstruct.p = p;
 
 if p.OM == 2 && p.Int ~= 0
     
-    solstruct.g = p.Int*interp1(p.genspace, Gx1S, (x-p.dcum(1)));
+    solstruct.g = p.Int*interp1(p.genspace, Gx1S, (x-dcum(1)));
     
 end
 
 if p.Ana == 1
     
-    [PL, Voc, Vapp_arr, Jtotr] = pinana(solstruct, t(end));
+    pinana(solstruct, t(end));%[PL, Voc, Vapp_arr, Jtotr] = 
     
     if p.OC == 1
         
@@ -705,7 +675,7 @@ if p.Ana == 1
         
     end
     
-    solstruct.Jtotr = Jtotr;
+%    solstruct.Jtotr = Jtotr;
     
 end
 
