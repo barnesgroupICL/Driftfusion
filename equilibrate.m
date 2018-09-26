@@ -6,7 +6,9 @@ function soleq = equilibrate(varargin)
 if length(varargin) == 1
     p = varargin{1,1};
 else
+    disp('Building parameters object...')
     p = pc;
+    disp('Complete')
 end
 
 tic;    % Start stopwatch
@@ -42,7 +44,7 @@ p.taup = [1e6, 1e6, 1e6];      % [s] SRH time constant for holes
 p.tmesh_type = 2;
 p.tpoints = 40;
 
-p.Ana = 0;
+p.Ana = 1;
 p.JV = 0;
 p.Vapp = 0;
 p.Int = 0;
@@ -54,9 +56,7 @@ p.tmax = 1e-9;
 p.t0 = p.tmax/1e4;
 
 %% Switch off mobilities
-p.mue = [0, 0, 0];          % electron mobility
-p.muh = [0, 0, 0];      % hole mobility
-p.mui = 0;
+p.mobset = 0;
 
 % Switch off extraction and recombination
 p.sn_l = 0;
@@ -70,9 +70,7 @@ sol = pindrift(sol, p);
 disp('Complete')
 
 % Switch on mobilities - easy numbers first
-p.mue = [1e-2, 1e-2, 1e-2];          % electron mobility
-p.muh = [1e-2, 1e-2, 1e-2];      % hole mobility
-p.mui = 0;
+p.mobset = 1;
 
 p.sn_l = p_original.sn_l;
 p.sn_r = p_original.sn_r;
@@ -88,8 +86,7 @@ disp('Solution with mobility switched on')
 sol = pindrift(sol, p);
 
 % switch to desired mobilities
-p.mue = p_original.mue;          % electron mobility
-p.muh = p_original.muh;      % hole mobility
+p.mobset = 1;
 
 sol = pindrift(sol, p);
 
@@ -167,7 +164,7 @@ disp('Closed circuit equilibrium with ions')
 p.OC = 0;
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
-p.mui = 1e-6;           % Ions are accelerated to reach equilibrium
+p.muion = [0, 1e-6, 0];           % Ions are accelerated to reach equilibrium
 
 sol = pindrift(soleq.eq, p);
 
@@ -177,6 +174,9 @@ p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
 
 soleq.i = pindrift(sol, p);
+% Switch to default ion mobility
+soleq.i.p.muion = p_original.muion;
+
 disp('Complete')
 
 %% Ion equilibrium with surface recombination
@@ -190,6 +190,8 @@ p.t0 = p.tmax/1e3;
 
 soleq.i_sr = pindrift(soleq.i, p);
 disp('Complete')
+% Switch to default ion mobility
+soleq.i_sr.p.muion = p_original.muion;
 
 % % Switch off SR
 % p.taun = [1e6, 1e6, 1e6];
@@ -255,8 +257,8 @@ disp('Complete')
 % 
 % disp('Complete')
 
-%}
 
+%}
 disp('EQUILIBRATION COMPLETE')
 toc
 
