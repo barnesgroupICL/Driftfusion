@@ -1,4 +1,4 @@
-function [PL, Voc, Vapp_arr, Jtot] = pinana(varargin)
+function pinana(varargin)   %[PL, Voc, Vapp_arr, Jtot] = 
 
 % tarr is a time time array for the time you wish to plot
 if length(varargin) == 1
@@ -9,27 +9,18 @@ elseif length(varargin) == 2
     tarr = varargin{2};    
 end
 
-% Plotting defaults
-set(0,'DefaultLineLinewidth',1);
-set(0,'DefaultAxesFontSize',16);
-set(0,'DefaultFigurePosition', [600, 400, 450, 300]);
-set(0,'DefaultAxesXcolor', [0, 0, 0]);
-set(0,'DefaultAxesYcolor', [0, 0, 0]);
-set(0,'DefaultAxesZcolor', [0, 0, 0]);
-set(0,'DefaultTextColor', [0, 0, 0]);
-
 % Simple structure names
 sol = solstruct.sol;
-P = solstruct.p;
+par = solstruct.p;
 x = solstruct.x;
 t = solstruct.t;
 
-if P.OM == 1
+if par.OM == 1
     gx = solstruct.gx;
 end
 
-P.x = x;
-P.t = t;        % For backwards compatibility
+par.x = x;
+par.t = t;        % For backwards compatibility
 
 xpoints = length(x);
 
@@ -44,163 +35,40 @@ p = sol(:,:,2);
 a = sol(:,:,3);
 V = sol(:,:,4);
 
-% plot the output
-% if OC == 0
+EA = ones(length(t), length(x))*par.dev.EA;
+IP = par.dev.IP;
+N0 = par.dev.N0;
+Nion = par.dev.Nion;
 
-%% Binary matrices defining regions of the device
-
-    % p-type binary matrix
-    pBM = ones(length(t), P.xpoints)*diag(x <= P.dcum(1));
-    % p-i interface binary matrix
-    piBM = ones(length(t), P.xpoints)*diag(x > (P.dcum(1)) & x <= (P.dcum(1) + P.dint));       
-    % Intrinsic binary matrix
-    iBM = ones(length(t), P.xpoints)*diag(x > P.dcum(1) & x <= P.dcum(2));
-    % i-n interface binary matrix II
-    inBM = ones(length(t), P.xpoints)*diag(x > P.dcum(2) - P.dint & x <= P.dcum(2));
-    % n-type binary matrix
-    nBM = ones(length(t), P.xpoints)*diag(x > P.dcum(2) & x <= P.dcum(end));
-
-    
-% For graded bands
-    % p-type binary matrix
-    pBM2 = ones(length(t), P.xpoints)*diag(x <= P.dcum(1)-P.dint);
-    % p-i interface binary matrix
-    piBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(1) -P.dint & x <= P.dcum(1) + P.dint);       
-    % Intrinsic binary matrix
-    iBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(1) + P.dint & x <= P.dcum(2) - P.dint);
-    % i-n interface binary matrix II
-    inBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(2) - P.dint & x <= P.dcum(2) + P.dint);
-    % n-type binary matrix
-    nBM2 = ones(length(t), P.xpoints)*diag(x > P.dcum(2)  + P.dint & x <= P.dcum(end));
-
-    
-for k=1:P.tpoints
-
-    j = 1;
-    jj= 1;
-
-    for i=1:P.xpoints
-        
-%         if P.OC == 1 && x(i) >= ceil(P.dcum(end)/2)
-%             
-%             i = P.xpoints - i + 1;
-%             
-%         end
-        
-        if x(i) > P.dcum(1) - P.dint && x(i) <= P.dcum(1)
-
-            EApi1(k, i) = P.EA(1) + j*(P.dint/P.pint)*P.dEAdx(1);
-            IPpi1(k, i) = P.IP(1) + j*(P.dint/P.pint)*P.dIPdx(1);
-            N0pi1(k,i) = P.N0(1) + j*(P.dint/P.pint)*P.dN0dx(1);
-            NIpi1(k,i) = 0 + j*(P.dint/P.pint)*(P.NI/(2*P.dint));
-            j = j+1;
-
-        else
-
-            EApi1(k, i) = 0;
-            IPpi1(k, i) = 0;
-            N0pi1(k,i) = 0;
-            NIpi1(k,i) = 0;
-            
-        end
-
-
-        if x(i) > P.dcum(1) && x(i) <= P.dcum(1)+P.dint
-
-            EApi2(k, i) = P.EA(1) + j*(P.dint/P.pint)*P.dEAdx(1);
-            IPpi2(k, i) = P.IP(1) + j*(P.dint/P.pint)*P.dIPdx(1);
-            N0pi2(k,i) = P.N0(1) + j*(P.dint/P.pint)*P.dN0dx(1);
-            NIpi2(k,i) = 0 + j*(P.dint/P.pint)*(P.NI/(2*P.dint));
-            j = j+1;
-
-        else
-
-            EApi2(k, i) = 0;
-            IPpi2(k, i) = 0;
-            N0pi2(k,i) = 0;
-            NIpi2(k,i) = 0;
-        end          
-        
-        
-        if x(i) > P.dcum(2) -P.dint && x(i) <= P.dcum(2)
-
-            EAin1(k, i) = P.EA(2) +jj*(P.dint/P.pint)*P.dEAdx(2);
-            IPin1(k, i) = P.IP(2) +jj*(P.dint/P.pint)*P.dIPdx(2);
-            N0in1(k,i) = P.N0(2) + jj*(P.dint/P.pint)*P.dN0dx(2);
-            NIin1(k,i) = P.NI + jj*(P.dint/P.pint)*(-P.NI/(2*P.dint));
-            jj = jj+1;
-
-        else 
-
-            EAin1(k, i) = 0;
-            IPin1(k, i) = 0;
-            N0in1(k,i) = 0;
-            NIin1(k,i) = 0;
-        end
-        
-        if x(i) > P.dcum(2) && x(i) <= P.dcum(2) + P.dint
-
-            EAin2(k, i) = P.EA(2)+jj*(P.dint/P.pint)*P.dEAdx(2);
-            IPin2(k, i) = P.IP(2)+jj*(P.dint/P.pint)*P.dIPdx(2);
-            N0in2(k,i) = P.N0(2) + jj*(P.dint/P.pint)*P.dN0dx(2);
-            NIin2(k,i) = P.NI + jj*(P.dint/P.pint)*(-P.NI/(2*P.dint));
-            jj = jj+1;
-
-        else %x(i) > P.dcum(2) +P.dint && x(i) <= P.dcum(2) + P.dint;
-
-            EAin2(k, i) = 0;
-            IPin2(k, i) = 0;
-            N0in2(k,i) = 0;
-            NIin2(k,i) = 0;
-       end
-        
-    end
-    
-end  
-    
 %nstat = zeros(1, xpoints);                                  % Static charge array
-nstat = (-P.NA(1)+P.ND(1))*pBM  + (-P.NA(2) + P.ND(2))*nBM + (-P.NA(3) + P.ND(3))*nBM;
+nstat = (-par.NA(1)+par.ND(1))*pBM  + (-par.NA(2) + par.ND(2))*nBM + (-par.NA(3) + par.ND(3))*nBM;
 rhoc = (-n + p + nstat);     % Net charge density calculated from adding individual charge densities
 
-EA = P.EA(1)*pBM2 +  EApi1 + EApi2 + P.EA(2)*iBM2 + EAin1 + EAin2 + P.EA(3)*nBM2;
-IP = P.IP(1)*pBM2 + IPpi1 + IPpi2 + P.IP(2)*iBM2 + IPin1 + IPin2 + P.IP(3)*nBM2;
-N0 = P.N0(1)*pBM2  + N0pi1 + N0pi2 + P.N0(2)*iBM2 + N0in1 + N0in2 +P.N0(3)*nBM2;
-NImat = NIpi1 + NIpi2 + P.NI*iBM2 + NIin1 + NIin2;
-Ei = P.Eif(1)*pBM  + P.Eif(2)*iBM + P.Eif(3)*nBM;
-ni = P.ni(1)*pBM  + P.ni(2)*iBM + P.ni(3)*nBM;
+%Ei = par.dev.Ei;
+ni = par.dev.ni;
 
 Ecb = EA-V;                                 % Conduction band potential
 Evb = IP-V;                                 % Valence band potential
-Efn = real(Ecb+(P.kB*P.T/P.q)*log(n./N0));        % Electron quasi-Fermi level 
-Efp = real(Evb-(P.kB*P.T/P.q)*log(p./N0));        % Hole quasi-Fermi level
-Phin = real(Ei+(P.kB*P.T/P.q)*log(n./ni)-EA);     % Chemical Potential electrons
-Phip = real(Ei-(P.kB*P.T/P.q)*log(p./ni)-EA);     % Chemical Potential holes
+Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./N0));        % Electron quasi-Fermi level 
+Efp = real(Evb-(par.kB*par.T/par.q)*log(p./N0));        % Hole quasi-Fermi level
+Phin = real(Ei+(par.kB*par.T/par.q)*log(n./ni)-EA);     % Chemical Potential electrons
+Phip = real(Ei-(par.kB*par.T/par.q)*log(p./ni)-EA);     % Chemical Potential holes
 Phi = Phin - Phip;
 
 % Remove ionic charge densities from contact regions
-rhoa = a - NImat;
-
-if P.OC == 1
-    
-    Voc = Efn(:, round(P.xpoints/2)) - Efp(:, 1);                    % Open Circuit Voltage
-    Voc_chem = Phin(:, round(P.xpoints/2)) - Phip(:, 1);              % Chemical componenet
-    Voc_V = V(:, round(P.xpoints/2)) - V(:, 1);
-
-else
+rhoa = a - Nionmat;
     
     Voc = nan;
-    
-end
 
-if P.OC == 1  && P.pulseon == 1                               % AC coupled mode
+if par.OC == 1  && par.pulseon == 1                               % AC coupled mode
    
     Voc = Voc - Voc(1, :);
-    t = (t-(P.pulsestart+P.pulselen));          % Zero point adjustment                               
+    t = (t-(par.pulsestart+par.pulselen));          % Zero point adjustment                               
 end
 
-if P.OC == 0 && P.pulseon == 1 
+if par.OC == 0 && par.pulseon == 1 
 
-    t = (t-P.pulsestart);          % Zero point adjustment   
+    t = (t-par.pulsestart);          % Zero point adjustment   
 
 end
 
@@ -213,17 +81,17 @@ end
 
 Potp = V(end, :);
 
-rhoctot = trapz(x, rhoc, 2)/P.dcum(end);   % Net charge
+rhoctot = trapz(x, rhoc, 2)/par.dcum(end);   % Net charge
 
-Irho = a - P.NI;                  % Net ionic charge
-Irhotot = trapz(x, Irho, 2)/P.dcum(end);   % Total Net ion charge
+Irho = a - par.Nion;                  % Net ionic charge
+Irhotot = trapz(x, Irho, 2)/par.dcum(end);   % Total Net ion charge
 
 ntot = trapz(x, n, 2);     % Total 
 ptot = trapz(x, p, 2);
 
-if P.JV == 1
+if par.JV == 1
     
-    Vapp_arr = P.Vstart + ((P.Vend-P.Vstart)*t*(1/P.tmax));
+    Vapp_arr = par.Vstart + ((par.Vend-par.Vstart)*t*(1/par.tmax));
     
 else
     
@@ -244,30 +112,30 @@ dndtInt = trapz(x, dndt, 2);
 dpdtInt = trapz(x, dpdt, 2);
 
 % Recombination
-Ubtb = P.krad(1)*(n.*p - P.ni(1)^2).*pBM2 +...
-    P.krad(2)*(n.*p - P.ni(2)^2).*piBM2 +...
-    P.krad(3)*(n.*p - P.ni(2)^2).*iBM2 +...
-    P.krad(4)*(n.*p - P.ni(2)^2).*inBM2 +...
-    P.krad(5)*(n.*p - P.ni(3)^2).*nBM2;
+Ubtb = par.krad(1)*(n.*p - par.ni(1)^2).*pBM2 +...
+    par.krad(2)*(n.*p - par.ni(2)^2).*piBM2 +...
+    par.krad(3)*(n.*p - par.ni(2)^2).*iBM2 +...
+    par.krad(4)*(n.*p - par.ni(2)^2).*inBM2 +...
+    par.krad(5)*(n.*p - par.ni(3)^2).*nBM2;
 
-Usrh = ((n.*p - P.ni(2)^2)./((P.taun(1).*(p+P.pt(2))) + (P.taup(1).*(n+P.nt(2))))).*piBM...
-            + ((n.*p- P.ni(2)^2)./((P.taun(3).*(p+P.pt(2))) + (P.taup(3).*(n+P.nt(2))))).*inBM;
+Usrh = ((n.*p - par.ni(2)^2)./((par.taun(1).*(p+par.pt(2))) + (par.taup(1).*(n+par.nt(2))))).*piBM...
+            + ((n.*p- par.ni(2)^2)./((par.taun(3).*(p+par.pt(2))) + (par.taup(3).*(n+par.nt(2))))).*inBM;
         
 U = Ubtb + Usrh;
 
 %Active layer PL intensity
-PL = P.krad(3)*(n.*p - P.ni(2)^2).*iBM2;
+PL = par.krad(3)*(n.*p - par.ni(2)^2).*iBM2;
 PLint = trapz(x, PL, 2);
 % Generation
 
 % Uniform Generation
-switch P.OM
+switch par.OM
     
     case 0
       
-      if P.Int ~= 0
+      if par.Int ~= 0
            
-          g = P.Int*P.G0*iBM;
+          g = par.Int*par.G0*iBM;
                 
       else
           
@@ -277,12 +145,12 @@ switch P.OM
  
     case 1
         
-        gxAM15 = P.Int*repmat(gx.AM15', length(t), 1);
+        gxAM15 = par.Int*repmat(gx.AM15', length(t), 1);
           
-        if P.pulseon == 1
+        if par.pulseon == 1
             
             las = repmat(gx.las', length(t), 1);
-            pulset = ones(length(x), length(t))*diag(t >= P.pulsestart & t < P.pulselen + P.pulsestart);
+            pulset = ones(length(x), length(t))*diag(t >= par.pulsestart & t < par.pulselen + par.pulsestart);
             pulset = pulset';
             gxlas = las.*pulset;
             
@@ -295,13 +163,13 @@ switch P.OM
         
     case 2 
         % Transfer Matrix
-        if P.Int == 0
+        if par.Int == 0
             
             g = 0;
             
         else
             
-            g = P.Int*interp1(P.genspace, solstruct.Gx1S, (x-P.dcum(1)));
+            g = par.Int*interp1(par.genspace, solstruct.Gx1S, (x-par.dcum(1)));
             
         end       
       
@@ -311,11 +179,11 @@ end
     djpdx = -(dpdt - g + U);
     
     % Integrate across the device to get delta fluxes at all positions
-    deltajn = cumtrapz(P.x, djndx, 2);
-    deltajp = cumtrapz(P.x, djpdx, 2);
+    deltajn = cumtrapz(par.x, djndx, 2);
+    deltajp = cumtrapz(par.x, djpdx, 2);
     
     %% Currents from the boundaries
-    if P.OC
+    if par.OC
         
         jn_l = 0;
         jp_l = 0;
@@ -324,7 +192,7 @@ end
         
     else
         
-        switch P.BC
+        switch par.BC
             case 0
                 jn_l = 0;
                 jp_l = 0;
@@ -341,19 +209,19 @@ end
                 
             case 2
                 
-                jn_l = -P.sn_l*(n(:, 1) - P.nleft);
-                jp_l = -deltajp(:, end) + P.sp_r*(p(:, end) - P.pright);
+                jn_l = -par.sn_l*(n(:, 1) - par.nleft);
+                jp_l = -deltajp(:, end) + par.sp_r*(p(:, end) - par.pright);
                 
-                jn_r = deltajn(:, end) - P.sn_l*(n(:, 1) - P.nleft);
-                jp_r = P.sp_r*(p(:, end) - P.pright);
+                jn_r = deltajn(:, end) - par.sn_l*(n(:, 1) - par.nleft);
+                jp_r = par.sp_r*(p(:, end) - par.pright);
                 
             case 3
                 
-                jn_l = -P.sn_l*(n(:, 1) - P.nleft);
-                jp_l = -P.sp_l*(p(:, 1) - P.pleft);
+                jn_l = -par.sn_l*(n(:, 1) - par.nleft);
+                jp_l = -par.sp_l*(p(:, 1) - par.pleft);
                 
-                jn_r = P.sn_r*(n(:, end) - P.nright);
-                jp_r = P.sp_r*(p(:, end) - P.pright);
+                jn_r = par.sn_r*(n(:, end) - par.nright);
+                jp_r = par.sp_r*(p(:, end) - par.pright);
                 
         end
     end
@@ -361,15 +229,15 @@ end
     jn = jn_l + deltajn;
     jp = jp_l + deltajp;
     
-    Jn = -jn*1000*P.e;
-    Jp = jp*1000*P.e;
+    Jn = -jn*1000*par.e;
+    Jp = jp*1000*par.e;
     
     % Total current
     Jtot = Jn + Jp;
 
 % Calculates current at every point and all times - 
 % UNRELIABLE FOR TOTAL CURRENT
-if P.calcJ == 1
+if par.calcJ == 1
 
 % find the internal current density in the device
 Jndiff = zeros(length(t), length(x));
@@ -387,14 +255,14 @@ for j=1:length(t)
     [Vloc, dVdx] = pdeval(0,x,V(j,:),x);
     
     % Particle currents
-    Jndiff(j,:) = (P.mue_i*P.kB*P.T*dnlocdx)*(1000*P.e);
-    Jndrift(j,:) = (-P.mue_i*nloc.*dVdx)*(1000*P.e);
+    Jndiff(j,:) = (par.mue_i*par.kB*par.T*dnlocdx)*(1000*par.e);
+    Jndrift(j,:) = (-par.mue_i*nloc.*dVdx)*(1000*par.e);
    
-    Jpdiff(j,:) = (-P.muh_i*P.kB*P.T*dplocdx)*(1000*P.e);
-    Jpdrift(j,:) = (-P.muh_i*ploc.*dVdx)*(1000*P.e);
+    Jpdiff(j,:) = (-par.muh_i*par.kB*par.T*dplocdx)*(1000*par.e);
+    Jpdrift(j,:) = (-par.muh_i*ploc.*dVdx)*(1000*par.e);
     
-    Jidiff(j,:) = (-P.mui*P.kB*P.T*dilocdx)*(1000*P.e);
-    Jidrift(j,:) = (-P.mui*iloc.*dVdx)*(1000*P.e);
+    Jidiff(j,:) = (-par.muion*par.kB*par.T*dilocdx)*(1000*par.e);
+    Jidrift(j,:) = (-par.muion*iloc.*dVdx)*(1000*par.e);
 
     % Particle current
     Jpart(j,:) = Jndiff(j,:) + Jndrift(j,:) + Jpdiff(j,:) + Jpdrift(j,:) + Jidiff(j,:) + Jidrift(j,:);   
@@ -410,16 +278,16 @@ Jpartr = Jpartr';
 
 % Displacement Current at right hand side
 Fend = -(dVdxt(:, end));
-Jdispr = (P.e*1000)*P.epp(3)*-gradient(dVdxt(:, end), t);
+Jdispr = (par.e*1000)*par.epp(3)*-gradient(dVdxt(:, end), t);
 Jdispr = Jdispr';
 
 end
 
 %Figures
-if P.figson == 1
+if par.figson == 1
     
     % Open circuit voltage
-      if P.OC == 1
+      if par.OC == 1
         
         figure(7);
         plot (t, Voc);
@@ -429,7 +297,7 @@ if P.figson == 1
       end
 
 % Dodgy way to change all the graphing but works!
-if P.OC == 1
+if par.OC == 1
     
     xnmend = round(xnm(end)/2);
     
@@ -439,6 +307,14 @@ else
 end
 
 %%%%% FIGURES %%%%%
+% Plotting defaults
+set(0,'DefaultLineLinewidth',1);
+set(0,'DefaultAxesFontSize',16);
+set(0,'DefaultFigurePosition', [600, 400, 450, 300]);
+set(0,'DefaultAxesXcolor', [0, 0, 0]);
+set(0,'DefaultAxesYcolor', [0, 0, 0]);
+set(0,'DefaultAxesZcolor', [0, 0, 0]);
+set(0,'DefaultTextColor', [0, 0, 0]);
 
 for i=1:length(tarr)
     
@@ -499,7 +375,7 @@ ylabel('PL Intensity');
 
 % % ion plots
 % figure(3)
-% plot(xnm, a(pparr(i),:), xnm, NImat(pparr(i), :), xnm, rhoa(pparr(i), :))
+% plot(xnm, a(pparr(i),:), xnm, Nionmat(pparr(i), :), xnm, rhoa(pparr(i), :))
 % xlabel('Position [nm]');
 % xlim([0, xnmend]);
 % legend('a', 'static', 'rho_a');
@@ -530,7 +406,7 @@ hold on
 % grid off
 
 % 
-if P.OM == 1 && P.Int~=0 || P.OM == 2 && P.Int~=0
+if par.OM == 1 && par.Int~=0 || par.OM == 2 && par.Int~=0
 
 figure(7);
 plot(xnm, gx.AM15)
@@ -542,7 +418,7 @@ grid off
 
 end
 
-if P.calcJ == 1
+if par.calcJ == 1
 
 figure(8);
 plot(xnm,Jndiff(pparr(i), :),xnm,Jndrift(pparr(i), :),xnm,Jpdiff(pparr(i), :),xnm,Jpdrift(pparr(i), :),xnm,Jidiff(pparr(i), :),xnm,Jidrift(pparr(i), :),xnm,Jpart(pparr(i), :));
@@ -582,9 +458,9 @@ hold off
 figure(4)
 hold off
 
-if P.calcJ == 0 || P.calcJ == 1
+if par.calcJ == 0 || par.calcJ == 1
     
-    if P.JV == 1
+    if par.JV == 1
             %JV
             figure(11)
             plot(Vapp_arr, Jtot(:, end))
@@ -612,3 +488,4 @@ end
 end
 
 end
+%}
