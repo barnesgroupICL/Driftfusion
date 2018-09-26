@@ -1,4 +1,4 @@
-function pinana(varargin)   %[PL, Voc, Vapp_arr, Jtot] = 
+function [Voc, Vapp_arr, Jtot] = pinana(varargin)
 
 % tarr is a time time array for the time you wish to plot
 if length(varargin) == 1
@@ -35,29 +35,33 @@ p = sol(:,:,2);
 a = sol(:,:,3);
 V = sol(:,:,4);
 
-EA = ones(length(t), length(x))*par.dev.EA;
-IP = par.dev.IP;
-N0 = par.dev.N0;
-Nion = par.dev.Nion;
+% Create 2D matrices for multiplication with solutions
 
-%nstat = zeros(1, xpoints);                                  % Static charge array
-nstat = (-par.NA(1)+par.ND(1))*pBM  + (-par.NA(2) + par.ND(2))*nBM + (-par.NA(3) + par.ND(3))*nBM;
-rhoc = (-n + p + nstat);     % Net charge density calculated from adding individual charge densities
+EAmat = repmat(par.dev.EA, length(t), 1);
+IPmat = repmat(par.dev.IP, length(t), 1);
+muemat = repmat(par.dev.mue, length(t), 1);
+muhmat = repmat(par.dev.muh, length(t), 1);
+muionmat = repmat(par.dev.muion, length(t), 1);
+NAmat = repmat(par.dev.NA, length(t), 1);
+NDmat = repmat(par.dev.ND, length(t), 1);
+N0mat = repmat(par.dev.N0, length(t), 1);
+Nionmat = repmat(par.dev.Nion, length(t), 1);
+eppmat = repmat(par.dev.epp, length(t), 1);
+nimat = repmat(par.dev.ni, length(t), 1);
+kradmat = repmat(par.dev.krad, length(t), 1);
 
-%Ei = par.dev.Ei;
-ni = par.dev.ni;
-
-Ecb = EA-V;                                 % Conduction band potential
-Evb = IP-V;                                 % Valence band potential
-Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./N0));        % Electron quasi-Fermi level 
-Efp = real(Evb-(par.kB*par.T/par.q)*log(p./N0));        % Hole quasi-Fermi level
-Phin = real(Ei+(par.kB*par.T/par.q)*log(n./ni)-EA);     % Chemical Potential electrons
-Phip = real(Ei-(par.kB*par.T/par.q)*log(p./ni)-EA);     % Chemical Potential holes
-Phi = Phin - Phip;
+Ecb = EAmat-V;                                 % Conduction band potential
+Evb = IPmat-V;                                 % Valence band potential
+Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./N0mat));        % Electron quasi-Fermi level 
+Efp = real(Evb-(par.kB*par.T/par.q)*log(p./N0mat));        % Hole quasi-Fermi level
 
 % Remove ionic charge densities from contact regions
 rhoa = a - Nionmat;
-    
+
+%nstat = zeros(1, xpoints);                                  % Static charge array
+rhostat = NAmat+NDmat;
+rhoc = (-n + p + rhostat);     % Net charge density calculated from adding individual charge densities
+
     Voc = nan;
 
 if par.OC == 1  && par.pulseon == 1                               % AC coupled mode
@@ -83,7 +87,7 @@ Potp = V(end, :);
 
 rhoctot = trapz(x, rhoc, 2)/par.dcum(end);   % Net charge
 
-Irho = a - par.Nion;                  % Net ionic charge
+Irho = a - Nionmat;                  % Net ionic charge
 Irhotot = trapz(x, Irho, 2)/par.dcum(end);   % Total Net ion charge
 
 ntot = trapz(x, n, 2);     % Total 
@@ -112,36 +116,20 @@ dndtInt = trapz(x, dndt, 2);
 dpdtInt = trapz(x, dpdt, 2);
 
 % Recombination
-Ubtb = par.krad(1)*(n.*p - par.ni(1)^2).*pBM2 +...
-    par.krad(2)*(n.*p - par.ni(2)^2).*piBM2 +...
-    par.krad(3)*(n.*p - par.ni(2)^2).*iBM2 +...
-    par.krad(4)*(n.*p - par.ni(2)^2).*inBM2 +...
-    par.krad(5)*(n.*p - par.ni(3)^2).*nBM2;
+Ubtb = kradmat.*(n.*p - nimat.^2);
 
-Usrh = ((n.*p - par.ni(2)^2)./((par.taun(1).*(p+par.pt(2))) + (par.taup(1).*(n+par.nt(2))))).*piBM...
-            + ((n.*p- par.ni(2)^2)./((par.taun(3).*(p+par.pt(2))) + (par.taup(3).*(n+par.nt(2))))).*inBM;
+Usrh = 0;%((n.*p - par.ni(2)^2)./((par.taun(1).*(p+par.pt(2))) + (par.taup(1).*(n+par.nt(2))))).*piBM...
+           % + ((n.*p- par.ni(2)^2)./((par.taun(3).*(p+par.pt(2))) + (par.taup(3).*(n+par.nt(2))))).*inBM;
         
 U = Ubtb + Usrh;
-
-%Active layer PL intensity
-PL = par.krad(3)*(n.*p - par.ni(2)^2).*iBM2;
-PLint = trapz(x, PL, 2);
-% Generation
 
 % Uniform Generation
 switch par.OM
     
+    % Uniform generation
     case 0
-      
-      if par.Int ~= 0
            
-          g = par.Int*par.G0*iBM;
-                
-      else
-          
-          g = 0;
-      
-      end
+          g = par.Int*par.dev.G0;    
  
     case 1
         
@@ -299,13 +287,13 @@ if par.figson == 1
 % Dodgy way to change all the graphing but works!
 if par.OC == 1
     
-    xnmend = round(xnm(end)/2);
+    xnm(end) = round(xnm(end)/2);
     
 else
     
-    xnmend = xnm(end);
+    xnm(end) = xnm(end);
 end
-
+%}
 %%%%% FIGURES %%%%%
 % Plotting defaults
 set(0,'DefaultLineLinewidth',1);
@@ -321,9 +309,9 @@ for i=1:length(tarr)
     timepoint = find(t <= tarr(i));
     pparr(i) = timepoint(end);
 
-    % Pl intensity at time point
-    PLint(pparr(i));
-       
+%     % Pl intensity at time point
+%     PLint(pparr(i));
+%        
 % Band Diagram
 FH1 = figure(1);
 %set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
@@ -333,7 +321,7 @@ plot (xnm, Efn(pparr(i),:), '--', xnm, Efp(pparr(i),:), '--', xnm, Ecb(pparr(i),
 set(legend,'FontSize',12);
 %xlabel('Position [nm]');
 ylabel('Energy [eV]'); 
-xlim([0, xnmend]);
+xlim([0, xnm(end)]);
 %ylim([-inf, 0.5]);
 set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
@@ -349,7 +337,7 @@ semilogy(xnm, n(pparr(i), :), xnm, p(pparr(i), :));
 ylabel('{\itn, p} [cm^{-3}]')
 %legend('\itn', '\itp')
 %xlabel('Position [nm]')
-xlim([0, xnmend]);
+xlim([0, xnm(end)]);
 ylim([1e0, 1e20]);
 set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
@@ -361,23 +349,23 @@ PH3 = subplot(3,1,3);
 plot(xnm, (rhoa(pparr(i),:))/1e18, 'black');
 ylabel('{\it\rho a} [x10^{18} cm^{-3}]');
 xlabel('Position [nm]');
-xlim([0, xnmend]);
+xlim([0, xnm(end)]);
 %ylim([0, 1.1*(max(sol(pparr(i),:,3))/1e19)]);
 set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
 grid off
 
-%PL
-figure(3)
-plot(xnm, PL(pparr(i),:))
-xlabel('Position [nm]');
-ylabel('PL Intensity');
+% %PL
+% figure(3)
+% plot(xnm, PL(pparr(i),:))
+% xlabel('Position [nm]');
+% ylabel('PL Intensity');
 
 % % ion plots
 % figure(3)
 % plot(xnm, a(pparr(i),:), xnm, Nionmat(pparr(i), :), xnm, rhoa(pparr(i), :))
 % xlabel('Position [nm]');
-% xlim([0, xnmend]);
+% xlim([0, xnm(end)]);
 % legend('a', 'static', 'rho_a');
 
 % Current vs position
@@ -391,7 +379,7 @@ hold on
 % plot(xnm, rhoc(end, :))
 % ylabel('Net Charge Density [cm^{-3}]')
 % xlabel('Position [nm]')
-% xlim([0, xnmend]);
+% xlim([0, xnm(end)]);
 % set(legend,'FontSize',14);
 % set(legend,'EdgeColor',[1 1 1]);
 % grid off
@@ -427,7 +415,7 @@ xlabel('Position [nm]');
 ylabel('Current Density [mA cm^-2]');
 set(legend,'FontSize',12);
 set(legend,'EdgeColor',[1 1 1]);
-xlim([0, xnmend]);
+xlim([0, xnm(end)]);
 grid off;
 drawnow;
 
@@ -453,8 +441,8 @@ subplot(3,1,2);
 hold off
 subplot(3,1,3);
 hold off
-figure(3)
-hold off
+% figure(3)
+% hold off
 figure(4)
 hold off
 
@@ -488,4 +476,3 @@ end
 end
 
 end
-%}
