@@ -3,11 +3,9 @@ classdef pc
     % Parameters Class
     
     properties (Constant)
-        % These cannot be altered
         
         % Physical constants
-        
-        kB = 8.617330350e-5;       % Boltzmann constant [eV K^-1]
+        kB = 8.617330350e-5;     % Boltzmann constant [eV K^-1]
         epp0 = 552434;           % Epsilon_0 [e^2 eV^-1 cm^-1] - Checked (02-11-15)
         q = 1;                   % Charge of the species in units of e.
         e = 1.61917e-19;         % Elementary charge in Coulombs.
@@ -20,8 +18,8 @@ classdef pc
         T = 300;
         
         % Device Dimensions [cm]
-        d = [200e-7, 400e-7, 50e-7];       % Layer thickness array
-        parr = [100, 200, 20];             % Spatial mesh points array
+        d = [100e-7, 400e-7, 100e-7];       % Layer thickness array
+        parr = [100, 200, 100];             % Spatial mesh points array
                          
         dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
@@ -76,18 +74,18 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels    
-        EA = [-1.9, -3.8, -4.1];
-        IP = [-4.9, -5.4, -7.4];
+        EA = [0, 0, 0];
+        IP = [-1.0, -1.0, -1.0];
         
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-4.8, -4.6, -4.2];
+        E0 = [-0.7, -0.5, -0.3];
         %E0 = [-5.25, -4.6, -3.95];
         
         % Workfunction energies
-        PhiA = -4.8;
-        PhiC = -4.2;
+        PhiA = -0.7;
+        PhiC = -0.3;
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
@@ -97,31 +95,31 @@ classdef pc
         % PCBM eDOS:
                 
         %%%%% MOBILE ION DEFECT DENSITY %%%%%
-        NI = 1e18;                      % [cm-3] A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
-        a_max = 1.21e22;                % [cm-3] max density of iodide sites- P. Calado thesis
+        Nion = [0, 1e18, 0];                     % [cm-3] A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
+        DOSion = [0, 1.21e22, 0];                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
-        mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
-        muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
-        mui = 1e-10;                   % ion mobility [cm2V-1s-1]
+        mue = [1, 1, 1];         % electron mobility [cm2V-1s-1]
+        muh = [1, 1, 1];         % hole mobility [cm2V-1s-1]
+        muion = [0, 0, 0];                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
         % TiO2 mue = 0.09?Bak2008
         % Spiro muh = 0.02 cm2V-1s-1 Hawash2018
         
         % Dielectric constants
-        epp = [4,23,12];
+        epp = [4,4,4];
         % TiO2?Wypych2014
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        krad = [3.1797e-11, 3.6e-12, 3.6e-12, 3.6e-12, 1.5366e-10];  % [cm3 s-1] Radiative Recombination coefficient
+        krad = [1e-12, 1e-12, 1e-12];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
                 
         % SRH trap energies- currently set to mid gap - always set
         % respective to energy levels to avoid conflicts
         % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))           
-        Et =[-4.8, -4.6, -4.4];
+        Et =[-0.5, -0.5, -0.5];
     
         taun = [1e-9, 1e-6, 1e-12];           % [s] SRH time constant for electrons
         taup = [1e-9, 1e-6, 1e-12];           % [s] SRH time constant for holes
@@ -159,7 +157,10 @@ classdef pc
         % Solver options
         RelTol = 1e-3;
         AbsTol = 1e-6;
-         
+        
+        dev;
+        xx;
+                
     end
     
     
@@ -197,6 +198,9 @@ classdef pc
             % paramsStruct Constructor for paramsStruct.
             %
             % Warn if tmesh_type is not correct
+            
+            params.dev  = pc.builddev(params);
+            params.xx = pc.xmeshini(params);
             
             if ~ any([1 2 3 4] == params.tmesh_type)
                 warning('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
@@ -267,7 +271,7 @@ classdef pc
                 end
             end
         end
-        
+                               
         % Cumulative thickness
         function value = get.dcum(params)
                 value = cumsum(params.d);                % cumulative thickness     
@@ -321,7 +325,7 @@ classdef pc
         function value = get.ND(params)
             
             value = [0, 0, F.fdn(params.N0(3), params.EA(3), params.E0(3), params.T)];
-            
+
         end
         % Donor densities
         function value = get.NA(params)
@@ -418,6 +422,160 @@ classdef pc
         end
         
         %%
+        
+    end
+    
+    methods (Static)
+        
+        function xx = xmeshini(params)
+            
+            xx = meshgen_x(params);
+            
+        end
+        
+        % EA array
+        function dev = builddev(params)
+            % This function builds the properties for the device as
+            % concatenated arrays such that each property can be called for
+            % each point including grading at interfaces. For future
+            % versions a choice of functions defining how the properties change
+            % at the interfaces is intended. For the time being the
+            % properties simply change linearly.
+            xx = pc.xmeshini(params);
+            
+            dev.EA = zeros(length(xx), 1);
+            dev.IP = zeros(length(xx), 1); 
+            dev.mue = zeros(length(xx), 1);
+            dev.muh = zeros(length(xx), 1);
+            dev.muion = zeros(length(xx), 1);
+            dev.NA = zeros(length(xx), 1);
+            dev.ND = zeros(length(xx), 1);
+            dev.N0 = zeros(length(xx), 1);
+            dev.Nion = zeros(length(xx), 1);
+            dev.ni = zeros(length(xx), 1);
+            dev.n0 = zeros(length(xx), 1);
+            dev.p0 = zeros(length(xx), 1);
+            dev.DOSion = zeros(length(xx), 1);
+            dev.epp = zeros(length(xx), 1);
+            dev.krad = zeros(length(xx), 1);
+            dev.gradEA = zeros(length(xx), 1);
+            dev.gradIP = zeros(length(xx), 1);
+            dev.gradN0 = zeros(length(xx), 1);
+            dev.E0 = zeros(length(xx), 1);
+            
+            dcum0 = [0,params.dcum];
+          for i =1:length(params.dcum)
+                    if i == 1
+                        aa = 0;
+                    else
+                        aa = 1;
+                    end
+                    
+                    if i == length(params.dcum)
+                        bb = 0;
+                    else
+                        bb = 1;
+                    end
+                    
+                    for j = 1:length(xx)                     
+                        if xx(j) >= dcum0(i) + aa*params.dint && xx(j) <= dcum0(i+1) - bb*params.dint                         
+                            dev.EA(j) = params.EA(i); 
+                            dev.IP(j) = params.IP(i);
+                            dev.mue(j) = params.mue(i);
+                            dev.muh(j) = params.muh(i);
+                            dev.muion(j) = params.muion(i);
+                            dev.N0(j) = params.N0(i);
+                            dev.NA(j) = params.NA(i);
+                            dev.ND(j) = params.ND(i);
+                            dev.epp(j) = params.epp(i);
+                            dev.ni(j) = params.ni(i);
+                            dev.Nion(j) = params.Nion(i);
+                            dev.DOSion(j) = params.DOSion(i);
+                            dev.krad(j) = params.krad(i);
+                            dev.n0(j) = params.n0(i);
+                            dev.p0(j) = params.p0(i);
+                            dev.E0(j) = params.E0(i);
+                            dev.gradEA(j) = 0;
+                            dev.gradIP(j) = 0;
+                            dev.gradN0(j) = 0;
+                            
+                        elseif xx(j) > dcum0(i+1) - bb*params.dint && xx(j) < dcum0(i+2) + bb*params.dint             
+                            xprime = xx(j)-(dcum0(i+1) - bb*params.dint);
+                            
+                            dEAdxprime = (params.EA(i+1)-params.EA(i))/(2*params.dint);
+                            dev.EA(j) = params.EA(i) + xprime*dEAdxprime;
+                            dev.gradEA(j) = dEAdxprime;
+                            
+                            dIPdxprime = (params.IP(i+1)-params.IP(i))/(2*params.dint);
+                            dev.IP(j) = params.IP(i) + xprime*dIPdxprime;
+                            dev.gradIP(j) = dIPdxprime;
+                                                        
+                            % Mobilities
+                            dmuedx = (params.mue(i+1)-params.mue(i))/(2*params.dint);
+                            dev.mue(j) = params.mue(i) + xprime*dmuedx;
+                            
+                            dmuhdx = (params.muh(i+1)-params.muh(i))/(2*params.dint);
+                            dev.muh(j) = params.muh(i) + xprime*dmuhdx;                           
+                            
+                            dmuiondx = (params.muion(i+1)-params.muion(i))/(2*params.dint);
+                            dev.muion(j) = params.muion(i) + xprime*dmuiondx;
+                            
+                            dmuhdx = (params.muh(i+1)-params.muh(i))/(2*params.dint);
+                            dev.muh(j) = params.muh(i) + xprime*dmuhdx;                                
+                            
+                            % effective density of states
+                            dN0dx = (params.N0(i+1)-params.N0(i))/(2*params.dint);
+                            dev.N0(j) = params.N0(i) + xprime*dN0dx;  
+                            dev.gradN0(j) = dN0dx;
+                            
+                            % Doping densities
+                            dNAdx = (params.NA(i+1)-params.NA(i))/(2*params.dint);
+                            dev.NA(j) = params.NA(i) + xprime*dNAdx;   
+                            
+                            dNDdx = (params.ND(i+1)-params.ND(i))/(2*params.dint);
+                            dev.ND(j) = params.ND(i) + xprime*dNDdx;
+                            
+                            % Dielectric constants
+                            deppdx = (params.epp(i+1)-params.epp(i))/(2*params.dint);
+                            dev.epp(j) = params.epp(i) + xprime*deppdx;
+                            
+                            % Intrinsic carrier densities
+                            dnidx = (params.ni(i+1)-params.ni(i))/(2*params.dint);
+                            dev.ni(j) = params.ni(i) + xprime*dnidx;
+                            
+                            % Equilibrium carrier densities
+                            dn0dx = (params.n0(i+1)-params.n0(i))/(2*params.dint);
+                            dev.n0(j) = params.n0(i) + xprime*dn0dx;
+                                                                                    
+                            % Equilibrium carrier densities
+                            dp0dx = (params.p0(i+1)-params.p0(i))/(2*params.dint);
+                            dev.p0(j) = params.p0(i) + xprime*dp0dx;
+                            
+                            % Equilibrium Fermi energy
+                            dE0dx = (params.E0(i+1)-params.E0(i))/(2*params.dint);
+                            dev.E0(j) = params.E0(i) + xprime*dE0dx;
+                            
+                            % Static ion background density
+                            dNiondx = (params.Nion(i+1)-params.Nion(i))/(2*params.dint);
+                            dev.Nion(j) = params.Nion(i) + xprime*dNiondx;
+                            
+                            % Ion density of states
+                            dDOSiondx = (params.DOSion(i+1)-params.DOSion(i))/(2*params.dint);
+                            dev.DOSion(j) = params.DOSion(i) + xprime*dDOSiondx;
+                            
+                            %recombination
+                            dkraddx = (params.krad(i+1)-params.krad(i))/(2*params.dint);
+                            dev.krad(j) = params.krad(i) + xprime*dkraddx;
+                           
+                        end  
+                    end                                   
+                    
+                end
+                % calculate the gradients
+                %dev.gradEA = gradient(dev.EA, xx);
+                %dev.gradIP = gradient(dev.IP, xx);
+                %dev.gradN0 = gradient(dev.N0, xx);
+        end
         
     end
 end
