@@ -49,6 +49,7 @@ classdef pc
         calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
         mobset = 1;             % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
         mobseti = 1;
+        SRHset = 1;
         JV = 0;                 % Toggle run JV scan on/off
         Ana = 1;                % Toggle on/off analysis
         
@@ -122,11 +123,17 @@ classdef pc
         % SRH trap energies- currently set to mid gap - always set
         % respective to energy levels to avoid conflicts
         % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))           
-        Et =[-0.5, -0.5, -0.5];
-    
-        taun = [1e-9, 1e-6, 1e-12];           % [s] SRH time constant for electrons
-        taup = [1e-9, 1e-6, 1e-12];           % [s] SRH time constant for holes
+        Et_bulk =[-0.5, -0.5, -0.5];
+        Et_inter = [-0.7, -0.8];
         
+        % Bulk SRH time constants for each layer
+        taun_bulk = [1e6, 1e-6, 1e6];           % [s] SRH time constant for electrons
+        taup_bulk = [1e6, 1e-6, 1e6];           % [s] SRH time constant for holes
+        
+        % Interfacial SRH time constants - should be of length (number of layers)-1
+        taun_inter = [1e-12, 1e-9];
+        taup_inter = [1e-12, 1e-9];
+                
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
         sn_l = 1e8;
@@ -183,11 +190,13 @@ classdef pc
         nleft
         nright
         ni
-        nt          % Density of CB electrons when Fermi level at trap state energy
+        nt_bulk          % Density of CB electrons when Fermi level at trap state energy
+        nt_inter
         p0
         pleft
         pright
-        pt           % Density of VB holes when Fermi level at trap state energy
+        pt_bulk           % Density of VB holes when Fermi level at trap state energy
+        pt_inter
         wn
         wp
         wscr            % Space charge region width
@@ -197,33 +206,33 @@ classdef pc
     
     methods
         
-        function params = pc
+        function par = pc
             % paramsStruct Constructor for paramsStruct.
             %
             % Warn if tmesh_type is not correct
             
-            params.dev  = pc.builddev(params);
-            params.xx = pc.xmeshini(params);
+            par.dev  = pc.builddev(par);
+            par.xx = pc.xmeshini(par);
             
-            if ~ any([1 2 3 4] == params.tmesh_type)
+            if ~ any([1 2 3 4] == par.tmesh_type)
                 warning('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
             end
             
             % Warn if xmesh_type is not correct
-            if ~ any(1:1:10 == params.xmesh_type)
+            if ~ any(1:1:10 == par.xmesh_type)
                 warning('PARAMS.xmesh_type should be an integer from 1 to 9 inclusive. MESHGEN_X cannot generate a mesh if this is not the case.')
             end
             
-            for i = 1:length(params.ND)
-                if params.ND(i) >= params.N0(i) || params.NA(i) >= params.N0(i)
+            for i = 1:length(par.ND)
+                if par.ND(i) >= par.N0(i) || par.NA(i) >= par.N0(i)
                     msg = 'Doping density must be less than eDOS. For consistent values ensure electrode workfunctions are within the band gap and check expressions for doping density in Dependent variables.';
                     error(msg);
                 end
             end
             
             % warn if trap energies are outside of band gpa energies
-            for i = 1:length(params.Et)
-                if params.Et(i) >= params.EA(2) || params.Et(i) <= params.IP(2)
+            for i = 1:length(par.Et_bulk)
+                if par.Et_bulk(i) >= par.EA(2) || par.Et_bulk(i) <= par.IP(2)
                     msg = 'Trap energies must exist within layer 2 band gap.';
                     error(msg);
                 end
@@ -239,7 +248,7 @@ classdef pc
             %   Otherwise, a warning is shown. Runs automatically whenever
             %   xmesh_type is changed.
             if any(1:1:9 == value)
-                params.xmesh_type = value;
+                par.xmesh_type = value;
             else
                 error('PARAMS.xmesh_type should be an integer from 1 to 9 inclusive. MESHGEN_X cannot generate a mesh if this is not the case.')
             end
@@ -253,174 +262,159 @@ classdef pc
             %   Otherwise, a warning is shown. Runs automatically whenever
             %   tmesh_type is changed.
             if any([1 2 3 4] == value)
-                params.tmesh_type = value;
+                par.tmesh_type = value;
             else
                 error('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
             end
         end
         
         function params = set.ND(params, value)
-            for i = 1:length(params.ND)
-                if value(i) >= params.N0(i)
+            for i = 1:length(par.ND)
+                if value(i) >= par.N0(i)
                     error('Doping density must be less than eDOS. For consistent values ensure electrode workfunctions are within the band gap.')
                 end
             end
         end
         
         function params = set.NA(params, value)
-            for i = 1:length(params.ND)
-                if value(i) >= params.N0(i)
+            for i = 1:length(par.ND)
+                if value(i) >= par.N0(i)
                     error('Doping density must be less than eDOS. For consistent values ensure electrode workfunctions are within the band gap.')
                 end
             end
         end
                                
         % Cumulative thickness
-        function value = get.dcum(params)
-                value = cumsum(params.d);                % cumulative thickness     
+        function value = get.dcum(par)
+                value = cumsum(par.d);                % cumulative thickness     
         end
         
         % Band gap energies
-        function value = get.Eg(params)
+        function value = get.Eg(par)
             
-            value = params.EA - params.IP;
+            value = par.EA - par.IP;
             
         end
         
         % Vbi based on difference in boundary workfunctions
-        function value = get.Vbi(params)
+        function value = get.Vbi(par)
             
-            value = params.PhiC - params.PhiA;
+            value = par.PhiC - par.PhiA;
             
         end
                 
         % Intrinsic Fermi Energies (Botzmann)
-        function value = get.Eif(params)
+        function value = get.Eif(par)
             
-            value = [0.5*((params.EA(1)+params.IP(1))+params.kB*params.T*log(params.N0(1)/params.N0(1))),...
-                0.5*((params.EA(2)+params.IP(2))+params.kB*params.T*log(params.N0(2)/params.N0(2))),...
-                0.5*((params.EA(3)+params.IP(3))+params.kB*params.T*log(params.N0(3)/params.N0(3)))];
+            value = [0.5*((par.EA(1)+par.IP(1))+par.kB*par.T*log(par.N0(1)/par.N0(1))),...
+                0.5*((par.EA(2)+par.IP(2))+par.kB*par.T*log(par.N0(2)/par.N0(2))),...
+                0.5*((par.EA(3)+par.IP(3))+par.kB*par.T*log(par.N0(3)/par.N0(3)))];
             
         end
         
         % Conduction band gradients at interfaces
-        function value = get.dEAdx(params)
+        function value = get.dEAdx(par)
             
-            value = [(params.EA(2)-params.EA(1))/(2*params.dint), (params.EA(3)-params.EA(2))/(2*params.dint)];
+            value = [(par.EA(2)-par.EA(1))/(2*par.dint), (par.EA(3)-par.EA(2))/(2*par.dint)];
          
         end
                 
         %Valence band gradients at interfaces
-        function value = get.dIPdx(params)
+        function value = get.dIPdx(par)
             
-            value = [(params.IP(2)-params.IP(1))/(2*params.dint), (params.IP(3)-params.IP(2))/(2*params.dint)];
+            value = [(par.IP(2)-par.IP(1))/(2*par.dint), (par.IP(3)-par.IP(2))/(2*par.dint)];
          
         end
         
         % eDOS gradients at interfaces 
-        function value = get.dN0dx(params)
+        function value = get.dN0dx(par)
             
-            value = [(params.N0(2)-params.N0(1))/(2*params.dint), (params.N0(3)-params.N0(2))/(2*params.dint)];
+            value = [(par.N0(2)-par.N0(1))/(2*par.dint), (par.N0(3)-par.N0(2))/(2*par.dint)];
          
         end
 
         % Donor densities
-        function value = get.ND(params)
+        function value = get.ND(par)
             
-            value = [0, 0, F.fdn(params.N0(3), params.EA(3), params.E0(3), params.T)];
+            value = [0, 0, F.fdn(par.N0(3), par.EA(3), par.E0(3), par.T)];
 
         end
         % Donor densities
-        function value = get.NA(params)
+        function value = get.NA(par)
             
-            value = [F.fdp(params.N0(1), params.IP(1), params.E0(1), params.T), 0, 0];
+            value = [F.fdp(par.N0(1), par.IP(1), par.E0(1), par.T), 0, 0];
             
         end
         
         % Intrinsic carrier densities - Boltzmann for now
-        function value = get.ni(params)
+        function value = get.ni(par)
             
-            value = [params.N0(1)*(exp(-params.Eg(1)/(2*params.kB*params.T))),...
-                params.N0(2)*(exp(-params.Eg(2)/(2*params.kB*params.T))),...
-                params.N0(3)*(exp(-params.Eg(3)/(2*params.kB*params.T)))];
+            value = [par.N0(1)*(exp(-par.Eg(1)/(2*par.kB*par.T))),...
+                par.N0(2)*(exp(-par.Eg(2)/(2*par.kB*par.T))),...
+                par.N0(3)*(exp(-par.Eg(3)/(2*par.kB*par.T)))];
             
         end
         % Equilibrium electron densities
-        function value = get.n0(params)
+        function value = get.n0(par)
             
-            value = [F.fdn(params.N0(1), params.EA(1), params.E0(1), params.T),...
-                F.fdn(params.N0(2), params.EA(2), params.E0(2), params.T),...
-                F.fdn(params.N0(3), params.EA(3), params.E0(3), params.T)];           
+            value = [F.fdn(par.N0(1), par.EA(1), par.E0(1), par.T),...
+                F.fdn(par.N0(2), par.EA(2), par.E0(2), par.T),...
+                F.fdn(par.N0(3), par.EA(3), par.E0(3), par.T)];           
         end
                      
-        function value = get.p0(params)
+        function value = get.p0(par)
             
-            value = [F.fdp(params.N0(1), params.IP(1), params.E0(1), params.T),...
-                F.fdp(params.N0(2), params.IP(2), params.E0(2), params.T),...
-                F.fdp(params.N0(3), params.IP(3), params.E0(3), params.T)];          % Background density holes in htl/p-type
+            value = [F.fdp(par.N0(1), par.IP(1), par.E0(1), par.T),...
+                F.fdp(par.N0(2), par.IP(2), par.E0(2), par.T),...
+                F.fdp(par.N0(3), par.IP(3), par.E0(3), par.T)];          % Background density holes in htl/p-type
             
         end
                 
         % Boundary electron and hole densities - based on the workfunction
         % of the electrodes
-        function value = get.nleft(params)
+        function value = get.nleft(par)
             
-            value = F.fdn(params.N0(1), params.EA(1), params.PhiA, params.T);
+            value = F.fdn(par.N0(1), par.EA(1), par.PhiA, par.T);
         
         end
         
                 % Boundary electron and hole densities
-        function value = get.nright(params)
+        function value = get.nright(par)
             
-            value = F.fdn(params.N0(3), params.EA(3), params.PhiC, params.T);
+            value = F.fdn(par.N0(end), par.EA(end), par.PhiC, par.T);
         
         end
         
                 % Boundary electron and hole densities
-        function value = get.pleft(params)
+        function value = get.pleft(par)
             
-            value = F.fdp(params.N0(1), params.IP(1), params.PhiA, params.T);
+            value = F.fdp(par.N0(1), par.IP(1), par.PhiA, par.T);
         
         end
         
-        function value = get.pright(params)
+        function value = get.pright(par)
             
-            value = F.fdp(params.N0(3), params.IP(3), params.PhiC, params.T);
+            value = F.fdp(par.N0(end), par.IP(end), par.PhiC, par.T);
         
         end
-        
-        %% SRH parameters
-        % nt_p - Density of CB electrons when Fermi level at trap state energy
-        function value = get.nt(params)
-            
-            value = F.fdn(params.N0, params.EA, params.Et, params.T);
-                        
-        end
-        
-        % pt_p - Density of VB holes when Fermi level at trap state energy
-        function value = get.pt(params)
-            
-            value =  F.fdp(params.N0, params.IP, params.Et, params.T);
-
-        end
-        
+                       
         %% Space charge layer widths
-        function value = get.wp (params)
+        function value = get.wp (par)
             
-            value = ((-params.d(2)*params.NA(1)*params.q) + ((params.NA(1)^0.5)*(params.q^0.5)*(((params.d(2)^2)*params.NA(1)*params.q) + (4*params.epp(2)*params.Vbi))^0.5))/(2*params.NA(1)*params.q);
+            value = ((-par.d(2)*par.NA(1)*par.q) + ((par.NA(1)^0.5)*(par.q^0.5)*(((par.d(2)^2)*par.NA(1)*par.q) + (4*par.epp(2)*par.Vbi))^0.5))/(2*par.NA(1)*par.q);
             
         end
         
-        function value = get.wn (params)
+        function value = get.wn (par)
             
-            value = ((-params.d(2)*params.ND(3)*params.q) + ((params.ND(3)^0.5)*(params.q^0.5)*(((params.d(2)^2)*params.ND(3)*params.q) + (4*params.epp(2)*params.Vbi))^0.5))/(2*params.ND(3)*params.q);
+            value = ((-par.d(2)*par.ND(3)*par.q) + ((par.ND(3)^0.5)*(par.q^0.5)*(((par.d(2)^2)*par.ND(3)*par.q) + (4*par.epp(2)*par.Vbi))^0.5))/(2*par.ND(3)*par.q);
             
         end
         
         % wscr - space charge region width
-        function value = get.wscr(params)
+        function value = get.wscr(par)
             
-            value = params.wp + params.d(2) + params.wn;         % cm
+            value = par.wp + par.d(2) + par.wn;         % cm
             
         end
         
@@ -430,21 +424,21 @@ classdef pc
     
     methods (Static)
         
-        function xx = xmeshini(params)
+        function xx = xmeshini(par)
             
-            xx = meshgen_x(params);
+            xx = meshgen_x(par);
             
         end
         
         % EA array
-        function dev = builddev(params)
+        function dev = builddev(par)
             % This function builds the properties for the device as
             % concatenated arrays such that each property can be called for
             % each point including grading at interfaces. For future
             % versions a choice of functions defining how the properties change
             % at the interfaces is intended. For the time being the
             % properties simply change linearly.
-            xx = pc.xmeshini(params);
+            xx = pc.xmeshini(par);
             
             dev.EA = zeros(1, length(xx));
             dev.IP = zeros(1, length(xx)); 
@@ -466,120 +460,137 @@ classdef pc
             dev.gradN0 = zeros(1, length(xx));
             dev.E0 = zeros(1, length(xx));
             dev.G0 = zeros(1, length(xx));
+            dev.taun = zeros(1, length(xx));
+            dev.taup = zeros(1, length(xx));
+            dev.Et = zeros(1, length(xx));
+            dev.nt = zeros(1, length(xx));
+            dev.pt = zeros(1, length(xx));
             
-            dcum0 = [0,params.dcum];
-          for i =1:length(params.dcum)
+            dcum0 = [0,par.dcum];
+          for i =1:length(par.dcum)
                     if i == 1
                         aa = 0;
                     else
                         aa = 1;
                     end
                     
-                    if i == length(params.dcum)
+                    if i == length(par.dcum)
                         bb = 0;
                     else
                         bb = 1;
                     end
                     
                     for j = 1:length(xx)                     
-                        if xx(j) >= dcum0(i) + aa*params.dint && xx(j) <= dcum0(i+1) - bb*params.dint                         
-                            dev.EA(j) = params.EA(i); 
-                            dev.IP(j) = params.IP(i);
-                            dev.mue(j) = params.mue(i);
-                            dev.muh(j) = params.muh(i);
-                            dev.muion(j) = params.muion(i);
-                            dev.N0(j) = params.N0(i);
-                            dev.NA(j) = params.NA(i);
-                            dev.ND(j) = params.ND(i);
-                            dev.epp(j) = params.epp(i);
-                            dev.ni(j) = params.ni(i);
-                            dev.Nion(j) = params.Nion(i);
-                            dev.DOSion(j) = params.DOSion(i);
-                            dev.krad(j) = params.krad(i);
-                            dev.n0(j) = params.n0(i);
-                            dev.p0(j) = params.p0(i);
-                            dev.E0(j) = params.E0(i);
-                            dev.G0(j) = params.G0(i);
+                        if xx(j) >= dcum0(i) + aa*par.dint && xx(j) <= dcum0(i+1) - bb*par.dint                         
+                            dev.EA(j) = par.EA(i); 
+                            dev.IP(j) = par.IP(i);
+                            dev.mue(j) = par.mue(i);
+                            dev.muh(j) = par.muh(i);
+                            dev.muion(j) = par.muion(i);
+                            dev.N0(j) = par.N0(i);
+                            dev.NA(j) = par.NA(i);
+                            dev.ND(j) = par.ND(i);
+                            dev.epp(j) = par.epp(i);
+                            dev.ni(j) = par.ni(i);
+                            dev.Nion(j) = par.Nion(i);
+                            dev.DOSion(j) = par.DOSion(i);
+                            dev.krad(j) = par.krad(i);
+                            dev.n0(j) = par.n0(i);
+                            dev.p0(j) = par.p0(i);
+                            dev.E0(j) = par.E0(i);
+                            dev.G0(j) = par.G0(i);
                             dev.gradEA(j) = 0;
                             dev.gradIP(j) = 0;
                             dev.gradN0(j) = 0;
+                            dev.taun(j) = par.taun_bulk(i);
+                            dev.taup(j) = par.taup_bulk(i);
+                            dev.Et(j) = par.Et_bulk(i);
+                           
                             
-                        elseif xx(j) > dcum0(i+1) - bb*params.dint && xx(j) < dcum0(i+2) + bb*params.dint             
-                            xprime = xx(j)-(dcum0(i+1) - bb*params.dint);
+                        elseif xx(j) > dcum0(i+1) - bb*par.dint && xx(j) < dcum0(i+2) + bb*par.dint             
+                            xprime = xx(j)-(dcum0(i+1) - bb*par.dint);
                             
-                            dEAdxprime = (params.EA(i+1)-params.EA(i))/(2*params.dint);
-                            dev.EA(j) = params.EA(i) + xprime*dEAdxprime;
+                            dEAdxprime = (par.EA(i+1)-par.EA(i))/(2*par.dint);
+                            dev.EA(j) = par.EA(i) + xprime*dEAdxprime;
                             dev.gradEA(j) = dEAdxprime;
                             
-                            dIPdxprime = (params.IP(i+1)-params.IP(i))/(2*params.dint);
-                            dev.IP(j) = params.IP(i) + xprime*dIPdxprime;
+                            dIPdxprime = (par.IP(i+1)-par.IP(i))/(2*par.dint);
+                            dev.IP(j) = par.IP(i) + xprime*dIPdxprime;
                             dev.gradIP(j) = dIPdxprime;
                                                         
                             % Mobilities
-                            dmuedx = (params.mue(i+1)-params.mue(i))/(2*params.dint);
-                            dev.mue(j) = params.mue(i) + xprime*dmuedx;
+                            dmuedx = (par.mue(i+1)-par.mue(i))/(2*par.dint);
+                            dev.mue(j) = par.mue(i) + xprime*dmuedx;
                             
-                            dmuhdx = (params.muh(i+1)-params.muh(i))/(2*params.dint);
-                            dev.muh(j) = params.muh(i) + xprime*dmuhdx;                           
+                            dmuhdx = (par.muh(i+1)-par.muh(i))/(2*par.dint);
+                            dev.muh(j) = par.muh(i) + xprime*dmuhdx;                           
                             
-                            dmuiondx = (params.muion(i+1)-params.muion(i))/(2*params.dint);
-                            dev.muion(j) = params.muion(i) + xprime*dmuiondx;
+                            dmuiondx = (par.muion(i+1)-par.muion(i))/(2*par.dint);
+                            dev.muion(j) = par.muion(i) + xprime*dmuiondx;
                             
-                            dmuhdx = (params.muh(i+1)-params.muh(i))/(2*params.dint);
-                            dev.muh(j) = params.muh(i) + xprime*dmuhdx;                                
+                            dmuhdx = (par.muh(i+1)-par.muh(i))/(2*par.dint);
+                            dev.muh(j) = par.muh(i) + xprime*dmuhdx;                                
                             
                             % effective density of states
-                            dN0dx = (params.N0(i+1)-params.N0(i))/(2*params.dint);
-                            dev.N0(j) = params.N0(i) + xprime*dN0dx;  
+                            dN0dx = (par.N0(i+1)-par.N0(i))/(2*par.dint);
+                            dev.N0(j) = par.N0(i) + xprime*dN0dx;  
                             dev.gradN0(j) = dN0dx;
                             
                             % Doping densities
-                            dNAdx = (params.NA(i+1)-params.NA(i))/(2*params.dint);
-                            dev.NA(j) = params.NA(i) + xprime*dNAdx;   
+                            dNAdx = (par.NA(i+1)-par.NA(i))/(2*par.dint);
+                            dev.NA(j) = par.NA(i) + xprime*dNAdx;   
                             
-                            dNDdx = (params.ND(i+1)-params.ND(i))/(2*params.dint);
-                            dev.ND(j) = params.ND(i) + xprime*dNDdx;
+                            dNDdx = (par.ND(i+1)-par.ND(i))/(2*par.dint);
+                            dev.ND(j) = par.ND(i) + xprime*dNDdx;
                             
                             % Dielectric constants
-                            deppdx = (params.epp(i+1)-params.epp(i))/(2*params.dint);
-                            dev.epp(j) = params.epp(i) + xprime*deppdx;
+                            deppdx = (par.epp(i+1)-par.epp(i))/(2*par.dint);
+                            dev.epp(j) = par.epp(i) + xprime*deppdx;
                             
                             % Intrinsic carrier densities
-                            dnidx = (params.ni(i+1)-params.ni(i))/(2*params.dint);
-                            dev.ni(j) = params.ni(i) + xprime*dnidx;
+                            dnidx = (par.ni(i+1)-par.ni(i))/(2*par.dint);
+                            dev.ni(j) = par.ni(i) + xprime*dnidx;
                             
                             % Equilibrium carrier densities
-                            dn0dx = (params.n0(i+1)-params.n0(i))/(2*params.dint);
-                            dev.n0(j) = params.n0(i) + xprime*dn0dx;
+                            dn0dx = (par.n0(i+1)-par.n0(i))/(2*par.dint);
+                            dev.n0(j) = par.n0(i) + xprime*dn0dx;
                                                                                     
                             % Equilibrium carrier densities
-                            dp0dx = (params.p0(i+1)-params.p0(i))/(2*params.dint);
-                            dev.p0(j) = params.p0(i) + xprime*dp0dx;
+                            dp0dx = (par.p0(i+1)-par.p0(i))/(2*par.dint);
+                            dev.p0(j) = par.p0(i) + xprime*dp0dx;
                             
                             % Equilibrium Fermi energy
-                            dE0dx = (params.E0(i+1)-params.E0(i))/(2*params.dint);
-                            dev.E0(j) = params.E0(i) + xprime*dE0dx;
+                            dE0dx = (par.E0(i+1)-par.E0(i))/(2*par.dint);
+                            dev.E0(j) = par.E0(i) + xprime*dE0dx;
                             
                             % Uniform generation rate
-                            dG0dx = (params.G0(i+1)-params.G0(i))/(2*params.dint);
-                            dev.G0(j) = params.G0(i) + xprime*dG0dx;
+                            dG0dx = (par.G0(i+1)-par.G0(i))/(2*par.dint);
+                            dev.G0(j) = par.G0(i) + xprime*dG0dx;
                             
                             % Static ion background density
-                            dNiondx = (params.Nion(i+1)-params.Nion(i))/(2*params.dint);
-                            dev.Nion(j) = params.Nion(i) + xprime*dNiondx;
+                            dNiondx = (par.Nion(i+1)-par.Nion(i))/(2*par.dint);
+                            dev.Nion(j) = par.Nion(i) + xprime*dNiondx;
                             
                             % Ion density of states
-                            dDOSiondx = (params.DOSion(i+1)-params.DOSion(i))/(2*params.dint);
-                            dev.DOSion(j) = params.DOSion(i) + xprime*dDOSiondx;
+                            dDOSiondx = (par.DOSion(i+1)-par.DOSion(i))/(2*par.dint);
+                            dev.DOSion(j) = par.DOSion(i) + xprime*dDOSiondx;
                             
                             %recombination
-                            dkraddx = (params.krad(i+1)-params.krad(i))/(2*params.dint);
-                            dev.krad(j) = params.krad(i) + xprime*dkraddx;
-                           
+                            dkraddx = (par.krad(i+1)-par.krad(i))/(2*par.dint);
+                            dev.krad(j) = par.krad(i) + xprime*dkraddx;
+                            
+                            dev.taun(j) = par.taun_inter(i);
+                            dev.taup(j) = par.taup_inter(i);
+                            dev.Et(j) = par.Et_inter(i);
+                                                        
                         end  
                     end                                   
                     
-                end
+          end
+                
+          dev.nt = F.fdn(dev.N0, dev.EA, dev.Et, par.T);
+          dev.pt = F.fdp(dev.N0, dev.IP, dev.Et, par.T);
+          
                 % calculate the gradients
                 %dev.gradEA = gradient(dev.EA, xx);
                 %dev.gradIP = gradient(dev.IP, xx);
