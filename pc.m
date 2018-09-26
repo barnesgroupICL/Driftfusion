@@ -121,16 +121,16 @@ classdef pc
         % SRH trap energies- currently set to mid gap - always set
         % respective to energy levels to avoid conflicts
         % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))           
-        Et_bulk =[-0.5, -0.5, -0.5];
-        Et_inter = [-0.7, -0.8];
+        Et_bulk =[-4.6, -4.6, -4.6];
+        Et_inter = [-4.6, -4.6];
         
         % Bulk SRH time constants for each layer
         taun_bulk = [1e6, 1e-6, 1e6];           % [s] SRH time constant for electrons
         taup_bulk = [1e6, 1e-6, 1e6];           % [s] SRH time constant for holes
         
         % Interfacial SRH time constants - should be of length (number of layers)-1
-        taun_inter = [1e-12, 1e-9];
-        taup_inter = [1e-12, 1e-9];
+        taun_inter = [1e-9, 1e-12];
+        taup_inter = [1e-9, 1e-12];
                 
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
@@ -205,13 +205,9 @@ classdef pc
     methods
         
         function par = pc
-            % paramsStruct Constructor for paramsStruct.
+            % parStruct Constructor for parStruct.
             %
-            % Warn if tmesh_type is not correct
-            
-            par.dev  = pc.builddev(par);
-            par.xx = pc.xmeshini(par);
-            
+            % Warn if tmesh_type is not correct            
             if ~ any([1 2 3 4] == par.tmesh_type)
                 warning('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
             end
@@ -230,16 +226,89 @@ classdef pc
             
             % warn if trap energies are outside of band gpa energies
             for i = 1:length(par.Et_bulk)
-                if par.Et_bulk(i) >= par.EA(2) || par.Et_bulk(i) <= par.IP(2)
-                    msg = 'Trap energies must exist within layer 2 band gap.';
+                if par.Et_bulk(i) >= par.EA(i) || par.Et_bulk(i) <= par.IP(i)
+                    msg = 'Trap energies must exist within layer band gap.';
                     error(msg);
                 end
             end
             
+            % warn if property array do not have the correct number of
+            % layers. The layer thickness array is used to define the
+            % number of layers
+            if length(par.parr) ~= length(par.d)
+                    msg = 'Points array (parr) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg); 
+            elseif length(par.EA) ~= length(par.d)
+                    msg = 'Electron Affinity array (EA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);
+            elseif length(par.IP) ~= length(par.d)
+                    msg = 'Ionisation Potential array (IP) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);
+            elseif length(par.mue) ~= length(par.d)
+                    msg = 'Electron mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);  
+            elseif length(par.muh) ~= length(par.d)
+                    msg = 'Hole mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);              
+            elseif length(par.muion) ~= length(par.d)
+                    msg = 'Ion mobility array (muh) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);               
+            elseif length(par.NA) ~= length(par.d)
+                    msg = 'Acceptor density array (NA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);
+            elseif length(par.ND) ~= length(par.d)
+                    msg = 'Donor density array (ND) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);
+            elseif length(par.N0) ~= length(par.d)
+                    msg = 'Effective density of states array (N0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);   
+            elseif length(par.Nion) ~= length(par.d)
+                    msg = 'Background ion density (Nion) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);
+            elseif length(par.DOSion) ~= length(par.d)
+                    msg = 'Ion density of states array (DOSion) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);   
+            elseif length(par.epp) ~= length(par.d)
+                    msg = 'Relative dielectric constant array (epp) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);
+            elseif length(par.krad) ~= length(par.d)
+                    msg = 'Radiative recombination coefficient array (krad) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);
+            elseif length(par.E0) ~= length(par.d)
+                    msg = 'Equilibrium Fermi level array (E0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);   
+            elseif length(par.G0) ~= length(par.d)
+                    msg = 'Uniform generation array (G0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);   
+            elseif length(par.taun_bulk) ~= length(par.d)
+                    msg = 'Bulk SRH electron time constants array (taun_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);   
+            elseif length(par.taup_bulk) ~= length(par.d)
+                    msg = 'Bulk SRH hole time constants array (taup_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);
+            elseif length(par.Et_bulk) ~= length(par.d)
+                    msg = 'Bulk SRH trap energy array (Et_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                    error(msg);
+            elseif length(par.Et_inter) ~= length(par.d)-1
+                    msg = 'Interfacial SRH trap energy array (Et_bulk) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
+                    error(msg);
+            elseif length(par.taun_inter) ~= length(par.d)-1
+                    msg = 'Interfacial electron SRH time constant array (taun_inter) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
+                    error(msg);                    
+            elseif length(par.taup_inter) ~= length(par.d)-1
+                    msg = 'Interfacial hole SRH time constant array (taup_inter) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
+                    error(msg);      
+            
+            end
+            
+            % Build the device- properties are defined at each point
+            par.dev  = pc.builddev(par);
+            % Build initial xmesh
+            par.xx = pc.xmeshini(par);
         end
         
-        function params = set.xmesh_type(params, value)
-            % SET.xmesh_type Check if xmesh_type is an integer from 1 to 4.
+        function par = set.xmesh_type(par, value)
+            % SET.xmesh_type Check if xmesh_type is an integer from 1 to 9.
             %
             %   SET.xmesh_type(PARAMS, VALUE) checks if VALUE is an integer
             %   from 1 to 4, and if so, changes PARAMS.xmesh_type to VALUE.
@@ -252,7 +321,7 @@ classdef pc
             end
         end
         
-        function params = set.tmesh_type(params, value)
+        function par = set.tmesh_type(par, value)
             % SET.tmesh_type Check if xmesh_type is an integer from 1 to 2.
             %
             %   SET.tmesh_type(PARAMS, VALUE) checks if VALUE is an integer
@@ -266,7 +335,7 @@ classdef pc
             end
         end
         
-        function params = set.ND(params, value)
+        function par = set.ND(par, value)
             for i = 1:length(par.ND)
                 if value(i) >= par.N0(i)
                     error('Doping density must be less than eDOS. For consistent values ensure electrode workfunctions are within the band gap.')
@@ -274,7 +343,7 @@ classdef pc
             end
         end
         
-        function params = set.NA(params, value)
+        function par = set.NA(par, value)
             for i = 1:length(par.ND)
                 if value(i) >= par.N0(i)
                     error('Doping density must be less than eDOS. For consistent values ensure electrode workfunctions are within the band gap.')
