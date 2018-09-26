@@ -1,4 +1,4 @@
-function JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mui, Vstart, Vend, option)
+function JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, muion, Vstart, Vend, option)
 disp('Current voltage scan')
 
 % A procedure for running JV scans using pindrift
@@ -22,7 +22,8 @@ p.Ana = 1;
 p.figson = 1;
 p.Int = 0;
 p.pulseon = 0;
-p.mui = mui;
+p.muion = muion;
+p.dev = pc.builddev(p);
 
 %% JV settings
 p.JV = 1;
@@ -63,7 +64,7 @@ if option ==2 || option ==3
         
         disp('1 Sun quasi-equilibrium solution')
         p.JV = 0;
-        p.mui = 0;          % Switch ion mobility off for illumination step
+        p.mobseti = 0;          % Switch ion mobility off for illumination step
         p.Int = Intensity;
         
         % Log time mesh
@@ -77,7 +78,7 @@ if option ==2 || option ==3
         %% Light forward
         
         disp('Light forward scan...')
-        p.mui = mui;
+        p.mobseti = 1;
         
         %% JV settings
         p.JV = 1;
@@ -109,21 +110,21 @@ if option ==2 || option ==3
         plotJV(JV, option)
 end
 
-p = find(JV.ill.f.Vapp >= 0);
-p = p(1);
-JV.Jsc_f = JV.ill.f.Jtotr(p, end)
-
-p = find(JV.ill.r.Vapp <= 0);
-p = p(1);
-JV.Jsc_r = JV.ill.r.Jtotr(p, end)
-
-p = find(JV.ill.f.Jtotr(:, end) >= 0);
-p = p(1)
-JV.Voc_f = JV.ill.f.Vapp(p)
-
-p = find(JV.ill.r.Jtotr(:, end) <= 0);
-p = p(1)
-JV.Voc_r = JV.ill.r.Vapp(p)
+% p = find(JV.ill.f.Vapp >= 0);
+% p = p(1);
+% JV.Jsc_f = JV.ill.f.Jtotr(p, end)
+% 
+% p = find(JV.ill.r.Vapp <= 0);
+% p = p(1);
+% JV.Jsc_r = JV.ill.r.Jtotr(p, end)
+% 
+% p = find(JV.ill.f.Jtotr(:, end) >= 0);
+% p = p(1);
+% JV.Voc_f = JV.ill.f.Vapp(p)
+% 
+% p = find(JV.ill.r.Jtotr(:, end) <= 0);
+% p = p(1);
+% JV.Voc_r = JV.ill.r.Vapp(p)
 
 end
 
