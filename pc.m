@@ -18,11 +18,11 @@ classdef pc
         T = 300;
         
         % Device Dimensions [cm]
-        d = [100e-7, 400e-7, 100e-7];       % Layer thickness array
-        parr = [50, 100, 50];             % Spatial mesh points array
+        d = [200e-7, 400e-7, 50e-7];       % Layer thickness array
+        parr = [100, 200, 20];             % Spatial mesh points array
                          
         dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
-        pint = 10;          % 0.5x Interfacial points (x_mesh_type = 3)
+        pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
         dscr = 30e-7;       % Approx space charge region thickness
         pscr = 30;          % No of points in space charge region
         pepe = 20;          % electrode interface points
@@ -75,21 +75,19 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels    
-        EA = [0, -0.1, -0.2];
-        IP = [-1.0, -1.1, -1.2];
+        EA = [-1.9, -3.8, -4.1];
+        IP = [-4.9, -5.4, -7.4];
         
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-0.7, -0.6, -0.5];
-        %E0 = [-5.25, -4.6, -3.95];
+        E0 = [-4.8, -4.6, -4.3];
         
         % Workfunction energies
-        PhiA = -0.7;
-        PhiC = -0.5;
+        PhiA = -4.8;
+        PhiC = -4.2;
         
         % Effective Density Of States
-        % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
         N0 = [1e19, 1e19, 1e19];
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
@@ -100,8 +98,8 @@ classdef pc
         DOSion = [0, 1.21e22, 0];                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
-        mue = [1, 1, 1];         % electron mobility [cm2V-1s-1]
-        muh = [1, 1, 1];         % hole mobility [cm2V-1s-1]
+        mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
+        muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
         muion = [0, 1e-10, 0];                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
@@ -109,7 +107,7 @@ classdef pc
         % Spiro muh = 0.02 cm2V-1s-1 Hawash2018
         
         % Dielectric constants
-        epp = [4,4,4];
+        epp = [4,23,12];
         % TiO2?Wypych2014
         
         %%% Generation %%%%%
@@ -117,7 +115,7 @@ classdef pc
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        krad = [1e-12, 1e-12, 1e-12];  % [cm3 s-1] Radiative Recombination coefficient
+        krad = [3.18e-11, 3.6e-12, 1.54e-10];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
                 
         % SRH trap energies- currently set to mid gap - always set
