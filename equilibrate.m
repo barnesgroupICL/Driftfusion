@@ -57,6 +57,7 @@ p.t0 = p.tmax/1e4;
 
 %% Switch off mobilities
 p.mobset = 0;
+p.mobseti = 0;
 
 % Switch off extraction and recombination
 p.sn_l = 0;
@@ -71,6 +72,7 @@ disp('Complete')
 
 % Switch on mobilities - easy numbers first
 p.mobset = 1;
+p.mobseti = 0;
 
 p.sn_l = p_original.sn_l;
 p.sn_r = p_original.sn_r;
@@ -83,11 +85,6 @@ p.t0 = p.tmax/1e3;
 
 %% Soluition with mobility switched on
 disp('Solution with mobility switched on')
-sol = pindrift(sol, p);
-
-% switch to desired mobilities
-p.mobset = 1;
-
 sol = pindrift(sol, p);
 
 p.Ana = 1;
@@ -156,15 +153,16 @@ disp('Complete')
 
 
 
-
 %% Equilibrium solutions with ion mobility switched on
 %% Closed circuit conditions
 disp('Closed circuit equilibrium with ions')
+p.mobseti = 1;
 
 p.OC = 0;
 p.tmax = 1e-9;
 p.t0 = p.tmax/1e3;
 p.muion = [0, 1e-6, 0];           % Ions are accelerated to reach equilibrium
+p.dev = pc.builddev(p);
 
 sol = pindrift(soleq.eq, p);
 
@@ -176,6 +174,7 @@ p.t0 = p.tmax/1e3;
 soleq.i = pindrift(sol, p);
 % Switch to default ion mobility
 soleq.i.p.muion = p_original.muion;
+soleq.i.p.dev = pc.builddev(p_original);
 
 disp('Complete')
 
@@ -192,6 +191,7 @@ soleq.i_sr = pindrift(soleq.i, p);
 disp('Complete')
 % Switch to default ion mobility
 soleq.i_sr.p.muion = p_original.muion;
+soleq.i_sr.p.dev = soleq.i.p.dev;
 
 % % Switch off SR
 % p.taun = [1e6, 1e6, 1e6];
@@ -257,7 +257,7 @@ soleq.i_sr.p.muion = p_original.muion;
 % 
 % disp('Complete')
 
-
+%}
 %}
 disp('EQUILIBRATION COMPLETE')
 toc
