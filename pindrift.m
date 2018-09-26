@@ -226,13 +226,9 @@ elseif p.Int ~= 0 && p.OM == 2
   
 % Uniform Generation
 elseif p.OM == 0
-      
-      if p.Int ~= 0 && x > dcum(1) && x <= dcum(2)  
-           g = p.Int*p.G0;
-      else
-           g = 0;
-      end
-        
+ 
+           g = p.Int*p.dev.G0;
+
         % Add pulse
         if p.pulseon == 1
             if  t >= p.pulsestart && t < p.pulselen + p.pulsestart
@@ -256,179 +252,25 @@ c = [1
      1
      1
      0];
- %{
+
 % Virtual charge carrier densities based on Fermi level equilibrium
-f = [dev.mue(i)*((u(1)*(-DuDx(4)+dev.gradEA(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(p.kB*p.T*DuDx(1)));
-     dev.muh(i)*((u(2)*(DuDx(4)-dev.gradIP(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(p.kB*p.T*DuDx(2)));     
-     dev.muion(i)*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(dev.DOSion(i)-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
+f = [p.mobset*dev.mue(i)*((u(1)*(-DuDx(4)+dev.gradEA(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(p.kB*p.T*DuDx(1)));
+     p.mobset*dev.muh(i)*((u(2)*(DuDx(4)-dev.gradIP(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(p.kB*p.T*DuDx(2)));     
+     p.mobseti*dev.muion(i)*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)));%+(u(3)*(DuDx(3)/(dev.DOSion(i)-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
      (dev.epp(i)/max(p.epp))*DuDx(4);];                                         
  
- s = [g - dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2));% - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      g - dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2));% - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+ s = [g(i) - dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2));% - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
+      g(i) - dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2));% - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
       0;
-      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-dev.NA(i)+dev.ND(i));]; 
+      (p.q/(max(p.epp)*p.epp0))*(-u(1)+u(2)-dev.NA(i)+dev.ND(i)-dev.Nion(i)+u(3));]; 
 
-%}  
-  % Virtual charge carrier densities based on Fermi level equilibrium
-f = [p.mobset*dev.mue(i)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
-     p.mobset*dev.muh(i)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));     
-     0;       % Nerst-Planck-Poisson approach ref: Borukhov 1997
-     (dev.epp(i)/max(p.epp))*DuDx(4);];                                         
- 
- s = [ - dev.krad(i)*(u(1)*u(2)-(dev.ni(i)^2));% - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-       - dev.krad(i)*(u(1)*u(2)-(dev.ni(i)^2));% - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      0;
-      (p.q/(max(p.epp)*p.epp0))*(-u(1)+u(2)-dev.NA(i)+dev.ND(i));]; 
-  
-%   
-%   % Virtual charge carrier densities based on Fermi level equilibrium
-% f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
-%      muh_inter*((u(2)*(DuDx(4)-dIPdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
-%      p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(a_max_inter-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
-%      (epp_inter/max(p.epp))*DuDx(4);];                                      
-% 
-%  s = [g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-%       g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-%       0;
-%       (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
-%   
-%{
-  
-% p-type
-if x <= dcum(1) - p.dint
- 
-   f = [p.mue(1)*(u(1)*-DuDx(4)+p.kB*p.T*DuDx(1));
-     p.muh(1)*(u(2)*DuDx(4)+p.kB*p.T*DuDx(2));     
-     0;
-     (p.epp(1)/max(p.epp))*DuDx(4);];                                  
-
- s = [ - p.krad(1)*((u(1)*u(2))-(ni(1)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptp)) + (taup(1)*(u(1)+ntp)))); %; %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % 
-       - p.krad(1)*((u(1)*u(2))-(ni(1)^2));% - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptp)) + (taup(1)*(u(1)+ntp)))); %- kradhtl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- htln0), (u(2)- htlp0)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+pthtl)) + (taup(1)*(u(1)+nthtl))));
-      0;
-      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NA(1)+ND(1));];
-
-% p-i Interface
-elseif x >  dcum(1) -p.dint && x <= dcum(1) +p.dint
-
-xprime = x - (dcum(1) - p.dint);
-N0_inter = p.N0(1) + (dN0dx(1) * xprime);
-deppdx = (p.epp(2) - p.epp(1))/(2*p.dint);
-epp_inter = p.epp(1) + (deppdx*xprime);
-
-%intrinsic carrier density (for recombination)
-dnidx = (ni(2) - ni(1))/(2*p.dint);
-ni_inter = ni(1) + dnidx*xprime;
-
-% mobilities
-dmuedx = (p.mue(2) - p.mue(1))/(2*p.dint);
-mue_inter = p.mue(1) + (dmuedx*xprime);
-dmuhdx = (p.muh(2) - p.muh(1))/(2*p.dint);
-muh_inter = p.muh(1) + (dmuhdx*xprime);
-
-% doping
-dNAdx = (NA(2) - NA(1))/(2*p.dint);
-NA_inter = NA(1) + dNAdx*xprime;
-dNDdx = (ND(2) - ND(1))/(2*p.dint);
-ND_inter = ND(1) + dNDdx*xprime;
-
-% ions
-dNIdx = p.NI/(2*p.dint);
-NI_inter = 0 + (dNIdx*xprime);  
-% ion DOS
-da_maxdx = p.a_max/(2*p.dint);
-a_max_inter = 0 + da_maxdx*xprime;
-
-% Virtual charge carrier densities based on Fermi level equilibrium
-f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
-     muh_inter*((u(2)*(DuDx(4)-dIPdx(1)-(dN0dx(1)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
-     p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(a_max_inter-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
-     (epp_inter/max(p.epp))*DuDx(4);];                                      
-
- s = [g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      g - p.krad(2)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(1)*(u(2)+pt(2))) + (p.taup(1)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      0;
-      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
-
-% Intrinsic
-elseif x >  dcum(1) +p.dint && x <= dcum(2) - p.dint
-% Virtual charge carrier densities based on Fermi level equilibrium
-f = [p.mue(2)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
-     p.muh(2)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));     
-     p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(p.a_max-u(3))))));   % Nerst-Planck-Poisson approach ref: Borukhov 1997
-     (p.epp(2)/max(p.epp))*DuDx(4);];                                      
-
- s = [g - p.krad(3)*((u(1)*u(2))-(ni(2)^2)) - (((u(1)*u(2))-ni(2)^2)/((p.taun(2)*(u(2)+pt(2))) + (p.taup(2)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      g - p.krad(3)*((u(1)*u(2))-(ni(2)^2)) - (((u(1)*u(2))-ni(2)^2)/((p.taun(2)*(u(2)+pt(2))) + (p.taup(2)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      0;
-      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-p.NI+u(3)+ND(2)-NA(2));]; 
- 
-% i-n Interface
-elseif x >  dcum(2) - p.dint && x <= dcum(2) +p.dint
-
-% Grading
-xprime = x - (dcum(2) - p.dint);          % co-ordinate shift
-N0_inter = p.N0(2) +  (dN0dx(2)*xprime);
-deppdx = (p.epp(3) - p.epp(2))/(2*p.dint);
-epp_inter = p.epp(2) + (deppdx*xprime);
-
-%intrinsic carrier density (for recombination)
-dnidx = (ni(3) - ni(2))/(2*p.dint);
-ni_inter = ni(2) + dnidx*xprime;
-
-% mobilities
-dmuedx = (p.mue(3) - p.mue(2))/(2*p.dint);
-mue_inter = p.mue(2) + (dmuedx*xprime);
-dmuhdx = (p.muh(3) - p.muh(2))/(2*p.dint);
-muh_inter = p.muh(2) + (dmuhdx*xprime);
-
-% doping
-dNAdx = (NA(3) - NA(2))/(2*p.dint);
-NA_inter = NA(2) + dNAdx*xprime;
-dNDdx = (ND(3) - ND(2))/(2*p.dint);
-ND_inter = ND(2) + dNDdx*xprime;
-
-% ions
-dNIdx = -p.NI/(2*p.dint);
-NI_inter = p.NI + (dNIdx*xprime);
-% ion DOS
-da_maxdx = -p.a_max/(2*p.dint);
-a_max_inter = p.a_max + da_maxdx*xprime;
-
-% Virtual charge carrier densities based on Fermi level equilibrium
-f = [mue_inter*((u(1)*(-DuDx(4)+dEAdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(1)));
-     muh_inter*((u(2)*(DuDx(4)-dIPdx(2)-(dN0dx(2)*p.kB*p.T/N0_inter)))+(p.kB*p.T*DuDx(2)));     
-     p.mui*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)+(u(3)*(DuDx(3)/(a_max_inter-u(3)))))); % Nerst-Planck-Poisson approach ref: Borukhov 1997
-     (epp_inter/max(p.epp))*DuDx(4);];                                      
-
- s = [g - p.krad(4)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(3)*(u(2)+pt(2))) + (p.taup(3)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      g - p.krad(4)*((u(1)*u(2))-(ni_inter^2)) - (((u(1)*u(2))-ni_inter^2)/((p.taun(3)*(u(2)+pt(2))) + (p.taup(3)*(u(1)+nt(2))))); %- krad*((u(1)*u(2))-(ni^2));  % - klin*min((u(1)- ni), (u(2)- ni)); % - (((u(1)*u(2))-ni^2)/((taun(1)*(u(2)+ptrap)) + (taup(1)*(u(1)+ntrap))));
-      0;
-      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))-NI_inter+u(3)-NA_inter+ND_inter);]; 
-  
-% n-type
-elseif x > dcum(2) +p.dint &&  x <= dmax
-    
-f = [p.mue(3)*((u(1)*-DuDx(4))+(p.kB*p.T*DuDx(1)));
-     p.muh(3)*((u(2)*DuDx(4))+(p.kB*p.T*DuDx(2)));      
-     0;
-     (p.epp(3)/max(p.epp))*DuDx(4)];                                      
-
-s = [ - p.krad(5)*((u(1)*u(2))-(ni(3)^2));% - (((u(1)*u(2))-ni(3)^2)/((p.taun(3)*(u(2)+ptn)) + (taup(3)*(u(1)+ntn))));  %- kradetl*((u(1)*u(2))-(ni^2)); %- klincon*min((u(1)- etln0), (u(2)- etlp0)); %  - (((u(1)*u(2))-ni^2)/((taun(3)*(u(2)+ptetl)) + (taup(3)*(u(1)+ntetl))));
-      - p.krad(5)*((u(1)*u(2))-(ni(3)^2));% - (((u(1)*u(2))-ni(3)^2)/((p.taun(1)*(u(2)+ptn)) + (taup(1)*(u(1)+ntn))));   %- kradetl*((u(1)*u(2))-(ni^2)); % - klincon*min((u(1)- etln0), (u(2)- etlp0)); %- (((u(1)*u(2))-ni^2)/((taun(3)*(u(2)+ptetl)) + (taup(3)*(u(1)+ntetl))));
-      0;
-      (p.q/(max(p.epp)*p.epp0))*(-(u(1))+(u(2))+ND(3)-NA(3));];
-
-end
-%}
 end
 
 % --------------------------------------------------------------------------
 % Define initial conditions.
 function u0 = pdex4ic(x)
 
-i = 1;
-
-if length(varargin) == 0 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) == 0
+if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) == 0
  
 i = find(p.xx <= x);
 i = i(end);
@@ -436,48 +278,9 @@ i = i(end);
 
 u0 = [dev.n0(i);
     dev.p0(i);
-    0;
+    dev.Nion(i);
     dev.E0(i)];
-%{
-    if x <=  dcum(1) - p.dint
-    
-     u0  = [nleft;
-            pleft;
-            0;
-            p.E0(1)];
-        
-    elseif x > dcum(1) - p.dint && x <= dcum(1) + p.dint
-    
-    u0 = [nleft;
-        pleft;
-        0; 
-       p.E0(1)];
-        
-    elseif x > dcum(1) + p.dint && x <= dcum(2) - p.dint
 
-     u0  = [ni(2);
-            ni(2);
-            0;%p.Nion(2);
-            Eif(2)];
-        
-    elseif x > dcum(2) - p.dint && x<= dcum(2) + p.dint 
-    Nionnow = dev.Nion(ii);
-    
-    u0  = [nright;
-        pright;
-        0;
-        p.E0(3);];
-        
-    elseif x >  dcum(2) + p.dint
-                   
-    u0  = [nright;
-           pright;
-           0;
-           p.E0(3)];
-    
-    end
-
-%}
      elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) ~= 0
     % insert previous solution and interpolate the x points
     u0 = [interp1(icx,icsol(end,:,1),x)
@@ -661,7 +464,7 @@ end
 
 if p.Ana == 1
     
-    pinana(solstruct, t(end));%[PL, Voc, Vapp_arr, Jtotr] = 
+    [Voc, Vapp_arr, Jtotr] = pinana(solstruct, t(end)); 
     
     if p.OC == 1
         
@@ -675,7 +478,7 @@ if p.Ana == 1
         
     end
     
-%    solstruct.Jtotr = Jtotr;
+solstruct.Jtotr = Jtotr;
     
 end
 
