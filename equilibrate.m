@@ -31,9 +31,8 @@ sp_r = p.sp_r;
 
 BC = p.BC;
 
-%% Start with low recombination coefficients
-p.taun = [1e6, 1e6, 1e6];       % [s] SRH time constant for electrons
-p.taup = [1e6, 1e6, 1e6];      % [s] SRH time constant for holes
+%% Start with SRH switched off
+p.SRHset = 0;
 
 % Raditative recombination could also be set to low values initially if required. 
 % p.krad = 1e-20;
@@ -95,64 +94,6 @@ p.t0 = p.tmax/1e10;
 soleq.eq = pindrift(sol, p);
 disp('Complete')
 
-% 
-% %% Set up solution for open circuit
-% disp('Switching boundary conditions to zero flux')
-% %p.Ana = 0;
-% p.BC = 0;
-% p.tmax = 1e-9;
-% p.t0 = p.tmax/1e3;
-% 
-% sol = pindrift(soleq.eq, p);
-% disp('Complete')
-% 
-% %% Symmetricise the solution
-% disp('Symmetricise solution for open circuit')
-% symsol = symmetricize(sol);
-% disp('Complete')
-% 
-% %% Equilibrium solution with mirrored cell and OC boundary conditions, mobility zero
-% disp('Initial equilibrium open circuit solution')
-% p.BC = BC;
-% p.OC = 1;
-% p.calcJ = 0;
-
-% %% Switch off mobilities
-% p.mue_i = 0;          % electron mobility
-% p.muh_i = 0;      % hole mobility
-% p.mue_p = 0;
-% p.muh_p = 0;
-% p.mue_n = 0;
-% p.muh_n = 0;
-% p.mui = 0;
-% 
-% ssol = pindrift(symsol, p);
-% disp('Complete')
-% 
-% %% OC with mobility switched on
-% disp('Open circuit solution with mobility switched on')
-% p.tmax = 1e-6;
-% p.t0 = p.tmax/1e3;
-% % Switch on mobilities
-% p.mue_i = mue_i;          % electron mobility
-% p.muh_i = muh_i;      % hole mobility
-% p.mue_p = mue_p;
-% p.muh_p = muh_p;
-% p.mue_n = mue_n;
-% p.muh_n = muh_n;
-% p.mui = 0;
-% 
-% ssol = pindrift(ssol, p);
-% 
-% % Longer time step to ensure equilibrium has been reached
-% p.tmax = 1e-2;
-% p.t0 = p.tmax/1e3;
-% 
-% ssol_eq = pindrift(ssol, p);
-% disp('Complete')
-
-
-
 %% Equilibrium solutions with ion mobility switched on
 %% Closed circuit conditions
 disp('Closed circuit equilibrium with ions')
@@ -180,8 +121,7 @@ disp('Complete')
 
 %% Ion equilibrium with surface recombination
 disp('Switching on surface recombination')
-p.taun = p_original.taun;
-p.taup = p_original.taup;
+p.SRHset = 1;
 
 p.calcJ = 0;
 p.tmax = 1e-6;
