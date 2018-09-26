@@ -19,12 +19,12 @@ classdef pc
         
         % Device Dimensions [cm]
         d = [100e-7, 400e-7, 100e-7];       % Layer thickness array
-        parr = [100, 200, 100];             % Spatial mesh points array
+        parr = [50, 100, 50];             % Spatial mesh points array
                          
         dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
-        pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
+        pint = 10;          % 0.5x Interfacial points (x_mesh_type = 3)
         dscr = 30e-7;       % Approx space charge region thickness
-        pscr = 60;          % No of points in space charge region
+        pscr = 30;          % No of points in space charge region
         pepe = 20;          % electrode interface points
         te = 10e-7;         % electrode interface thickness
         dmin = 1e-7;        % start value for log meshes
@@ -39,7 +39,6 @@ classdef pc
         %%%%%%% GENERAL CONTROL PARAMETERS %%%%%%%%%%
         OC = 0;                 % Closed circuit = 0, Open Circuit = 1
         Int = 0;                % Bias Light intensity (Suns Eq.)
-        G0 = 2.6409e+21;        % Uniform generation rate @ 1 Sun
         pulseon = 0;            % Switch pulse on TPC or TPV
         Vapp = 0;               % Applied bias
         BC = 3;                 % Boundary Conditions. Must be set to one for first solution
@@ -49,6 +48,7 @@ classdef pc
         side = 1;               % illumination side 1 = EE, 2 = SE
         calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
         mobset = 1;             % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
+        mobseti = 1;
         JV = 0;                 % Toggle run JV scan on/off
         Ana = 1;                % Toggle on/off analysis
         
@@ -74,18 +74,18 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels    
-        EA = [0, 0, 0];
-        IP = [-1.0, -1.0, -1.0];
+        EA = [0, -0.1, -0.2];
+        IP = [-1.0, -1.1, -1.2];
         
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-0.7, -0.5, -0.3];
+        E0 = [-0.7, -0.6, -0.5];
         %E0 = [-5.25, -4.6, -3.95];
         
         % Workfunction energies
         PhiA = -0.7;
-        PhiC = -0.3;
+        PhiC = -0.5;
         
         % Effective Density Of States
         % DIFFERENT eDOS IN DIFFERENT LAYERS AS YET UNTESTED!
@@ -101,7 +101,7 @@ classdef pc
         % Mobilities
         mue = [1, 1, 1];         % electron mobility [cm2V-1s-1]
         muh = [1, 1, 1];         % hole mobility [cm2V-1s-1]
-        muion = [0, 0, 0];                   % ion mobility [cm2V-1s-1]
+        muion = [0, 1e-10, 0];                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
         % TiO2 mue = 0.09?Bak2008
@@ -110,6 +110,9 @@ classdef pc
         % Dielectric constants
         epp = [4,4,4];
         % TiO2?Wypych2014
+        
+        %%% Generation %%%%%
+        G0 = [0, 2.6409e+21, 0];        % Uniform generation rate @ 1 Sun      
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
@@ -443,25 +446,26 @@ classdef pc
             % properties simply change linearly.
             xx = pc.xmeshini(params);
             
-            dev.EA = zeros(length(xx), 1);
-            dev.IP = zeros(length(xx), 1); 
-            dev.mue = zeros(length(xx), 1);
-            dev.muh = zeros(length(xx), 1);
-            dev.muion = zeros(length(xx), 1);
-            dev.NA = zeros(length(xx), 1);
-            dev.ND = zeros(length(xx), 1);
-            dev.N0 = zeros(length(xx), 1);
-            dev.Nion = zeros(length(xx), 1);
-            dev.ni = zeros(length(xx), 1);
-            dev.n0 = zeros(length(xx), 1);
-            dev.p0 = zeros(length(xx), 1);
-            dev.DOSion = zeros(length(xx), 1);
-            dev.epp = zeros(length(xx), 1);
-            dev.krad = zeros(length(xx), 1);
-            dev.gradEA = zeros(length(xx), 1);
-            dev.gradIP = zeros(length(xx), 1);
-            dev.gradN0 = zeros(length(xx), 1);
-            dev.E0 = zeros(length(xx), 1);
+            dev.EA = zeros(1, length(xx));
+            dev.IP = zeros(1, length(xx)); 
+            dev.mue = zeros(1, length(xx));
+            dev.muh = zeros(1, length(xx));
+            dev.muion = zeros(1, length(xx));
+            dev.NA = zeros(1, length(xx));
+            dev.ND = zeros(1, length(xx));
+            dev.N0 = zeros(1, length(xx));
+            dev.Nion = zeros(1, length(xx));
+            dev.ni = zeros(1, length(xx));
+            dev.n0 = zeros(1, length(xx));
+            dev.p0 = zeros(1, length(xx));
+            dev.DOSion = zeros(1, length(xx));
+            dev.epp = zeros(1, length(xx));
+            dev.krad = zeros(1, length(xx));
+            dev.gradEA = zeros(1, length(xx));
+            dev.gradIP = zeros(1, length(xx));
+            dev.gradN0 = zeros(1, length(xx));
+            dev.E0 = zeros(1, length(xx));
+            dev.G0 = zeros(1, length(xx));
             
             dcum0 = [0,params.dcum];
           for i =1:length(params.dcum)
@@ -495,6 +499,7 @@ classdef pc
                             dev.n0(j) = params.n0(i);
                             dev.p0(j) = params.p0(i);
                             dev.E0(j) = params.E0(i);
+                            dev.G0(j) = params.G0(i);
                             dev.gradEA(j) = 0;
                             dev.gradIP(j) = 0;
                             dev.gradN0(j) = 0;
@@ -554,6 +559,10 @@ classdef pc
                             % Equilibrium Fermi energy
                             dE0dx = (params.E0(i+1)-params.E0(i))/(2*params.dint);
                             dev.E0(j) = params.E0(i) + xprime*dE0dx;
+                            
+                            % Uniform generation rate
+                            dG0dx = (params.G0(i+1)-params.G0(i))/(2*params.dint);
+                            dev.G0(j) = params.G0(i) + xprime*dG0dx;
                             
                             % Static ion background density
                             dNiondx = (params.Nion(i+1)-params.Nion(i))/(2*params.dint);
