@@ -1,17 +1,19 @@
-function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startInt, endInt, points)
+function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startInt, endInt, points, include_dark)
 %GENINTSTRUCTSREALVOC - Generates a cell containing structures of solutions at various light intensities at an accurate VOC
 % This script just uses other three scripts: genIntStructs, findOptimVoc
 % and asymmetricize. Both symmetric and asymmetric solutions are supported
 % in input, but the usage of symmetric solutions is strongly encouraged as
 % the findOptimVoc will start from a condition closer to the Voc.
 %
-% Syntax:  structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points)
+% Syntax:  structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points, include_dark)
 %
 % Inputs:
-%   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions, or a logic false for not having the dark.
+%   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions
 %   STARTINT - higher requested illumination.
 %   ENDINT - lower requested illumination.
 %   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
+%   INCLUDE_DARK - logical, if to include the dark solution in the output
+%     structure
 %
 % Outputs:
 %   GOODVOCASYMSTRUCTCELL - a cell containing structs of asymmetric solutions at various light
@@ -19,7 +21,7 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startIn
 %   VOCS - an array with the VOC, getting populated just if the input structures were at open circuit
 %
 % Example:
-%   structs_voc = genIntStructsRealVoc(ssol_i_eq_SR, 1, 1e-3, 7)
+%   structs_voc = genIntStructsRealVoc(ssol_i_eq_SR, 1, 1e-3, 7, true)
 %     prepare solutions at 100, 10, 1, 0.1 and 0 illumination intensities
 %
 % Other m-files required: changeLight, pindrift, genIntStructs,
@@ -45,7 +47,7 @@ end
 
 % use the normal genIntStructs for obtaining a cell with structs at various
 % light intensities
-[badVocStructCell, ~, ~] = genIntStructs(struct_eq, startInt, endInt, points);
+[badVocStructCell, ~, ~] = genIntStructs(struct_eq, startInt, endInt, points, include_dark);
 
 % how many solutions have been obtained
 nsolutions = length(badVocStructCell(1,:));
@@ -79,7 +81,6 @@ for i = 1:nsolutions
     asymstruct_Int_Voc.p.figson = 1;
     % replace the solution at the bad VOC with the new one
     goodVocAsymStructCell{1, i} = asymstruct_Int_Voc;
-    assignin('base', goodVocAsymStructCell{2, i}, asymstruct_Int_Voc);
     % populate the array containing VOCs
     VOCs(i) = VOC;
 end

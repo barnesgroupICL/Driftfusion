@@ -7,7 +7,7 @@ basename = 'test';
 % functions
 
 [sol_eq, sol_light, ssol_eq, ssol_light, sol_i_eq, sol_i_light, ssol_i_eq, ssol_i_light] = equilibrate(basename);
-symstructs = genIntStructs(ssol_i_eq, 100, 1e-7, 4);
+symstructs = genIntStructs(ssol_i_eq, 100, 1e-7, 4, true);
 
 % prepare tests for boundary conditions
 p = ssol_i_eq.p;
@@ -16,7 +16,7 @@ ssol_i_eq_BC2 = pindrift(ssol_i_eq, p);
 p = ssol_i_light.p;
 p.BC = 2;
 ssol_i_light_BC2 = pindrift(ssol_i_light, p);
-symstructs_BC2 = genIntStructs(ssol_i_eq_BC2, 100, 1e-7, 4);
+symstructs_BC2 = genIntStructs(ssol_i_eq_BC2, 100, 1e-7, 4, true);
 
 % test Charge Extraction (CE)
 % CE_struct = CE_full_exec(symstructs, BC, save_solutions, save_results)

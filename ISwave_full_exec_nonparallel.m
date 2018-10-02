@@ -31,12 +31,12 @@ function ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFr
 %   ISWAVE_RESULTS - a struct containing the most important results of the simulation
 %
 % Example:
-%   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, true, false, true, true)
+%   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, 100, 1e-7, 4, true), 1e9, 1e-2, 23, 1e-3, true, false, true, true)
 %     calculate also with dark background, do not freeze ions, use a
 %     voltage oscillation amplitude of 1 mV, on 23 points from frequencies of 1 GHz to
 %     0.01 Hz, with selective contacts, without calculating ionic current,
 %     without parallelization
-%   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, 100, 1e-7, 4), 1e9, 1e-2, 23, 1e-3, true, true, true, true)
+%   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, 100, 1e-7, 4, true), 1e9, 1e-2, 23, 1e-3, true, true, true, true)
 %     as above but freezing ions during voltage oscillation
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
