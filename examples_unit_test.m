@@ -55,7 +55,7 @@ TPVvariab_full_exec(ssol_i_eq, true, true);
 TPVvariab_full_exec(ssol_i_light, false, false);
 
 % test Impedance Spectroscopy with voltage step (ISstep)
-% ISstep_struct = ISstep_full_exec(symstructs, deltaV, BC, frozen_ions, save_solutions, save_results)
+% ISstep_struct = ISstep_full_exec(symstructs, deltaV, frozen_ions, save_solutions, save_results)
 
 %% Impedance Spectroscopy with voltage step (ISstep) - various light intensities
 ISstep_full_exec(symstructs, 1e-3, 1, false, false, false);
@@ -71,7 +71,7 @@ ISstep_full_exec(ssol_i_light_BC2, 0.000015, 2, false, false, false);
 ISstep_full_exec(ssol_i_light, [-1e-2, -1e-3, 1e-3, 1e-2], 1, false, false, false);
 
 % test Impedance Spectroscopy with oscillating voltage (ISwave)
-% ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, BC, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
+% ISwave_struct = ISwave_full_exec(symstructs, startFreq, endFreq, Freq_points, deltaV, reach_stability, frozen_ions, calcJi, parallelize, save_solutions, save_results)
 
 %% Impedance Spectroscopy with oscillating voltage (ISwave) - various light intensities
 ISwave_full_exec(symstructs, 500, 500, 1, 0.002, 1, true, false, false, false, false, false, false);
