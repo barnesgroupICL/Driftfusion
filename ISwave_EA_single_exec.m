@@ -24,11 +24,12 @@ function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq,
 %     oscillating voltage
 %
 % Example:
-%   ISwave_EA_single_exec(asymmetricize(ssol_i_light), 2e-3, 1e6, 20, 40, true, true, 1e-6)
+%   ISwave_EA_single_exec(asymmetricize(ssol_i_light), 2e-3, 1e6, 20, 40, true, false, 1e-6)
 %     simulate an oscillating voltage at 1 MHz and 2 mV of amplitude, with
 %     selective contacts, 20 periods and 40 time points per period,
 %     calculating the ionic current and using a starting relative tolerance
-%     of 1e-4
+%     of 1e-6, calculate also the electronic current needed by impedance
+%     simulations
 %
 % Other m-files required: pindrift, verifyStabilization, pinAna
 % Subfunctions: none
@@ -61,6 +62,7 @@ else
     % a meaningful value of calcJ should be set from pinParams
     % in Impedance Spectroscopy we need the current at the electrodes
     p.Ana = 1;
+    assert(logical(p.calcJ), [mfilename ' - p.calcJ needs to be set in the input structure in order to perform an IS simulation']);
 end
 
 p.RelTol = RelTol; % in case some were defined, for increasing accuracy
