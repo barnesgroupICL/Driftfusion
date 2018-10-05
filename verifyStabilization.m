@@ -1,6 +1,7 @@
 function all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
-%VERIFYSTABILIZATION - Checks if the solution reached a stabilized status
-%at the final time point
+%VERIFYSTABILIZATION - Checks if the solution reached a stabilized status at the final time point
+% beware that this can have false positives when the analyzed solution had
+% a tmax so small that the ionic movement did not even start
 %
 % Syntax:  all_stable = verifyStabilization(sol_matrix, t, time_fraction)
 %
@@ -40,6 +41,7 @@ function all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
 
 %------------- BEGIN CODE --------------
 
+% name of the variables
 names = ["electrons", "holes", "ions", "potential"];
 log = [true, true, false, false]; % which values to check when representing in log10 form or not
 all_stable = true;
@@ -60,16 +62,19 @@ for i = 1:length(sol_matrix(1, 1, :))
     end
 
     difference = sum(abs(profile_end - profile_at_time)); % sum up all the differences between the profiles
+    % if the values change more than one tenthousandth, the solution is
+    % considered not stable
     threshold = 1e-4 * sum(abs(profile_end - mean(profile_end))); % sum up absolute values, ignore constant bias
     stable = difference <= threshold;
 
     if stable
-        display(['variable ', num2str(i), ' stabilisation verified']);
+        disp(['variable ', names(i), ' stabilisation verified']);
     else
         warning('pindrift:verifyStabilization',...
             'Comparing final solutions at %s s and %s s showed that the %s distribution did not reach stability. Consider trying with a greater tmax.',...
             num2str(t_array(time_index)), num2str(t_array(end)), names(i));
     end
+    % true just if all the variables are stabilized
     all_stable = all_stable && stable;
 end
 

@@ -1,6 +1,5 @@
 function [n_coeff, i_coeff, U_coeff, dQ_coeff, n_noionic_coeff] = ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
-%ISWAVE_SINGLE_ANALYSIS - Calculate impedance (reactance and resistance) and phase by Impedance
-% Spectroscopy (ISwave) with oscillating voltage
+%ISWAVE_SINGLE_ANALYSIS - Calculate impedance (reactance and resistance) and phase by Impedance Spectroscopy (ISwave) with oscillating voltage
 %
 % Syntax:  ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
 %
@@ -15,7 +14,7 @@ function [n_coeff, i_coeff, U_coeff, dQ_coeff, n_noionic_coeff] = ISwave_single_
 % Outputs:
 %  
 % Example:
-%   ISwave_single_analysis(ISwave_EA_single_exec(asymmetricize(ssol_i_light), 2e-3, 1e6, 20, 40, true, false, 1e-4), false, true)
+%   ssol_i_light_IS = ISwave_single_analysis(ISwave_EA_single_exec(asymmetricize(ssol_i_light), 2e-3, 1e6, 20, 40, true, false, 1e-4), false, true)
 %     do plot
 %
 % Other m-files required: ISwave_subtracting_analysis,
@@ -42,10 +41,10 @@ set(0, 'defaultfigureposition', [0, 0, 1000, 750]);
 % set line thickness
 set(0, 'defaultLineLineWidth', 2);
 
-% evil shortcut
+% shortcut
 s = asymstruct_ISwave;
 
-% verify if the simulation broke, in that case return NaNs
+% verify if the simulation broke, in that case return just NaNs
 if size(asymstruct_ISwave.sol, 1) < asymstruct_ISwave.p.tpoints
     n_coeff = [NaN, NaN, NaN];
     i_coeff = [NaN, NaN, NaN];
@@ -55,22 +54,32 @@ if size(asymstruct_ISwave.sol, 1) < asymstruct_ISwave.p.tpoints
     return;
 end
 
-% round should not be needed here
-% s.p.Vapp_params(4) should be pulsatance
+%% get current profiles
+
+% s.p.Vapp_params(4) is pulsatance
+% round _should_ not be needed here
 periods = round(s.p.tmax * s.p.Vapp_params(4) / (2 * pi));
 
 % here is critical that exactely an entire number of periods is provided to
-% ISwave_single_demodulator
+% ISwave_single_demodulation
 fit_t_index = round((s.p.tpoints - 1) * round(periods / 2) / periods) + 1;
 fit_t = s.t(fit_t_index:end)';
-fit_J = s.Jn(fit_t_index:end) / 1000; % in Ampere
-% obtain recombination current
-[~, ~, ~, ~, ~, U] = pinAna(s);
 
+% current profile to be analyzed
+fit_J = s.Jn(fit_t_index:end) / 1000; % in Ampere
+
+% recombination current profile to be analyzed
+[~, ~, ~, ~, ~, U] = pinAna(s);
 fit_U = U(fit_t_index:end) / 1000; % in Ampere
 
-% remove some tilting from fit_J to get better fit and better demodulation in case of
-% unstabilized solutions. In case of noisy solutions this could work badly
+% accumulating current profile to be analyzed
+[dQ_t, ~, ~, ~, ~] = ISwave_subtracting_analysis(asymstruct_ISwave);
+fit_dQ = dQ_t(fit_t_index:end); % in Ampere
+
+%% remove some tilting from fit_J
+
+% to get better fit and better demodulation in case of
+% unstabilized solutions (not usually the case). In case of noisy solutions this could work badly
 % but should not affect too much the fitting/demodulation
 delta_t = fit_t(end) - fit_t(1);
 % this assumes that the first and last point are at the same point in the oscillating voltage
@@ -80,9 +89,7 @@ t_middle = fit_t(round(end/2));
 % because of this, the bias value that will be obtained from the fit/demodulation is not going to be correct
 fit_J_flat = fit_J - tilting * (fit_t - t_middle);
 
-% try to calculate the accumulated charge
-[dQ_t, ~, ~, ~, ~] = ISwave_subtracting_analysis(asymstruct_ISwave);
-fit_dQ = dQ_t(fit_t_index:end); % in Ampere
+%% extract parameters from current profiles
 
 if demodulation
     n_coeff = ISwave_EA_single_demodulation(fit_t, fit_J_flat, s.p.Vapp_func, s.p.Vapp_params);
@@ -95,6 +102,7 @@ else
 end
 
 %% calculate ionic contribution
+
 if s.p.mui % if there was ion mobility, current due to ions have been calculated, fit it
     % Intrinsic points logical array
     itype_points= (s.x >= s.p.tp & s.x <= s.p.tp + s.p.ti);
@@ -128,13 +136,14 @@ if s.p.mui % if there was ion mobility, current due to ions have been calculated
     % calculate electronic current subtracting ionic contribution
     Jn_noionic = s.Jn/1000 - Ji_disp; % in Ampere
 
-else
+else % if no ionic mobility is present, report NaNs
     i_coeff = [NaN, NaN, NaN];
     Ji_disp = NaN;
     Jn_noionic = NaN;
 end
 
 %% plot solutions
+
 if ~minimal_mode % disable all this stuff if under parallelization or if explicitly asked to not plot any graphics
 
     % in phase electronic current
@@ -184,8 +193,6 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         legend_array = [legend_array, "Accumulating current"];
         i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(n_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
         legend_array = [legend_array, "Fit of Current"];
-        %i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(U_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
-        %legend_array = [legend_array, "Fit of Recombination current"];
         i=i+1; h(i) = plot(s.t, Jn_inphase*1000, 'm-', 'LineWidth', 1, 'Marker', 'o', 'MarkerSize', 7); % mA
         legend_array = [legend_array, "In phase J"];
         i=i+1; h(i) = plot(s.t, Jn_quadrature*1000, 'm-', 'LineWidth', 1, 'Marker', 'x', 'MarkerSize', 7); % mA
@@ -193,12 +200,8 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         if s.p.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
             i=i+1; h(i) = plot(s.t, Ji_disp * 1000, 'g--', 'LineWidth', 2); % mA
             legend_array = [legend_array, "Ionic displacement current"];
-            %i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(i_coeff, fit_t, tilting_i, t_middle) * 1000, 'g--'); % mA
-            %legend_array = [legend_array, "Fit of Ionic displacement current"];
             i=i+1; h(i) = plot(s.t, Jn_noionic * 1000, 'c-.', 'LineWidth', 2); % mA
             legend_array = [legend_array, "Purely electronic current"];
-            %i=i+1; h(i) = plot(fit_t, s.p.J_E_func(n_noionic_coeff, fit_t) * 1000, 'kx-'); % mA
-            %legend_array = [legend_array, "Fit of Purely electronic current"];
             i=i+1; h(i) = plot(s.t, Jn_noionic_inphase*1000, 'm--', 'LineWidth', 1, 'Marker', '+', 'MarkerSize', 7); % mA
             legend_array = [legend_array, "In phase electronic J"];
             i=i+1; h(i) = plot(s.t, Jn_noionic_quadrature*1000, 'm--', 'LineWidth', 1, 'Marker', 's', 'MarkerSize', 7); % mA

@@ -1,6 +1,5 @@
 function ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFreq, Freq_points, deltaV, sequential, frozen_ions, do_graphics, save_solutions)
-%ISWAVE_FULL_EXEC_NONPARALLEL - Do Impedance Spectroscopy approximated applying an
-% oscillating voltage (ISwave) in a range of background light intensities.
+%ISWAVE_FULL_EXEC_NONPARALLEL - Do Impedance Spectroscopy approximated applying an oscillating voltage (ISwave) in a range of background light intensities.
 % Getting rid of annoying parfor
 %
 % Syntax:  ISwave_results = ISwave_full_exec_nonparallel(symstructs, startFreq, endFreq, Freq_points, deltaV, sequential, frozen_ions, do_graphics, save_solutions)
@@ -31,12 +30,12 @@ function ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFr
 %   ISWAVE_RESULTS - a struct containing the most important results of the simulation
 %
 % Example:
-%   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, 100, 1e-7, 4, true), 1e9, 1e-2, 23, 1e-3, true, false, true, true)
+%   ISwave_results = ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, 100, 1e-7, 4, true), 1e9, 1e-2, 23, 1e-3, true, false, true, true)
 %     calculate also with dark background, do not freeze ions, use a
 %     voltage oscillation amplitude of 1 mV, on 23 points from frequencies of 1 GHz to
 %     0.01 Hz, with selective contacts, without calculating ionic current,
 %     without parallelization
-%   ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, 100, 1e-7, 4, true), 1e9, 1e-2, 23, 1e-3, true, true, true, true)
+%   ISwave_results = ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq, 100, 1e-7, 4, true), 1e9, 1e-2, 23, 1e-3, true, true, true, true)
 %     as above but freezing ions during voltage oscillation
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
@@ -66,7 +65,8 @@ if length(structs(:, 1)) == 1 % if the input is a single structure instead of a 
     structs = symstructs_temp;
 end
 
-% don't display figures until the end of the script, as they steal the focus
+% don't display figures until the end of the script, as they steal the
+% focus and being very annoying
 % taken from https://stackoverflow.com/questions/8488758/inhibit-matlab-window-focus-stealing
 if do_graphics
     set(0, 'DefaultFigureVisible', 'off');
@@ -121,13 +121,15 @@ for i = 1:length(structs(1, :))
     struct.p.figson = 0;
     if struct.p.OC % in case the solution is symmetric, break it in halves
         asymstruct_Int = asymmetricize(struct);
-    else
+    else % otherwise use it as it comes
         asymstruct_Int = struct;
     end
+    % calculate currently applied DC voltage, as defined in pinana
     [~, ~, ~, Efn, Efp, ~] = pinAna(asymstruct_Int);
     Vdc_array(i) = Efn(end, end) - Efp(end, 1);
+    % in case the simulation without moving ions is requested, freeze them
     if frozen_ions
-        asymstruct_Int.p.mui = 0; % if frozen_ions option is set, freezing ions
+        asymstruct_Int.p.mui = 0;
     end
     % simulate first frequency with the stabilized solution
     asymstruct_start = asymstruct_Int;
@@ -144,13 +146,14 @@ for i = 1:length(structs(1, :))
         % by the demodulation, the fitting way does not have this problem
         if n_coeff(3) < 0.006 || n_coeff(3) > pi/2 - 0.006
             disp([mfilename ' - Int: ' num2str(Int_array(i)) '; Vdc: ' num2str(Vdc_array(i)) ' V; Freq: ' num2str(Freq_array(j)) ' Hz; Fitted phase is ' num2str(rad2deg(n_coeff(3))) ' degrees, it is extremely small or close to pi/2 or out of 0-pi/2 range, increasing solver accuracy and calculate again'])
+            % decrease tollerance
             tempRelTol = tempRelTol / 100;
             % if just the initial solution, non-stabilized, is requested, do
             % not start from oscillating solution
             if sequential
                 asymstruct_temp = asymstruct_start; % strictly use the last point from previous cycle
             else
-                asymstruct_temp = asymstruct_ISwave; % the oscillating solution, better starting point
+                asymstruct_temp = asymstruct_ISwave; % the last point of the oscillating solution, better starting point
             end
             asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_temp,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, ~sequential, false, tempRelTol); % do IS
@@ -163,7 +166,8 @@ for i = 1:length(structs(1, :))
         % the simulation
         if n_coeff(3) < 0 || n_coeff(3) > pi/2
             disp([mfilename ' - Int: ' num2str(Int_array(i)) '; Vdc: ' num2str(Vdc_array(i)) ' V; Freq: ' num2str(Freq_array(j)) ' Hz; Phase from demodulation is weird: ' num2str(rad2deg(n_coeff(3))) ' degrees, confirming using fitting'])
-            % use fitting
+            % use fitting, just in case the weird result was due to
+            % demodulation failure
             [n_coeff, i_coeff, U_coeff, dQ_coeff, ~] = ISwave_single_analysis(asymstruct_ISwave, ~do_graphics, false);
             disp([mfilename ' - Int: ' num2str(Int_array(i)) '; Vdc: ' num2str(Vdc_array(i)) ' V; Freq: ' num2str(Freq_array(j)) ' Hz; Phase from fitting is: ' num2str(rad2deg(n_coeff(3))) ' degrees'])
         end
@@ -185,6 +189,7 @@ for i = 1:length(structs(1, :))
             % use fitting
             [n_coeff, i_coeff, U_coeff, dQ_coeff, ~] = ISwave_single_analysis(asymstruct_ISwave, ~do_graphics, false);
         end
+        % save values
         J_bias(i, j) = n_coeff(1);
         J_amp(i, j) = n_coeff(2);
         J_phase(i, j) = n_coeff(3);
@@ -199,7 +204,7 @@ for i = 1:length(structs(1, :))
         dQ_phase(i, j) = dQ_coeff(3);
         
         % as the number of periods is fixed, there's no need for tmax to be
-        % a matrix, but this could change, so it's a matrix
+        % a matrix, but this could change in future code...
         tmax_matrix(i,j) = asymstruct_ISwave.p.tmax;
         
         if save_solutions % assignin cannot be used in a parallel loop, so single solutions cannot be saved
@@ -220,12 +225,13 @@ for i = 1:length(structs(1, :))
     end
 end
 
-%% calculate apparent capacity 
+%% calculate apparent capacity  and impedance
 
-sun_index = find(Int_array == 1); % could used for plotting... maybe...
+% save in an easy to access variable which solution refers to 1 sun
+sun_index = find(Int_array == 1);
 
 % even if here the frequency is always the same for each illumination, it
-% is not the case for ISstep, and the solution has to be more similar in
+% is not the case for ISstep (still unpublished), and the solution has to be more similar in
 % order to be used by the same scripts
 Freq_matrix = repmat(Freq_array, length(structs(1, :)), 1);
 
@@ -246,17 +252,23 @@ pulsatance_matrix = 2 * pi * repmat(Freq_array, length(structs(1, :)), 1);
 % or can be obtained in the same way with Joutphase/(pulsatance*deltaV)
 cap = sin(J_phase) ./ (pulsatance_matrix .* impedance_abs);
 
+%% impedance due to ionic displacement current
+
 impedance_i_abs = deltaV ./ J_i_amp; % J_amp is in amperes
 % impedance phase is minus current phase, so -J_i_phase
 impedance_i_re = impedance_i_abs .* cos(-J_i_phase); % this is the resistance
 impedance_i_im = impedance_i_abs .* sin(-J_i_phase);
 cap_idrift = sin(J_i_phase) ./ (pulsatance_matrix .* impedance_i_abs);
 
+%% impedance due to recombination current
+
 impedance_U_abs = deltaV ./ J_U_amp; % J_amp is in amperes
 % impedance phase is minus current phase, so -J_U_phase
 impedance_U_re = impedance_U_abs .* cos(-J_U_phase); % this is the resistance
 impedance_U_im = impedance_U_abs .* sin(-J_U_phase);
 cap_U = sin(J_U_phase) ./ (pulsatance_matrix .* impedance_U_abs);
+
+%% impedance due to accumulating current
 
 impedance_dQ_abs = deltaV ./ dQ_amp; % J_amp is in amperes
 impedance_dQ_re = impedance_dQ_abs .* cos(-dQ_phase); % this is the resistance
@@ -265,8 +277,6 @@ cap_dQ = sin(dQ_phase) ./ (pulsatance_matrix .* impedance_dQ_abs);
 
 %% save results
 
-% this struct is similar to ISstep_struct in terms of fields,
-% but the columns and rows in the fields can be different
 ISwave_results.sol_name = structs{2, 1};
 ISwave_results.Vdc = Vdc_array;
 ISwave_results.periods = periods;

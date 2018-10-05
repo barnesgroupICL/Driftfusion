@@ -1,7 +1,5 @@
 function ISwave_full_analysis_nyquist(ISwave_results)
-%ISSTEP_FULL_ANALYSIS_NYQUIST - Plot Nyquist graph for Impedance Spectroscopy (ISwave) in a range
-% of background light intensities, imaginary part of capacitance versus
-% real part of capacitance
+%ISSTEP_FULL_ANALYSIS_NYQUIST - Plot Nyquist graph for Impedance Spectroscopy (ISwave) in a range of background light intensities, imaginary part of capacitance versus real part of capacitance
 %
 % Syntax:  ISwave_full_analysis_nyquist(ISwave_struct)
 %
@@ -68,7 +66,7 @@ h = zeros(length(legend_text), 1);
 figure('Name', 'Nyquist plot of IS at various light intensities', 'NumberTitle', 'off')
     hold off
     for i = 1:length(legend_text)
-        % find the points of the decades
+        % find the points of the even decades
         temp_logfreq = log10(ISwave_results.Freq(i,:));
         evendecade_index = mod(temp_logfreq, 2) == 0;
         
@@ -78,7 +76,7 @@ figure('Name', 'Nyquist plot of IS at various light intensities', 'NumberTitle',
             'MarkerSize', 3, 'LineWidth', 1.3);
         hold on
         
-        % add bigger markers for the points of the decades
+        % add bigger markers for the points of the even decades
         plot(ISwave_results.impedance_re(i, evendecade_index), -ISwave_results.impedance_im(i, evendecade_index)',...
             'MarkerFaceColor', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'Marker', 'x', 'LineStyle', 'none', 'MarkerSize', 12);
@@ -90,8 +88,7 @@ figure('Name', 'Nyquist plot of IS at various light intensities', 'NumberTitle',
 
 % preallocate figures handles
 h = zeros(length(legend_text), 1);
-% function for normalization fitting
-%semicircle = @(coeff, re) real((coeff(1).^2 - (re - coeff(2)).^2).^0.5);
+% normalized Nyquist plot
 figure('Name', 'Normalized Nyquist plot of IS at various light intensities', 'NumberTitle', 'off')
     hold off
     % take the last point orizontally
@@ -100,16 +97,8 @@ figure('Name', 'Normalized Nyquist plot of IS at various light intensities', 'Nu
     max_array = max(-ISwave_results.impedance_im, [], 2);
     norm_array = max_array / min(max_array);
     for i = 1:length(legend_text)
-%         fit_re = ISwave_struct.impedance_re(i, end-9:end);
-%         fit_im = -ISwave_struct.impedance_im(i, end-9:end);
-%         try
-%             fit = fitnlm(fit_re, fit_im, semicircle, [max_array(i).^2, max_array(i)]);
-%             norm_array(i) = sqrt(fit.Coefficients.Estimate(1));
-%         catch
-%             disp([mfilename ' - Failed fit for ' legend_flip(i)])
-%         end
         
-        % find the points of the decades
+        % find the points of the even decades
         temp_logfreq = log10(ISwave_results.Freq(i,:));
         evendecade_index = mod(temp_logfreq, 2) == 0;
         
@@ -119,7 +108,7 @@ figure('Name', 'Normalized Nyquist plot of IS at various light intensities', 'Nu
             'MarkerSize', 3, 'LineWidth', 1.3);
         hold on
         
-        % add bigger markers for the points of the decades
+        % add bigger markers for the points of the even decades
         plot(ISwave_results.impedance_re(i, evendecade_index) / norm_array(i), -ISwave_results.impedance_im(i, evendecade_index)' / norm_array(i),...
             'MarkerFaceColor', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'Marker', 'x', 'LineStyle', 'none', 'MarkerSize', 12);
