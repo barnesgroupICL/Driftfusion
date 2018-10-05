@@ -1,11 +1,13 @@
 % test pindrift and photophysics examples
-% USAGE: runtests('unit_test')
+% USAGE: runtests('examples_unit_test')
+% for profiling the usage run 'profile on' before running the tests and
+% 'profile viewer' after
 
 % prepare solutions and indirectly test equilibrate and genIntStructs
 % functions
 [sol_eq, sol_i_eq, sol_i_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_i_1S_SR, ssol_i_1S_SR] = equilibrate_minimal();
-symstructs = genIntStructs(ssol_i_eq_SR, 100, 1e-7, 4, true);
-asymstructs = genIntStructs(sol_i_eq_SR, 100, 1e-7, 4, true);
+symstructs = genIntStructs(ssol_i_eq_SR, 10, 1e-5, 4, true);
+asymstructs = genIntStructs(sol_i_eq_SR, 10, 1e-5, 4, true);
 
 % test Charge Extraction (CE)
 % CE_struct = CE_full_exec(symstructs, BC, save_solutions, save_results)
@@ -60,41 +62,40 @@ asymstructs = genIntStructs(sol_i_eq_SR, 100, 1e-7, 4, true);
 %ISstep_full_exec(ssol_i_light, [-1e-2, -1e-3, 1e-3, 1e-2], 1, false, false, false);
 
 % test Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel)
-% ISwave_struct =  ISwave_full_exec_nonparallel(structs, startFreq, endFreq, Freq_points, deltaV, sequential, frozen_ions, do_graphics, save_solutions)
+% ISwave_results =  ISwave_full_exec_nonparallel(structs, startFreq, endFreq, Freq_points, deltaV, sequential, frozen_ions, do_graphics, save_solutions)
 
 %% Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel) - OC and various light intensities
 ISwave_full_exec_nonparallel(symstructs, 1e2, 1e2, 1, 0.002, false, false, false, false);
 
-%% Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel) - OC and various frequencies and just one input solution at 1 sun
-ISwave_full_exec_nonparallel(ssol_i_1S_SR, 1e8, 1e-2, 6, 0.002, 1, false, false, false, false);
+%% Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel) - OC, 1S and various frequencies
+ISwave_full_exec_nonparallel(ssol_i_1S_SR, 1e8, 1e-2, 6, 0.002, false, false, false, false);
 
-%% Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel) - OC and various frequencies and just one input solution at 1 sun
-ISwave_full_exec_nonparallel(ssol_i_eq_SR, 1e8, 1e-2, 6, 0.002, 1, false, false, false, false);
+%% Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel) - OC, dark and various frequencies
+ISwave_full_exec_nonparallel(ssol_i_eq_SR, 1e8, 1e-2, 6, 0.002, false, false, false, false);
 
 %% Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel) - SC and various light intensities
-ISwave_full_exec_nonparallel(asymstructs, 1e2, 1e2, 1, 0.002, 1, false, false, false, false);
+ISwave_full_exec_nonparallel(asymstructs, 1e2, 1e2, 1, 0.002, false, false, false, false);
 
-%% Impedance Spectroscopy with oscillating voltage (ISwave) - big oscillations
-ISwave_full_exec(ssol_i_1S_SR, 500, 500, 1, 1.0, 1, false, false, false, false, false, false, false);
+%% Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel) - OC, 1S and big oscillations
+ISwave_full_exec_nonparallel(ssol_i_1S_SR, 1e2, 1e2, 1, 0.2, false, false, false, false);
 
-%% Impedance Spectroscopy with oscillating voltage (ISwave) - boundary conditions
-ISwave_full_exec(ssol_i_light_BC2, 1e9, 1e-1, 4, 0.002, 2, false, false, false, false, false, false, false);
+%% Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel) - OC, 1S and do not reach stability and do sequential simulations
+ISwave_full_exec_nonparallel(ssol_i_1S_SR, 100, 1, 3, 0.002, true, false, false, false);
 
-%% Impedance Spectroscopy with oscillating voltage (ISwave) - reach stability
-ISwave_full_exec(ssol_i_light, 500, 500, 1, 0.002, 2, true, false, false, false, false, false, false);
+%% Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel) - frozen ions & do graphics & saving solutions
+ISwave_full_exec_nonparallel(ssol_i_1S_SR, 1e8, 1e-2, 2, 0.002, false, true, true, true);
 
-%% Impedance Spectroscopy with oscillating voltage (ISwave) - frozen ions & saving solutions
-ISwave_full_exec(ssol_i_light, 1e9, 1e-1, 4, 0.002, 1, false, true, false, false, false, true, true);
+% test Impedance Spectroscopy with oscillating voltage (ISwave)
+% ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, do_graphics)
 
-%% Impedance Spectroscopy with oscillating voltage (ISwave) - calculate ionic current
-ISwave_full_exec(ssol_i_light, 500, 500, 1, 0.002, 1, false, false, true, false, false, false, false);
+%% Impedance Spectroscopy with oscillating voltage (ISwave) - OC and various light intensities
+ISwave_full_exec(symstructs, 1e2, 1e2, 1, 0.002, false, false);
 
-%% Impedance Spectroscopy with oscillating voltage (ISwave) - parallelization
-ISwave_full_exec(ssol_i_light, 1e9, 1e-1, 4, 0.002, 1, false, false, false, true, false, false, false);
+%% Impedance Spectroscopy with oscillating voltage (ISwave) - OC, dark and various frequencies
+ISwave_full_exec(ssol_i_eq_SR, 1e8, 1e-2, 6, 0.002, false, false);
 
-%% Impedance Spectroscopy with oscillating voltage (ISwave) - do graphics switch
-ISwave_full_exec(ssol_i_light, 500, 500, 1, 0.002, 1, false, false, false, false, true, false, false);
+%% Impedance Spectroscopy with oscillating voltage (ISwave) - frozen ions & do graphics
+ISwave_full_exec(ssol_i_1S_SR, 1e8, 1e-2, 2, 0.002, true, true);
 
 %% test Stark Effect - ElectroAbsorption (EA)
-
-true;
+%true;
