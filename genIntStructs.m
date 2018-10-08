@@ -20,8 +20,10 @@ function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, end
 %   J_ARRAY - an array with the currents present in the solutionJs
 %
 % Example:
-%   genIntStructs(ssol_i_eq, 100, 0.1, 4, true)
-%     prepare solutions at 100, 10, 1, 0.1 and 0 illumination intensities
+%   [structs_oc, VOCs, ~] = genIntStructs(ssol_i_eq_SR, 100, 0.1, 4, true)
+%     prepare open circuit solutions at 100, 10, 1, 0.1 and 0 illumination intensities
+%   [structs_sc, ~, JSCs] = genIntStructs(sol_i_eq_SR, 100, 0.1, 4, false)
+%     prepare short circuit solutions at 100, 10, 1 and 0.1 illumination intensities
 %
 % Other m-files required: changeLight, pindrift
 % Subfunctions: none
