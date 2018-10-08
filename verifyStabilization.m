@@ -68,7 +68,7 @@ for i = 1:length(sol_matrix(1, 1, :))
     stable = difference <= threshold;
 
     if stable
-        disp(['variable ', names(i), ' stabilisation verified']);
+        disp(strcat("variable ", names(i), " stabilisation verified"));
     else
         warning('pindrift:verifyStabilization',...
             'Comparing final solutions at %s s and %s s showed that the %s distribution did not reach stability. Consider trying with a greater tmax.',...

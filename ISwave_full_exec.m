@@ -1,7 +1,7 @@
-function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, do_graphics)
+function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, demodulation, do_graphics)
 %ISWAVE_FULL_EXEC - Do Impedance Spectroscopy approximated applying an oscillating voltage (ISwave) in a range of background light intensities
 %
-% Syntax:  ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, do_graphics)
+% Syntax:  ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, demodulation, do_graphics)
 %
 % Inputs:
 %   STRUCTS - can be a cell structure containing structs at various background
@@ -14,6 +14,9 @@ function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_poi
 %   DELTAV - voltage oscillation amplitude in volts, one mV should be enough
 %   FROZEN_IONS - logical, after stabilization sets the mobility of
 %     ionic defects to zero
+%   DEMODULATION - which method to use for extracting phase and amplitude of the current
+%     if false, always uses fitting, if true uses demodulation multiplying the current
+%     by sin waves. Anyway if the obtained phase is werid, fit will be used
 %   DO_GRAPHICS - logical, whether to graph the individual solutions and
 %     the overall graphics
 %
@@ -21,11 +24,11 @@ function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_poi
 %   ISWAVE_RESULTS - a struct containing the most important results of the simulation
 %
 % Example:
-%   ISwave_results = ISwave_full_exec(genIntStructs(ssol_i_eq, 100, 1e-7, 4, true), 1e9, 1e-2, 23, 1e-3, false, true)
+%   ISwave_results = ISwave_full_exec(genIntStructs(ssol_i_eq, 100, 1e-7, 4, true), 1e9, 1e-2, 23, 1e-3, false, true, true)
 %     calculate also with dark background, do not freeze ions, use a
 %     voltage oscillation amplitude of 1 mV, on 23 points from frequencies of 1 GHz to
 %     0.01 Hz
-%   ISwave_results = ISwave_full_exec(genIntStructs(ssol_i_eq, 100, 1e-7, 4, true), 1e9, 1e-2, 23, 1e-3, true, true)
+%   ISwave_results = ISwave_full_exec(genIntStructs(ssol_i_eq, 100, 1e-7, 4, true), 1e9, 1e-2, 23, 1e-3, true, true, true)
 %     as above but freezing ions during voltage oscillation
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
@@ -61,11 +64,6 @@ end
 if do_graphics
     set(0, 'DefaultFigureVisible', 'off');
 end
-
-% which method to use for extracting phase and amplitude of the current
-% if false, always uses fitting, if true uses demodulation multiplying the current
-% by sin waves. Anyway if the obtained phase is werid, fit will be used
-demodulation = true;
 
 % number of complete oscillation periods to simulate
 % the current looks reproducible already after few oscillations, this could be set in an automatic way

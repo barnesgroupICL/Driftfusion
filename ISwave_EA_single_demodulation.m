@@ -53,10 +53,8 @@ function coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
 assert(size(t, 2) == 1, [mfilename ' - ' inputname(1) ' has to be provided as a single column']);
 assert(size(y, 1) == size(t, 1), [mfilename ' - ' inputname(1) ' and ' inputname(2) ' need to have the same number of rows']);
 % verify if the first and last point are identical, or into the double
-% precision error
-if Vapp_func(Vapp_params, t(1)) >= Vapp_func(Vapp_params, t(end)) + 1e-14 || Vapp_func(Vapp_params, t(1)) <= Vapp_func(Vapp_params, t(end)) - 1e-14
-    warning('pindrift:demodulation', 'It is suggested to provide a whole period, including the first and last repeated points')
-end
+% precision error, maybe checking with ismembertol would be enough
+assert(Vapp_func(Vapp_params, t(1)) < Vapp_func(Vapp_params, t(end)) + 100*eps && Vapp_func(Vapp_params, t(1)) > Vapp_func(Vapp_params, t(end)) - 100*eps, [mfilename ' - It is suggested to provide a whole period, including the first and last repeated points']);
 
 Vapp_params(1) = 0; % Vapp_params(1) is bias of applied voltage, not wanted here
 Vapp_params(2) = 1; % Vapp_params(2) is deltaV of applied voltage, set to one to normalize
