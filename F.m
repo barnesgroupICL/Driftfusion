@@ -40,7 +40,7 @@ classdef F
                 
                 f = @(E) ((E/kT).^0.5)./(1 + exp((E-Efn(i)+Ec(i))/kT));
                 
-                n(i) = ((2*Nc(i))/(kT*pi^0.5))*integral(f, Ec, Inf);
+                n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(f, Ec(i), Inf));
                 
             end
             
@@ -60,7 +60,7 @@ classdef F
                 
                 f = @(E) ((E/kT).^0.5).*(1 - 1./(1 + exp((E-Efp(i)+Ev(i))/kT)));
                 
-                p(i) = imag(((2*Nv(i))/(kT*pi^0.5))*integral(f, -Inf, Ev));
+                p(i) = imag(((2*Nv(i))/(kT*pi^0.5))*integral(f, -Inf, Ev(i)));
                 % Not sure why this is the imaginary component- must be something to do with the integral function
             end
             
