@@ -7,7 +7,7 @@ function D = Ddfn(Nc, Ec, Efn, mu, T)
 % See Schubert 2015, pp. 130
 
 kB = 8.617330350e-5;       % Boltzmann constant [eV K^-1]    
-kT = F.kB*T;
+kT = kB*T;
 e = 1.61917e-19;         % Elementary charge in Coulombs.
 
 for i = 1:length(Efn)
@@ -19,9 +19,11 @@ for i = 1:length(Efn)
     h = @(E) g(E).*f(E);
     k = @(E) g(E).*dfdE(E);
 
-    n(i) = ((2*Nc)/(kT*pi^0.5))*integral(h, 0, Inf);
-    dndE(i) = ((2*Nc)/(kT*pi^0.5))*integral(k, 0, Inf);
+    n(i) = real(((2*Nc)/(kT*pi^0.5))*integral(h, 0, Inf));
+    %dndE(i) = ((2*Nc)/(kT*pi^0.5))*integral(k, 0, Inf);
 end
+
+dndE = gradient(n);
 
 D = mu*(n./dndE);
 
