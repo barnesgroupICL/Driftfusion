@@ -18,8 +18,8 @@ classdef pc
         T = 300;
         
         % Device Dimensions [cm]
-        d = [200e-7, 400e-7, 50e-7];       % Layer thickness array
-        parr = [100, 200, 20];             % Spatial mesh points array
+        d = [200e-7, 400e-7, 200e-7];       % Layer thickness array
+        parr = [100, 200, 100];             % Spatial mesh points array
                          
         dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
@@ -75,17 +75,21 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels    
-        EA = [-1.9, -3.8, -4.1];
-        IP = [-4.9, -5.4, -7.4];
+        EA = [0, -0.2, -0.4];
+        IP = [-1.6, -1.8, -2.0];
+        
+        %EA = [-1.9, -3.8, -4.1];
+        %IP = [-4.9, -5.4, -7.4];
         
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-4.8, -4.6, -4.3];
+        % E0 = [-4.8, -4.6, -4.3];
+        E0 = [-1.4, -1, -0.6]
         
         % Workfunction energies
-        PhiA = -4.8;
-        PhiC = -4.2;
+        PhiA = -1.4;
+        PhiC = -0.6;
         
         % Effective Density Of States
         N0 = [1e19, 1e19, 1e19];
@@ -121,8 +125,8 @@ classdef pc
         % SRH trap energies- currently set to mid gap - always set
         % respective to energy levels to avoid conflicts
         % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))           
-        Et_bulk =[-4.6, -4.6, -4.6];
-        Et_inter = [-4.6, -4.6];
+        Et_bulk =[-1, -1, -1];
+        Et_inter = [-1, -1];
         
         % Bulk SRH time constants for each layer
         taun_bulk = [1e6, 1e-6, 1e6];           % [s] SRH time constant for electrons
@@ -572,7 +576,6 @@ classdef pc
                             dev.taun(j) = par.taun_bulk(i);
                             dev.taup(j) = par.taup_bulk(i);
                             dev.Et(j) = par.Et_bulk(i);
-                           
                             
                         elseif xx(j) > dcum0(i+1) - bb*par.dint && xx(j) < dcum0(i+2) + bb*par.dint             
                             xprime = xx(j)-(dcum0(i+1) - bb*par.dint);
