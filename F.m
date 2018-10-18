@@ -1,5 +1,5 @@
 classdef F
-    % distribution function Class - 
+    % distribution function Class -
     % calculates carrier densities for different distribution functions -
     % should be renamed!
     properties (Constant)
@@ -33,14 +33,15 @@ classdef F
             % Ef = Fermi level
             % T = temperature
             % See Schubert 2015, pp. 130
+            n = zeros(length(Nc));
             
             for i=1:length(Nc)
                 
                 kT = F.kB*T;
                 
-                f = @(E) ((E/kT).^0.5)./(1 + exp((E-Efn(i)+Ec(i))/kT));
+                fn = @(E) ((E/kT).^0.5)./(1 + exp((E-Efn(i)+Ec(i))/kT));
                 
-                n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(f, Ec(i), Inf));
+                n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(fn, Ec(i), Inf));
                 
             end
             
@@ -53,16 +54,30 @@ classdef F
             % Ef = Fermi level
             % T = temperature
             % See Schubert 2015, pp. 130
-            
             kT = F.kB*T;
+            p = zeros(length(Nv));
+            
+            % Reflecting the energy makes the integral easier for some
+            % reason- doesn't seem to liek integrating from negative
+            % infinitiy...
+            Efp = Ev-(Efp-Ev);
             
             for i=1:length(Nv)
                 
-                f = @(E) ((E/kT).^0.5).*(1 - 1./(1 + exp((E-Efp(i)+Ev(i))/kT)));
+            fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));
                 
-                p(i) = imag(((2*Nv(i))/(kT*pi^0.5))*integral(f, -Inf, Ev(i)));
-                % Not sure why this is the imaginary component- must be something to do with the integral function
+            p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, Ev(i), Inf));
+            
             end
+
+            
+%             for i=1:length(Nv)
+%                 
+%                 fp = @(E) ((E/kT).^0.5).*(1 - 1./(1 + exp((E-Efp(i)+Ev(i))/kT)));
+%                 
+%                 p(i) = imag(((2*Nv(i))/(kT*pi^0.5))*integral(fp, -Inf, 0));%Ev(i)));
+%                 % Not sure why this is the imaginary component- must be something to do with the integral function
+%             end
             
         end
         
