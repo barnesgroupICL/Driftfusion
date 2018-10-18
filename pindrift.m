@@ -250,7 +250,6 @@ c = [1
      1
      0];
 
-% Virtual charge carrier densities based on Fermi level equilibrium
 f = [p.mobset*dev.mue(i)*((u(1)*(-DuDx(4)+dev.gradEA(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(p.kB*p.T*DuDx(1)));
      p.mobset*dev.muh(i)*((u(2)*(DuDx(4)-dev.gradIP(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(p.kB*p.T*DuDx(2)));     
      p.mobseti*dev.muion(i)*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)));%+(u(3)*(DuDx(3)/(dev.DOSion(i)-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
@@ -271,7 +270,6 @@ if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol)
  
 i = find(p.xx <= x);
 i = i(end);
-
 
 u0 = [dev.n0(i);
     dev.p0(i);
