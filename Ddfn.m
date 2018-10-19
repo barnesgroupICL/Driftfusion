@@ -19,8 +19,8 @@ for i = 1:length(Efn)
     h = @(E) g(E).*f(E);
     k = @(E) g(E).*dfdE(E);
 
-    n(i) = real(((2*Nc)/(kT*pi^0.5))*integral(h, 0, Inf));
-    %dndE(i) = ((2*Nc)/(kT*pi^0.5))*integral(k, 0, Inf);
+    n(i) = real(((2*Nc)/(kT*pi^0.5))*integral(f, Ec, Inf));
+    %dndE(i) = ((2*Nc)/(kT*pi^0.5))*integral(dfdE, Ec, Inf);
 end
 
 dndE = gradient(n);
@@ -31,15 +31,23 @@ figure(1)
 semilogy(Efn, n)
 xlabel('Fermi energy [eV]')
 ylabel('Carrier density [cm-3]')
+hold on
 
 figure(2)
 semilogy(Efn, dndE)
 xlabel('Fermi energy [eV]')
 ylabel('dndEfn [cm-3/eV]')
+hold on
 
 figure(3)
 semilogy(Efn, D)
 xlabel('Fermi energy [eV]')
-ylabel('Diffusion coefficient')
-%ylim([0, 0.05])
+ylabel('Diffusion coefficient [cm2s-1]')
+hold on
+
+figure(4)
+loglog(n, D)
+xlabel('Carrier density [cm-3]')
+ylabel('Diffusion coefficient [cm2s-1]')
+hold on
 end
