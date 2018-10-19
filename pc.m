@@ -61,7 +61,7 @@ classdef pc
         
         %%%%%%% MESHES %%%%%%
         % xmesh_type specification - see xmesh_gen
-        xmesh_type = 3;
+        xmesh_type = 11;
         
         % Parameters for time mesh
         tmax = 1e-12;               % Max time value
@@ -217,8 +217,8 @@ classdef pc
             end
             
             % Warn if xmesh_type is not correct
-            if ~ any(1:1:10 == par.xmesh_type)
-                warning('PARAMS.xmesh_type should be an integer from 1 to 9 inclusive. MESHGEN_X cannot generate a mesh if this is not the case.')
+            if ~ any(1:1:11 == par.xmesh_type)
+                warning('PARAMS.xmesh_type should be an integer from 1 to 11 inclusive. MESHGEN_X cannot generate a mesh if this is not the case.')
             end
             
             for i = 1:length(par.ND)
@@ -451,45 +451,31 @@ classdef pc
         
                 % Boundary electron and hole densities
         function value = get.nright(par)
-            
             value = F.fdn(par.N0(end), par.EA(end), par.PhiC, par.T);
-        
         end
         
                 % Boundary electron and hole densities
-        function value = get.pleft(par)
-            
+        function value = get.pleft(par)    
             value = F.fdp(par.N0(1), par.IP(1), par.PhiA, par.T);
-        
         end
         
         function value = get.pright(par)
-            
             value = F.fdp(par.N0(end), par.IP(end), par.PhiC, par.T);
-        
         end
                        
         %% Space charge layer widths
         function value = get.wp (par)
-            
-            value = ((-par.d(2)*par.NA(1)*par.q) + ((par.NA(1)^0.5)*(par.q^0.5)*(((par.d(2)^2)*par.NA(1)*par.q) + (4*par.epp(2)*par.Vbi))^0.5))/(2*par.NA(1)*par.q);
-            
+            value = ((-par.d(2)*par.NA(1)*par.q) + ((par.NA(1)^0.5)*(par.q^0.5)*(((par.d(2)^2)*par.NA(1)*par.q) + (4*par.epp(2)*par.Vbi))^0.5))/(2*par.NA(1)*par.q); 
         end
         
-        function value = get.wn (par)
-            
-            value = ((-par.d(2)*par.ND(3)*par.q) + ((par.ND(3)^0.5)*(par.q^0.5)*(((par.d(2)^2)*par.ND(3)*par.q) + (4*par.epp(2)*par.Vbi))^0.5))/(2*par.ND(3)*par.q);
-            
+        function value = get.wn (par)   
+            value = ((-par.d(2)*par.ND(3)*par.q) + ((par.ND(3)^0.5)*(par.q^0.5)*(((par.d(2)^2)*par.ND(3)*par.q) + (4*par.epp(2)*par.Vbi))^0.5))/(2*par.ND(3)*par.q);  
         end
         
         % wscr - space charge region width
-        function value = get.wscr(par)
-            
-            value = par.wp + par.d(2) + par.wn;         % cm
-            
+        function value = get.wscr(par)  
+            value = par.wp + par.d(2) + par.wn;         % cm  
         end
-        
-        %%
         
     end
     
@@ -551,6 +537,8 @@ classdef pc
                         bb = 1;
                     end
                     
+                    [Dn_n, Dn] = F.Ddfn_numeric(par.N0(i), par.EA(i), par.IP(i):0.01:par.EA(i)+0.4, par.mue(i), par.T);
+                    
                     for j = 1:length(xx)                     
                         if xx(j) >= dcum0(i) + aa*par.dint && xx(j) <= dcum0(i+1) - bb*par.dint                         
                             dev.EA(j) = par.EA(i); 
@@ -576,6 +564,7 @@ classdef pc
                             dev.taun(j) = par.taun_bulk(i);
                             dev.taup(j) = par.taup_bulk(i);
                             dev.Et(j) = par.Et_bulk(i);
+                            dev.Dn(j, :) = Dn;
                             
                         elseif xx(j) > dcum0(i+1) - bb*par.dint && xx(j) < dcum0(i+2) + bb*par.dint             
                             xprime = xx(j)-(dcum0(i+1) - bb*par.dint);
