@@ -126,6 +126,57 @@ case 10
         linspace(dcum(2), dcum(2)+p.dscr-(p.dscr/p.pscr), p.pscr),...
         linspace(dcum(2)+p.dscr, dcum(end), p.parr(3));];        
         
+case 11
+    
+    %x = zeros(1, 600);
+    parrcum = [0, cumsum(p.parr)];
+    parr = p.parr;
+    dcum = [0, p.dcum];
+    j = 1;
+    k = 1;
+    % Iteration around number of layers and desired points
+    for i=1:2*length(p.parr)-1
+               
+        if rem(i, 2) == 1
+            parrint(j) = parr(k);
+            j = j+1;
+            k = k+1;
+        elseif rem(i, 2) == 0
+            parrint(j) = p.pint;
+            j = j+1;
+        end
+    end
+    parrintcum = cumsum(parrint);
+    parrintcum = [0,parrintcum];
+    j=1;
+    k=1;
+    
+    for i=1:length(parrint)
+        if i == 1
+            A = 0;
+        else
+            A = 1;
+        end
+        
+        if i == length(parrint)
+            B = 0;
+        else
+            B = 1;
+        end
+        
+        if rem(i, 2) == 1
+            linarr = linspace(dcum(j)+A*(p.dint+p.dint/p.pint), dcum(j+1)-B*(p.dint+p.dint/p.pint), parrint(i));
+            x(1, (parrintcum(i)+1):parrintcum(i+1)) = linarr;
+        elseif rem(i, 2) == 0
+            linarr = linspace(dcum(j+1)-p.dint, dcum(j+1)+p.dint, parrint(i));
+            x(1, (parrintcum(i)+1):parrintcum(i+1)) = linarr;
+            j=j+1;
+        end
+        
+        
+    end
+    
+    
     otherwise
         error('DrIFtFUSION:xmesh_type', [mfilename ' - xmesh_type not recognized'])
                 
