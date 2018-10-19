@@ -64,25 +64,55 @@ classdef F
             
             for i=1:length(Nv)
                 
-            fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));
+                fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));
                 
-            p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, Ev(i), Inf));
-            
+                p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, Ev(i), Inf));
+                
             end
-
             
-%             for i=1:length(Nv)
-%                 
-%                 fp = @(E) ((E/kT).^0.5).*(1 - 1./(1 + exp((E-Efp(i)+Ev(i))/kT)));
-%                 
-%                 p(i) = imag(((2*Nv(i))/(kT*pi^0.5))*integral(fp, -Inf, 0));%Ev(i)));
-%                 % Not sure why this is the imaginary component- must be something to do with the integral function
-%             end
+            
+            %             for i=1:length(Nv)
+            %
+            %                 fp = @(E) ((E/kT).^0.5).*(1 - 1./(1 + exp((E-Efp(i)+Ev(i))/kT)));
+            %
+            %                 p(i) = imag(((2*Nv(i))/(kT*pi^0.5))*integral(fp, -Inf, 0));%Ev(i)));
+            %                 % Not sure why this is the imaginary component- must be something to do with the integral function
+            %             end
             
         end
         
+        function [n,Dn] = Ddfn_numeric(Nc, Ec, Efn, mu, T)
+            % Test function for Fermi Dirac diffusion coefficient
+            % Curretn uses upper limit for the integral of CB +10 eV- using
+            % higher values causes problems resulting in Nan results for Dn
+            % Nc = conduction band density of states
+            % Ec = conduction band energy
+            % Ef = Fermi level
+            % T = temperature
+            % See Schubert 2015, pp. 130
+            
+            kB = 8.617330350e-5;       % Boltzmann constant [eV K^-1]
+            kT = kB*T;
+            e = 1.61917e-19;         % Elementary charge in Coulombs.
+            
+            for i = 1:length(Efn)
+                
+                E = Ec:0.01:(10+Ec);
+                f = 1./(1 + exp((E-Efn(i)+Ec)/kT));    % Fermi- Dirac function
+                dfdE = ((exp((E-Efn(i)+Ec)/kT))./(kT*((exp((E-Efn(i)+Ec)/kT)+1).^2)));
+                
+                g = (E/kT).^0.5;                        % DOS function based on 3D semiconductor
+                h = g.*f;
+                k = g.*dfdE;
+                
+                n(i) = real(((2*Nc)/(kT*pi^0.5))*trapz(E, h));
+                dndE(i) = real(((2*Nc)/(kT*pi^0.5))*trapz(E, k));
+            end
+            
+            Dn = mu*(n./dndE);
+            
+            
+        end
         
     end
-    
 end
-
