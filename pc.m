@@ -9,7 +9,7 @@ classdef pc
         epp0 = 552434;           % Epsilon_0 [e^2 eV^-1 cm^-1] - Checked (02-11-15)
         q = 1;                   % Charge of the species in units of e.
         e = 1.61917e-19;         % Elementary charge in Coulombs.
-       
+        
     end
     
     properties
@@ -18,9 +18,9 @@ classdef pc
         T = 300;
         
         % Device Dimensions [cm]
-        d = [200e-7, 400e-7, 200e-7];       % Layer thickness array
+        d = [100e-7, 400e-7, 100e-7];       % Layer thickness array
         parr = [100, 200, 100];             % Spatial mesh points array
-                         
+        
         dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
         dscr = 30e-7;       % Approx space charge region thickness
@@ -74,7 +74,7 @@ classdef pc
         % See Index of Refraction library for choices- names must be exactly the same but '_n', '_k' should be omitted
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
-        %% Energy levels    
+        %% Energy levels
         EA = [0, -0.2, -0.4];
         IP = [-1.6, -1.8, -2.0];
         
@@ -88,6 +88,8 @@ classdef pc
         E0 = [-1.4, -1, -0.6]
         
         % Workfunction energies
+        % PhiA = -4.8;
+        % PhiC = -4.3;
         PhiA = -1.4;
         PhiC = -0.6;
         
@@ -96,14 +98,16 @@ classdef pc
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
-                
+        
         %%%%% MOBILE ION DEFECT DENSITY %%%%%
         Nion = [0, 1e18, 0];                     % [cm-3] A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
         DOSion = [0, 1.21e22, 0];                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
-        mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
-        muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
+        %mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
+        %muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
+        mue = [1, 1, 1];         % electron mobility [cm2V-1s-1]
+        muh = [1, 1, 1];         % hole mobility [cm2V-1s-1]
         muion = [0, 1e-10, 0];                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
@@ -112,19 +116,21 @@ classdef pc
         
         % Dielectric constants
         epp = [4,23,12];
-        % TiO2?Wypych2014
+        % TiO2 Wypych2014
         
         %%% Generation %%%%%
-        G0 = [0, 2.6409e+21, 0];        % Uniform generation rate @ 1 Sun      
+        G0 = [0, 2.6409e+21, 0];        % Uniform generation rate @ 1 Sun
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
         krad = [3.18e-11, 3.6e-12, 1.54e-10];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
-                
+        
         % SRH trap energies- currently set to mid gap - always set
         % respective to energy levels to avoid conflicts
-        % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))           
+        % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
+        %Et_bulk =[-3.4, -4.6, -4.3];
+        %Et_inter = [-4.6, -4.6];
         Et_bulk =[-1, -1, -1];
         Et_inter = [-1, -1];
         
@@ -135,7 +141,7 @@ classdef pc
         % Interfacial SRH time constants - should be of length (number of layers)-1
         taun_inter = [1e-9, 1e-12];
         taup_inter = [1e-9, 1e-12];
-                
+        
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
         sn_l = 1e8;
@@ -172,7 +178,7 @@ classdef pc
         
         dev;
         xx;
-                
+        
     end
     
     
@@ -183,6 +189,7 @@ classdef pc
         dEAdx
         dIPdx
         dN0dx
+        Dn
         Eg
         Eif
         NA
@@ -211,7 +218,7 @@ classdef pc
         function par = pc
             % parStruct Constructor for parStruct.
             %
-            % Warn if tmesh_type is not correct            
+            % Warn if tmesh_type is not correct
             if ~ any([1 2 3 4] == par.tmesh_type)
                 warning('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
             end
@@ -236,73 +243,85 @@ classdef pc
                 end
             end
             
+            % warn if electrode workfunctions are outside of boundary layer
+            % bandgap
+            if par.PhiA < par.IP(1) || par.PhiA > par.EA(1)
+                msg = 'Anode workfunction (PhiA) out of range: value must exist within left-hand layer band gap';
+                error(msg)
+            end
+            
+            if par.PhiA < par.IP(end) || par.PhiA > par.EA(end)
+                msg = 'Anode workfunction (PhiA) out of range: value must exist within right-hand layer band gap';
+                error(msg)
+            end           
+            
             % warn if property array do not have the correct number of
             % layers. The layer thickness array is used to define the
             % number of layers
             if length(par.parr) ~= length(par.d)
-                    msg = 'Points array (parr) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg); 
+                msg = 'Points array (parr) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.EA) ~= length(par.d)
-                    msg = 'Electron Affinity array (EA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);
+                msg = 'Electron Affinity array (EA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.IP) ~= length(par.d)
-                    msg = 'Ionisation Potential array (IP) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);
+                msg = 'Ionisation Potential array (IP) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.mue) ~= length(par.d)
-                    msg = 'Electron mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);  
+                msg = 'Electron mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.muh) ~= length(par.d)
-                    msg = 'Hole mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);              
+                msg = 'Hole mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.muion) ~= length(par.d)
-                    msg = 'Ion mobility array (muh) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);               
+                msg = 'Ion mobility array (muh) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.NA) ~= length(par.d)
-                    msg = 'Acceptor density array (NA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);
+                msg = 'Acceptor density array (NA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.ND) ~= length(par.d)
-                    msg = 'Donor density array (ND) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);
+                msg = 'Donor density array (ND) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.N0) ~= length(par.d)
-                    msg = 'Effective density of states array (N0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);   
+                msg = 'Effective density of states array (N0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.Nion) ~= length(par.d)
-                    msg = 'Background ion density (Nion) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);
+                msg = 'Background ion density (Nion) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.DOSion) ~= length(par.d)
-                    msg = 'Ion density of states array (DOSion) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);   
+                msg = 'Ion density of states array (DOSion) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.epp) ~= length(par.d)
-                    msg = 'Relative dielectric constant array (epp) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);
+                msg = 'Relative dielectric constant array (epp) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.krad) ~= length(par.d)
-                    msg = 'Radiative recombination coefficient array (krad) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);
+                msg = 'Radiative recombination coefficient array (krad) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.E0) ~= length(par.d)
-                    msg = 'Equilibrium Fermi level array (E0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);   
+                msg = 'Equilibrium Fermi level array (E0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.G0) ~= length(par.d)
-                    msg = 'Uniform generation array (G0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);   
+                msg = 'Uniform generation array (G0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.taun_bulk) ~= length(par.d)
-                    msg = 'Bulk SRH electron time constants array (taun_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);   
+                msg = 'Bulk SRH electron time constants array (taun_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.taup_bulk) ~= length(par.d)
-                    msg = 'Bulk SRH hole time constants array (taup_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);
+                msg = 'Bulk SRH hole time constants array (taup_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.Et_bulk) ~= length(par.d)
-                    msg = 'Bulk SRH trap energy array (Et_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                    error(msg);
+                msg = 'Bulk SRH trap energy array (Et_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
             elseif length(par.Et_inter) ~= length(par.d)-1
-                    msg = 'Interfacial SRH trap energy array (Et_bulk) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
-                    error(msg);
+                msg = 'Interfacial SRH trap energy array (Et_bulk) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
+                error(msg);
             elseif length(par.taun_inter) ~= length(par.d)-1
-                    msg = 'Interfacial electron SRH time constant array (taun_inter) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
-                    error(msg);                    
+                msg = 'Interfacial electron SRH time constant array (taun_inter) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
+                error(msg);
             elseif length(par.taup_inter) ~= length(par.d)-1
-                    msg = 'Interfacial hole SRH time constant array (taup_inter) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
-                    error(msg);      
-            
+                msg = 'Interfacial hole SRH time constant array (taup_inter) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
+                error(msg);
+                
             end
             
             % Build the device- properties are defined at each point
@@ -354,10 +373,10 @@ classdef pc
                 end
             end
         end
-                               
+        
         % Cumulative thickness
         function value = get.dcum(par)
-                value = cumsum(par.d);                % cumulative thickness     
+            value = cumsum(par.d);                % cumulative thickness
         end
         
         % Band gap energies
@@ -373,7 +392,7 @@ classdef pc
             value = par.PhiC - par.PhiA;
             
         end
-                
+        
         % Intrinsic Fermi Energies (Botzmann)
         function value = get.Eif(par)
             
@@ -387,28 +406,28 @@ classdef pc
         function value = get.dEAdx(par)
             
             value = [(par.EA(2)-par.EA(1))/(2*par.dint), (par.EA(3)-par.EA(2))/(2*par.dint)];
-         
+            
         end
-                
+        
         %Valence band gradients at interfaces
         function value = get.dIPdx(par)
             
             value = [(par.IP(2)-par.IP(1))/(2*par.dint), (par.IP(3)-par.IP(2))/(2*par.dint)];
-         
+            
         end
         
-        % eDOS gradients at interfaces 
+        % eDOS gradients at interfaces
         function value = get.dN0dx(par)
             
             value = [(par.N0(2)-par.N0(1))/(2*par.dint), (par.N0(3)-par.N0(2))/(2*par.dint)];
-         
+            
         end
-
+        
         % Donor densities
         function value = get.ND(par)
             
             value = [0, 0, F.fdn(par.N0(3), par.EA(3), par.E0(3), par.T)];
-
+            
         end
         % Donor densities
         function value = get.NA(par)
@@ -430,9 +449,9 @@ classdef pc
             
             value = [F.fdn(par.N0(1), par.EA(1), par.E0(1), par.T),...
                 F.fdn(par.N0(2), par.EA(2), par.E0(2), par.T),...
-                F.fdn(par.N0(3), par.EA(3), par.E0(3), par.T)];           
+                F.fdn(par.N0(3), par.EA(3), par.E0(3), par.T)];
         end
-                     
+        
         function value = get.p0(par)
             
             value = [F.fdp(par.N0(1), par.IP(1), par.E0(1), par.T),...
@@ -440,43 +459,44 @@ classdef pc
                 F.fdp(par.N0(3), par.IP(3), par.E0(3), par.T)];          % Background density holes in htl/p-type
             
         end
-                
+        
         % Boundary electron and hole densities - based on the workfunction
         % of the electrodes
         function value = get.nleft(par)
             
             value = F.fdn(par.N0(1), par.EA(1), par.PhiA, par.T);
-        
+            
         end
         
-                % Boundary electron and hole densities
+        % Boundary electron and hole densities
         function value = get.nright(par)
             value = F.fdn(par.N0(end), par.EA(end), par.PhiC, par.T);
         end
         
-                % Boundary electron and hole densities
-        function value = get.pleft(par)    
+        % Boundary electron and hole densities
+        function value = get.pleft(par)
             value = F.fdp(par.N0(1), par.IP(1), par.PhiA, par.T);
         end
         
         function value = get.pright(par)
             value = F.fdp(par.N0(end), par.IP(end), par.PhiC, par.T);
         end
-                       
+        
         %% Space charge layer widths
         function value = get.wp (par)
-            value = ((-par.d(2)*par.NA(1)*par.q) + ((par.NA(1)^0.5)*(par.q^0.5)*(((par.d(2)^2)*par.NA(1)*par.q) + (4*par.epp(2)*par.Vbi))^0.5))/(2*par.NA(1)*par.q); 
+            value = ((-par.d(2)*par.NA(1)*par.q) + ((par.NA(1)^0.5)*(par.q^0.5)*(((par.d(2)^2)*par.NA(1)*par.q) + (4*par.epp(2)*par.Vbi))^0.5))/(2*par.NA(1)*par.q);
         end
         
-        function value = get.wn (par)   
-            value = ((-par.d(2)*par.ND(3)*par.q) + ((par.ND(3)^0.5)*(par.q^0.5)*(((par.d(2)^2)*par.ND(3)*par.q) + (4*par.epp(2)*par.Vbi))^0.5))/(2*par.ND(3)*par.q);  
+        function value = get.wn (par)
+            value = ((-par.d(2)*par.ND(3)*par.q) + ((par.ND(3)^0.5)*(par.q^0.5)*(((par.d(2)^2)*par.ND(3)*par.q) + (4*par.epp(2)*par.Vbi))^0.5))/(2*par.ND(3)*par.q);
         end
         
         % wscr - space charge region width
-        function value = get.wscr(par)  
-            value = par.wp + par.d(2) + par.wn;         % cm  
+        function value = get.wscr(par)
+            value = par.wp + par.d(2) + par.wn;         % cm
         end
         
+                
     end
     
     methods (Static)
@@ -498,7 +518,7 @@ classdef pc
             xx = pc.xmeshini(par);
             
             dev.EA = zeros(1, length(xx));
-            dev.IP = zeros(1, length(xx)); 
+            dev.IP = zeros(1, length(xx));
             dev.mue = zeros(1, length(xx));
             dev.muh = zeros(1, length(xx));
             dev.muion = zeros(1, length(xx));
@@ -524,136 +544,176 @@ classdef pc
             dev.pt = zeros(1, length(xx));
             
             dcum0 = [0,par.dcum];
-          for i =1:length(par.dcum)
-                    if i == 1
-                        aa = 0;
-                    else
-                        aa = 1;
-                    end
-                    
-                    if i == length(par.dcum)
-                        bb = 0;
-                    else
-                        bb = 1;
-                    end
-                    
-                    [Dn_n, Dn] = F.Ddfn_numeric(par.N0(i), par.EA(i), par.IP(i):0.01:par.EA(i)+0.4, par.mue(i), par.T);
-                    
-                    for j = 1:length(xx)                     
-                        if xx(j) >= dcum0(i) + aa*par.dint && xx(j) <= dcum0(i+1) - bb*par.dint                         
-                            dev.EA(j) = par.EA(i); 
-                            dev.IP(j) = par.IP(i);
-                            dev.mue(j) = par.mue(i);
-                            dev.muh(j) = par.muh(i);
-                            dev.muion(j) = par.muion(i);
-                            dev.N0(j) = par.N0(i);
-                            dev.NA(j) = par.NA(i);
-                            dev.ND(j) = par.ND(i);
-                            dev.epp(j) = par.epp(i);
-                            dev.ni(j) = par.ni(i);
-                            dev.Nion(j) = par.Nion(i);
-                            dev.DOSion(j) = par.DOSion(i);
-                            dev.krad(j) = par.krad(i);
-                            dev.n0(j) = par.n0(i);
-                            dev.p0(j) = par.p0(i);
-                            dev.E0(j) = par.E0(i);
-                            dev.G0(j) = par.G0(i);
-                            dev.gradEA(j) = 0;
-                            dev.gradIP(j) = 0;
-                            dev.gradN0(j) = 0;
-                            dev.taun(j) = par.taun_bulk(i);
-                            dev.taup(j) = par.taup_bulk(i);
-                            dev.Et(j) = par.Et_bulk(i);
-                            dev.Dn(j, :) = Dn;
-                            
-                        elseif xx(j) > dcum0(i+1) - bb*par.dint && xx(j) < dcum0(i+2) + bb*par.dint             
-                            xprime = xx(j)-(dcum0(i+1) - bb*par.dint);
-                            
-                            dEAdxprime = (par.EA(i+1)-par.EA(i))/(2*par.dint);
-                            dev.EA(j) = par.EA(i) + xprime*dEAdxprime;
-                            dev.gradEA(j) = dEAdxprime;
-                            
-                            dIPdxprime = (par.IP(i+1)-par.IP(i))/(2*par.dint);
-                            dev.IP(j) = par.IP(i) + xprime*dIPdxprime;
-                            dev.gradIP(j) = dIPdxprime;
-                                                        
-                            % Mobilities
-                            dmuedx = (par.mue(i+1)-par.mue(i))/(2*par.dint);
-                            dev.mue(j) = par.mue(i) + xprime*dmuedx;
-                            
-                            dmuhdx = (par.muh(i+1)-par.muh(i))/(2*par.dint);
-                            dev.muh(j) = par.muh(i) + xprime*dmuhdx;                           
-                            
-                            dmuiondx = (par.muion(i+1)-par.muion(i))/(2*par.dint);
-                            dev.muion(j) = par.muion(i) + xprime*dmuiondx;
-                            
-                            dmuhdx = (par.muh(i+1)-par.muh(i))/(2*par.dint);
-                            dev.muh(j) = par.muh(i) + xprime*dmuhdx;                                
-                            
-                            % effective density of states
-                            dN0dx = (par.N0(i+1)-par.N0(i))/(2*par.dint);
-                            dev.N0(j) = par.N0(i) + xprime*dN0dx;  
-                            dev.gradN0(j) = dN0dx;
-                            
-                            % Doping densities
-                            dNAdx = (par.NA(i+1)-par.NA(i))/(2*par.dint);
-                            dev.NA(j) = par.NA(i) + xprime*dNAdx;   
-                            
-                            dNDdx = (par.ND(i+1)-par.ND(i))/(2*par.dint);
-                            dev.ND(j) = par.ND(i) + xprime*dNDdx;
-                            
-                            % Dielectric constants
-                            deppdx = (par.epp(i+1)-par.epp(i))/(2*par.dint);
-                            dev.epp(j) = par.epp(i) + xprime*deppdx;
-                            
-                            % Intrinsic carrier densities
-                            dnidx = (par.ni(i+1)-par.ni(i))/(2*par.dint);
-                            dev.ni(j) = par.ni(i) + xprime*dnidx;
-                            
-                            % Equilibrium carrier densities
-                            dn0dx = (par.n0(i+1)-par.n0(i))/(2*par.dint);
-                            dev.n0(j) = par.n0(i) + xprime*dn0dx;
-                                                                                    
-                            % Equilibrium carrier densities
-                            dp0dx = (par.p0(i+1)-par.p0(i))/(2*par.dint);
-                            dev.p0(j) = par.p0(i) + xprime*dp0dx;
-                            
-                            % Equilibrium Fermi energy
-                            dE0dx = (par.E0(i+1)-par.E0(i))/(2*par.dint);
-                            dev.E0(j) = par.E0(i) + xprime*dE0dx;
-                            
-                            % Uniform generation rate
-                            dG0dx = (par.G0(i+1)-par.G0(i))/(2*par.dint);
-                            dev.G0(j) = par.G0(i) + xprime*dG0dx;
-                            
-                            % Static ion background density
-                            dNiondx = (par.Nion(i+1)-par.Nion(i))/(2*par.dint);
-                            dev.Nion(j) = par.Nion(i) + xprime*dNiondx;
-                            
-                            % Ion density of states
-                            dDOSiondx = (par.DOSion(i+1)-par.DOSion(i))/(2*par.dint);
-                            dev.DOSion(j) = par.DOSion(i) + xprime*dDOSiondx;
-                            
-                            %recombination
-                            dkraddx = (par.krad(i+1)-par.krad(i))/(2*par.dint);
-                            dev.krad(j) = par.krad(i) + xprime*dkraddx;
-                            
-                            dev.taun(j) = par.taun_inter(i);
-                            dev.taup(j) = par.taup_inter(i);
-                            dev.Et(j) = par.Et_inter(i);
-                                                        
-                        end  
-                    end                                   
-                    
-          end
+            
+            % Build diffusion coefficient structure
+            for i =1:length(par.dcum)
+                startlim = par.IP(i);
+                endlim = par.EA(i)+0.6;
+                interval = (endlim-startlim)/400;
                 
-          dev.nt = F.fdn(dev.N0, dev.EA, dev.Et, par.T);
-          dev.pt = F.fdp(dev.N0, dev.IP, dev.Et, par.T);
-          
-                % calculate the gradients
-                %dev.gradEA = gradient(dev.EA, xx);
-                %dev.gradIP = gradient(dev.IP, xx);
-                %dev.gradN0 = gradient(dev.N0, xx);
+                Dfd_struct_n(i) = F.Dn_fd_fun(par.N0(i), par.EA(i), startlim:interval:endlim, par.mue(i), par.T);
+                
+                startlim = par.IP(i)-0.6;
+                endlim = par.EA(i);
+                interval = (endlim-startlim)/400;               
+                
+                range = startlim:interval:endlim;
+                
+                Dfd_struct_p(i) = F.Dp_fd_fun(par.N0(i), par.IP(i), range, par.mue(i), par.T);
+            end
+            
+            for i =1:length(par.dcum)
+                if i == 1
+                    aa = 0;
+                else
+                    aa = 1;
+                end
+                
+                if i == length(par.dcum)
+                    bb = 0;
+                else
+                    bb = 1;
+                end
+                
+                
+                for j = 1:length(xx)
+                    
+                    if xx(j) >= dcum0(i) + aa*par.dint && xx(j) <= dcum0(i+1) - bb*par.dint
+                        dev.EA(j) = par.EA(i);
+                        dev.IP(j) = par.IP(i);
+                        dev.mue(j) = par.mue(i);
+                        dev.muh(j) = par.muh(i);
+                        dev.muion(j) = par.muion(i);
+                        dev.N0(j) = par.N0(i);
+                        dev.NA(j) = par.NA(i);
+                        dev.ND(j) = par.ND(i);
+                        dev.epp(j) = par.epp(i);
+                        dev.ni(j) = par.ni(i);
+                        dev.Nion(j) = par.Nion(i);
+                        dev.DOSion(j) = par.DOSion(i);
+                        dev.krad(j) = par.krad(i);
+                        dev.n0(j) = par.n0(i);
+                        dev.p0(j) = par.p0(i);
+                        dev.E0(j) = par.E0(i);
+                        dev.G0(j) = par.G0(i);
+                        dev.gradEA(j) = 0;
+                        dev.gradIP(j) = 0;
+                        dev.gradN0(j) = 0;
+                        dev.taun(j) = par.taun_bulk(i);
+                        dev.taup(j) = par.taup_bulk(i);
+                        dev.Et(j) = par.Et_bulk(i);
+                        % Electron diffusion coefficient lookup table
+                        dev.Dnfun(j,:) = Dfd_struct_n(i).Dnfun;
+                        dev.n_fd(j,:) = Dfd_struct_n(i).n_fd;
+                        dev.Efn(j,:) = Dfd_struct_n(i).Efn;
+                        % Hole diffusion coefficient lookup table
+                        dev.Dpfun(j,:) = Dfd_struct_p(i).Dpfun;
+                        dev.p_fd(j,:) = Dfd_struct_p(i).p_fd;
+                        dev.Efp(j,:) = Dfd_struct_p(i).Efp;                       
+                    
+                    elseif xx(j) > dcum0(i+1) - bb*par.dint && xx(j) < dcum0(i+2) + bb*par.dint
+                        xprime = xx(j)-(dcum0(i+1) - bb*par.dint);
+                        
+                        dEAdxprime = (par.EA(i+1)-par.EA(i))/(2*par.dint);
+                        dev.EA(j) = par.EA(i) + xprime*dEAdxprime;
+                        dev.gradEA(j) = dEAdxprime;
+                        
+                        dIPdxprime = (par.IP(i+1)-par.IP(i))/(2*par.dint);
+                        dev.IP(j) = par.IP(i) + xprime*dIPdxprime;
+                        dev.gradIP(j) = dIPdxprime;
+                        
+                        % Mobilities
+                        dmuedx = (par.mue(i+1)-par.mue(i))/(2*par.dint);
+                        dev.mue(j) = par.mue(i) + xprime*dmuedx;
+                        
+                        dmuhdx = (par.muh(i+1)-par.muh(i))/(2*par.dint);
+                        dev.muh(j) = par.muh(i) + xprime*dmuhdx;
+                        
+                        dmuiondx = (par.muion(i+1)-par.muion(i))/(2*par.dint);
+                        dev.muion(j) = par.muion(i) + xprime*dmuiondx;
+                        
+                        dmuhdx = (par.muh(i+1)-par.muh(i))/(2*par.dint);
+                        dev.muh(j) = par.muh(i) + xprime*dmuhdx;
+                        
+                        % effective density of states
+                        dN0dx = (par.N0(i+1)-par.N0(i))/(2*par.dint);
+                        dev.N0(j) = par.N0(i) + xprime*dN0dx;
+                        dev.gradN0(j) = dN0dx;
+                        
+                        % Doping densities
+                        dNAdx = (par.NA(i+1)-par.NA(i))/(2*par.dint);
+                        dev.NA(j) = par.NA(i) + xprime*dNAdx;
+                        
+                        dNDdx = (par.ND(i+1)-par.ND(i))/(2*par.dint);
+                        dev.ND(j) = par.ND(i) + xprime*dNDdx;
+                        
+                        % Dielectric constants
+                        deppdx = (par.epp(i+1)-par.epp(i))/(2*par.dint);
+                        dev.epp(j) = par.epp(i) + xprime*deppdx;
+                        
+                        % Intrinsic carrier densities
+                        dnidx = (par.ni(i+1)-par.ni(i))/(2*par.dint);
+                        dev.ni(j) = par.ni(i) + xprime*dnidx;
+                        
+                        % Equilibrium carrier densities
+                        dn0dx = (par.n0(i+1)-par.n0(i))/(2*par.dint);
+                        dev.n0(j) = par.n0(i) + xprime*dn0dx;
+                        
+                        % Equilibrium carrier densities
+                        dp0dx = (par.p0(i+1)-par.p0(i))/(2*par.dint);
+                        dev.p0(j) = par.p0(i) + xprime*dp0dx;
+                        
+                        % Equilibrium Fermi energy
+                        dE0dx = (par.E0(i+1)-par.E0(i))/(2*par.dint);
+                        dev.E0(j) = par.E0(i) + xprime*dE0dx;
+                        
+                        % Uniform generation rate
+                        dG0dx = (par.G0(i+1)-par.G0(i))/(2*par.dint);
+                        dev.G0(j) = par.G0(i) + xprime*dG0dx;
+                        
+                        % Static ion background density
+                        dNiondx = (par.Nion(i+1)-par.Nion(i))/(2*par.dint);
+                        dev.Nion(j) = par.Nion(i) + xprime*dNiondx;
+                        
+                        % Ion density of states
+                        dDOSiondx = (par.DOSion(i+1)-par.DOSion(i))/(2*par.dint);
+                        dev.DOSion(j) = par.DOSion(i) + xprime*dDOSiondx;
+                        
+                        % recombination
+                        dkraddx = (par.krad(i+1)-par.krad(i))/(2*par.dint);
+                        dev.krad(j) = par.krad(i) + xprime*dkraddx;
+                        
+                        dev.taun(j) = par.taun_inter(i);
+                        dev.taup(j) = par.taup_inter(i);
+                        dev.Et(j) = par.Et_inter(i);
+                        
+                        % Electron diffusion coefficient function
+                        dDndx = (Dfd_struct_n(i+1).Dnfun-Dfd_struct_n(i).Dnfun)/(2*par.dint);
+                        dev.Dnfun(j,:) = Dfd_struct_n(i).Dnfun + xprime*dDndx;
+                        
+                        dn_fddx = (Dfd_struct_n(i+1).n_fd-Dfd_struct_n(i).n_fd)/(2*par.dint);
+                        dev.n_fd(j,:) = Dfd_struct_n(i).n_fd + xprime*dn_fddx;
+                        
+                        dEfndx = (Dfd_struct_n(i+1).Efn-Dfd_struct_n(i).Efn)/(2*par.dint);
+                        dev.Efn(j,:) = Dfd_struct_n(i).Efn + xprime*dEfndx;
+                        
+                        % Hole diffusion coefficient function
+                        dDpdx = (Dfd_struct_p(i+1).Dpfun-Dfd_struct_p(i).Dpfun)/(2*par.dint);
+                        dev.Dpfun(j,:) = Dfd_struct_p(i).Dpfun + xprime*dDpdx;
+                        
+                        dp_fddx = (Dfd_struct_p(i+1).p_fd-Dfd_struct_p(i).p_fd)/(2*par.dint);
+                        dev.p_fd(j,:) = Dfd_struct_p(i).p_fd + xprime*dp_fddx;
+                        
+                        dEfpdx = (Dfd_struct_p(i+1).Efp-Dfd_struct_p(i).Efp)/(2*par.dint);
+                        dev.Efp(j,:) = Dfd_struct_p(i).Efp + xprime*dEfpdx;
+                    end
+                end
+                
+            end
+            
+            dev.nt = F.fdn(dev.N0, dev.EA, dev.Et, par.T);
+            dev.pt = F.fdp(dev.N0, dev.IP, dev.Et, par.T);
+            
         end
         
     end
