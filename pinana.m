@@ -65,18 +65,21 @@ Evb = IPmat-V;                                 % Valence band potential
 Efn = zeros(size(n,1), size(n,2)); 
 Efp = zeros(size(n,1), size(n,2)); 
 
+if par.stats == 'Fermi'
+
 for i = 1:size(n,1)           % time
-    
     for j = 1:size(n,2)       % position
-    
            Efn(i,j) = F.Efn_fd_fun(n(i,j), par.dev.Efn(j,:),  par.dev.n_fd(j,:));
            Efp(i,j) = F.Efp_fd_fun(p(i,j), par.dev.Efp(j,:),  par.dev.p_fd(j,:));
     end
 end
 Efn = Efn-V;
 Efp = Efp-V;
-%Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./N0mat));        % Electron quasi-Fermi level 
-%Efp = real(Evb-(par.kB*par.T/par.q)*log(p./N0mat));        % Hole quasi-Fermi level
+
+elseif stats == 'Boltz'
+    Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./N0mat));        % Electron quasi-Fermi level 
+    Efp = real(Evb-(par.kB*par.T/par.q)*log(p./N0mat));        % Hole quasi-Fermi level
+end
 
 % Remove ionic charge densities from contact regions
 rhoa = a - Nionmat;

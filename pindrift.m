@@ -250,8 +250,13 @@ c = [1
      1
      0];
  
-Dn = F.D(u(1), dev.Dnfun(i,:), dev.n_fd(i,:));
-Dp = F.D(u(2), dev.Dpfun(i,:), dev.p_fd(i,:));
+if p.stats == 'Fermi'
+    Dn = F.D(u(1), dev.Dnfun(i,:), dev.n_fd(i,:));
+    Dp = F.D(u(2), dev.Dpfun(i,:), dev.p_fd(i,:));
+elseif p.stats == 'Boltz'
+    Dn = dev.mue(i)*p.kB*p.T;
+    Dp = dev.muh(i)*p.kB*p.T;
+end
 
 f = [p.mobset*(dev.mue(i)*(u(1)*(-DuDx(4)+dev.gradEA(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(Dn*DuDx(1)));
      p.mobset*(dev.muh(i)*(u(2)*(DuDx(4)-dev.gradIP(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(Dp*DuDx(2)));     
