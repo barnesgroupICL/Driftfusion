@@ -52,6 +52,7 @@ classdef pc
         SRHset = 1;
         JV = 0;                 % Toggle run JV scan on/off
         Ana = 1;                % Toggle on/off analysis
+        stats = 'Fermi';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
         
         % OM = Optical Model
         % Current only uniform generation functionality is avaiable- this will be
