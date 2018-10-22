@@ -7,7 +7,7 @@ classdef F
         
         % Physical constants
         kB = 8.617330350e-5;       % Boltzmann constant [eV K^-1]
-        
+        uplimit = 16;              % Upper limit for the integration [eV]
     end
     
     methods (Static)
@@ -41,7 +41,7 @@ classdef F
                 
                 fn = @(E) ((E/kT).^0.5)./(1 + exp((E-Efn(i)+Ec(i))/kT));
                 
-                n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(fn, Ec(i), Inf));
+                n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(fn, 0, F.uplimit));
                 
             end
             
@@ -66,25 +66,17 @@ classdef F
                 
                 fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));
                 
-                p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, Ev(i), Inf));
+                p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, 0, F.uplimit));
                 
             end
-            
-            
-            %             for i=1:length(Nv)
-            %
-            %                 fp = @(E) ((E/kT).^0.5).*(1 - 1./(1 + exp((E-Efp(i)+Ev(i))/kT)));
-            %
-            %                 p(i) = imag(((2*Nv(i))/(kT*pi^0.5))*integral(fp, -Inf, 0));%Ev(i)));
-            %                 % Not sure why this is the imaginary component- must be something to do with the integral function
-            %             end
-            
+
         end
         
-        function [n,Dn] = Ddfn_numeric(Nc, Ec, Efn, mu, T)
-            % Test function for Fermi Dirac diffusion coefficient
-            % Curretn uses upper limit for the integral of CB +10 eV- using
+        function Dnfd = Dn_fd_fun(Nc, Ec, Efn, mue, T)
+            % Calculates Fermi Dirac diffusion coefficient function 
+            % Currently uses upper limit for the integral of CB +16eV- using
             % higher values causes problems resulting in Nan results for Dn
+            % - requires further investigation 
             % Nc = conduction band density of states
             % Ec = conduction band energy
             % Ef = Fermi level
@@ -97,21 +89,80 @@ classdef F
             
             for i = 1:length(Efn)
                 
-                E = Ec:0.01:(10+Ec);
-                f = 1./(1 + exp((E-Efn(i)+Ec)/kT));    % Fermi- Dirac function
-                dfdE = ((exp((E-Efn(i)+Ec)/kT))./(kT*((exp((E-Efn(i)+Ec)/kT)+1).^2)));
+                f = @(E) 1./(1 + exp((E-Efn(i)+Ec)/kT));    % Fermi- Dirac function
+                dfdE = @(E) exp((E-Efn(i)+Ec)/kT)./(kT*(exp((E-Efn(i)+Ec)/kT)+1).^2);
                 
-                g = (E/kT).^0.5;                        % DOS function based on 3D semiconductor
-                h = g.*f;
-                k = g.*dfdE;
+                g = @(E) (E/kT).^0.5;                        % DOS function based on 3D semiconductor
+                h = @(E) g(E).*f(E);
+                k = @(E) g(E).*dfdE(E);
                 
-                n(i) = real(((2*Nc)/(kT*pi^0.5))*trapz(E, h));
-                dndE(i) = real(((2*Nc)/(kT*pi^0.5))*trapz(E, k));
+                n(i) = real(((2*Nc)/(kT*pi^0.5))*integral(f, 0, F.uplimit));
+                dndE(i) = ((2*Nc)/(kT*pi^0.5))*integral(dfdE, 0, F.uplimit);
             end
             
-            Dn = mu*(n./dndE);
+            Dnfd.Dnfun = mue*(n./dndE);
+            Dnfd.n_fd = n;
+            Dnfd.Efn = Efn;
+        end
+        
+        
+        function Dpfd = Dp_fd_fun(Nv, Ev, Efp, muh, T)
+            % Calculates Fermi Dirac diffusion coefficient function 
+            % Currently uses upper limit for the integral of CB +16eV- using
+            % higher values causes problems resulting in Nan results for Dn
+            % - requires further investigation 
+            % Nc = conduction band density of states
+            % Ec = conduction band energy
+            % Ef = Fermi level
+            % T = temperature
+            % See Schubert 2015, pp. 130
             
+            % Reflecting the energy makes the integral easier for some
+            % reason- doesn't seem to liek integrating from negative
+            % infinitiy...
+            Efp_trans = 2*Ev-Efp;            
             
+            kB = 8.617330350e-5;       % Boltzmann constant [eV K^-1]
+            kT = kB*T;
+            e = 1.61917e-19;         % Elementary charge in Coulombs.
+            
+            for i = 1:length(Efp)
+                
+                f = @(E) 1./(1 + exp((E-Efp_trans(i)+Ev)/kT));    % Fermi- Dirac function
+                dfdE = @(E) exp((E-Efp_trans(i)+Ev)/kT)./(kT*(exp((E-Efp_trans(i)+Ev)/kT)+1).^2);
+                
+                g = @(E) (E/kT).^0.5;                        % DOS function based on 3D semiconductor
+                h = @(E) g(E).*f(E);
+                k = @(E) g(E).*dfdE(E);
+                
+                p(i) = real(((2*Nv)/(kT*pi^0.5))*integral(f, 0, F.uplimit));
+                dpdE(i) = ((2*Nv)/(kT*pi^0.5))*integral(dfdE, 0, F.uplimit);
+            end
+            
+            Dpfd.Dpfun = muh*(p./dpdE);
+            Dpfd.p_fd = p;
+            Dpfd.Efp = Efp;
+        end
+               
+        function Dsol = D(n, Dnfun, n_fd)
+           
+           if n > max(n_fd)
+               warning('Carrier density is outside of specified limits for the Fermi Dirac integral: Try increasing the Fermi energy limit in PC.BUILDDEV.')
+           
+           end
+           
+           % To avoid problems with negative carrier densities
+           if n < 0
+               n = 0;
+           end
+           
+           Dsol = interp1(n_fd, Dnfun, n, 'pchip', 'extrap');
+           
+           if Dsol > 10
+               
+               
+           end
+           
         end
         
     end
