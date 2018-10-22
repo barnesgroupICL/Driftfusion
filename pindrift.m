@@ -249,10 +249,13 @@ c = [1
      1
      1
      0];
+ 
+Dn = F.D(u(1), dev.Dnfun(i,:), dev.n_fd(i,:));
+Dp = F.D(u(2), dev.Dpfun(i,:), dev.p_fd(i,:));
 
-f = [p.mobset*dev.mue(i)*((u(1)*(-DuDx(4)+dev.gradEA(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(p.kB*p.T*DuDx(1)));
-     p.mobset*dev.muh(i)*((u(2)*(DuDx(4)-dev.gradIP(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(p.kB*p.T*DuDx(2)));     
-     p.mobseti*dev.muion(i)*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3)));%+(u(3)*(DuDx(3)/(dev.DOSion(i)-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
+f = [p.mobset*(dev.mue(i)*(u(1)*(-DuDx(4)+dev.gradEA(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(Dn*DuDx(1)));
+     p.mobset*(dev.muh(i)*(u(2)*(DuDx(4)-dev.gradIP(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(Dp*DuDx(2)));     
+     p.mobseti*(dev.muion(i)*(u(3)*DuDx(4)+p.kB*p.T*(DuDx(3))));%+(u(3)*(DuDx(3)/(dev.DOSion(i)-u(3))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
      (dev.epp(i)/max(p.epp))*DuDx(4);];                                         
  
  s = [g(i) - dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2)) - p.SRHset*(((u(1)*u(2))-dev.ni(i)^2)/((dev.taun(i)*(u(2)+dev.pt(i))) + (dev.taup(i)*(u(1)+dev.nt(i)))));
