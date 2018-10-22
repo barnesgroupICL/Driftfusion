@@ -1,5 +1,14 @@
 function [Voc, Vapp_arr, Jtot] = pinana(varargin)
 
+% Plotting defaults
+set(0,'DefaultLineLinewidth',1);
+set(0,'DefaultAxesFontSize',16);
+set(0,'DefaultFigurePosition', [600, 400, 450, 300]);
+set(0,'DefaultAxesXcolor', [0, 0, 0]);
+set(0,'DefaultAxesYcolor', [0, 0, 0]);
+set(0,'DefaultAxesZcolor', [0, 0, 0]);
+set(0,'DefaultTextColor', [0, 0, 0]);
+
 % tarr is a time time array for the time you wish to plot
 if length(varargin) == 1
     solstruct = varargin{1};
@@ -52,8 +61,22 @@ kradmat = repmat(par.dev.krad, length(t), 1);
 
 Ecb = EAmat-V;                                 % Conduction band potential
 Evb = IPmat-V;                                 % Valence band potential
-Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./N0mat));        % Electron quasi-Fermi level 
-Efp = real(Evb-(par.kB*par.T/par.q)*log(p./N0mat));        % Hole quasi-Fermi level
+
+Efn = zeros(size(n,1), size(n,2)); 
+Efp = zeros(size(n,1), size(n,2)); 
+
+for i = 1:size(n,1)           % time
+    
+    for j = 1:size(n,2)       % position
+    
+           Efn(i,j) = F.Efn_fd_fun(n(i,j), par.dev.Efn(j,:),  par.dev.n_fd(j,:));
+           Efp(i,j) = F.Efp_fd_fun(p(i,j), par.dev.Efp(j,:),  par.dev.p_fd(j,:));
+    end
+end
+Efn = Efn-V;
+Efp = Efp-V;
+%Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./N0mat));        % Electron quasi-Fermi level 
+%Efp = real(Evb-(par.kB*par.T/par.q)*log(p./N0mat));        % Hole quasi-Fermi level
 
 % Remove ionic charge densities from contact regions
 rhoa = a - Nionmat;
