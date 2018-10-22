@@ -1,5 +1,6 @@
-function D = Ddfn_numeric(Nc, Ec, Efn, mu, T)
-% Test function for Fermi Dirac diffusion coefficient 
+function [D,n] = Ddfn_numeric(Nc, Ec, Efn, mu, T)
+% Test function for Fermi Dirac diffusion coefficient
+%% Not currently working! Problems at high energies!
 % Nc = conduction band density of states
 % Ec = conduction band energy
 % Ef = Fermi level
