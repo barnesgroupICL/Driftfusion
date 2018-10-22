@@ -7,7 +7,7 @@ classdef F
         
         % Physical constants
         kB = 8.617330350e-5;       % Boltzmann constant [eV K^-1]
-        uplimit = 16;              % Upper limit for the integration [eV]
+        uplimit = 10;              % Upper limit for the integration [eV]
     end
     
     methods (Static)
@@ -69,14 +69,14 @@ classdef F
                 p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, 0, F.uplimit));
                 
             end
-
+            
         end
         
         function Dnfd = Dn_fd_fun(Nc, Ec, Efn, mue, T)
-            % Calculates Fermi Dirac diffusion coefficient function 
+            % Calculates Fermi Dirac diffusion coefficient function
             % Currently uses upper limit for the integral of CB +16eV- using
             % higher values causes problems resulting in Nan results for Dn
-            % - requires further investigation 
+            % - requires further investigation
             % Nc = conduction band density of states
             % Ec = conduction band energy
             % Ef = Fermi level
@@ -105,12 +105,11 @@ classdef F
             Dnfd.Efn = Efn;
         end
         
-        
         function Dpfd = Dp_fd_fun(Nv, Ev, Efp, muh, T)
-            % Calculates Fermi Dirac diffusion coefficient function 
+            % Calculates Fermi Dirac diffusion coefficient function
             % Currently uses upper limit for the integral of CB +16eV- using
             % higher values causes problems resulting in Nan results for Dn
-            % - requires further investigation 
+            % - requires further investigation
             % Nc = conduction band density of states
             % Ec = conduction band energy
             % Ef = Fermi level
@@ -120,7 +119,7 @@ classdef F
             % Reflecting the energy makes the integral easier for some
             % reason- doesn't seem to liek integrating from negative
             % infinitiy...
-            Efp_trans = 2*Ev-Efp;            
+            Efp_trans = 2*Ev-Efp;
             
             kB = 8.617330350e-5;       % Boltzmann constant [eV K^-1]
             kT = kB*T;
@@ -143,26 +142,51 @@ classdef F
             Dpfd.p_fd = p;
             Dpfd.Efp = Efp;
         end
-               
+        
         function Dsol = D(n, Dnfun, n_fd)
-           
-           if n > max(n_fd)
-               warning('Carrier density is outside of specified limits for the Fermi Dirac integral: Try increasing the Fermi energy limit in PC.BUILDDEV.')
-           
-           end
-           
-           % To avoid problems with negative carrier densities
-           if n < 0
-               n = 0;
-           end
-           
-           Dsol = interp1(n_fd, Dnfun, n, 'pchip', 'extrap');
-           
-           if Dsol > 10
-               
-               
-           end
-           
+            
+            if n > max(n_fd)
+                warning('Carrier density is outside of specified limits for the Fermi Dirac integral: Try increasing the Fermi energy limit in PC.BUILDDEV.')
+                
+            end
+            
+            % To avoid problems with negative carrier densities
+            if n < 0
+                n = 0;
+            end
+            
+            if n>min(n_fd)
+                pp = find(n_fd <= n);
+                pp = pp(end);
+                Dsol = Dnfun(1,pp);
+            else
+                Dsol = min(Dnfun);
+            end
+            
+            %Dsol = interp1(n_fd, Dnfun, n, 'nearest', 'extrap');
+            
+        end
+        
+        function Efn_fd = Efn_fd_fun(n, Efn, n_fd)
+            
+            if n>min(n_fd)
+                pp = find(n_fd <= n);
+                pp = pp(end);
+                Efn_fd = Efn(1,pp);
+            else
+                Efn_fd = min(Efn);
+            end
+        end
+        
+        function Efp_fd = Efp_fd_fun(p, Efp, p_fd)
+            
+            if p>min(p_fd)
+                pp = find(p_fd <= p);
+                pp = pp(1);
+                Efp_fd = Efp(1,pp);
+            else
+                Efp_fd = min(Efp);
+            end
         end
         
     end
