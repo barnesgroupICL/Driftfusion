@@ -86,6 +86,10 @@ dataZphaseIonic = [frequencies, ZphaseIonic];
 JionicAmpAbs = abs(ISwave_results.J_i_amp)';
 dataJionicAmpAbs = [frequencies, JionicAmpAbs];
 
+% absolute out of phase current amplitude
+JampOutOfPhaseAbs = abs(ISwave_results.J_amp.*sin(ISwave_results.J_phase))';
+dataJampOutOfPhaseAbs = [frequencies, JampOutOfPhaseAbs];
+
 % absolute out of phase recombination current amplitude
 JrecAmpOutOfPhaseAbs = abs(ISwave_results.J_U_amp.*sin(ISwave_results.J_U_phase))';
 dataJrecAmpOutOfPhaseAbs = [frequencies, JrecAmpOutOfPhaseAbs];
@@ -110,6 +114,8 @@ toBeSavedZphaseIonic = [headerFrequencyIntVdc; unitsPhase; dataZphaseIonic];
 
 toBeSavedJionicAmpAbs = [headerFrequencyIntVdc; unitsJ; commentV_DC; dataJionicAmpAbs];
 
+toBeSavedJampOutOfPhaseAbs = [headerFrequencyIntVdc; unitsJ; commentV_DC; dataJampOutOfPhaseAbs];
+
 toBeSavedJrecAmpOutOfPhaseAbs = [headerFrequencyIntVdc; unitsJ; commentV_DC; dataJrecAmpOutOfPhaseAbs];
 
 %% set NaNs to NaN
@@ -123,6 +129,7 @@ toBeSavedZabs = fillmissing(toBeSavedZabs, 'constant', "NaN");
 toBeSavedZphase = fillmissing(toBeSavedZphase, 'constant', "NaN");
 toBeSavedZphaseIonic = fillmissing(toBeSavedZphaseIonic, 'constant', "NaN");
 toBeSavedJionicAmpAbs = fillmissing(toBeSavedJionicAmpAbs, 'constant', "NaN");
+toBeSavedJampOutOfPhaseAbs = fillmissing(toBeSavedJampOutOfPhaseAbs, 'constant', "NaN");
 toBeSavedJrecAmpOutOfPhaseAbs = fillmissing(toBeSavedJrecAmpOutOfPhaseAbs, 'constant', "NaN");
 
 %% save csv
@@ -136,6 +143,7 @@ fid_Zabs = fopen([prefix '-Zabs.txt'], 'wt+');
 fid_phase = fopen([prefix '-Zphase.txt'], 'wt+');
 fid_phaseIonic = fopen([prefix '-ZphaseIonic.txt'], 'wt+');
 fid_JionicAmpAbs = fopen([prefix '-JionicAmpAbs.txt'], 'wt+');
+fid_JampOutOfPhaseAbs = fopen([prefix '-JampOutOfPhaseAbs.txt'], 'wt+');
 fid_JrecAmpOutOfPhaseAbs = fopen([prefix '-JrecAmpOutOfPhaseAbs.txt'], 'wt+');
 
 for i = 1:size(toBeSavedCap, 1)
@@ -175,6 +183,10 @@ for i = 1:size(toBeSavedCap, 1)
     fprintf(fid_JionicAmpAbs, '%s', toBeSavedJionicAmpAbs(i, end));
     fprintf(fid_JionicAmpAbs, '\n');
     
+    fprintf(fid_JampOutOfPhaseAbs, '%s\t', toBeSavedJampOutOfPhaseAbs(i, 1:end-1));
+    fprintf(fid_JampOutOfPhaseAbs, '%s', toBeSavedJampOutOfPhaseAbs(i, end));
+    fprintf(fid_JampOutOfPhaseAbs, '\n');
+    
     fprintf(fid_JrecAmpOutOfPhaseAbs, '%s\t', toBeSavedJrecAmpOutOfPhaseAbs(i, 1:end-1));
     fprintf(fid_JrecAmpOutOfPhaseAbs, '%s', toBeSavedJrecAmpOutOfPhaseAbs(i, end));
     fprintf(fid_JrecAmpOutOfPhaseAbs, '\n');
@@ -189,4 +201,5 @@ fclose(fid_Zabs);
 fclose(fid_phase);
 fclose(fid_phaseIonic);
 fclose(fid_JionicAmpAbs);
+fclose(fid_JampOutOfPhaseAbs);
 fclose(fid_JrecAmpOutOfPhaseAbs);
