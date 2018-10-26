@@ -1,5 +1,5 @@
 function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
-%ISWAVE_SINGLE_EXEC - Do a single Impedance Spectroscopy (ISwave) experiment
+%ISWAVE_EA_SINGLE_EXEC - Do a single Impedance Spectroscopy (ISwave) experiment
 %
 % Syntax:  asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
 %

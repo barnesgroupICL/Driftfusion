@@ -1,7 +1,6 @@
 function coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
-%ISWAVE_SINGLE_DEMODULATION - Calculate phase and amplitude demodulating
-% oscillating current data from impedance spectroscopy with oscillating
-% voltage. The current profile gets multiplied by the voltage profile and,
+%ISWAVE_EA_SINGLE_DEMODULATION - Calculate phase and amplitude demodulating oscillating current data from impedance spectroscopy with oscillating voltage.
+% The current profile gets multiplied by the voltage profile and,
 % separately, by the voltage profile with an additional 90 degrees phase,
 % the integrals of the resulting profiles are related to the phase.
 % This simulates the working principle of a dual-phase demodulator often
