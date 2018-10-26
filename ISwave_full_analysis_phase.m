@@ -15,7 +15,7 @@ function ISwave_full_analysis_phase(ISwave_results)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also ISwave_full_exec, EA_full_analysis_phase, ISwave_full_analysis_nyquist, IS_full_analysis_impedance.
+% See also ISwave_full_exec, ISwave_full_analysis_nyquist, IS_full_analysis_impedance.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
