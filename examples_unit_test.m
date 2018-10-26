@@ -11,58 +11,6 @@ asymStructs = genIntStructs(sol_i_eq_SR, 1, 1e-6, 4, true);
 vappStructs = genVappStructs(sol_i_eq_SR, [0.2, 0.4, 0.95]);
 asymStructsNoIonsNoSR = genIntStructs(sol_eq, 10, 1e-5, 4, true);
 
-% test Charge Extraction (CE)
-% CE_struct = CE_full_exec(symstructs, BC, save_solutions, save_results)
-
-%% Charge Extraction (CE) - various light intensities
-%CE_full_exec(symstructs, 1, false, false);
-
-%% Charge Extraction (CE) - just dark & saving solutions
-%CE_full_exec(ssol_i_eq, 1, true, true);
-
-%% Charge Extraction (CE) - boundary conditions and just one sun
-%CE_full_exec(ssol_i_light_BC2, 2, false, false);
-
-% test Transient PhotoVoltage (TPV) with constant pulse intensity
-% TPV_struct = TPVconst_full_exec(symstructs, save_solutions, save_results)
-
-%% Transient PhotoVoltage (TPV) - constant pulse intensity, various light intensities
-%TPVconst_full_exec(symstructs, false, false);
-
-%% Transient PhotoVoltage (TPV) - constant pulse intensity, just dark & saving solutions
-%TPVconst_full_exec(ssol_i_eq, true, true);
-
-%% Transient PhotoVoltage (TPV) - constant pulse intensity, just one sun
-%TPVconst_full_exec(ssol_i_light, false, false);
-
-% test Transient PhotoVoltage (TPV) with variable pulse intensity
-% TPV_struct = TPVvariab_full_exec(symstructs, save_solutions, save_results)
-
-%% Transient PhotoVoltage (TPV) - variable pulse intensity, various light intensities
-%TPVvariab_full_exec(symstructs, false, false);
-
-%% Transient PhotoVoltage (TPV) - variable pulse intensity, just dark & saving solutions
-%TPVvariab_full_exec(ssol_i_eq, true, true);
-
-%% Transient PhotoVoltage (TPV) - variable pulse intensity, just one sun
-%TPVvariab_full_exec(ssol_i_light, false, false);
-
-% test Impedance Spectroscopy with voltage step (ISstep)
-% ISstep_struct = ISstep_full_exec(symstructs, deltaV, frozen_ions, save_solutions, save_results)
-
-%% Impedance Spectroscopy with voltage step (ISstep) - various light intensities
-%ISstep_full_exec(symstructs, 1e-3, 1, false, false, false);
-
-%% Impedance Spectroscopy with voltage step (ISstep) - frozen ions & saving solutions
-%ISstep_full_exec(ssol_i_light, 5e-4, 1, true, true, true);
-
-%% Impedance Spectroscopy with voltage step (ISstep) - boundary conditions
-% deltaV has to be very small for the solver not to go crazy
-%ISstep_full_exec(ssol_i_light_BC2, 0.000015, 2, false, false, false);
-
-%% Impedance Spectroscopy with voltage step (ISstep) - various deltaV
-%ISstep_full_exec(ssol_i_light, [-1e-2, -1e-3, 1e-3, 1e-2], 1, false, false, false);
-
 % test Impedance Spectroscopy with oscillating voltage and without parallelization (ISwave_nonparallel)
 % ISwave_results =  ISwave_full_exec_nonparallel(structs, startFreq, endFreq, Freq_points, deltaV, sequential, frozen_ions, do_graphics, save_solutions)
 
@@ -123,5 +71,3 @@ ISwave_full_exec(asymStructsNoIonsNoSR, 1e2, 1e2, 1, 0.002, false, true, false);
 %% Impedance Spectroscopy with oscillating voltage (ISwave) - fitting instead of demodulation
 ISwave_full_exec(ssol_i_1S_SR, 1e8, 1e-2, 2, 0.002, false, false, false);
 
-%% test Stark Effect - ElectroAbsorption (EA)
-%true;
