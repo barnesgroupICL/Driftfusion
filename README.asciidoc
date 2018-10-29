@@ -26,6 +26,10 @@ or, quicker with link:https://github.com/barnesgroupICL/Driftfusion/blob/2018-EI
 
  >> [sol_eq, sol_i_eq, sol_i_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_i_1S_SR, ssol_i_1S_SR] = equilibrate_minimal(pinParams)
 
+For simulating a different set of parameters, specify the relative pinParams file as an argument to equilibrate:
+
+ >> [~, ~, sol_i_eq_SR, ~, ssol_i_eq_SR, sol_i_1S_SR, ssol_i_1S_SR] = equilibrate_minimal(pinParams_10kxSRH_001xmajority)
+
 Simulate impedance spectroscopy with oscillating voltage on a single solution with link:https://github.com/barnesgroupICL/Driftfusion/blob/2018-EIS/ISwave_EA_single_exec.m[ISwave_EA_single_exec]:
 
  >> ssol_i_1S_SR_is_100Hz_50mV = ISwave_EA_single_exec(asymmetricize(ssol_i_1S_SR), 5e-2, 1e2, 20, 40, true, false, 1e-8)
@@ -52,7 +56,7 @@ Simulate the impedance spectroscopy with oscillating voltage on a cell containin
 
 Complete documentation for each function is in the header of the relative file, which can be found link:https://github.com/barnesgroupICL/Driftfusion/tree/2018-EIS[here].
 
-This page can be accessed also in the Driftfusion link:https://github.com/barnesgroupICL/Driftfusion/wiki/2018-EIS[wiki].
+This page can be accessed also in the Driftfusion link:https://github.com/barnesgroupICL/Driftfusion/wiki/2018-Impedance-Spectroscopy[wiki].
 
 == Unit testing
 
