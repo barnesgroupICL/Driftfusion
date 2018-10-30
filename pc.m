@@ -18,17 +18,11 @@ classdef pc
         T = 300;
         
         % Device Dimensions [cm]
-        d = [100e-7, 400e-7, 100e-7];       % Layer thickness array
-        parr = [100, 200, 100];             % Spatial mesh points array
+        dcell = {{70e-7, 30e-7}; {30e-7, 340e-7, 30e-7}; {30e-7, 70e-7}};       % Layer thickness array
+        pcell = {{35, 30}; {30, 170, 30}; {30, 35}};             % Spatial mesh points array
         
-        dint = 2e-7;        % 0.5x Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
-        pint = 20;          % 0.5x Interfacial points (x_mesh_type = 3)
-        dscr = 30e-7;       % Approx space charge region thickness
-        pscr = 30;          % No of points in space charge region
-        pepe = 20;          % electrode interface points
-        te = 10e-7;         % electrode interface thickness
-        dmin = 1e-7;        % start value for log meshes
-        deltax = 1e-7;
+        dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
+        pint = 40;          % Interfacial points (x_mesh_type = 3)
         
         % Define spatial cordinate system
         % m=0 cartesian
@@ -62,7 +56,7 @@ classdef pc
         
         %%%%%%% MESHES %%%%%%
         % xmesh_type specification - see xmesh_gen
-        xmesh_type = 11;
+        xmesh_type = 3;
         
         % Parameters for time mesh
         tmax = 1e-12;               % Max time value
@@ -76,23 +70,23 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels
-        EA = [0, -0.2, -0.4];
-        IP = [-1.6, -1.8, -2.0];
+        %EA = [0, -0.2, -0.4];
+        %IP = [-1.6, -1.8, -2.0];
         
-        %EA = [-1.9, -3.8, -4.1];
-        %IP = [-4.9, -5.4, -7.4];
+        EA = [-1.9, -3.8, -4.1];
+        IP = [-4.9, -5.4, -7.4];
         
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        % E0 = [-4.8, -4.6, -4.3];
-        E0 = [-1.4, -1, -0.6]
+        E0 = [-4.8, -4.6, -4.3];
+        %E0 = [-1.4, -1, -0.6]
         
         % Workfunction energies
-        % PhiA = -4.8;
-        % PhiC = -4.3;
-        PhiA = -1.4;
-        PhiC = -0.6;
+        PhiA = -4.8;
+        PhiC = -4.3;
+        %PhiA = -1.4;
+        %PhiC = -0.6;
         
         % Effective Density Of States
         N0 = [1e19, 1e19, 1e19];
@@ -105,10 +99,10 @@ classdef pc
         DOSion = [0, 1.21e22, 0];                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
-        %mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
-        %muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
-        mue = [1, 1, 1];         % electron mobility [cm2V-1s-1]
-        muh = [1, 1, 1];         % hole mobility [cm2V-1s-1]
+        mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
+        muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
+        %mue = [1, 1, 1];         % electron mobility [cm2V-1s-1]
+        %muh = [1, 1, 1];         % hole mobility [cm2V-1s-1]
         muion = [0, 1e-10, 0];                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
@@ -130,10 +124,10 @@ classdef pc
         % SRH trap energies- currently set to mid gap - always set
         % respective to energy levels to avoid conflicts
         % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-        %Et_bulk =[-3.4, -4.6, -4.3];
-        %Et_inter = [-4.6, -4.6];
-        Et_bulk =[-1, -1, -1];
-        Et_inter = [-1, -1];
+        Et_bulk =[-3.4, -4.6, -4.3];
+        Et_inter = [-4.6, -4.6];
+        %Et_bulk =[-1, -1, -1];
+        %Et_inter = [-1, -1];
         
         % Bulk SRH time constants for each layer
         taun_bulk = [1e6, 1e-6, 1e6];           % [s] SRH time constant for electrons
@@ -185,7 +179,8 @@ classdef pc
     
     %%  Properties whose values depend on other properties (see 'get' methods).
     properties (Dependent)
-        
+        d
+        parr
         dcum
         dEAdx
         dIPdx
@@ -254,7 +249,7 @@ classdef pc
             if par.PhiA < par.IP(end) || par.PhiA > par.EA(end)
                 msg = 'Anode workfunction (PhiA) out of range: value must exist within right-hand layer band gap';
                 error(msg)
-            end           
+            end
             
             % warn if property array do not have the correct number of
             % layers. The layer thickness array is used to define the
@@ -338,7 +333,7 @@ classdef pc
             %   from 1 to 4, and if so, changes PARAMS.xmesh_type to VALUE.
             %   Otherwise, a warning is shown. Runs automatically whenever
             %   xmesh_type is changed.
-            if any(1:1:9 == value)
+            if any(1:1:3 == value)
                 par.xmesh_type = value;
             else
                 error('PARAMS.xmesh_type should be an integer from 1 to 9 inclusive. MESHGEN_X cannot generate a mesh if this is not the case.')
@@ -375,10 +370,32 @@ classdef pc
             end
         end
         
+        
+        % layer thicknesses
+        function value = get.d(par)
+            value = zeros(1, length(par.stack));
+            for i=1:size(par.dcell, 1)
+                tempcell = par.dcell{i, :};
+                arr = cell2mat(tempcell);
+                value(1, i) = sum(arr);                % cumulative thickness
+            end
+        end
+        
+        % layer point
+        function value = get.parr(par)
+            value = zeros(1, length(par.stack));
+            for i=1:size(par.pcell, 1)
+                tempcell = par.pcell{i, :};
+                arr = cell2mat(tempcell);
+                value(1, i) = sum(arr);                % cumulative thickness
+            end
+        end
+        
         % Cumulative thickness
         function value = get.dcum(par)
-            value = cumsum(par.d);                % cumulative thickness
+            value = cumsum(par.d);
         end
+        
         
         % Band gap energies
         function value = get.Eg(par)
@@ -497,7 +514,7 @@ classdef pc
             value = par.wp + par.d(2) + par.wn;         % cm
         end
         
-                
+        
     end
     
     methods (Static)
@@ -544,7 +561,22 @@ classdef pc
             dev.nt = zeros(1, length(xx));
             dev.pt = zeros(1, length(xx));
             
-            dcum0 = [0,par.dcum];
+            % build cumulative d array with interfaces
+            k = 1;
+            darrint = zeros(1, 2*length(par.d)-1);
+            for i=1:2*length(par.d)-1
+                % i tracks the stack layers including interfaces
+                % m tracks the stack layers
+                if rem(i, 2) == 1
+                    darrint(i) = par.d(k);
+                    k = k+1;
+                elseif rem(i, 2) == 0
+                    darrint(i) = par.dint;
+                end
+                
+            end
+            darrcumint = cumsum(darrint);
+            darrcumint = [0,darrcumint];
             
             % Build diffusion coefficient structure
             for i =1:length(par.dcum)
@@ -556,157 +588,183 @@ classdef pc
                 
                 startlim = par.IP(i)-0.6;
                 endlim = par.EA(i);
-                interval = (endlim-startlim)/400;               
+                interval = (endlim-startlim)/400;
                 
                 range = startlim:interval:endlim;
                 
                 Dfd_struct_p(i) = F.Dp_fd_fun(par.N0(i), par.IP(i), range, par.mue(i), par.T);
             end
             
-            for i =1:length(par.dcum)
-                if i == 1
-                    aa = 0;
-                else
-                    aa = 1;
-                end
-                
-                if i == length(par.dcum)
-                    bb = 0;
-                else
-                    bb = 1;
-                end
-                
-                
+            % i is the stack layer excluding interfaces
+            % j is the xmesh index
+            % k is the stack layer including interfaces
+            
+            for k=1:length(darrint)
+                i= ceil(k/2);
                 for j = 1:length(xx)
-                    
-                    if xx(j) >= dcum0(i) + aa*par.dint && xx(j) <= dcum0(i+1) - bb*par.dint
-                        dev.EA(j) = par.EA(i);
-                        dev.IP(j) = par.IP(i);
-                        dev.mue(j) = par.mue(i);
-                        dev.muh(j) = par.muh(i);
-                        dev.muion(j) = par.muion(i);
-                        dev.N0(j) = par.N0(i);
-                        dev.NA(j) = par.NA(i);
-                        dev.ND(j) = par.ND(i);
-                        dev.epp(j) = par.epp(i);
-                        dev.ni(j) = par.ni(i);
-                        dev.Nion(j) = par.Nion(i);
-                        dev.DOSion(j) = par.DOSion(i);
-                        dev.krad(j) = par.krad(i);
-                        dev.n0(j) = par.n0(i);
-                        dev.p0(j) = par.p0(i);
-                        dev.E0(j) = par.E0(i);
-                        dev.G0(j) = par.G0(i);
-                        dev.gradEA(j) = 0;
-                        dev.gradIP(j) = 0;
-                        dev.gradN0(j) = 0;
-                        dev.taun(j) = par.taun_bulk(i);
-                        dev.taup(j) = par.taup_bulk(i);
-                        dev.Et(j) = par.Et_bulk(i);
-                        % Electron diffusion coefficient lookup table
-                        dev.Dnfun(j,:) = Dfd_struct_n(i).Dnfun;
-                        dev.n_fd(j,:) = Dfd_struct_n(i).n_fd;
-                        dev.Efn(j,:) = Dfd_struct_n(i).Efn;
-                        % Hole diffusion coefficient lookup table
-                        dev.Dpfun(j,:) = Dfd_struct_p(i).Dpfun;
-                        dev.p_fd(j,:) = Dfd_struct_p(i).p_fd;
-                        dev.Efp(j,:) = Dfd_struct_p(i).Efp;                       
-                    
-                    elseif xx(j) > dcum0(i+1) - bb*par.dint && xx(j) < dcum0(i+2) + bb*par.dint
-                        xprime = xx(j)-(dcum0(i+1) - bb*par.dint);
+                    if rem(k, 2) == 1
+                        if xx(j) >= darrcumint(k) %&& xx(j) <= darrcumint(k+1)
+                            % Upper limits currently causing errors for final points-
+                            % seems to be due to rounding. For now ignore
+                            % upper limit- more expensive but ensures no
+                            % problems. This may be a problem with the
+                            % conversion of the cell arrays with d and p
+                            % values.
+                            dev.EA(j) = par.EA(i);
+                            dev.IP(j) = par.IP(i);
+                            dev.mue(j) = par.mue(i);
+                            dev.muh(j) = par.muh(i);
+                            dev.muion(j) = par.muion(i);
+                            dev.N0(j) = par.N0(i);
+                            dev.NA(j) = par.NA(i);
+                            dev.ND(j) = par.ND(i);
+                            dev.epp(j) = par.epp(i);
+                            dev.ni(j) = par.ni(i);
+                            dev.Nion(j) = par.Nion(i);
+                            dev.DOSion(j) = par.DOSion(i);
+                            dev.krad(j) = par.krad(i);
+                            dev.n0(j) = par.n0(i);
+                            dev.p0(j) = par.p0(i);
+                            dev.E0(j) = par.E0(i);
+                            dev.G0(j) = par.G0(i);
+                            dev.gradEA(j) = 0;
+                            dev.gradIP(j) = 0;
+                            dev.gradN0(j) = 0;
+                            dev.taun(j) = par.taun_bulk(i);
+                            dev.taup(j) = par.taup_bulk(i);
+                            dev.Et(j) = par.Et_bulk(i);
+                            % Electron diffusion coefficient lookup table
+                            dev.Dnfun(j,:) = Dfd_struct_n(i).Dnfun;
+                            dev.n_fd(j,:) = Dfd_struct_n(i).n_fd;
+                            dev.Efn(j,:) = Dfd_struct_n(i).Efn;
+                            % Hole diffusion coefficient lookup table
+                            dev.Dpfun(j,:) = Dfd_struct_p(i).Dpfun;
+                            dev.p_fd(j,:) = Dfd_struct_p(i).p_fd;
+                            dev.Efp(j,:) = Dfd_struct_p(i).Efp;
+                        end
                         
-                        dEAdxprime = (par.EA(i+1)-par.EA(i))/(2*par.dint);
-                        dev.EA(j) = par.EA(i) + xprime*dEAdxprime;
-                        dev.gradEA(j) = dEAdxprime;
+                    elseif rem(k, 2) == 0
                         
-                        dIPdxprime = (par.IP(i+1)-par.IP(i))/(2*par.dint);
-                        dev.IP(j) = par.IP(i) + xprime*dIPdxprime;
-                        dev.gradIP(j) = dIPdxprime;
-                        
-                        % Mobilities
-                        dmuedx = (par.mue(i+1)-par.mue(i))/(2*par.dint);
-                        dev.mue(j) = par.mue(i) + xprime*dmuedx;
-                        
-                        dmuhdx = (par.muh(i+1)-par.muh(i))/(2*par.dint);
-                        dev.muh(j) = par.muh(i) + xprime*dmuhdx;
-                        
-                        dmuiondx = (par.muion(i+1)-par.muion(i))/(2*par.dint);
-                        dev.muion(j) = par.muion(i) + xprime*dmuiondx;
-                        
-                        dmuhdx = (par.muh(i+1)-par.muh(i))/(2*par.dint);
-                        dev.muh(j) = par.muh(i) + xprime*dmuhdx;
-                        
-                        % effective density of states
-                        dN0dx = (par.N0(i+1)-par.N0(i))/(2*par.dint);
-                        dev.N0(j) = par.N0(i) + xprime*dN0dx;
-                        dev.gradN0(j) = dN0dx;
-                        
-                        % Doping densities
-                        dNAdx = (par.NA(i+1)-par.NA(i))/(2*par.dint);
-                        dev.NA(j) = par.NA(i) + xprime*dNAdx;
-                        
-                        dNDdx = (par.ND(i+1)-par.ND(i))/(2*par.dint);
-                        dev.ND(j) = par.ND(i) + xprime*dNDdx;
-                        
-                        % Dielectric constants
-                        deppdx = (par.epp(i+1)-par.epp(i))/(2*par.dint);
-                        dev.epp(j) = par.epp(i) + xprime*deppdx;
-                        
-                        % Intrinsic carrier densities
-                        dnidx = (par.ni(i+1)-par.ni(i))/(2*par.dint);
-                        dev.ni(j) = par.ni(i) + xprime*dnidx;
-                        
-                        % Equilibrium carrier densities
-                        dn0dx = (par.n0(i+1)-par.n0(i))/(2*par.dint);
-                        dev.n0(j) = par.n0(i) + xprime*dn0dx;
-                        
-                        % Equilibrium carrier densities
-                        dp0dx = (par.p0(i+1)-par.p0(i))/(2*par.dint);
-                        dev.p0(j) = par.p0(i) + xprime*dp0dx;
-                        
-                        % Equilibrium Fermi energy
-                        dE0dx = (par.E0(i+1)-par.E0(i))/(2*par.dint);
-                        dev.E0(j) = par.E0(i) + xprime*dE0dx;
-                        
-                        % Uniform generation rate
-                        dG0dx = (par.G0(i+1)-par.G0(i))/(2*par.dint);
-                        dev.G0(j) = par.G0(i) + xprime*dG0dx;
-                        
-                        % Static ion background density
-                        dNiondx = (par.Nion(i+1)-par.Nion(i))/(2*par.dint);
-                        dev.Nion(j) = par.Nion(i) + xprime*dNiondx;
-                        
-                        % Ion density of states
-                        dDOSiondx = (par.DOSion(i+1)-par.DOSion(i))/(2*par.dint);
-                        dev.DOSion(j) = par.DOSion(i) + xprime*dDOSiondx;
-                        
-                        % recombination
-                        dkraddx = (par.krad(i+1)-par.krad(i))/(2*par.dint);
-                        dev.krad(j) = par.krad(i) + xprime*dkraddx;
-                        
-                        dev.taun(j) = par.taun_inter(i);
-                        dev.taup(j) = par.taup_inter(i);
-                        dev.Et(j) = par.Et_inter(i);
-                        
-                        % Electron diffusion coefficient function
-                        dDndx = (Dfd_struct_n(i+1).Dnfun-Dfd_struct_n(i).Dnfun)/(2*par.dint);
-                        dev.Dnfun(j,:) = Dfd_struct_n(i).Dnfun + xprime*dDndx;
-                        
-                        dn_fddx = (Dfd_struct_n(i+1).n_fd-Dfd_struct_n(i).n_fd)/(2*par.dint);
-                        dev.n_fd(j,:) = Dfd_struct_n(i).n_fd + xprime*dn_fddx;
-                        
-                        dEfndx = (Dfd_struct_n(i+1).Efn-Dfd_struct_n(i).Efn)/(2*par.dint);
-                        dev.Efn(j,:) = Dfd_struct_n(i).Efn + xprime*dEfndx;
-                        
-                        % Hole diffusion coefficient function
-                        dDpdx = (Dfd_struct_p(i+1).Dpfun-Dfd_struct_p(i).Dpfun)/(2*par.dint);
-                        dev.Dpfun(j,:) = Dfd_struct_p(i).Dpfun + xprime*dDpdx;
-                        
-                        dp_fddx = (Dfd_struct_p(i+1).p_fd-Dfd_struct_p(i).p_fd)/(2*par.dint);
-                        dev.p_fd(j,:) = Dfd_struct_p(i).p_fd + xprime*dp_fddx;
-                        
-                        dEfpdx = (Dfd_struct_p(i+1).Efp-Dfd_struct_p(i).Efp)/(2*par.dint);
-                        dev.Efp(j,:) = Dfd_struct_p(i).Efp + xprime*dEfpdx;
+                        if xx(j) > darrcumint(k) && xx(j) < darrcumint(k+1)
+                            
+                            xprime = xx(j)-darrcumint(k);
+                            
+                            dEAdxprime = (par.EA(i+1)-par.EA(i))/(par.dint);
+                            dev.EA(j) = par.EA(i) + xprime*dEAdxprime;
+                            dev.gradEA(j) = dEAdxprime;
+                            
+                            dIPdxprime = (par.IP(i+1)-par.IP(i))/(par.dint);
+                            dev.IP(j) = par.IP(i) + xprime*dIPdxprime;
+                            dev.gradIP(j) = dIPdxprime;
+                            
+                            % Mobilities
+                            dmuedx = (par.mue(i+1)-par.mue(i))/(par.dint);
+                            dev.mue(j) = par.mue(i) + xprime*dmuedx;
+                            
+                            dmuhdx = (par.muh(i+1)-par.muh(i))/(par.dint);
+                            dev.muh(j) = par.muh(i) + xprime*dmuhdx;
+                            
+                            dmuiondx = (par.muion(i+1)-par.muion(i))/(par.dint);
+                            dev.muion(j) = par.muion(i) + xprime*dmuiondx;
+                            
+                            dmuhdx = (par.muh(i+1)-par.muh(i))/(par.dint);
+                            dev.muh(j) = par.muh(i) + xprime*dmuhdx;
+                            
+                            % effective density of states
+                            dN0dx = (par.N0(i+1)-par.N0(i))/(par.dint);
+                            dev.N0(j) = par.N0(i) + xprime*dN0dx;
+                            dev.gradN0(j) = dN0dx;
+                            
+                            % Doping densities
+                            dNAdx = (par.NA(i+1)-par.NA(i))/(par.dint);
+                            dev.NA(j) = par.NA(i) + xprime*dNAdx;
+                            
+                            dNDdx = (par.ND(i+1)-par.ND(i))/(par.dint);
+                            dev.ND(j) = par.ND(i) + xprime*dNDdx;
+                            
+                            % Dielectric constants
+                            deppdx = (par.epp(i+1)-par.epp(i))/(par.dint);
+                            dev.epp(j) = par.epp(i) + xprime*deppdx;
+                            
+                            % Intrinsic carrier densities
+                            dnidx = (par.ni(i+1)-par.ni(i))/(par.dint);
+                            dev.ni(j) = par.ni(i) + xprime*dnidx;
+                            
+                            % Equilibrium carrier densities
+                            dn0dx = (par.n0(i+1)-par.n0(i))/(par.dint);
+                            dev.n0(j) = par.n0(i) + xprime*dn0dx;
+                            
+                            % Equilibrium carrier densities
+                            dp0dx = (par.p0(i+1)-par.p0(i))/(par.dint);
+                            dev.p0(j) = par.p0(i) + xprime*dp0dx;
+                            
+                            % Equilibrium Fermi energy
+                            dE0dx = (par.E0(i+1)-par.E0(i))/(par.dint);
+                            dev.E0(j) = par.E0(i) + xprime*dE0dx;
+                            
+                            % Uniform generation rate
+                            dG0dx = (par.G0(i+1)-par.G0(i))/(par.dint);
+                            dev.G0(j) = par.G0(i) + xprime*dG0dx;
+                            
+                            % Static ion background density
+                            dNiondx = (par.Nion(i+1)-par.Nion(i))/(par.dint);
+                            dev.Nion(j) = par.Nion(i) + xprime*dNiondx;
+                            
+                            % Ion density of states
+                            dDOSiondx = (par.DOSion(i+1)-par.DOSion(i))/(par.dint);
+                            dev.DOSion(j) = par.DOSion(i) + xprime*dDOSiondx;
+                            
+                            % recombination
+                            dkraddx = (par.krad(i+1)-par.krad(i))/(par.dint);
+                            dev.krad(j) = par.krad(i) + xprime*dkraddx;
+                            
+                            dev.taun(j) = par.taun_inter(i);
+                            dev.taup(j) = par.taup_inter(i);
+                            dev.Et(j) = par.Et_inter(i);
+                            
+                            % Build diffusion coefficient structure
+                                startlim = dev.IP(j);
+                                endlim = dev.EA(j)+0.6;
+                                interval = (endlim-startlim)/400;
+                                                                
+                                Dfd_struct_n_temp = F.Dn_fd_fun(dev.N0(j), dev.EA(j), startlim:interval:endlim, dev.mue(j), par.T);
+                                
+                                dev.Dnfun(j,:) = Dfd_struct_n_temp.Dnfun;
+                                dev.n_fd(j,:) = Dfd_struct_n_temp.n_fd;
+                                dev.Efn(j,:) = Dfd_struct_n_temp.Efn;  
+                                
+                                startlim = dev.IP(j)-0.6;
+                                endlim = dev.EA(j);
+                                interval = (endlim-startlim)/400;
+                                                                
+                                Dfd_struct_p_temp = F.Dp_fd_fun(dev.N0(j), dev.IP(j), startlim:interval:endlim, dev.mue(j), par.T);
+                            
+                                dev.Dpfun(j,:) = Dfd_struct_p_temp.Dpfun;
+                                dev.p_fd(j,:) = Dfd_struct_p_temp.p_fd;
+                                dev.Efp(j,:) = Dfd_struct_p_temp.Efp;                         
+
+                            
+                            %                             % Electron diffusion coefficient function this
+                            %                             % is not the correct way to do this..
+                            %                             dDndx = (Dfd_struct_n(i+1).Dnfun-Dfd_struct_n(i).Dnfun)/(par.dint);
+                            %                             dev.Dnfun(j,:) = Dfd_struct_n(i).Dnfun + xprime*dDndx;
+                            %
+                            %                             dn_fddx = (Dfd_struct_n(i+1).n_fd-Dfd_struct_n(i).n_fd)/(par.dint);
+                            %                             dev.n_fd(j,:) = Dfd_struct_n(i).n_fd + xprime*dn_fddx;
+                            %
+                            %                             dEfndx = (Dfd_struct_n(i+1).Efn-Dfd_struct_n(i).Efn)/(par.dint);
+                            %                             dev.Efn(j,:) = Dfd_struct_n(i).Efn + xprime*dEfndx;
+                            %
+                            %                             % Hole diffusion coefficient function
+                            %                             dDpdx = (Dfd_struct_p(i+1).Dpfun-Dfd_struct_p(i).Dpfun)/(par.dint);
+                            %                             dev.Dpfun(j,:) = Dfd_struct_p(i).Dpfun + xprime*dDpdx;
+                            %
+                            %                             dp_fddx = (Dfd_struct_p(i+1).p_fd-Dfd_struct_p(i).p_fd)/(par.dint);
+                            %                             dev.p_fd(j,:) = Dfd_struct_p(i).p_fd + xprime*dp_fddx;
+                            %
+                            %                             dEfpdx = (Dfd_struct_p(i+1).Efp-Dfd_struct_p(i).Efp)/(par.dint);
+                            %                             dev.Efp(j,:) = Dfd_struct_p(i).Efp + xprime*dEfpdx;
+                        end
                     end
                 end
                 
@@ -714,8 +772,8 @@ classdef pc
             
             dev.nt = F.fdn(dev.N0, dev.EA, dev.Et, par.T);
             dev.pt = F.fdp(dev.N0, dev.IP, dev.Et, par.T);
-            
         end
+        
         
     end
 end
