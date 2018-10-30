@@ -45,7 +45,6 @@ a = sol(:,:,3);
 V = sol(:,:,4);
 
 % Create 2D matrices for multiplication with solutions
-
 EAmat = repmat(par.dev.EA, length(t), 1);
 IPmat = repmat(par.dev.IP, length(t), 1);
 muemat = repmat(par.dev.mue, length(t), 1);
