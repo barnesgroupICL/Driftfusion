@@ -75,7 +75,7 @@ end
 Efn = Efn-V;
 Efp = Efp-V;
 
-elseif stats == 'Boltz'
+elseif par.stats == 'Boltz'
     Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./N0mat));        % Electron quasi-Fermi level 
     Efp = real(Evb-(par.kB*par.T/par.q)*log(p./N0mat));        % Hole quasi-Fermi level
 end
