@@ -71,9 +71,9 @@ Efield_i = p.e * cumtrapz(struct.x, i_matrix, 2) / p.eppi;
 % intrinsic, indeed I have to use trapz for considering the spatial mesh
 Efield_i_mean = trapz(struct.x(itype_points), Efield_i(:, itype_points), 2) / p.ti;
 % calculate displacement current due to ions
-Ji_disp = -p.eppi * gradient(Efield_i_mean, struct.t); % in Amperes, column
+Ji_disp = -p.eppi * gradient(Efield_i_mean, struct.t) * 1000; % in mA, column
 
-J_noionic = Jn - Ji_disp * 1000; % in mA, column
+J_noionic = Jn - Ji_disp; % in mA, column
 
 % try to calculate the accumulated charge
 [dQ_t, ~, ~, ~, ~] = ISwave_subtracting_analysis(struct);
