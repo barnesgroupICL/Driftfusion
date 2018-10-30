@@ -1,4 +1,4 @@
-function JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, muion, Vstart, Vend, option)
+function JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 disp('Current voltage scan')
 
 % A procedure for running JV scans using pindrift
@@ -7,12 +7,12 @@ disp('Current voltage scan')
 % starting voltage for the scan- currently set to Vapp = 0 V
 % JVscan_rate   = self-explanatory
 % JVscan_pnts   = no. of points in time mesh
-% mui           = ion mobility
+% mobseti       = determines whether ion mobility is on or off
 % Vstart        = scan start voltage
 % Vend          = scan end voltage
 % option        1 = dark only, 2 = light only, 3 = dark & light
 
-[JV.dk.f, JV.dk.r, JV.ill.f, JV.ill.r] = deal(0);
+%[JV.dk.f, JV.dk.r, JV.ill.f, JV.ill.r] = deal(0);
 
 % Read parameters structure into structure P
 p = sol_ini.p;
@@ -22,17 +22,11 @@ p.Ana = 1;
 p.figson = 1;
 p.Int = 0;
 p.pulseon = 0;
-
-if muion == 0
-    p.mobseti =0;
-else
-    p.muion = [0,muion,0];
-    p.dev = pc.builddev(p);
-end
+p.mobseti = mobseti;
 
 %% JV settings
 p.JV = 1;
-% p.Vstart = Vstart;
+p.Vstart = Vstart;
 p.Vend = Vend;
 p.calcJ = 0;
 p.JVscan_pnts = JVscan_pnts;
@@ -83,7 +77,7 @@ if option ==2 || option ==3
         %% Light forward
         
         disp('Light forward scan...')
-        p.mobseti = 1;
+        p.mobseti = mobseti;
         
         %% JV settings
         p.JV = 1;
@@ -100,7 +94,7 @@ if option ==2 || option ==3
         disp('Complete.')
         
         %% Light reverse
-        
+      
         disp('Light reverse scan...')
         p.Vstart = Vend;
         p.Vend = Vstart;
@@ -113,23 +107,10 @@ if option ==2 || option ==3
         disp('JV scan complete.')
         
         plotJV(JV, option)
+        
 end
 
-% p = find(JV.ill.f.Vapp >= 0);
-% p = p(1);
-% JV.Jsc_f = JV.ill.f.Jtotr(p, end)
-% 
-% p = find(JV.ill.r.Vapp <= 0);
-% p = p(1);
-% JV.Jsc_r = JV.ill.r.Jtotr(p, end)
-% 
-% p = find(JV.ill.f.Jtotr(:, end) >= 0);
-% p = p(1);
-% JV.Voc_f = JV.ill.f.Vapp(p)
-% 
-% p = find(JV.ill.r.Jtotr(:, end) <= 0);
-% p = p(1);
-% JV.Voc_r = JV.ill.r.Vapp(p)
+JV.stats = JVstats(JV);
 
 end
 
