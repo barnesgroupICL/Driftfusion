@@ -70,23 +70,17 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels
-        %EA = [0, -0.2, -0.4];
-        %IP = [-1.6, -1.8, -2.0];
-        
-        EA = [-1.9, -3.8, -4.1];
-        IP = [-4.9, -5.4, -7.4];
+        EA = [-3.5, -3.8, -3.8];
+        IP = [-5.1, -5.4, -6.2];
         
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
-        E0 = [-4.8, -4.6, -4.3];
-        %E0 = [-1.4, -1, -0.6]
+        E0 = [-4.3, -4.6, -3.9];
         
         % Workfunction energies
-        PhiA = -4.8;
-        PhiC = -4.3;
-        %PhiA = -1.4;
-        %PhiC = -0.6;
+        PhiA = -5;
+        PhiC = -3.9;
         
         % Effective Density Of States
         N0 = [1e19, 1e19, 1e19];
@@ -99,10 +93,9 @@ classdef pc
         DOSion = [0, 1.21e22, 0];                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
-        mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
-        muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
-        %mue = [1, 1, 1];         % electron mobility [cm2V-1s-1]
-        %muh = [1, 1, 1];         % hole mobility [cm2V-1s-1]
+        mue = [1e-4, 20, 1e-3];         % electron mobility [cm2V-1s-1]
+        muh = [1e-4, 20, 1e-3];         % hole mobility [cm2V-1s-1]
+
         muion = [0, 1e-10, 0];                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
@@ -110,7 +103,7 @@ classdef pc
         % Spiro muh = 0.02 cm2V-1s-1 Hawash2018
         
         % Dielectric constants
-        epp = [4,23,12];
+        epp = [4,23,4];
         % TiO2 Wypych2014
         
         %%% Generation %%%%%
@@ -118,24 +111,22 @@ classdef pc
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        krad = [3.18e-11, 3.6e-12, 1.54e-10];  % [cm3 s-1] Radiative Recombination coefficient
+        krad = [8.3e-11, 3.6e-12, 6.9e-11];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
         
         % SRH trap energies- currently set to mid gap - always set
         % respective to energy levels to avoid conflicts
         % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-        Et_bulk =[-3.4, -4.6, -4.3];
+        Et_bulk =[-4.3, -4.6, -5.0];
         Et_inter = [-4.6, -4.6];
-        %Et_bulk =[-1, -1, -1];
-        %Et_inter = [-1, -1];
         
         % Bulk SRH time constants for each layer
-        taun_bulk = [1e6, 1e-6, 1e6];           % [s] SRH time constant for electrons
-        taup_bulk = [1e6, 1e-6, 1e6];           % [s] SRH time constant for holes
+        taun_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for electrons
+        taup_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for holes
         
         % Interfacial SRH time constants - should be of length (number of layers)-1
-        taun_inter = [1e-9, 1e-12];
-        taup_inter = [1e-9, 1e-12];
+        taun_inter = [2e-10, 1e-6];
+        taup_inter = [2e-10, 1e-6];
         
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
