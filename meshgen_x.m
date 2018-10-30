@@ -3,184 +3,144 @@ function x = meshgen_x(p)
 dcum = p.dcum;
 
 switch p.xmesh_type
-% Linearly spaced
-case 1
-
-    x = linspace(0,dcum(end),p.parr(1)+p.parr(2)+p.parr(3));
-
-% Linearly spaced, more points at interfaces   
-case 2
-   
-    x = [linspace(0, dcum(1)-p.dint, p.parr(1)),...
-        linspace(dcum(1)-p.dint+(p.dint/p.pint), dcum(1), p.pint),...
-        linspace(dcum(1)+(p.dint/p.pint), dcum(1)+p.dint, p.pint),...
-        linspace(dcum(1)+p.dint+(p.dint/p.pint), dcum(1)+p.dscr, p.pscr),...
-        linspace(dcum(1)+p.dscr+(p.dscr/p.pscr), dcum(2)-p.dscr-(p.dscr/p.pscr), p.parr(2)),...
-        linspace(dcum(2)-p.dscr, dcum(2)-p.dint-(p.dint/p.pint), p.pscr),...
-        linspace(dcum(2)-p.dint, dcum(2)-(p.dint/p.pint), p.pint),...
-        linspace(dcum(2), dcum(2)+p.dint-(p.dint/p.pint), p.pint),....
-        linspace(dcum(2)+p.dint, dcum(end), p.parr(3));];
+    % Linearly spaced
+    case 1
         
-% Linearly spaced, more points at interfaces   
-case 3
-   
-    x = [linspace(0, dcum(1)-p.dscr, p.parr(1)),...
-        linspace(dcum(1)-p.dscr+(p.dscr/p.pscr), dcum(1)-p.dint, p.pscr),...
-        linspace(dcum(1)-p.dint+(p.dint/p.pint), dcum(1), p.pint),...
-        linspace(dcum(1)+(p.dint/p.pint), dcum(1)+p.dint, p.pint),...
-        linspace(dcum(1)+p.dint+(p.dint/p.pint), dcum(1)+p.dscr, p.pscr),...
-        linspace(dcum(1)+p.dscr+(p.dscr/p.pscr), dcum(2)-p.dscr-(p.dscr/p.pscr), p.parr(2)),...
-        linspace(dcum(2)-p.dscr, dcum(2)-p.dint-(p.dint/p.pint), p.pscr),...
-        linspace(dcum(2)-p.dint, dcum(2)-(p.dint/p.pint), p.pint),...
-        linspace(dcum(2), dcum(2)+p.dint-(p.dint/p.pint), p.pint),...
-        linspace(dcum(2)+p.dint, dcum(2)+p.dscr-(p.dscr/p.pscr), p.pscr),...
-        linspace(dcum(2)+p.dscr, dcum(end), p.parr(3));];
+        x = linspace(0,dcum(end),p.parr(1)+p.parr(2)+p.parr(3));
         
-% Linearly spaced, more points at interfaces and electrodes
-case 4
-   
-    x = [linspace(0, p.te, p.pepe),...
-        linspace(p.te+p.deltax, dcum(1)-p.dscr, p.parr(1)),...
-        linspace(dcum(1)-p.dscr+p.deltax, dcum(1), p.pscr),...
-        linspace(dcum(1)+p.deltax, dcum(1)+p.dscr, p.pscr),...
-        linspace(dcum(1)+p.dscr+p.deltax, dcum(2)-p.dscr-p.deltax, p.parr(2)),...
-        linspace(dcum(2)-p.dscr, dcum(2)-p.deltax, p.pscr),...
-        linspace(dcum(2), dcum(2)+p.dscr-p.deltax, p.pscr),...
-        linspace(dcum(2)+p.dscr, dcum(end)-p.te-p.deltax, p.parr(3)),...
-        linspace(dcum(end)-p.te, dcum(end), p.pepe);]; 
-
-% Linearly spaced, more points at interfaces includes low Er n-type material (electrode)    
-case 5
-   
-    x = [linspace(0, p.telp, p.pelp),...
-        linspace(p.telp+(p.dscr/p.pscr), p.telp+dcum(1)-p.dscr, p.parr(1)),...
-        linspace(p.telp+dcum(1)-p.dscr+(p.dscr/p.pscr), p.telp+dcum(1)-p.dint, p.pscr),...
-        linspace(p.telp+dcum(1)-p.dint+(p.dint/p.pint), p.telp+dcum(1), p.pint),...
-        linspace(p.telp+dcum(1)+(p.dint/p.pint), p.telp+dcum(1)+p.dint, p.pint),...
-        linspace(p.telp+dcum(1)+p.dint+(p.dint/p.pint), p.telp+dcum(1)+p.dscr, p.pscr),...
-        linspace(p.telp+dcum(1)+p.dscr+(p.dscr/p.pscr), p.telp+dcum(2)-p.dscr-(p.dscr/p.pscr), p.parr(2)),...
-        linspace(p.telp+dcum(2)-p.dscr, p.telp+dcum(2)-p.dint-(p.dint/p.pint), p.pscr),...
-        linspace(p.telp+dcum(2)-p.dint, p.telp+dcum(2)-(p.dint/p.pint), p.pint),...
-        linspace(p.telp+dcum(2), p.telp+dcum(2)+p.dint-(p.dint/p.pint), p.pint),...
-        linspace(p.telp+dcum(2)+p.dint, p.telp+dcum(2)+p.dscr-(p.dscr/p.pscr), p.pscr),...
-        linspace(p.telp+dcum(2)+p.dscr, dcum(end)-p.teln, p.parr(3)),...
-        linspace(dcum(end)-p.teln+(p.teln/p.peln), dcum(end), p.peln);];
-           
-case 7
-   
-    x = [linspace(0, p.telp-p.tjn, p.pelp),...
-        linspace(p.telp-p.tjn+(p.tjn/p.pjn), p.telp+p.tjn-(p.tjn/p.pjn), p.pjn),...
-        linspace(p.telp+p.tjn, p.telp+dcum(1)-p.dscr, p.parr(1)),...
-        linspace(p.telp+dcum(1)-p.dscr+(p.dscr/p.pscr), p.telp+dcum(1)-p.dint, p.pscr),...
-        linspace(p.telp+dcum(1)-p.dint+(p.dint/p.pint), p.telp+dcum(1), p.pint),...
-        linspace(p.telp+dcum(1)+(p.dint/p.pint), p.telp+dcum(1)+p.dint, p.pint),...
-        linspace(p.telp+dcum(1)+p.dint+(p.dint/p.pint), p.telp+dcum(1)+p.dscr, p.pscr),...
-        linspace(p.telp+dcum(1)+p.dscr+(p.dscr/p.pscr), p.telp+dcum(1)+ti-p.dscr-(p.dscr/p.pscr), p.parr(2)),...
-        linspace(p.telp+dcum(2)-p.dscr, p.telp+dcum(2)-p.dint-(p.dint/p.pint), p.pscr),...
-        linspace(p.telp+dcum(2)-p.dint, p.telp+dcum(2)-(p.dint/p.pint), p.pint),...
-        linspace(p.telp+dcum(2), p.telp+dcum(2)+p.dint-(p.dint/p.pint), p.pint),...
-        linspace(p.telp+dcum(2)+p.dint, p.telp+dcum(2)+p.dscr-(p.dscr/p.pscr), p.pscr),...
-        linspace(p.telp+dcum(2)+p.dscr, dcum(end)-(p.teln+p.tjn), p.parr(3)),...
-        linspace(dcum(end)-(p.teln+p.tjn-(p.tjn/p.pjn)), dcum(end)-(p.teln-p.tjn+(p.tjn/p.pjn)), p.pjn),...
-        linspace(dcum(end)-(p.teln-p.tjn), dcum(end), p.peln);];
-
-    % Log 10 mesh - fails for high number of spatial points
-    case 8
+    case 2
         
-        halfmesh = logspace(log10(p.dmin), log10(p.d(2)/2+p.dmin), p.parr(2)/2);
-        findmin = min(halfmesh);
-        endspace = halfmesh(end) - halfmesh(end-1);
-                
-        x1 = [dcum(1) - p.dint - logspace(log10(dcum(1) - p.dint-p.dmin), log10(p.dmin), p.parr(1)),...
-            linspace(dcum(1) - p.dint, dcum(1) + p.dint-p.dmin, p.pint),...
-            dcum(1) + p.dint + logspace(log10(p.dmin), log10(p.d(2)/2+p.dmin-0.5*endspace), p.parr(2)/2)-p.dmin];         
-    
-        x2 = (dcum(end)-fliplr(x1));
-        
-        x = [x1, x2];
+        %x = zeros(1, 600);
+        parrcum = [0, cumsum(p.parr)];
+        parr = p.parr;
+        dcum = [0, p.dcum];
+        j = 1;
+        k = 1;
+        % Iteration around number of layers and desired points
+        for i=1:2*length(p.parr)-1
             
-    case 9
-        
-        halfmesh = dcum(1) - logspace(log10(dcum(1)+p.dmin), log10(p.dmin), p.parr(2)/2);
-        findmin = min(halfmesh);
-        endspace = halfmesh(end) - halfmesh(end-1);
-                
-        x = [dcum(1) + p.dmin - logspace(log10(p.d(1)), log10(p.dmin+endspace), p.parr(1)),...
-              dcum(1) + logspace(log10(p.dmin), log10(p.d(2)/2+p.dmin-endspace), p.parr(2)/2)-p.dmin,...
-              dcum(2) - logspace(log10(p.d(2)/2+p.dmin-endspace), log10(p.dmin), p.parr(2)/2)+p.dmin,...
-              dcum(2) - p.dmin + logspace(log10(p.dmin+endspace), log10(p.d(3)), p.parr(3))];
-        %x2 = (dcum(end)-fliplr(x1));
-        
-        %x = [x1, x2];
-
-        % Linearly spaced, more points at interfaces   
-case 10
-   
-    x = [linspace(0, dcum(1)-p.dscr, p.parr(1)),...
-        linspace(dcum(1)-p.dscr+(p.dscr/p.pscr), dcum(1), p.pscr),...     
-        linspace(dcum(1)+(p.dint/p.pint), dcum(1)+2*p.dint, 2*p.pint),...
-        linspace(dcum(1)+2*p.dint+(p.dint/p.pint), dcum(1)+p.dscr, p.pscr),...
-        linspace(dcum(1)+p.dscr+(p.dscr/p.pscr), dcum(2)-p.dscr-(p.dscr/p.pscr), p.parr(2)),...
-        linspace(dcum(2)-p.dscr, dcum(2)-2*p.dint-(p.dint/p.pint), p.pscr),...
-        linspace(dcum(2)-2*p.dint, dcum(2)-(p.dint/p.pint), 2*p.pint),...
-        linspace(dcum(2), dcum(2)+p.dscr-(p.dscr/p.pscr), p.pscr),...
-        linspace(dcum(2)+p.dscr, dcum(end), p.parr(3));];        
-        
-case 11
-    
-    %x = zeros(1, 600);
-    parrcum = [0, cumsum(p.parr)];
-    parr = p.parr;
-    dcum = [0, p.dcum];
-    j = 1;
-    k = 1;
-    % Iteration around number of layers and desired points
-    for i=1:2*length(p.parr)-1
-               
-        if rem(i, 2) == 1
-            parrint(j) = parr(k);
-            j = j+1;
-            k = k+1;
-        elseif rem(i, 2) == 0
-            parrint(j) = p.pint;
-            j = j+1;
+            if rem(i, 2) == 1
+                parrint(j) = parr(k);
+                j = j+1;
+                k = k+1;
+            elseif rem(i, 2) == 0
+                parrint(j) = p.pint;
+                j = j+1;
+            end
         end
-    end
-    parrintcum = cumsum(parrint);
-    parrintcum = [0,parrintcum];
-    j=1;
-    k=1;
-    
-    for i=1:length(parrint)
-        if i == 1
-            A = 0;
-        else
-            A = 1;
+        parrintcum = cumsum(parrint);
+        parrintcum = [0,parrintcum];
+        j=1;
+        k=1;
+        
+        for i=1:length(parrint)
+            if i == 1
+                A = 0;
+            else
+                A = 1;
+            end
+            
+            if i == length(parrint)
+                B = 0;
+            else
+                B = 1;
+            end
+            
+            if rem(i, 2) == 1
+                linarr = linspace(dcum(j)+A*(p.dint+p.dint/p.pint), dcum(j+1)-B*(p.dint+p.dint/p.pint), parrint(i));
+                x(1, (parrintcum(i)+1):parrintcum(i+1)) = linarr;
+            elseif rem(i, 2) == 0
+                linarr = linspace(dcum(j+1)-p.dint, dcum(j+1)+p.dint, parrint(i));
+                x(1, (parrintcum(i)+1):parrintcum(i+1)) = linarr;
+                j=j+1;
+            end
+            
+            
         end
         
-        if i == length(parrint)
-            B = 0;
-        else
-            B = 1;
-        end
         
-        if rem(i, 2) == 1
-            linarr = linspace(dcum(j)+A*(p.dint+p.dint/p.pint), dcum(j+1)-B*(p.dint+p.dint/p.pint), parrint(i));
+    case 3
+        
+%         parrcum = [0, cumsum(p.parr)];
+%         parr = p.parr;
+%         darr = p.d;
+%         dcum = [0, p.dcum];
+        
+        % build number array from dcell (cell array containing lengths)
+        dcellarr = 0;
+        for i = 1:size(p.dcell, 1)
+            tempcell = p.dcell{i,:};
+            dcellarr = [dcellarr, cell2mat(tempcell)];
+        end
+        dcellcum = cumsum(dcellarr);
+        
+        % build number array from pcell (cell array containing lengths)
+        pcellarr = 0;
+        for i = 1:size(p.pcell, 1)
+            tempcell = p.pcell{i,:};
+            pcellarr = [pcellarr, cell2mat(tempcell)];
+        end
+        pcellcum = cumsum(pcellarr);
+        
+        j = 1;
+        k = 1;
+        % Iteration around number of layers and desired points
+        for i=1:2*length(p.d)-1
+            % i tracks the stack layers including interfaces
+            % j tracks the point layer (not inc interfaces)
+            % k tracks the stack layers not including interfaces
+            
+            if rem(i, 2) == 1
+                for n=1:length(p.pcell{k,:})
+                    tempcell = p.pcell{k, :};
+                    stacklayerarr = cell2mat(tempcell);
+                    parrint(j) = stacklayerarr(n);
+                    
+                    tempcell = p.dcell{k, :};
+                    stacklayerarr = cell2mat(tempcell);
+                    darrint(j) = stacklayerarr(n);
+                    
+                    j = j+1;
+                end
+                k = k+1;
+            elseif rem(i, 2) == 0
+                parrint(j) = p.pint;
+                darrint(j) = p.dint;
+                j = j+1;
+            end
+            
+        end
+        parrintcum = cumsum(parrint);
+        parrintcum = [0,parrintcum];
+        darrintcum = cumsum(darrint);
+        darrintcum = [0,darrintcum];
+        
+        for i=1:length(parrint)     % Layer with interface index
+            if i == 1
+                A = 0;
+            else
+                A = 1;
+            end
+            
+            if i == length(parrint)
+                B = 0;
+            else
+                B = 1;
+            end
+            
+            % Write the entries into x
+            linarr = linspace(darrintcum(i), darrintcum(i+1)-B*(darrint(i)/parrint(i)), parrint(i));
             x(1, (parrintcum(i)+1):parrintcum(i+1)) = linarr;
-        elseif rem(i, 2) == 0
-            linarr = linspace(dcum(j+1)-p.dint, dcum(j+1)+p.dint, parrint(i));
-            x(1, (parrintcum(i)+1):parrintcum(i+1)) = linarr;
-            j=j+1;
+     
         end
         
+        % To account for rounding errors
+        x(end) = darrintcum(end);
         
-    end
-    
-    
     otherwise
         error('DrIFtFUSION:xmesh_type', [mfilename ' - xmesh_type not recognized'])
-                
-end 
+        
+end
 
 px = length(x);
 
@@ -200,9 +160,9 @@ if p.meshx_figon == 1
     figure(1011)
     plot(xmir, dpdx);
     xlabel('Position');
-    ylabel('dpdx');    
+    ylabel('dpdx');
     %ylim([-10,10])
-     
+    
     drawnow
 end
 
