@@ -12,11 +12,11 @@ function structCell = genVappStructs(asymstruct, Vapp_array)
 %     voltages, ordered with ascending voltages
 %
 % Example:
-%   structs_Vapp_dark = genVappStructs(sol_i_eq, 0:0.2:1);
+%   structs_Vapp_dark = genVappStructs(sol_i_eq_SR, 0:0.2:1);
 %     generates dark solutions at 0, 0.2, 0.4, 0.6, 0.8 and 1 V applied voltages
-%   structs_Vapp_dark = genVappStructs(sol_i_eq, linspace(0, 1, 15));
+%   structs_Vapp_dark = genVappStructs(sol_i_eq_SR, linspace(0, 1, 15));
 %     generates dark solutions at 15 different voltages from 0 to 1 V
-%   structs_Vapp_dark = genVappStructs(sol_i_eq, [0, 0.8, 0.9]);
+%   structs_Vapp_dark = genVappStructs(sol_i_eq_SR, [0, 0.8, 0.9]);
 %     generates dark solutions at a list of applied voltages, remember that
 %     the list will have an ascending ordering in the output structure
 %
@@ -52,17 +52,10 @@ Vapp_array = sort(Vapp_array, 'ascend');
 % pre allocate
 structCell = cell(2, length(Vapp_array));
 
-existingVars = evalin('base', 'who');
-
 %% generate solutions
 for i = 1:length(Vapp_array)
     disp([mfilename ' - applied voltage ' num2str(Vapp_array(i))])
     name = matlab.lang.makeValidName([inputname(1) '_Vapp_' num2str(Vapp_array(i))]);
-    if any(strcmp(existingVars, name)) % check if a structure with the same name already exists
-        asymstruct_Vapp = evalin('base', name);
-        % if none of the previous if conditions is true, just use the
-        % previously set struct_Vapp
-    end
     % decrease annoiance by figures popping up
     asymstruct_Vapp.p.figson = 0;
     
@@ -108,7 +101,6 @@ for i = 1:length(Vapp_array)
 
     structCell{1, i} = asymstruct_Vapp;
     structCell{2, i} = name;
-    assignin('base', name, asymstruct_Vapp);
 end
 
 %------------- END OF CODE --------------

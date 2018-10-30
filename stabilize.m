@@ -48,7 +48,6 @@ p.Ana = 0;
 
 min_tmax_ions = 1;
 min_tmax_freecharges = 1e-3;
-min_tmax_allfrozen = 1e-6;
 
 % if both mobilities are set
 if p.mui && p.mue_i
@@ -58,10 +57,6 @@ if p.mui && p.mue_i
 elseif p.mue_i
     p.tmax = min([min_tmax_freecharges, p.tmax*1e4, 2^(-log10(p.mue_i))]);
     min_tmax = min_tmax_freecharges;
-% if no mobility (or just the ionic one) is set
-else
-    p.tmax = min_tmax_allfrozen;
-    min_tmax = min_tmax_allfrozen;
 end
 
 p.t0 = p.tmax / 1e8;
