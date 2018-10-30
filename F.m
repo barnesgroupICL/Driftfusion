@@ -11,22 +11,13 @@ classdef F
     end
     
     methods (Static)
-        function n = boltzn(Nc, Ec, Efn, T)
-            % Boltzmann carrier density
+        
+        function n = nfun(Nc, Ec, Efn, T, stats)
             
             kT = F.kB*T;
-            n = Nc*exp((Efn-Ec)/kT);
             
-        end
-        
-        function p = boltzp(Nv, Ev, Efp, T)
+            if stats == 'Fermi'
             
-            kT = F.kB*T;
-            p = Nv*exp((Ev-Efp)/kT);
-            
-        end
-        
-        function n = fdn(Nc, Ec, Efn, T)
             % Fermi dirac integral for obtaining electron densities
             % Nc = conduction band density of states
             % Ec = conduction band energy
@@ -36,25 +27,31 @@ classdef F
             n = zeros(length(Nc));
             
             for i=1:length(Nc)
-                
-                kT = F.kB*T;
-                
+                                
                 fn = @(E) ((E/kT).^0.5)./(1 + exp((E-Efn(i)+Ec(i))/kT));
                 
                 n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(fn, 0, F.uplimit));
                 
             end
             
+            elseif stats == 'Boltz'
+            
+                n = Nc.*exp((Efn-Ec)./kT);
+            end
+            
         end
         
-        function p = fdp(Nv, Ev, Efp, T)
+        function p = pfun(Nv, Ev, Efp, T, stats)
+            
+            kT = F.kB*T;
+            
+            if stats == 'Fermi'
             % Fermi dirac integral for obtaining electron densities
             % Nc = conduction band density of states
             % Ec = conduction band energy
             % Ef = Fermi level
             % T = temperature
             % See Schubert 2015, pp. 130
-            kT = F.kB*T;
             p = zeros(length(Nv));
             
             % Reflecting the energy makes the integral easier for some
@@ -68,6 +65,12 @@ classdef F
                 
                 p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, 0, F.uplimit));
                 
+            end
+            
+            elseif stats == 'Boltz'
+                
+                p = Nv.*exp((Ev-Efp)./kT);
+            
             end
             
         end
