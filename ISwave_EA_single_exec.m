@@ -17,19 +17,19 @@ function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq,
 %     unstabilized ionic profile without frozen_ions
 %   EA - logical, set to true when performing ElectroAbsorbance simulation,
 %     this will skip the electrical current calculation
-%   RELTOL - starting relative tolerance of the PDEPE solver
+%   RELTOL - starting relative tolerance of the PDEPE solver, for example a
+%     value of 1e-8 sets for a very precise simulation
 %
 % Outputs:
 %   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbated by an
 %     oscillating voltage
 %
 % Example:
-%   ISwave_EA_single_exec(asymmetricize(ssol_i_light), 2e-3, 1e6, 20, 40, true, false, 1e-6)
-%     simulate an oscillating voltage at 1 MHz and 2 mV of amplitude, with
-%     selective contacts, 20 periods and 40 time points per period,
-%     calculating the ionic current and using a starting relative tolerance
-%     of 1e-6, calculate also the electronic current needed by impedance
-%     simulations
+%   ssol_i_1S_SR_is_100mHz_2mV = ISwave_EA_single_exec(asymmetricize(ssol_i_1S_SR), 2e-3, 1e-2, 20, 40, true, false, 1e-8)
+%     simulate an oscillating voltage at 0.1 Hz and 2 mV of half peak to peak voltage amplitude,
+%     20 periods and 40 time points per period, taking care of reaching a stable solution,
+%     and using a starting relative tolerance of 1e-8,
+%     calculate also the electronic current needed by impedance simulations
 %
 % Other m-files required: pindrift, verifyStabilization, pinAna
 % Subfunctions: none

@@ -20,8 +20,8 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 %   VOC - the value of the obtained open circuit voltage
 %
 % Example:
-%   sol_i_light_SR_OC = findOptimVoc(asymmetricize(ssol_i_light_SR))
-%     get closer to the real VOC
+%   [sol_i_1S_SR_OC, VOC_1S] = findOptimVoc(asymmetricize(ssol_i_1S_SR))
+%     get closer to the real VOC and save the VOC value in VOC_1S variable
 %
 % Other m-files required: pindrift, pinAna, stabilize
 % Subfunctions: IgiveCurrentForVoltage

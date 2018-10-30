@@ -1,6 +1,8 @@
 function fromSteadyStateStructToTxt(struct, prefix)
 % save the main data from a stabilized solution created by pindrift to
 % txt files, ideally easy to import with Origin (from OriginLab)
+% example:
+%   fromSteadyStateStructToTxt(ssol_i_1S_SR, 'pinParams_ssol_i_1S_SR')
 
 p = struct.p;
 

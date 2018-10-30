@@ -1,4 +1,7 @@
 function nid = ideality_from_Voc(structs_oc)
+%IDEALITY_FROM_VOC - obtains the ideality factor from a fitting of VOC versus light intensity of stabilized solutions
+% example:
+%   nid = ideality_from_Voc(genIntStructs(ssol_i_eq_SR, 1, 0.001, 4, false))
 
 Int_array = NaN(1, size(structs_oc, 2));
 Voc_array = NaN(1, size(structs_oc, 2));
@@ -13,6 +16,7 @@ end
 disp(Int_array)
 disp(Voc_array)
 
+% removes the dark point
 nonzero_index = find(Int_array);
 
 p = structs_oc{1, 1}.p;

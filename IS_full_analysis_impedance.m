@@ -1,15 +1,15 @@
 function IS_full_analysis_impedance(IS_results)
-%IS_FULL_ANALYSIS_VSFREQUENCY - Plot Impedance Spectroscopy (IS) in a range
-% of background light intensities, capacitance versus voltage oscillation
-% frequency at various light bias
+%IS_FULL_ANALYSIS_IMPEDANCE - Plot impedance and capacitance from Impedance Spectroscopy (IS)
+% in a range of background light intensities or applied DC voltages and in a range
+% of voltage oscillation frequencies
 %
-% Syntax:  IS_full_analysis_impedance(IS_struct)
+% Syntax:  IS_full_analysis_impedance(IS_results)
 %
 % Inputs:
-%   IS_STRUCT - a struct containing the most important results of the ISstep or the ISwave simulation
+%   IS_RESULTS - a struct containing the most important results of the ISstep or the ISwave simulation
 %
 % Example:
-%   IS_full_analysis_impedance(IS_struct)
+%   IS_full_analysis_impedance(ISwave_oc)
 %     do plot
 %
 % Other m-files required: none

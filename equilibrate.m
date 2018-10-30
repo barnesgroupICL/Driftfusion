@@ -36,7 +36,8 @@ function [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_
 %   [sol_eq, sol_eq_SR, sol_i_eq, sol_i_eq_SR, ssol_eq, ssol_eq_SR, ssol_i_eq,...
 %       ssol_i_eq_SR, sol_1S, sol_1S_SR, sol_i_1S, sol_i_1S_SR,...
 %       ssol_1S, ssol_1S_SR, ssol_i_1S, ssol_i_1S_SR] = equilibrate()
-%     generate stabilized solutions
+%     generate stabilized solutions using default parameters from
+%     pinParams.m
 %
 % Other m-files required: pindrift, pinParams, stabilize
 % Subfunctions: none

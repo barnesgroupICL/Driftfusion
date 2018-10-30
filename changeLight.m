@@ -14,10 +14,10 @@ function struct_Int = changeLight(struct, newInt, tmax)
 %   STRUCT_INT - a solution struct at NEWINT light intensity
 %
 % Example:
-%   changeLight(ssol_i_light, 1e-3, 5)
+%   ssol_i_1S_SR_1mS = changeLight(ssol_i_1S_SR, 1e-3, 5)
 %     take the solution ssol_i_light and stabilize to a new light intensity
 %     of 0.001, use as stabilization time 5 seconds
-%   changeLight(ssol_i_light, 1e-3, 0)
+%   ssol_i_1S_SR_1mS = changeLight(ssol_i_1S_SR, 1e-3, 0)
 %     as above, but estimate a good time for stabilization
 %
 % Other m-files required: pindrift, stabilize

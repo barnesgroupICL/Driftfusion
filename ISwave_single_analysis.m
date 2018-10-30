@@ -12,9 +12,22 @@ function [n_coeff, i_coeff, U_coeff, dQ_coeff, n_noionic_coeff] = ISwave_single_
 %   DEMODULATION - logical, get phase via demodulation instead of using a fitting
 %
 % Outputs:
+%   n_coeff - background current, half peak to peak amplitude of
+%     oscillation and phase of total electronic current
+%   i_coeff - background current, half peak to peak amplitude of
+%     oscillation and phase of ionic displacement current
+%   U_coeff - background current, half peak to peak amplitude of
+%     oscillation and phase of recombinating charge per unit time
+%   dQ_coeff - background current, half peak to peak amplitude of
+%     oscillation and phase of accumulating current, this is the real
+%     capacitive current, obtained comparing the free charges profiles at
+%     different times
+%   n_noionic_coeff - background current, half peak to peak amplitude of
+%     oscillation and phase of non ionic current as obtained via
+%     subtraction of ionic current from total electronic current
 %  
 % Example:
-%   ssol_i_light_IS = ISwave_single_analysis(ISwave_EA_single_exec(asymmetricize(ssol_i_light), 2e-3, 1e6, 20, 40, true, false, 1e-4), false, true)
+%   ISwave_single_analysis(ssol_i_1S_SR_is_100mHz_2mV, false, true)
 %     do plot
 %
 % Other m-files required: ISwave_subtracting_analysis,
@@ -73,7 +86,7 @@ fit_J = s.Jn(fit_t_index:end) / 1000; % in Ampere
 fit_U = U(fit_t_index:end) / 1000; % in Ampere
 
 % accumulating current profile to be analyzed
-[dQ_t, ~, ~, ~, ~] = ISwave_subtracting_analysis(asymstruct_ISwave);
+[dQ_t, ~] = ISwave_subtracting_analysis(asymstruct_ISwave);
 fit_dQ = dQ_t(fit_t_index:end); % in Ampere
 
 %% remove some tilting from fit_J
@@ -201,7 +214,7 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
             i=i+1; h(i) = plot(s.t, Ji_disp * 1000, 'g--', 'LineWidth', 2); % mA
             legend_array = [legend_array, "Ionic displacement current"];
             i=i+1; h(i) = plot(s.t, Jn_noionic * 1000, 'c-.', 'LineWidth', 2); % mA
-            legend_array = [legend_array, "Purely electronic current"];
+            legend_array = [legend_array, "Non-ionic electronic current"];
             i=i+1; h(i) = plot(s.t, Jn_noionic_inphase*1000, 'm--', 'LineWidth', 1, 'Marker', '+', 'MarkerSize', 7); % mA
             legend_array = [legend_array, "In phase electronic J"];
             i=i+1; h(i) = plot(s.t, Jn_noionic_quadrature*1000, 'm--', 'LineWidth', 1, 'Marker', 's', 'MarkerSize', 7); % mA

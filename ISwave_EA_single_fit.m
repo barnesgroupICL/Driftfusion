@@ -6,17 +6,17 @@ function fit_coeff = ISwave_EA_single_fit(t, y, J_E_func)
 % Inputs:
 %   T - an array with the time mesh.
 %   Y - an array with the value to be fitted.
-%     In case of IS: current in Ampere.
-%   J_E_FUNC - fitting function containing a constant bias, the amplitude of
-%     the sinusoid and its phase. The frequency is taken as it is from
-%     input, it is not fitted.
+%     In case of IS: current.
+%   J_E_FUNC - an anonymous function to be used for the fitting, containing
+%     a constant bias, the amplitude of the sinusoid and its phase. The
+%     frequency is taken as it is from input, it is not fitted.
 %
 % Outputs:
 %   FIT_COEFF - an array with the values from the sinusoidal fit: constant
 %     bias, sinusoid amplitude, phase shift.
 %
 % Example:
-%   ISwave_EA_single_fit(ssol_i_light_Int_1_Freq_100_ISwave.t, ssol_i_light_Int_1_Freq_100_ISwave.Jtotr, @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + 2 * pi * 100 * t))
+%   ISwave_EA_single_fit(ssol_i_1S_SR_is_100mHz_2mV.t, ssol_i_1S_SR_is_100mHz_2mV.Jn, @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + 2 * pi * 100 * t))
 %     fits the charge vs voltage data
 %
 % Other m-files required: none

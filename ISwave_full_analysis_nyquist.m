@@ -1,13 +1,14 @@
 function ISwave_full_analysis_nyquist(ISwave_results)
-%ISSTEP_FULL_ANALYSIS_NYQUIST - Plot Nyquist graph for Impedance Spectroscopy (ISwave) in a range of background light intensities, imaginary part of capacitance versus real part of capacitance
+%ISSTEP_FULL_ANALYSIS_NYQUIST - Plot Nyquist graph for Impedance Spectroscopy (ISwave)
+% in a range of background light intensities or applied DC voltages, imaginary part of impedance versus real part of impedance
 %
-% Syntax:  ISwave_full_analysis_nyquist(ISwave_struct)
+% Syntax:  ISwave_full_analysis_nyquist(ISwave_results)
 %
 % Inputs:
-%   ISWAVE_STRUCT - a struct containing the most important results of the ISwave simulation
+%   ISWAVE_RESULTS - a struct containing the most important results of the ISwave simulation
 %
 % Example:
-%   ISwave_full_analysis_nyquist(ISwave_struct)
+%   ISwave_full_analysis_nyquist(ISwave_oc)
 %     do plot
 %
 % Other m-files required: none
@@ -91,8 +92,6 @@ h = zeros(length(legend_text), 1);
 % normalized Nyquist plot
 figure('Name', 'Normalized Nyquist plot of IS at various light intensities', 'NumberTitle', 'off')
     hold off
-    % take the last point orizontally
-    %norm_array = ISwave_struct.impedance_re(:, end) / min(ISwave_struct.impedance_re(:, end));
     % take the maximum point vertically
     max_array = max(-ISwave_results.impedance_im, [], 2);
     norm_array = max_array / min(max_array);

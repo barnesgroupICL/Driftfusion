@@ -16,12 +16,12 @@ function coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
 % Syntax:  coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
 %
 % Inputs:
-%   T - an array with the time mesh.
-%   Y - a row array with the value to be fitted.
-%     In case of IS: current in Ampere.
-%   VAPP_FUNC - function containing a constant bias, the amplitude of
+%   T - a column with the time mesh.
+%   Y - a column with the value to be fitted.
+%     In case of IS: current.
+%   VAPP_FUNC - an anonymous function containing a constant bias, the amplitude of
 %     the sinusoid, its phase and the frequency
-%   VAPP_PARAMS - are the parameters used for calculating the applied
+%   VAPP_PARAMS - an array with the parameters used for calculating the applied
 %     oscillating voltage with VAPP_FUNC
 %
 % Outputs:
@@ -29,7 +29,7 @@ function coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
 %     bias, sinusoid amplitude, phase shift.
 %
 % Example:
-%   ISwave_EA_single_demodulation(ssol_i_light_Int_1_Freq_100_ISwave.t, ssol_i_light_Int_1_Freq_100_ISwave.Jtotr, @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + coeff(4) * t), ssol_i_light_Int_1_Freq_100_ISwave.)
+%   ISwave_EA_single_demodulation(ssol_i_1S_SR_is_100mHz_2mV.t', ssol_i_1S_SR_is_100mHz_2mV.Jn, @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + coeff(4) * t), ssol_i_1S_SR_is_100mHz_2mV.p.Vapp_params)
 %     demodulate the components of the oscillating current
 %
 % Other m-files required: none

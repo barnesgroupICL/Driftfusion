@@ -1,14 +1,14 @@
 function ISwave_full_analysis_phase(ISwave_results)
-%ISWAVE_FULL_ANALYSIS_PHASE - Plot phase Bode plots from Impedance Spectroscopy (IS) in a range of background light intensities or applied DC voltages
-% This script is very similar to EA_full_analysis_phase
+%ISWAVE_FULL_ANALYSIS_PHASE - Plot phase Bode plots from Impedance Spectroscopy (IS)
+% in a range of background light intensities or applied DC voltages
 %
 % Syntax:  ISwave_full_analysis_phase(ISwave_results)
 %
 % Inputs:
-%   ISWAVE_STRUCT - a struct containing the most important results of the ISwave simulation
+%   ISWAVE_RESULTS - a struct containing the most important results of the ISwave simulation
 %
 % Example:
-%   ISwave_full_analysis_phase(ISwave_results)
+%   ISwave_full_analysis_phase(ISwave_oc)
 %     do plot
 %
 % Other m-files required: none

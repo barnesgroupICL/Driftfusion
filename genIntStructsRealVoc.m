@@ -8,7 +8,8 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startIn
 % Syntax:  structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points, include_dark)
 %
 % Inputs:
-%   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions
+%   STRUCT_EQ - a solution struct as created by PINDRIFT in dark
+%     conditions, preferably a symmetric (open circuit) solution
 %   STARTINT - higher requested illumination.
 %   ENDINT - lower requested illumination.
 %   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
@@ -21,7 +22,7 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startIn
 %   VOCS - an array with the VOC, getting populated just if the input structures were at open circuit
 %
 % Example:
-%   structs_voc = genIntStructsRealVoc(ssol_i_eq_SR, 1, 1e-3, 7, true)
+%   [structs_voc, VOCs] = genIntStructsRealVoc(ssol_i_eq_SR, 1, 1e-3, 7, true)
 %     prepare solutions at 100, 10, 1, 0.1 and 0 illumination intensities
 %
 % Other m-files required: changeLight, pindrift, genIntStructs,

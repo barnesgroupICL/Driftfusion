@@ -1,6 +1,8 @@
 function fromISwaveEAStructToTxt(struct, prefix)
 % save the main data from a oscilalting solution created by ISwave_EA_single_exec to
 % txt files, ideally easy to import with Origin (from OriginLab)
+% example:
+%   fromISwaveEAStructToTxt(ssol_i_1S_SR_is_100mHz_2mV, 'pinParams_ssol_i_1S_SR_is_100mHz_2mV')
 
 p = struct.p;
 
@@ -76,7 +78,7 @@ Ji_disp = -p.eppi * gradient(Efield_i_mean, struct.t) * 1000; % in mA, column
 J_noionic = Jn - Ji_disp; % in mA, column
 
 % try to calculate the accumulated charge
-[dQ_t, ~, ~, ~, ~] = ISwave_subtracting_analysis(struct);
+[dQ_t, ~] = ISwave_subtracting_analysis(struct);
 
 J_accumulating = -dQ_t * 1000; % mA, row
 

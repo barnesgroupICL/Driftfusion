@@ -1,5 +1,7 @@
 function fromISwaveResultsToTxt(ISwave_results, prefix)
 % save the main data from an ISwave_results struct created by ISwave_full_exec* to txt files, ideally easy to import with Origin (from OriginLab)
+% example:
+%   fromISwaveResultsToTxt(ISwave_oc, 'pinParams_ISwave_oc')
 
 %% create header
 

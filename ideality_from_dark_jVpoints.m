@@ -1,5 +1,8 @@
 function nid_array = ideality_from_dark_jVpoints(asymstruct_eq, Vend, deltaV)
+%IDEALITY_FROM_DARK_JVPOINTS - obtains ideality factor from stabilized points on a current-voltage curve in dark
 % https://www.pveducation.org/pvcdrom/characterisation/measurement-of-ideality-factor
+% example:
+%   nid_array = ideality_from_dark_jVpoints(sol_i_eq_SR, 1, 0.05)
 
 p = asymstruct_eq.p;
 asymstruct_newVapp = asymstruct_eq;

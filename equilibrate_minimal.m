@@ -25,7 +25,8 @@ function [sol_eq, sol_i_eq, sol_i_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_i_1S_SR, s
 %
 % Example:
 %   [sol_eq, sol_i_eq, sol_i_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_i_1S_SR, ssol_i_1S_SR] = equilibrate_minimal()
-%     generate stabilized solutions
+%     generate stabilized solutions using default parameters from
+%     pinParams.m
 %
 % Other m-files required: pindrift, pinParams, stabilize
 % Subfunctions: none
