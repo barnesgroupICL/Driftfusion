@@ -18,8 +18,8 @@ classdef pc
         T = 300;
         
         % Device Dimensions [cm]
-        dcell = {{70e-7, 30e-7}; {30e-7, 340e-7, 30e-7}; {30e-7, 70e-7}};       % Layer thickness array
-        pcell = {{35, 30}; {30, 170, 30}; {30, 35}};             % Spatial mesh points array
+        dcell = {{20e-7}; {30e-7, 450e-7, 30e-7}; {60e-7}};       % Layer thickness array
+        pcell = {{40}; {30, 225, 30}; {60}};             % Spatial mesh points array
         
         dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 40;          % Interfacial points (x_mesh_type = 3)
