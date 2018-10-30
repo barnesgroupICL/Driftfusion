@@ -39,12 +39,8 @@ p.OC = 0; % OC 0 is needed for the asymmetric solution
 p.tpoints = 10; % rough, just for re-stabilization at Vapp
 p.Ana = 0;
 
-% get the Voc value in the middle of the symmetrical solution at the final time step
-if isfield(symstruct, 'Voc')
-    Voc = symstruct.Voc;
-else
-    [Voc, ~, ~, ~, ~, ~] = pinAna(symstruct);
-end
+% get the Voc value at the final time step
+[Voc, ~, ~, ~, ~, ~] = pinAna(symstruct);
 p.Vapp = Voc(end); % use potential value in the middle as new applied voltage
 
 % set an initial time for stabilization tmax
