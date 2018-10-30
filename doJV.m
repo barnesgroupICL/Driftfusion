@@ -22,12 +22,17 @@ p.Ana = 1;
 p.figson = 1;
 p.Int = 0;
 p.pulseon = 0;
-p.muion = muion;
-p.dev = pc.builddev(p);
+
+if muion == 0
+    p.mobseti =0;
+else
+    p.muion = [0,muion,0];
+    p.dev = pc.builddev(p);
+end
 
 %% JV settings
 p.JV = 1;
-p.Vstart = Vstart;
+% p.Vstart = Vstart;
 p.Vend = Vend;
 p.calcJ = 0;
 p.JVscan_pnts = JVscan_pnts;
