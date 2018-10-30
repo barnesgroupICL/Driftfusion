@@ -71,3 +71,14 @@ ISwave_full_exec(asymStructsNoIonsNoSR, 1e2, 1e2, 1, 0.002, false, true, false);
 %% Impedance Spectroscopy with oscillating voltage (ISwave) - fitting instead of demodulation
 ISwave_full_exec(ssol_i_1S_SR, 1e8, 1e-2, 2, 0.002, false, false, false);
 
+% test Ideality Factor from VOC
+% nid = ideality_from_Voc(structs_oc)
+
+%% Ideality Factor from VOC
+ideality_from_Voc(symStructs)
+
+% test Ideality Factor from stabilized JV points in dark
+% nid_array = ideality_from_dark_jVpoints(asymstruct_eq, Vend, deltaV)
+
+%% Ideality Factor from stabilized JV points in dark
+ideality_from_dark_jVpoints(sol_i_eq_SR, 1, 0.1)
