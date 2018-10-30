@@ -39,8 +39,12 @@ catch
     error('Material name in stack does not match that in the Index of Refraction Library. Please check the names contained in the ''stack'' cell of the parameters object are correct.')
 end
 
-xarr = [0, params.d];
-xcum = [0, params.dcum];
+% For the time being, the optical properties are changed abruptly mid-way
+% through the interface. Grading of the optical properties is desirable
+% in future versions.
+xarr = [0, params.d+0.5*params.dint];
+xarr(end) = xarr(end) +0.5*params.dint; % Adjustment required as no interface at end of device
+xcum = cumsum(xarr);
 
 % calculate absorption coefficient from k
 for i = 1:length(layers)
@@ -56,8 +60,12 @@ for i =1:length(xarr)-1
     for j = 1:length(lambda)
     
         x1 = sum(xarr(1:i));
-        x2 = sum(xarr(1:(i+1)));
         
+        if i==length(xarr)-1
+            x2 = x(end);    %avoid rounding issues
+        else
+            x2 = sum(xarr(1:(i+1)));
+        end
         % Set p1 to 1 on first loop to avoid problems with mesh not
         % starting at 0
         if i == 1
