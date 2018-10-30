@@ -46,7 +46,7 @@ classdef pc
         SRHset = 1;
         JV = 0;                 % Toggle run JV scan on/off
         Ana = 1;                % Toggle on/off analysis
-        stats = 'Fermi';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
+        stats = 'Boltz';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
         
         % OM = Optical Model
         % Current only uniform generation functionality is avaiable- this will be
@@ -444,17 +444,17 @@ classdef pc
         % Donor densities
         function value = get.ND(par)
             
-            value = [0, 0, F.fdn(par.N0(3), par.EA(3), par.E0(3), par.T)];
+            value = [0, 0, F.nfun(par.N0(3), par.EA(3), par.E0(3), par.T, par.stats)];
             
         end
         % Donor densities
         function value = get.NA(par)
             
-            value = [F.fdp(par.N0(1), par.IP(1), par.E0(1), par.T), 0, 0];
+            value = [F.pfun(par.N0(1), par.IP(1), par.E0(1), par.T, par.stats), 0, 0];
             
         end
         
-        % Intrinsic carrier densities - Boltzmann for now
+        % Intrinsic carrier densities (Boltzmann)
         function value = get.ni(par)
             
             value = [par.N0(1)*(exp(-par.Eg(1)/(2*par.kB*par.T))),...
@@ -465,16 +465,16 @@ classdef pc
         % Equilibrium electron densities
         function value = get.n0(par)
             
-            value = [F.fdn(par.N0(1), par.EA(1), par.E0(1), par.T),...
-                F.fdn(par.N0(2), par.EA(2), par.E0(2), par.T),...
-                F.fdn(par.N0(3), par.EA(3), par.E0(3), par.T)];
+            value = [F.nfun(par.N0(1), par.EA(1), par.E0(1), par.T, par.stats),...
+                F.nfun(par.N0(2), par.EA(2), par.E0(2), par.T, par.stats),...
+                F.nfun(par.N0(3), par.EA(3), par.E0(3), par.T, par.stats)];
         end
         
         function value = get.p0(par)
             
-            value = [F.fdp(par.N0(1), par.IP(1), par.E0(1), par.T),...
-                F.fdp(par.N0(2), par.IP(2), par.E0(2), par.T),...
-                F.fdp(par.N0(3), par.IP(3), par.E0(3), par.T)];          % Background density holes in htl/p-type
+            value = [F.pfun(par.N0(1), par.IP(1), par.E0(1), par.T, par.stats),...
+                F.pfun(par.N0(2), par.IP(2), par.E0(2), par.T, par.stats),...
+                F.pfun(par.N0(3), par.IP(3), par.E0(3), par.T, par.stats)];          % Background density holes in htl/p-type
             
         end
         
@@ -482,22 +482,24 @@ classdef pc
         % of the electrodes
         function value = get.nleft(par)
             
-            value = F.fdn(par.N0(1), par.EA(1), par.PhiA, par.T);
+            value = F.nfun(par.N0(1), par.EA(1), par.PhiA, par.T, par.stats);
             
         end
         
         % Boundary electron and hole densities
         function value = get.nright(par)
-            value = F.fdn(par.N0(end), par.EA(end), par.PhiC, par.T);
+            value = F.nfun(par.N0(end), par.EA(end), par.PhiC, par.T, par.stats);
         end
         
         % Boundary electron and hole densities
         function value = get.pleft(par)
-            value = F.fdp(par.N0(1), par.IP(1), par.PhiA, par.T);
+            value = F.pfun(par.N0(1), par.IP(1), par.PhiA, par.T, par.stats);
         end
         
         function value = get.pright(par)
-            value = F.fdp(par.N0(end), par.IP(end), par.PhiC, par.T);
+            
+            value = F.pfun(par.N0(end), par.IP(end), par.PhiC, par.T, par.stats);
+            
         end
         
         %% Space charge layer widths
@@ -578,21 +580,23 @@ classdef pc
             darrcumint = cumsum(darrint);
             darrcumint = [0,darrcumint];
             
-            % Build diffusion coefficient structure
-            for i =1:length(par.dcum)
-                startlim = par.IP(i);
-                endlim = par.EA(i)+0.6;
-                interval = (endlim-startlim)/400;
-                
-                Dfd_struct_n(i) = F.Dn_fd_fun(par.N0(i), par.EA(i), startlim:interval:endlim, par.mue(i), par.T);
-                
-                startlim = par.IP(i)-0.6;
-                endlim = par.EA(i);
-                interval = (endlim-startlim)/400;
-                
-                range = startlim:interval:endlim;
-                
-                Dfd_struct_p(i) = F.Dp_fd_fun(par.N0(i), par.IP(i), range, par.mue(i), par.T);
+            if par.stats == 'Fermi'
+                % Build diffusion coefficient structure
+                for i =1:length(par.dcum)
+                    startlim = par.IP(i);
+                    endlim = par.EA(i)+0.6;
+                    interval = (endlim-startlim)/400;
+                    
+                    Dfd_struct_n(i) = F.Dn_fd_fun(par.N0(i), par.EA(i), startlim:interval:endlim, par.mue(i), par.T);
+                    
+                    startlim = par.IP(i)-0.6;
+                    endlim = par.EA(i);
+                    interval = (endlim-startlim)/400;
+                    
+                    range = startlim:interval:endlim;
+                    
+                    Dfd_struct_p(i) = F.Dp_fd_fun(par.N0(i), par.IP(i), range, par.mue(i), par.T);
+                end
             end
             
             % i is the stack layer excluding interfaces
@@ -633,14 +637,17 @@ classdef pc
                             dev.taun(j) = par.taun_bulk(i);
                             dev.taup(j) = par.taup_bulk(i);
                             dev.Et(j) = par.Et_bulk(i);
-                            % Electron diffusion coefficient lookup table
-                            dev.Dnfun(j,:) = Dfd_struct_n(i).Dnfun;
-                            dev.n_fd(j,:) = Dfd_struct_n(i).n_fd;
-                            dev.Efn(j,:) = Dfd_struct_n(i).Efn;
-                            % Hole diffusion coefficient lookup table
-                            dev.Dpfun(j,:) = Dfd_struct_p(i).Dpfun;
-                            dev.p_fd(j,:) = Dfd_struct_p(i).p_fd;
-                            dev.Efp(j,:) = Dfd_struct_p(i).Efp;
+                            
+                            if par.stats =='Fermi'
+                                % Electron diffusion coefficient lookup table
+                                dev.Dnfun(j,:) = Dfd_struct_n(i).Dnfun;
+                                dev.n_fd(j,:) = Dfd_struct_n(i).n_fd;
+                                dev.Efn(j,:) = Dfd_struct_n(i).Efn;
+                                % Hole diffusion coefficient lookup table
+                                dev.Dpfun(j,:) = Dfd_struct_p(i).Dpfun;
+                                dev.p_fd(j,:) = Dfd_struct_p(i).p_fd;
+                                dev.Efp(j,:) = Dfd_struct_p(i).Efp;
+                            end
                         end
                         
                     elseif rem(k, 2) == 0
@@ -722,56 +729,36 @@ classdef pc
                             dev.taup(j) = par.taup_inter(i);
                             dev.Et(j) = par.Et_inter(i);
                             
-                            % Build diffusion coefficient structure
+                            if par.stats == 'Fermi'
+                                % Build diffusion coefficient structure
                                 startlim = dev.IP(j);
                                 endlim = dev.EA(j)+0.6;
                                 interval = (endlim-startlim)/400;
-                                                                
+                                
                                 Dfd_struct_n_temp = F.Dn_fd_fun(dev.N0(j), dev.EA(j), startlim:interval:endlim, dev.mue(j), par.T);
                                 
                                 dev.Dnfun(j,:) = Dfd_struct_n_temp.Dnfun;
                                 dev.n_fd(j,:) = Dfd_struct_n_temp.n_fd;
-                                dev.Efn(j,:) = Dfd_struct_n_temp.Efn;  
+                                dev.Efn(j,:) = Dfd_struct_n_temp.Efn;
                                 
                                 startlim = dev.IP(j)-0.6;
                                 endlim = dev.EA(j);
                                 interval = (endlim-startlim)/400;
-                                                                
+                                
                                 Dfd_struct_p_temp = F.Dp_fd_fun(dev.N0(j), dev.IP(j), startlim:interval:endlim, dev.mue(j), par.T);
-                            
+                                
                                 dev.Dpfun(j,:) = Dfd_struct_p_temp.Dpfun;
                                 dev.p_fd(j,:) = Dfd_struct_p_temp.p_fd;
-                                dev.Efp(j,:) = Dfd_struct_p_temp.Efp;                         
-
-                            
-                            %                             % Electron diffusion coefficient function this
-                            %                             % is not the correct way to do this..
-                            %                             dDndx = (Dfd_struct_n(i+1).Dnfun-Dfd_struct_n(i).Dnfun)/(par.dint);
-                            %                             dev.Dnfun(j,:) = Dfd_struct_n(i).Dnfun + xprime*dDndx;
-                            %
-                            %                             dn_fddx = (Dfd_struct_n(i+1).n_fd-Dfd_struct_n(i).n_fd)/(par.dint);
-                            %                             dev.n_fd(j,:) = Dfd_struct_n(i).n_fd + xprime*dn_fddx;
-                            %
-                            %                             dEfndx = (Dfd_struct_n(i+1).Efn-Dfd_struct_n(i).Efn)/(par.dint);
-                            %                             dev.Efn(j,:) = Dfd_struct_n(i).Efn + xprime*dEfndx;
-                            %
-                            %                             % Hole diffusion coefficient function
-                            %                             dDpdx = (Dfd_struct_p(i+1).Dpfun-Dfd_struct_p(i).Dpfun)/(par.dint);
-                            %                             dev.Dpfun(j,:) = Dfd_struct_p(i).Dpfun + xprime*dDpdx;
-                            %
-                            %                             dp_fddx = (Dfd_struct_p(i+1).p_fd-Dfd_struct_p(i).p_fd)/(par.dint);
-                            %                             dev.p_fd(j,:) = Dfd_struct_p(i).p_fd + xprime*dp_fddx;
-                            %
-                            %                             dEfpdx = (Dfd_struct_p(i+1).Efp-Dfd_struct_p(i).Efp)/(par.dint);
-                            %                             dev.Efp(j,:) = Dfd_struct_p(i).Efp + xprime*dEfpdx;
+                                dev.Efp(j,:) = Dfd_struct_p_temp.Efp;
+                            end
                         end
                     end
                 end
                 
             end
             
-            dev.nt = F.fdn(dev.N0, dev.EA, dev.Et, par.T);
-            dev.pt = F.fdp(dev.N0, dev.IP, dev.Et, par.T);
+            dev.nt = F.nfun(dev.N0, dev.EA, dev.Et, par.T, par.stats);
+            dev.pt = F.pfun(dev.N0, dev.IP, dev.Et, par.T, par.stats);
         end
         
         
