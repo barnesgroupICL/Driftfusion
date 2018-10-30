@@ -1,4 +1,4 @@
-function [params] = pinParams
+function [params] = pinParams_10kxSRH_001xmajority
 % Generates parameters structure for pinDrift
 
 % Physical constants
