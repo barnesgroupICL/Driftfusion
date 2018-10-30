@@ -140,7 +140,7 @@ elseif p.OM == 2 && p.Int ~= 0
     
     %% TRANSFER MATRIX NOT CURRENTLY AVAILABLE
     % Call Transfer Matrix code: [Gx1, Gx2] = TMPC1(layers, thicknesses, activeLayer1, activeLayer2)
-    [Gx1S, GxLas] = TMPC1({'TiO2' 'MAPICl' 'Spiro'}, [p.d(1) p.d(2) p.d(3)], 2, 2, p.laserlambda, p.pulsepow);
+    [Gx1S, GxLas] = TMPC1({'TiO2' 'MAPICl' 'Spiro'}, [p.d(1)+0.5*p.dint, p.d(2)+0.5*p.dint, p.d(3)+0.5*p.dint], 2, 2, p.laserlambda, p.pulsepow);
     Gx1S = Gx1S';
     GxLas = GxLas';
   
@@ -159,28 +159,7 @@ sol = pdepe(p.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
 function [c,f,s,iterations] = pdex4pde(x,t,u,DuDx)
 
-% Open circuit condition- symmetric model
-if (p.OC ==1)
-    
-    if x > dmax/2
-
-        x = dmax - x;
-        gradcoeff = -1;
-       
-    else
-        
-        gradcoeff = 1;
-        
-    end
-
-else
-    
-    gradcoeff = 1;
-    
-end
-
 % Beer Lambert or Transfer Matrix 1 Sun
-%% NOT CURRENTLY WORKING
 if p.OM == 1
     %AM15
     if p.Int ~= 0 
@@ -256,7 +235,7 @@ if p.stats == 'Fermi'
 elseif p.stats == 'Boltz'
     Dn = dev.mue(i)*p.kB*p.T;
     Dp = dev.muh(i)*p.kB*p.T;
-end
+end    
 
 f = [p.mobset*(dev.mue(i)*(u(1)*(-DuDx(4)+dev.gradEA(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(Dn*DuDx(1)));
      p.mobset*(dev.muh(i)*(u(2)*(DuDx(4)-dev.gradIP(i)-(dev.gradN0(i)*p.kB*p.T/dev.N0(i))))+(Dp*DuDx(2)));     
