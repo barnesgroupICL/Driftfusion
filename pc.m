@@ -21,8 +21,8 @@ classdef pc
         dcell = {{20e-7}; {30e-7, 450e-7, 30e-7}; {60e-7}};       % Layer thickness array
         pcell = {{40}; {30, 225, 30}; {60}};             % Spatial mesh points array
         
-        dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
-        pint = 40;          % Interfacial points (x_mesh_type = 3)
+        dint = 2e-7;        % Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
+        pint = 20;          % Interfacial points (x_mesh_type = 3)
         
         % Define spatial cordinate system
         % m=0 cartesian
@@ -90,7 +90,7 @@ classdef pc
         
         %%%%% MOBILE ION DEFECT DENSITY %%%%%
         Nion = [0, 1e18, 0];                     % [cm-3] A. Walsh, D. O. Scanlon, S. Chen, X. G. Gong and S.-H. Wei, Angewandte Chemie, 2015, 127, 1811.
-        DOSion = [0, 1.21e22, 0];                % [cm-3] max density of iodide sites- P. Calado thesis
+        DOSion = [1e-6, 1.21e22, 1e-6];                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
         mue = [1e-4, 20, 1e-3];         % electron mobility [cm2V-1s-1]
@@ -121,8 +121,8 @@ classdef pc
         Et_inter = [-4.6, -4.6];
         
         % Bulk SRH time constants for each layer
-        taun_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for electrons
-        taup_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for holes
+        taun_bulk = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for electrons
+        taup_bulk = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for holes
         
         % Interfacial SRH time constants - should be of length (number of layers)-1
         taun_inter = [2e-10, 1e-6];
@@ -226,6 +226,13 @@ classdef pc
             for i = 1:length(par.Et_bulk)
                 if par.Et_bulk(i) >= par.EA(i) || par.Et_bulk(i) <= par.IP(i)
                     msg = 'Trap energies must exist within layer band gap.';
+                    error(msg);
+                end
+            end
+            
+            for i = 1:length(par.DOSion)
+                if par.DOSion(i) <= 0
+                    msg = 'ion DOS (DOSion) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
                     error(msg);
                 end
             end
