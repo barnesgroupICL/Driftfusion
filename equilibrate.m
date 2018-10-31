@@ -168,7 +168,9 @@ while any(all_stable) == 0
     all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
 
 end
-sol.p.mobseti = 1;
+p.muion = p_original.muion;           % Ions are accelerated to reach equilibrium
+p.dev = pc.builddev(p);
+sol.p=p;
 % write solution and reset ion mobility
 soleq.i = sol;
 
