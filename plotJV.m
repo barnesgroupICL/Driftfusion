@@ -8,18 +8,20 @@ function plotJV(JV, option)
 if option == 1 || option == 3
     pinana(JV.dk.f);
     figure(11)
-%xlim([-0.2, 1.15])
-ylim([-25, 5]);
-hold on
+    %xlim([-0.2, 1.15])
+    ylim([-25, 5]);
+    hold on
     pinana(JV.dk.r);
     
 end
 
 if option == 2 || option == 3
-    pinana(JV.ill.f);figure(11)
-%xlim([-0.2, 1.15])
-ylim([-25, 5]);
-hold on
+    pinana(JV.ill.f);
+    
+    figure(11)
+    %xlim([-0.2, 1.15])
+    ylim([-25, 5]);
+    hold on
     pinana(JV.ill.r);
 end
 
