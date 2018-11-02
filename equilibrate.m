@@ -119,6 +119,7 @@ disp('Complete')
 disp('Switching on interfacial recombination')
 p.taun_inter = p_original.taun_inter;
 p.taup_inter = p_original.taup_inter;
+p.dev = pc.builddev(p);
 
 p.calcJ = 0;
 p.tmax = 1e-6;
@@ -181,6 +182,7 @@ disp('Ion equilibrium solution complete')
 disp('Switching on surface recombination')
 p.taun_inter = p_original.taun_inter;
 p.taup_inter = p_original.taup_inter;
+p.dev = pc.builddev(p);
 
 p.calcJ = 0;
 p.tmax = 1e-6;
