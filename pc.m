@@ -16,11 +16,15 @@ classdef pc
         
         % Temperature [K]
         T = 300;
-        
+        % TiO2
         % Device Dimensions [cm]
+        %dcell = {{180e-7, 20e-7}; {30e-7, 450e-7, 30e-7}; {50e-7}};       % Layer thickness array
+        %pcell = {{90, 20}; {30, 225, 30}; {50}};             % Spatial mesh points array
+        
+        % PEDOT
         dcell = {{50e-7}; {30e-7, 450e-7, 30e-7}; {60e-7}};       % Layer thickness array
         pcell = {{50}; {30, 225, 30}; {60}};             % Spatial mesh points array
-        
+                
         dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
         pint = 20;          % Interfacial points (x_mesh_type = 3)
         
@@ -70,15 +74,34 @@ classdef pc
         stack = {'PEDOT', 'MAPICl', 'PCBM'}
         
         %% Energy levels
+        % TiO2
+        %EA = [-1.9, -3.8, -4.1];
+        %IP = [-4.9, -5.4, -7.4];
+        % PEDOT
         EA = [-3.0, -3.8, -3.8];
         IP = [-5.1, -5.4, -6.2];
-        
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
+        %TiO2
+        %E0 = [-4.8, -4.6, -4.2];
+        % PEDOT
         E0 = [-5, -4.6, -3.9];
+         
+        % SRH trap energies- currently set to mid gap - always set
+        % respective to energy levels to avoid conflicts
+        % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
+        %TiO2
+        %Et_bulk =[-4.05, -4.6, -5];
+        % PEDOT
+        Et_bulk =[-3.4, -4.6, -5.75];
         
+        % Currently redundant
+        Et_inter = [-4.6, -4.6];    
         % Workfunction energies
+        %PhiA = -4.8;
+        %PhiC = -4.2;        
+        %PEDOT
         PhiA = -5;
         PhiC = -3.9;
         
@@ -93,9 +116,13 @@ classdef pc
         DOSion = [1e-6, 1.21e22, 1e-6];                % [cm-3] max density of iodide sites- P. Calado thesis
         
         % Mobilities
+        % TiO2
+        %mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
+        %muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
+        % PEDOT
         mue = [0.01, 20, 1e-3];         % electron mobility [cm2V-1s-1]
         muh = [0.01, 20, 1e-3];         % hole mobility [cm2V-1s-1]
-
+        
         muion = [0, 1e-10, 0];                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
@@ -103,6 +130,9 @@ classdef pc
         % Spiro muh = 0.02 cm2V-1s-1 Hawash2018
         
         % Dielectric constants
+        %TiO2
+        %epp = [4,23,12];       
+        %PEDOT
         epp = [4,23,4];
         % TiO2 Wypych2014
         
@@ -111,20 +141,22 @@ classdef pc
         
         %%%%%%% RECOMBINATION %%%%%%%%%%%
         % Radiative recombination, U = k(np - ni^2)
-        krad = [6.3e-11, 3.6e-12, 6.8e-11];  % [cm3 s-1] Radiative Recombination coefficient
-        % p-type/pi-interface/intrinsic/in-interface/n-type
         
-        % SRH trap energies- currently set to mid gap - always set
-        % respective to energy levels to avoid conflicts
-        % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-        Et_bulk =[-4.05, -4.6, -5.0];
-        Et_inter = [-4.6, -4.6];
+        % TiO2
+        %krad = [3.18e-11, 3.6e-12, 1.54e-10];  % [cm3 s-1] Radiative Recombination coefficient
+        % p-type/pi-interface/intrinsic/in-interface/n-type
+        % PEDOT
+        krad = [6.3e-11, 3.6e-12, 6.8e-11];
         
         % Bulk SRH time constants for each layer
-        taun_bulk = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for electrons
-        taup_bulk = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for holes
+        taun_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for electrons
+        taup_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for holes
         
         % Interfacial SRH time constants - should be of length (number of layers)-1
+        % TiO2
+        %taun_inter = [1e-9, 1e-12];
+        %taup_inter = [1e-9, 1e-12];        
+        % PEDOT
         taun_inter = [1e-13, 1e-6];
         taup_inter = [1e-13, 1e-6];
         
@@ -723,9 +755,12 @@ classdef pc
                             dkraddx = (par.krad(i+1)-par.krad(i))/(par.dint);
                             dev.krad(j) = par.krad(i) + xprime*dkraddx;
                             
+                            % trap level
+                            dEtdx = (par.Et_bulk(i+1)-par.Et_bulk(i))/(par.dint);
+                            dev.Et(j) = par.Et_bulk(i) + xprime*dEtdx;
+                            
                             dev.taun(j) = par.taun_inter(i);
                             dev.taup(j) = par.taup_inter(i);
-                            dev.Et(j) = par.Et_inter(i);
                             
                             if par.stats == 'Fermi'
                                 % Build diffusion coefficient structure
