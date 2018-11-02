@@ -13,6 +13,11 @@ set(0,'DefaultTextColor', [0, 0, 0]);
 if length(varargin) == 1
     solstruct = varargin{1};
     tarr = solstruct.t(end);
+    pointtype = 't';
+elseif length(varargin) == 2
+    solstruct = varargin{1};
+    tarr = varargin{2};
+    pointtype = 't';
 elseif length(varargin) == 3
     solstruct = varargin{1};
     pointtype = varargin{2};
@@ -197,15 +202,6 @@ deltajn = cumtrapz(par.x, djndx, 2);
 deltajp = cumtrapz(par.x, djpdx, 2);
 
 %% Currents from the boundaries
-if par.OC
-    
-    jn_l = 0;
-    jp_l = 0;
-    jn_r = 0;
-    jp_r = 0;
-    
-else
-    
     switch par.BC
         case 0
             jn_l = 0;
@@ -238,7 +234,7 @@ else
             jp_r = par.sp_r*(p(:, end) - par.pright);
             
     end
-end
+
 % Calculate total electron and hole currents from fluxes
 jn = jn_l + deltajn;
 jp = jp_l + deltajp;
@@ -293,53 +289,50 @@ if par.figson == 1
             pparr(i) = Vpoint(end);
         end
         
+        % Field
+        Field = -gradient(V(pparr(i),:), x);
+        
         % Calculates current at every point and all times -
         % UNRELIABLE FOR TOTAL CURRENT
         %if par.calcJ == 1
             
-           
-            for j=1:length(t)
-                
-                [nloc,dnlocdx] = pdeval(0,x,n(pparr(i),:),x);
-                [ploc,dplocdx] = pdeval(0,x,p(pparr(i),:),x);
-                [iloc,dilocdx] = pdeval(0,x,a(pparr(i),:),x);
-                [Vloc, dVdx] = pdeval(0,x,V(pparr(i),:),x);
-                
-                % Particle currents
-                Jndiff(pparr(i),:) = par.dev.mue.*par.kB*par.T.*dnlocdx*par.e;
-                Jndrift(pparr(i),:) = -par.dev.mue.*nloc.*dVdx*par.e;
-                
-                Jpdiff(pparr(i),:) = -par.dev.muh*par.kB*par.T.*dplocdx*par.e;
-                Jpdrift(pparr(i),:) = -par.dev.muh*ploc.*dVdx*par.e;
-                
-                Jidiff(pparr(i),:) = -par.dev.muion*par.kB*par.T.*dilocdx*par.e;
-                Jidrift(pparr(i),:) = -par.dev.muion*iloc.*dVdx*par.e;
-                
-                % Particle current
-                Jpart(pparr(i),:) = Jndiff(pparr(i),:) + Jndrift(pparr(i),:) + Jpdiff(pparr(i),:) + Jpdrift(pparr(i),:) + Jidiff(pparr(i),:) + Jidrift(pparr(i),:);
-                
-                % Potential grad
-                dVdxt(pparr(i),:) = dVdx;
-                
-            end
+            [nloc,dnlocdx] = pdeval(0,x,n(pparr(i),:),x);
+            [ploc,dplocdx] = pdeval(0,x,p(pparr(i),:),x);
+            [iloc,dilocdx] = pdeval(0,x,a(pparr(i),:),x);
+            [Vloc, dVdx] = pdeval(0,x,V(pparr(i),:),x);
             
-            % Median current- temporary fix to avoid large errors
-            Jpartr = median(Jpart,2);
-            Jpartr = Jpartr';
+            % Particle currents
+            Jndiff = par.dev.mue.*par.kB*par.T.*dnlocdx*par.e;
+            Jndrift = -par.dev.mue.*nloc.*dVdx*par.e;
             
-            % Displacement Current at right hand side
-            Fend = -(dVdxt(:, end));
-            Jdispr = (par.e*1000)*par.epp(3)*-gradient(dVdxt(:, end), t);
-            Jdispr = Jdispr';
+            Jpdiff = -par.dev.muh*par.kB*par.T.*dplocdx*par.e;
+            Jpdrift = -par.dev.muh.*ploc.*dVdx*par.e;
             
-        %end
-                    % ion currents
+            Jidiff = -par.dev.muion*par.kB*par.T.*dilocdx*par.e;
+            Jidrift = -par.dev.muion.*iloc.*dVdx*par.e;
+            Jitot = Jidiff + Jidrift;
+            
+            % Particle current
+            Jpart = Jndiff + Jndrift + Jpdiff + Jpdrift + Jidiff + Jidrift;
+        
+        
+        % Displacement Current at right hand side
+        Fend = -(dVdx(:, end));
+        Jdispr = (par.e)*par.epp(3)*-gradient(dVdx(:, end), t);
+        Jdispr = Jdispr';
+        
+        % TiO2 bulk
+        % xrange = [200, 720];
+        % PEDOT bulk
+         xrange = [50, 570]'
+        
+        yrange = [-5e-7, 5e-7];
+        % ion currents
         figure(20)
         plot(xnm, Jidiff)
         xlabel('Position [nm]');
-        xlim([46, 60]);
-        %xlim([196, 210]);
-        ylim([-3e-5, 2e-5])
+        xlim([xrange(1), xrange(2)]);
+        ylim([yrange(1), yrange(2)])
         ylabel('Ionic diffusion current [A]')
         hold on
         
@@ -347,20 +340,17 @@ if par.figson == 1
         plot(xnm, Jidrift)
         xlabel('Position [nm]');
         ylabel('Ionic drift current [A]')
-        xlim([46, 60]);
-        %xlim([196, 210]);
-        ylim([-2e-5, 1e-5])
-        hold on            
-        %end
-        
+        xlim([xrange(1), xrange(2)])
+        ylim([yrange(1), yrange(2)])
+        hold on
+
         figure(22)
         plot(xnm, Jitot)
         xlabel('Position [nm]');
         ylabel('Total ion current [A]')
-        xlim([46, 60]);
-        %xlim([196, 210]);
-        ylim([-3e-5, 1e-5])
-        hold on           
+        xlim([xrange(1), xrange(2)])
+        ylim([yrange(1), yrange(2)])
+        hold on
         
         figure(23)
         plot(xnm, (V(pparr(i), :)))
@@ -371,14 +361,13 @@ if par.figson == 1
         hold on
         
         figure(24)
-        plot(xnm, F)
+        plot(xnm, Field)
         xlabel('Position [nm]');
         ylabel('Electric field [Vcm-1]')
-        xlim([46, 60]);
-        %xlim([196, 210]);
+        xlim([xrange(1), xrange(2)]);
         hold on
+        %}
         
-
         %     % Pl intensity at time point
         %     PLint(pparr(i));
         %
@@ -490,7 +479,7 @@ if par.figson == 1
             drawnow;
             
             hold on
-            
+        end
             %{
 % Electric Field
 figure(9);
@@ -500,8 +489,6 @@ ylabel('time [s]');
 title('Electric Field');
             %}
             
-        end
-        
     end
     
     figure(1)
@@ -511,10 +498,21 @@ title('Electric Field');
     hold off
     subplot(3,1,3);
     hold off
-    % figure(3)
-    % hold off
+    figure(3)
+    hold off
     figure(4)
     hold off
+    figure(20)
+    hold off
+    figure(21)
+    hold off    
+    figure(22)
+    hold off  
+    figure(23)
+    hold off
+    figure(24)
+    hold off
+    
     
     if par.calcJ == 0 || par.calcJ == 1
         
@@ -546,3 +544,5 @@ title('Electric Field');
 end
 
 end
+
+
