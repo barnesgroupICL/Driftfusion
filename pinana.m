@@ -333,10 +333,52 @@ if par.figson == 1
             Jdispr = Jdispr';
             
         %end
+                    % ion currents
+        figure(20)
+        plot(xnm, Jidiff)
+        xlabel('Position [nm]');
+        xlim([46, 60]);
+        %xlim([196, 210]);
+        ylim([-3e-5, 2e-5])
+        ylabel('Ionic diffusion current [A]')
+        hold on
         
+        figure(21)
+        plot(xnm, Jidrift)
+        xlabel('Position [nm]');
+        ylabel('Ionic drift current [A]')
+        xlim([46, 60]);
+        %xlim([196, 210]);
+        ylim([-2e-5, 1e-5])
+        hold on            
+        %end
         
+        figure(22)
+        plot(xnm, Jitot)
+        xlabel('Position [nm]');
+        ylabel('Total ion current [A]')
+        xlim([46, 60]);
+        %xlim([196, 210]);
+        ylim([-3e-5, 1e-5])
+        hold on           
         
+        figure(23)
+        plot(xnm, (V(pparr(i), :)))
+        xlabel('Position [nm]');
+        ylabel('Electric field potential [V]')
+        xlim([0, xnm(end)]);
+        ylim([-0.5, 1.2])
+        hold on
         
+        figure(24)
+        plot(xnm, F)
+        xlabel('Position [nm]');
+        ylabel('Electric field [Vcm-1]')
+        xlim([46, 60]);
+        %xlim([196, 210]);
+        hold on
+        
+
         %     % Pl intensity at time point
         %     PLint(pparr(i));
         %
