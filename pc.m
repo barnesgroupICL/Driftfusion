@@ -78,15 +78,15 @@ classdef pc
         %EA = [-1.9, -3.8, -4.1];
         %IP = [-4.9, -5.4, -7.4];
         % PEDOT
-        EA = [-3.0, -3.8, -3.8];
-        IP = [-5.1, -5.4, -6.2];
+        EA = [-3.0, -3.8, -4];
+        IP = [-4.8, -5.4, -6.2];
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies - defines doping density
         %TiO2
         %E0 = [-4.8, -4.6, -4.2];
         % PEDOT
-        E0 = [-5, -4.6, -3.9];
+        E0 = [-4.7, -4.6, -4.1];
          
         % SRH trap energies- currently set to mid gap - always set
         % respective to energy levels to avoid conflicts
@@ -102,8 +102,8 @@ classdef pc
         %PhiA = -4.8;
         %PhiC = -4.2;        
         %PEDOT
-        PhiA = -5;
-        PhiC = -3.9;
+        PhiA = -4.7;
+        PhiC = -4.1;
         
         % Effective Density Of States
         N0 = [1e19, 1e19, 1e19];
@@ -120,8 +120,8 @@ classdef pc
         %mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
         %muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
         % PEDOT
-        mue = [0.01, 20, 1e-3];         % electron mobility [cm2V-1s-1]
-        muh = [0.01, 20, 1e-3];         % hole mobility [cm2V-1s-1]
+        mue = [0.01, 20, 0.01];         % electron mobility [cm2V-1s-1]
+        muh = [0.01, 20, 0.01];         % hole mobility [cm2V-1s-1]
         
         muion = [0, 1e-10, 0];                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
@@ -235,7 +235,7 @@ classdef pc
     methods
         
         function par = pc
-            % parStruct Constructor for parStruct.
+            % parameters constructor function
             %
             % Warn if tmesh_type is not correct
             if ~ any([1 2 3 4] == par.tmesh_type)
@@ -688,11 +688,11 @@ classdef pc
                             
                             dEAdxprime = (par.EA(i+1)-par.EA(i))/(par.dint);
                             dev.EA(j) = par.EA(i) + xprime*dEAdxprime;
-                            dev.gradEA(j) = dEAdxprime;
+                            %dev.gradEA(j) = dEAdxprime;
                             
                             dIPdxprime = (par.IP(i+1)-par.IP(i))/(par.dint);
                             dev.IP(j) = par.IP(i) + xprime*dIPdxprime;
-                            dev.gradIP(j) = dIPdxprime;
+                            %dev.gradIP(j) = dIPdxprime;
                             
                             % Mobilities
                             dmuedx = (par.mue(i+1)-par.mue(i))/(par.dint);
@@ -710,7 +710,7 @@ classdef pc
                             % effective density of states
                             dN0dx = (par.N0(i+1)-par.N0(i))/(par.dint);
                             dev.N0(j) = par.N0(i) + xprime*dN0dx;
-                            dev.gradN0(j) = dN0dx;
+                            %dev.gradN0(j) = dN0dx;
                             
                             % Doping densities
                             dNAdx = (par.NA(i+1)-par.NA(i))/(par.dint);
@@ -789,6 +789,10 @@ classdef pc
                 end
                 
             end
+            
+            dev.gradN0 = gradient(dev.N0, xx);
+            dev.gradEA = gradient(dev.EA, xx);
+            dev.gradIP = gradient(dev.IP, xx);
             
             dev.nt = F.nfun(dev.N0, dev.EA, dev.Et, par.T, par.stats);
             dev.pt = F.pfun(dev.N0, dev.IP, dev.Et, par.T, par.stats);
