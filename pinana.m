@@ -9,6 +9,8 @@ set(0,'DefaultAxesYcolor', [0, 0, 0]);
 set(0,'DefaultAxesZcolor', [0, 0, 0]);
 set(0,'DefaultTextColor', [0, 0, 0]);
 
+ionfigon = 0;
+
 % tarr is a time time array for the time you wish to plot
 if length(varargin) == 1
     solstruct = varargin{1};
@@ -288,7 +290,7 @@ if par.figson == 1
             Vpoint = find(solstruct.Vapp <= tarr(i));
             pparr(i) = Vpoint(end);
         end
-        
+        if ionfigon == 1
         % Field
         Field = -gradient(V(pparr(i),:), x);
         
@@ -324,10 +326,16 @@ if par.figson == 1
         % TiO2 bulk
         % xrange = [200, 720];
         % PEDOT bulk
-         xrange = [50, 570]'
-        
+        % xrange = [50, 570]'
+        % Spiro-pvsk interface
+        xrange = [198, 210];
+        % PEDOT-pvsk interface
+        % xrange = [48, 60];
+               
         yrange = [-5e-7, 5e-7];
         % ion currents
+        
+        %{
         figure(20)
         plot(xnm, Jidiff)
         xlabel('Position [nm]');
@@ -366,7 +374,18 @@ if par.figson == 1
         ylabel('Electric field [Vcm-1]')
         xlim([xrange(1), xrange(2)]);
         hold on
+ 
+        figure(3)
+        plot(xnm, rhoa(pparr(i), :)) %xnm, a(pparr(i),:), xnm, Nionmat(pparr(i), :), 
+        ylabel('Ionic space charge density [cm-3]')
+        xlabel('Position [nm]');
+        xlim([xrange(1), xrange(2)]);
+        %legend('a', 'static', 'rho_a');
+        hold on
         %}
+        
+        end
+        
         
         %     % Pl intensity at time point
         %     PLint(pparr(i));
@@ -420,19 +439,12 @@ if par.figson == 1
         % xlabel('Position [nm]');
         % ylabel('PL Intensity');
         
-        % % ion plots
-        % figure(3)
-        % plot(xnm, a(pparr(i),:), xnm, Nionmat(pparr(i), :), xnm, rhoa(pparr(i), :))
-        % xlabel('Position [nm]');
-        % xlim([0, xnm(end)]);
-        % legend('a', 'static', 'rho_a');
-        
-        % Current vs position
-        figure(4)
-        plot(xnm, Jn(pparr(i), :), xnm, Jp(pparr(i), :), xnm, Jtot(pparr(i), :))
-        xlabel('Position [nm]')
-        ylabel('Current density [mAcm-2]')
-        hold on
+%         % Current vs position
+%         figure(4)
+%         plot(xnm, Jn(pparr(i), :), xnm, Jp(pparr(i), :), xnm, Jtot(pparr(i), :))
+%         xlabel('Position [nm]')
+%         ylabel('Current density [mAcm-2]')
+%         hold on
         
         % figure(5)
         % plot(xnm, rhoc(end, :))
@@ -498,21 +510,22 @@ title('Electric Field');
     hold off
     subplot(3,1,3);
     hold off
-    figure(3)
-    hold off
-    figure(4)
-    hold off
-    figure(20)
-    hold off
-    figure(21)
-    hold off    
-    figure(22)
-    hold off  
-    figure(23)
-    hold off
-    figure(24)
-    hold off
     
+%     figure(3)
+%     hold off
+%     figure(4)
+%     hold off
+%     figure(20)
+%     hold off
+%     figure(21)
+%     hold off    
+%     figure(22)
+%     hold off  
+%     figure(23)
+%     hold off
+%     figure(24)
+%     hold off
+
     
     if par.calcJ == 0 || par.calcJ == 1
         
