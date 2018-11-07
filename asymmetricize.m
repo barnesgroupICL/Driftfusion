@@ -1,7 +1,6 @@
 function asymstruct = asymmetricize(symstruct)
-%ASYMMETRICIZE - Break a symmetrical solution in two halves and stabilize the
-% asymmetrical model at pseudo-OC conditions applying Vapp equal to Voc
-% taken from the symmetrical solution
+%ASYMMETRICIZE - Break a symmetrical solution in two halves
+% Please note that further stabilization could be required
 %
 % Syntax:  asymstruct = asymmetricize(symstruct)
 %
@@ -18,7 +17,7 @@ function asymstruct = asymmetricize(symstruct)
 %   sol_i_light_OC = asymmetricize(ssol_i_light)
 %     take the first half of symmetrical solution at open circuit
 %
-% Other m-files required: pindrift, stabilize
+% Other m-files required: pindrift
 % Subfunctions: none
 % MAT-files required: none
 %
@@ -63,7 +62,5 @@ if symstruct.p.BC ~= 1 % in case the boundary conditions set was not 1, go to th
     p.BC = symstruct.p.BC; % re-establish the original BC
     asymstruct = pindrift(asymstruct, p);
 end
-
-asymstruct = stabilize(asymstruct); % go to steady state
 
 %------------- END OF CODE --------------
