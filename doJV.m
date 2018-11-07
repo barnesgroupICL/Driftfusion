@@ -107,10 +107,8 @@ if option ==2 || option ==3
         disp('JV scan complete.')
         
         plotJV(JV, option)
-        
+        JV.stats = JVstats(JV);
 end
-
-JV.stats = JVstats(JV);
 
 end
 
