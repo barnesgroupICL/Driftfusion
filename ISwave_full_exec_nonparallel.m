@@ -128,6 +128,11 @@ for i = 1:length(structs(1, :))
     else % otherwise use it as it comes
         asymstruct_Int = struct;
     end
+    % the asymmetricized solution could require some stabilization after
+    % breaking
+    if ~sequential
+        asymstruct_Int = stabilize(asymstruct_Int);
+    end
     % calculate currently applied DC voltage, as defined in pinana
     [~, ~, ~, Efn, Efp, ~] = pinAna(asymstruct_Int);
     Vdc_array(i) = Efn(end, end) - Efp(end, 1);

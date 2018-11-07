@@ -32,7 +32,9 @@ For simulating a different set of parameters, specify the relative pinParams fil
 
 Simulate impedance spectroscopy with oscillating voltage on a single solution with link:https://github.com/barnesgroupICL/Driftfusion/blob/2018-EIS/ISwave_EA_single_exec.m[ISwave_EA_single_exec]:
 
- >> ssol_i_1S_SR_is_100Hz_50mV = ISwave_EA_single_exec(asymmetricize(ssol_i_1S_SR), 5e-2, 1e2, 20, 40, true, false, 1e-8)
+ >> asymssol_i_1S_SR = asymmetricize(ssol_i_1S_SR)
+ >> asymssol_i_1S_SR = stabilize(asymssol_i_1S_SR)
+ >> ssol_i_1S_SR_is_100Hz_50mV = ISwave_EA_single_exec(asymssol_i_1S_SR, 5e-2, 1e2, 20, 40, true, false, 1e-8)
 
 Analyse the obtained solution with link:https://github.com/barnesgroupICL/Driftfusion/blob/2018-EIS/ISwave_single_analysis.m[ISwave_single_analysis]:
 

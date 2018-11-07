@@ -72,6 +72,9 @@ for i = 1:nsolutions
     else
         asymstruct_Int = badVocStructCell{1, i};
     end
+    % the asymmetricized solution could require some stabilization after
+    % breaking
+    asymstruct_Int = stabilize(asymstruct_Int);
     
     % use findOptimVoc for finding the applied voltage that minimizes the
     % residual current
