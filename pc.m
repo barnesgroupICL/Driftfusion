@@ -26,7 +26,7 @@ classdef pc
         pcell = {{50}; {30, 225, 30}; {60}};             % Spatial mesh points array
                 
         dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
-        pint = 20;          % Interfacial points (x_mesh_type = 3)
+        pint = 30;          % Interfacial points (x_mesh_type = 3)
         
         % Define spatial cordinate system
         % m=0 cartesian
