@@ -9,7 +9,7 @@ set(0,'DefaultAxesYcolor', [0, 0, 0]);
 set(0,'DefaultAxesZcolor', [0, 0, 0]);
 set(0,'DefaultTextColor', [0, 0, 0]);
 
-ionfigon = 0;
+ionfigon = 1;
 
 % tarr is a time time array for the time you wish to plot
 if length(varargin) == 1
@@ -142,12 +142,12 @@ for j = 1:size(n, 2)
     
     dndt(:,j) = gradient(n(:,j), t);
     dpdt(:,j) = gradient(p(:,j), t);
-    
+    dadt(:,j) = gradient(a(:,j), t);
 end
 
 dndtInt = trapz(x, dndt, 2);
 dpdtInt = trapz(x, dpdt, 2);
-
+dadtInt = trapz(x, dadt, 2);
 % Recombination
 Ubtb = kradmat.*(n.*p - nimat.^2);
 
@@ -198,55 +198,57 @@ end
 
 djndx = -(dndt - g + U);    % Not certain about the sign here
 djpdx = -(dpdt - g + U);
+djadx = -dadt;
 
 % Integrate across the device to get delta fluxes at all positions
 deltajn = cumtrapz(par.x, djndx, 2);
 deltajp = cumtrapz(par.x, djpdx, 2);
-
+deltaja = cumtrapz(par.x, djadx, 2);
 %% Currents from the boundaries
-    switch par.BC
-        case 0
-            jn_l = 0;
-            jp_l = 0;
-            jn_r = 0;
-            jp_r = 0;
-            % Blocking contacts
-        case 1
-            % Setting jp_l = djpdx(end) ensures that jp_r = 0;
-            jn_l = 0;
-            jp_l = -deltajp(:, end);
-            
-            jn_r = deltajn(:, end);
-            jp_r = 0;
-            
-        case 2
-            
-            jn_l = -par.sn_l*(n(:, 1) - par.nleft);
-            jp_l = -deltajp(:, end) + par.sp_r*(p(:, end) - par.pright);
-            
-            jn_r = deltajn(:, end) - par.sn_l*(n(:, 1) - par.nleft);
-            jp_r = par.sp_r*(p(:, end) - par.pright);
-            
-        case 3
-            
-            jn_l = -par.sn_l*(n(:, 1) - par.nleft);
-            jp_l = -par.sp_l*(p(:, 1) - par.pleft);
-            
-            jn_r = par.sn_r*(n(:, end) - par.nright);
-            jp_r = par.sp_r*(p(:, end) - par.pright);
-            
-    end
+switch par.BC
+    case 0
+        jn_l = 0;
+        jp_l = 0;
+        jn_r = 0;
+        jp_r = 0;
+        % Blocking contacts
+    case 1
+        % Setting jp_l = djpdx(end) ensures that jp_r = 0;
+        jn_l = 0;
+        jp_l = -deltajp(:, end);
+        
+        jn_r = deltajn(:, end);
+        jp_r = 0;
+        
+    case 2
+        
+        jn_l = -par.sn_l*(n(:, 1) - par.nleft);
+        jp_l = -deltajp(:, end) + par.sp_r*(p(:, end) - par.pright);
+        
+        jn_r = deltajn(:, end) - par.sn_l*(n(:, 1) - par.nleft);
+        jp_r = par.sp_r*(p(:, end) - par.pright);
+        
+    case 3
+        
+        jn_l = -par.sn_l*(n(:, 1) - par.nleft);
+        jp_l = -par.sp_l*(p(:, 1) - par.pleft);
+        
+        jn_r = par.sn_r*(n(:, end) - par.nright);
+        jp_r = par.sp_r*(p(:, end) - par.pright);
+        
+end
 
 % Calculate total electron and hole currents from fluxes
 jn = jn_l + deltajn;
 jp = jp_l + deltajp;
+ja = 0 + deltaja;
 
-Jn = -jn*1000*par.e;
-Jp = jp*1000*par.e;
+Jn = -jn*par.e;
+Jp = jp*par.e;
+Ja = ja*par.e;
 
-% Total current
+% Total electronic current
 Jtot = Jn + Jp;
-
 
 %Figures
 if par.figson == 1
@@ -291,12 +293,12 @@ if par.figson == 1
             pparr(i) = Vpoint(end);
         end
         if ionfigon == 1
-        % Field
-        Field = -gradient(V(pparr(i),:), x);
-        
-        % Calculates current at every point and all times -
-        % UNRELIABLE FOR TOTAL CURRENT
-        %if par.calcJ == 1
+            % Field
+            Field = -gradient(V(pparr(i),:), x);
+            
+            % Calculates current at every point and all times -
+            % UNRELIABLE FOR TOTAL CURRENT
+            %if par.calcJ == 1
             
             [nloc,dnlocdx] = pdeval(0,x,n(pparr(i),:),x);
             [ploc,dplocdx] = pdeval(0,x,p(pparr(i),:),x);
@@ -316,74 +318,94 @@ if par.figson == 1
             
             % Particle current
             Jpart = Jndiff + Jndrift + Jpdiff + Jpdrift + Jidiff + Jidrift;
-        
-        
-        % Displacement Current at right hand side
-        Fend = -(dVdx(:, end));
-        Jdispr = (par.e)*par.epp(3)*-gradient(dVdx(:, end), t);
-        Jdispr = Jdispr';
-        
-        % TiO2 bulk
-        % xrange = [200, 720];
-        % PEDOT bulk
-        % xrange = [50, 570]'
-        % Spiro-pvsk interface
-        xrange = [198, 210];
-        % PEDOT-pvsk interface
-        % xrange = [48, 60];
-               
-        yrange = [-5e-7, 5e-7];
-        % ion currents
-        
-        %{
-        figure(20)
-        plot(xnm, Jidiff)
-        xlabel('Position [nm]');
-        xlim([xrange(1), xrange(2)]);
-        ylim([yrange(1), yrange(2)])
-        ylabel('Ionic diffusion current [A]')
-        hold on
-        
-        figure(21)
-        plot(xnm, Jidrift)
-        xlabel('Position [nm]');
-        ylabel('Ionic drift current [A]')
-        xlim([xrange(1), xrange(2)])
-        ylim([yrange(1), yrange(2)])
-        hold on
-
-        figure(22)
-        plot(xnm, Jitot)
-        xlabel('Position [nm]');
-        ylabel('Total ion current [A]')
-        xlim([xrange(1), xrange(2)])
-        ylim([yrange(1), yrange(2)])
-        hold on
-        
-        figure(23)
-        plot(xnm, (V(pparr(i), :)))
-        xlabel('Position [nm]');
-        ylabel('Electric field potential [V]')
-        xlim([0, xnm(end)]);
-        ylim([-0.5, 1.2])
-        hold on
-        
-        figure(24)
-        plot(xnm, Field)
-        xlabel('Position [nm]');
-        ylabel('Electric field [Vcm-1]')
-        xlim([xrange(1), xrange(2)]);
-        hold on
- 
-        figure(3)
-        plot(xnm, rhoa(pparr(i), :)) %xnm, a(pparr(i),:), xnm, Nionmat(pparr(i), :), 
-        ylabel('Ionic space charge density [cm-3]')
-        xlabel('Position [nm]');
-        xlim([xrange(1), xrange(2)]);
-        %legend('a', 'static', 'rho_a');
-        hold on
-        %}
-        
+            
+            
+            % Displacement Current at right hand side
+            Fend = -(dVdx(:, end));
+            Jdispr = (par.e)*par.epp(3)*-gradient(dVdx(:, end), t);
+            Jdispr = Jdispr';
+            
+            % TiO2 bulk
+            % xrange = [200, 724];
+            % PEDOT bulk
+            % xrange = [50, 574]'
+            % Tio2, Spiro-pvsk interface
+            %xrange = [198, 210];
+            % PEDOT-pvsk interface
+            xrange = [48, 60];
+            
+            yrange = [-5e-7, 5e-7];
+            % ion currents
+            
+            figure(20)
+            plot(xnm, Jidiff)
+            xlabel('Position [nm]');
+            xlim([xrange(1), xrange(2)]);
+            ylim([yrange(1), yrange(2)])
+            ylabel('Ionic diffusion current [A]')
+            hold on
+            
+            figure(21)
+            plot(xnm, Jidrift)
+            xlabel('Position [nm]');
+            ylabel('Ionic drift current [A]')
+            xlim([xrange(1), xrange(2)])
+            ylim([yrange(1), yrange(2)])
+            hold on
+            
+%             figure(22)
+%             plot(xnm, Jitot)
+%             xlabel('Position [nm]');
+%             ylabel('Total ion current [A]')
+%             %xlim([xrange(1), xrange(2)])
+%             %ylim([yrange(1), yrange(2)])
+%             hold on
+            
+            figure(23)
+            plot(xnm, (-V(pparr(i), :)))
+            xlabel('Position [nm]');
+            ylabel('-Electric field potential [V]')
+            xlim([0, xnm(end)]);
+            ylim([-1.2, 0.5])
+            hold on
+            
+            figure(24)
+            plot(xnm, Field)
+            xlabel('Position [nm]');
+            ylabel('Electric field [Vcm-1]')
+            xlim([xrange(1), xrange(2)]);
+            hold on
+            
+            figure(3)
+            plot(xnm, rhoa(pparr(i), :)) %xnm, a(pparr(i),:), xnm, Nionmat(pparr(i), :),
+            ylabel('Ionic space charge density [cm-3]')
+            xlabel('Position [nm]');
+            xlim([xrange(1), xrange(2)]);
+            %legend('a', 'static', 'rho_a');
+            hold on
+            
+            % Potential across the active layer as a function of time
+            p1 = find(xnm <= xrange(1));
+            p1 = p1(end);
+            p2 = find(xnm <= xrange(2));
+            p2 = p2(end);
+            
+            figure(25)
+            plot(t, -((V(:,p2)-V(:,p1))-(V(end,p2)-V(end,p1))), t, -((V(:,end)-V(:,1))-(V(end,end)-V(end,1))))
+            legend('active layer', 'device')
+            xlabel('time [s]')
+            ylabel('Delta V [V]')
+            
+            % total ionic current
+            figure(26)
+            plot(xnm, Ja(pparr(i), :))
+            xlabel('Position [nm]');
+            ylabel('Total ion current [A]')
+            xlim([xrange(1), xrange(2)]);
+            %xlim([xnm(1), xnm(end)])
+            %ylim([yrange(1), yrange(2)])
+            hold on            
+            
         end
         
         
@@ -439,12 +461,12 @@ if par.figson == 1
         % xlabel('Position [nm]');
         % ylabel('PL Intensity');
         
-%         % Current vs position
-%         figure(4)
-%         plot(xnm, Jn(pparr(i), :), xnm, Jp(pparr(i), :), xnm, Jtot(pparr(i), :))
-%         xlabel('Position [nm]')
-%         ylabel('Current density [mAcm-2]')
-%         hold on
+        %         % Current vs position
+        %         figure(4)
+        %         plot(xnm, Jn(pparr(i), :), xnm, Jp(pparr(i), :), xnm, Jtot(pparr(i), :))
+        %         xlabel('Position [nm]')
+        %         ylabel('Current density [Acm-2]')
+        %         hold on
         
         % figure(5)
         % plot(xnm, rhoc(end, :))
@@ -483,7 +505,7 @@ if par.figson == 1
             plot(xnm,Jndiff(pparr(i), :),xnm,Jndrift(pparr(i), :),xnm,Jpdiff(pparr(i), :),xnm,Jpdrift(pparr(i), :),xnm,Jidiff(pparr(i), :),xnm,Jidrift(pparr(i), :),xnm,Jpart(pparr(i), :));
             legend('Jn diff','Jn drift','Jp diff','Jp drift','Ji diff','Ji drift','Total J');
             xlabel('Position [nm]');
-            ylabel('Current Density [mA cm^-2]');
+            ylabel('Current Density [A cm^-2]');
             set(legend,'FontSize',12);
             set(legend,'EdgeColor',[1 1 1]);
             xlim([0, xnm(end)]);
@@ -492,15 +514,15 @@ if par.figson == 1
             
             hold on
         end
-            %{
+        %{
 % Electric Field
 figure(9);
 surf(xnm, t, Floct);
 xlabel('Position [m]');
 ylabel('time [s]');
 title('Electric Field');
-            %}
-            
+        %}
+        
     end
     
     figure(1)
@@ -511,21 +533,22 @@ title('Electric Field');
     subplot(3,1,3);
     hold off
     
-%     figure(3)
-%     hold off
-%     figure(4)
-%     hold off
-%     figure(20)
-%     hold off
-%     figure(21)
-%     hold off    
-%     figure(22)
-%     hold off  
-%     figure(23)
-%     hold off
-%     figure(24)
-%     hold off
-
+    figure(3)
+    hold off
+    figure(4)
+    hold off
+    figure(20)
+    hold off
+    figure(21)
+    hold off
+    figure(22)
+    hold off
+    figure(23)
+    hold off
+    figure(24)
+    hold off
+    figure(26)
+    hold off
     
     if par.calcJ == 0 || par.calcJ == 1
         
@@ -534,7 +557,7 @@ title('Electric Field');
             figure(11)
             plot(Vapp_arr, Jtot(:, end))
             xlabel('V_{app} [V]')
-            ylabel('Current Density [mA cm^-2]');
+            ylabel('Current Density [A cm^-2]');
             grid off;
             
         else
@@ -543,7 +566,7 @@ title('Electric Field');
             plot(t, Jtot(:, end));
             legend('Jtotal')
             xlabel('time [s]');
-            ylabel('J [mA cm^{-2}]');
+            ylabel('J [A cm^{-2}]');
             set(legend,'FontSize',16);
             set(legend,'EdgeColor',[1 1 1]);
             grid off;
