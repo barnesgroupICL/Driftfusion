@@ -9,7 +9,7 @@ set(0,'DefaultAxesYcolor', [0, 0, 0]);
 set(0,'DefaultAxesZcolor', [0, 0, 0]);
 set(0,'DefaultTextColor', [0, 0, 0]);
 
-ionfigon = 1;
+ionfigon = 0;
 
 % tarr is a time time array for the time you wish to plot
 if length(varargin) == 1
@@ -319,92 +319,94 @@ if par.figson == 1
             % Particle current
             Jpart = Jndiff + Jndrift + Jpdiff + Jpdrift + Jidiff + Jidrift;
             
-            
             % Displacement Current at right hand side
             Fend = -(dVdx(:, end));
             Jdispr = (par.e)*par.epp(3)*-gradient(dVdx(:, end), t);
             Jdispr = Jdispr';
             
-            % TiO2 bulk
-            % xrange = [200, 724];
-            % PEDOT bulk
-            % xrange = [50, 574]'
-            % Tio2, Spiro-pvsk interface
-            %xrange = [198, 210];
-            % PEDOT-pvsk interface
-            xrange = [48, 60];
-            
-            yrange = [-5e-7, 5e-7];
-            % ion currents
-            
-            figure(20)
-            plot(xnm, Jidiff)
-            xlabel('Position [nm]');
-            xlim([xrange(1), xrange(2)]);
-            ylim([yrange(1), yrange(2)])
-            ylabel('Ionic diffusion current [A]')
-            hold on
-            
-            figure(21)
-            plot(xnm, Jidrift)
-            xlabel('Position [nm]');
-            ylabel('Ionic drift current [A]')
-            xlim([xrange(1), xrange(2)])
-            ylim([yrange(1), yrange(2)])
-            hold on
-            
-%             figure(22)
-%             plot(xnm, Jitot)
-%             xlabel('Position [nm]');
-%             ylabel('Total ion current [A]')
-%             %xlim([xrange(1), xrange(2)])
-%             %ylim([yrange(1), yrange(2)])
-%             hold on
-            
-            figure(23)
-            plot(xnm, (-V(pparr(i), :)))
-            xlabel('Position [nm]');
-            ylabel('-Electric field potential [V]')
-            xlim([0, xnm(end)]);
-            ylim([-1.2, 0.5])
-            hold on
-            
-            figure(24)
-            plot(xnm, Field)
-            xlabel('Position [nm]');
-            ylabel('Electric field [Vcm-1]')
-            xlim([xrange(1), xrange(2)]);
-            hold on
-            
-            figure(3)
-            plot(xnm, rhoa(pparr(i), :)) %xnm, a(pparr(i),:), xnm, Nionmat(pparr(i), :),
-            ylabel('Ionic space charge density [cm-3]')
-            xlabel('Position [nm]');
-            xlim([xrange(1), xrange(2)]);
-            %legend('a', 'static', 'rho_a');
-            hold on
-            
-            % Potential across the active layer as a function of time
-            p1 = find(xnm <= xrange(1));
-            p1 = p1(end);
-            p2 = find(xnm <= xrange(2));
-            p2 = p2(end);
-            
-            figure(25)
-            plot(t, -((V(:,p2)-V(:,p1))-(V(end,p2)-V(end,p1))), t, -((V(:,end)-V(:,1))-(V(end,end)-V(end,1))))
-            legend('active layer', 'device')
-            xlabel('time [s]')
-            ylabel('Delta V [V]')
-            
-            % total ionic current
-            figure(26)
-            plot(xnm, Ja(pparr(i), :))
-            xlabel('Position [nm]');
-            ylabel('Total ion current [A]')
-            xlim([xrange(1), xrange(2)]);
-            %xlim([xnm(1), xnm(end)])
-            %ylim([yrange(1), yrange(2)])
-            hold on            
+            if ionfigon ==1
+                
+                % TiO2 bulk
+                % xrange = [200, 724];
+                % PEDOT bulk
+                % xrange = [50, 574]'
+                % Tio2, Spiro-pvsk interface
+                %xrange = [198, 210];
+                % PEDOT-pvsk interface
+                xrange = [48, 60];
+                
+                yrange = [-5e-7, 5e-7];
+                % ion currents
+                
+                figure(20)
+                plot(xnm, Jidiff)
+                xlabel('Position [nm]');
+                xlim([xrange(1), xrange(2)]);
+                ylim([yrange(1), yrange(2)])
+                ylabel('Ionic diffusion current [A]')
+                hold on
+                
+                figure(21)
+                plot(xnm, Jidrift)
+                xlabel('Position [nm]');
+                ylabel('Ionic drift current [A]')
+                xlim([xrange(1), xrange(2)])
+                ylim([yrange(1), yrange(2)])
+                hold on
+                
+                %             figure(22)
+                %             plot(xnm, Jitot)
+                %             xlabel('Position [nm]');
+                %             ylabel('Total ion current [A]')
+                %             %xlim([xrange(1), xrange(2)])
+                %             %ylim([yrange(1), yrange(2)])
+                %             hold on
+                
+                figure(23)
+                plot(xnm, (-V(pparr(i), :)))
+                xlabel('Position [nm]');
+                ylabel('-Electric field potential [V]')
+                xlim([0, xnm(end)]);
+                ylim([-1.2, 0.5])
+                hold on
+                
+                figure(24)
+                plot(xnm, Field)
+                xlabel('Position [nm]');
+                ylabel('Electric field [Vcm-1]')
+                xlim([xrange(1), xrange(2)]);
+                hold on
+                
+                figure(3)
+                plot(xnm, rhoa(pparr(i), :)) %xnm, a(pparr(i),:), xnm, Nionmat(pparr(i), :),
+                ylabel('Ionic space charge density [cm-3]')
+                xlabel('Position [nm]');
+                xlim([xrange(1), xrange(2)]);
+                %legend('a', 'static', 'rho_a');
+                hold on
+                
+                % Potential across the active layer as a function of time
+                p1 = find(xnm <= xrange(1));
+                p1 = p1(end);
+                p2 = find(xnm <= xrange(2));
+                p2 = p2(end);
+                
+                figure(25)
+                plot(t, -((V(:,p2)-V(:,p1))-(V(end,p2)-V(end,p1))), t, -((V(:,end)-V(:,1))-(V(end,end)-V(end,1))))
+                legend('active layer', 'device')
+                xlabel('time [s]')
+                ylabel('Delta V [V]')
+                
+                % total ionic current
+                figure(26)
+                plot(xnm, Ja(pparr(i), :))
+                xlabel('Position [nm]');
+                ylabel('Total ion current [A]')
+                xlim([xrange(1), xrange(2)]);
+                %xlim([xnm(1), xnm(end)])
+                %ylim([yrange(1), yrange(2)])
+                hold on
+            end
             
         end
         
@@ -533,22 +535,24 @@ title('Electric Field');
     subplot(3,1,3);
     hold off
     
-    figure(3)
-    hold off
-    figure(4)
-    hold off
-    figure(20)
-    hold off
-    figure(21)
-    hold off
-    figure(22)
-    hold off
-    figure(23)
-    hold off
-    figure(24)
-    hold off
-    figure(26)
-    hold off
+    if ionfigon ==1
+        figure(3)
+        hold off
+        figure(4)
+        hold off
+        figure(20)
+        hold off
+        figure(21)
+        hold off
+        figure(22)
+        hold off
+        figure(23)
+        hold off
+        figure(24)
+        hold off
+        figure(26)
+        hold off
+    end
     
     if par.calcJ == 0 || par.calcJ == 1
         
