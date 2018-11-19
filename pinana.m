@@ -132,7 +132,7 @@ if par.JV == 1
     
 else
     
-    Vapp_arr = nan;
+    Vapp_arr = Efn(:, end) - Efp(:, 1);
     
 end
 
