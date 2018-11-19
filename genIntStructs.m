@@ -25,7 +25,7 @@ function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, end
 %   [structs_sc, ~, JSCs] = genIntStructs(sol_i_eq_SR, 100, 0.1, 4, false)
 %     prepare short circuit solutions at 100, 10, 1 and 0.1 illumination intensities
 %
-% Other m-files required: changeLight, pindrift
+% Other m-files required: changeLight, pindrift, pinana
 % Subfunctions: none
 % MAT-files required: none
 %
