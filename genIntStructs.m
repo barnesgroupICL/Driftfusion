@@ -1,7 +1,7 @@
 function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
 %GENINTSTRUCTS - Generates a cell containing structures of solutions at various light intensities, starting from the one in dark
 %
-% Syntax:  structCell = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
+% Syntax:  [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
 %
 % Inputs:
 %   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions, or a logic false for not having the dark.

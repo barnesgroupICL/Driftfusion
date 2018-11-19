@@ -5,7 +5,7 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startIn
 % in input, but the usage of symmetric solutions is strongly encouraged as
 % the findOptimVoc will start from a condition closer to the Voc.
 %
-% Syntax:  structCell = genIntStructs(struct_eq, struct_light, startInt, endInt, points, include_dark)
+% Syntax:  [structCell, VOCs] = genIntStructs(struct_eq, struct_light, startInt, endInt, points, include_dark)
 %
 % Inputs:
 %   STRUCT_EQ - a solution struct as created by PINDRIFT in dark
