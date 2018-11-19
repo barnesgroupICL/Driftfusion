@@ -94,7 +94,6 @@ p.E2_func = @(coeff, t) coeff(1) + coeff(2) * sin(-pi/2 + coeff(3) + 4 * pi * fr
 
 %% first run
 disp([mfilename ' - Int: ' num2str(p.Int) '; Vdc: ' num2str(Efn(end, end) - Efp(end, 1)) ' V; Freq: ' num2str(freq) ' Hz']);
-warning('off', 'pindrift:verifyStabilization'); % verifyStabilization warnings are substituted by others here
 asymstruct_ISwave = pindrift(asymstruct_Int, p);
 
 %% run until oscillating stabilization
@@ -103,18 +102,21 @@ asymstruct_ISwave = pindrift(asymstruct_Int, p);
 % if just the first solution is requested setting reach_stability to
 % false, break after the first cycle
 i = 0;
-while ~verifyStabilization(asymstruct_ISwave.sol, asymstruct_ISwave.t, round(periods / 2) / periods) && reach_stability
-    disp([mfilename ' - solution was not stabilized, trying again'])
-    asymstruct_ISwave = pindrift(asymstruct_ISwave, p);
-    i = i+1;
-    % in case 10 repetitions were not enough, stop
-    if i > 10
-        warning('pindrift:ISwave_EA_single_exec',...
-            'ISwave_EA_single_exec seems that the solution did not reach complete stabilization after %s repetitions on %s periods',...
-            num2str(i), num2str(periods))
-        break
+if reach_stability
+    warning('off', 'pindrift:verifyStabilization'); % verifyStabilization warnings are substituted by others here
+    while ~verifyStabilization(asymstruct_ISwave.sol, asymstruct_ISwave.t, round(periods / 2) / periods)
+        disp([mfilename ' - solution was not stabilized, trying again'])
+        asymstruct_ISwave = pindrift(asymstruct_ISwave, p);
+        i = i+1;
+        % in case 10 repetitions were not enough, stop
+        if i > 10
+            warning('pindrift:ISwave_EA_single_exec',...
+                'ISwave_EA_single_exec seems that the solution did not reach complete stabilization after %s repetitions on %s periods',...
+                num2str(i), num2str(periods))
+            break
+        end
     end
+    warning('on', 'pindrift:verifyStabilization'); % re-enable warnings
 end
-warning('on', 'pindrift:verifyStabilization'); % re-enable warnings
 
 %------------- END OF CODE --------------
