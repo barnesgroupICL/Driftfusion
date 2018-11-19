@@ -76,7 +76,7 @@ dVlimit = 1.3;
 % look for the residual current at a new voltage,
 % if the sign of the residual current is different use the voltage
 % variation as a search range limit
-for dV = [0.001, 0.01, 0.1, 0.3, 0.3, 0.3]
+for dV = [0.01, 0.7, repelem(0.05, 11)]
     % this assumes that a more positive voltage results in more positive
     % current
     [~, newCurrent, asymstruct_newVapp] = IgiveCurrentForVoltage(asymstruct, asymstruct.p.Vapp - sign(previousCurrent) * dV);
