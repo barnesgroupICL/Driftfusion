@@ -46,7 +46,7 @@ p.Ana = 0;
 % a tmax too short would make the solution look stable even
 % if it's not; too large and the simulation could fail
 
-min_tmax_ions = 1;
+min_tmax_ions = 10;
 min_tmax_freecharges = 1e-3;
 
 % if both mobilities are set
