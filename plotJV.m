@@ -9,7 +9,7 @@ if option == 1 || option == 3
     pinana(JV.dk.f);
     figure(11)
     %xlim([-0.2, 1.15])
-    ylim([-25, 5]);
+    ylim([-25e-3, 5e-3]);
     hold on
     pinana(JV.dk.r);
     
@@ -20,7 +20,7 @@ if option == 2 || option == 3
     
     figure(11)
     %xlim([-0.2, 1.15])
-    ylim([-25, 5]);
+    ylim([-25e-3, 5e-3]);
     hold on
     pinana(JV.ill.r);
 end
