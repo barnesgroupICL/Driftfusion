@@ -75,7 +75,7 @@ periods = round(s.p.tmax * s.p.Vapp_params(4) / (2 * pi));
 
 % here is critical that exactely an entire number of periods is provided to
 % ISwave_single_demodulation
-fit_t_index = round((s.p.tpoints - 1) * round(periods / 2) / periods) + 1;
+fit_t_index = round((s.p.tpoints - 1) * floor(periods / 2) / periods) + 1;
 fit_t = s.t(fit_t_index:end)';
 
 % current profile to be analyzed
