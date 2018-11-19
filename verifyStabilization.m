@@ -68,15 +68,17 @@ for i = 1:length(sol_matrix(1, 1, :))
     threshold = 1e-4 * sum(abs(profile_end - mean(profile_end))); % sum up absolute values, ignore constant bias
     stable = difference <= threshold;
 
-    if stable
-        disp(strcat("variable ", names(i), " stabilisation verified"));
-    else
+    if ~stable
         warning('pindrift:verifyStabilization',...
             'Comparing final solutions at %s s and %s s showed that the %s distribution did not reach stability. Consider trying with a greater tmax.',...
             num2str(t_array(time_index)), num2str(t_array(end)), names(i));
     end
     % true just if all the variables are stabilized
     all_stable = all_stable && stable;
+end
+
+if all_stable
+    disp("Stabilisation verified");
 end
 
 %------------- END OF CODE --------------
