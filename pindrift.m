@@ -1,15 +1,11 @@
-function solstruct = pindrift(varargin);
-
-% Requires v2struct toolbox for unpacking parameters structure
-% IMPORTANT! Currently uses parameters from pinParams - all variables must be
-% declared in pinDrift (line 52)
+function solstruct = pindrift(varargin)
 
 % A routine to test solving the diffusion and drift equations using the
 % matlab pde solver. This version defines electrons as n and holes as p,
 % and ions as a. V is the electric potential.
 %
 % Piers Barnes last modified (09/01/2016)
-% Phil Calado last modified (07/07/2016)
+% Phil Calado last modified (19/11/2018)
 
 % This version allows a previous solution to be used as the input
 % conditions. If there is no input argument asssume default flat background
@@ -446,14 +442,8 @@ end
 
 if p.Ana == 1
     
-    [Voc, Vapp_arr, Jtotr] = pinana(solstruct, t(end)); 
-    
-    if p.OC == 1
-        
-        solstruct.Voc = Voc;
-        
-    end
-    
+    [Vapp_arr, Jtotr] = pinana(solstruct, t(end)); 
+       
     if p.JV == 1
         
         solstruct.Vapp = Vapp_arr;

@@ -7,7 +7,7 @@ name = [name, '.avi'];
 
 % Write to file
 myVideo = VideoWriter(name);
-myVideo.FrameRate = 10;
+myVideo.FrameRate = 6;
 open(myVideo);
 writeVideo(myVideo, Framefile);
 close(myVideo);
