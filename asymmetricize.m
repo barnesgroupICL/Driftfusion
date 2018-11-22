@@ -14,7 +14,7 @@ function asymstruct = asymmetricize(symstruct)
 %     voltage taken from the input SYMSTRUCT
 %
 % Example:
-%   sol_i_light_OC = asymmetricize(ssol_i_light)
+%   sol_i_light_OC = asymmetricize(ssol_i_SR_1S)
 %     take the first half of symmetrical solution at open circuit
 %
 % Other m-files required: pindrift
