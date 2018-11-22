@@ -1,4 +1,4 @@
-function [Voc, Vapp_arr, Jtot, U_overt] = pinana(solstruct)
+function [Vapp_arr, Jtot, U_overt] = pinana(solstruct)
 % pinana analyses the input solution and plots various useful graphs.
 % Many plots are available to the user although currently these are
 % commented out. In future
@@ -31,15 +31,8 @@ i_n_array = ismembertol(p.x, p.tp + p.ti);
 p_i_index = find(p_i_array, 1);
 i_n_index = find(i_n_array, 1);
 
-if p.OC
-    Voc = Efn(:, round(p.xpoints/2)) - Efp(:, 1); % Open Circuit Voltage
-else
-    Voc = p.Vapp;
-end
-
 %% TPV
 if p.OC && p.pulseon % AC coupled mode
-    Voc = Voc - Voc(1); % Removes baseline from TPV
     p.t = p.t-(p.pulsestart+p.pulselen); % Zero point adjustment
 end
 
@@ -299,7 +292,7 @@ if p.figson == 1
     % Open circuit voltage
     if p.OC == 1
         figure(7);
-            plot (p.t(1:length(sol(:,1,1))), Voc);
+            plot (p.t(1:length(sol(:,1,1))), Vapp_arr);
             xlabel('Time [s]');
             ylabel('Voltage [V]');
     end
