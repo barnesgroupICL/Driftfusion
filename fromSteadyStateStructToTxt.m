@@ -31,7 +31,16 @@ ionicProfile_depl = ionicProfile(depl_zone);
 data_ionic_acc = [x_acc', ionicProfile_acc'];
 data_ionic_depl = [x_depl', ionicProfile_depl'];
 
-[~, ~, ~, Efn, Efp, ~] = pinAna(struct);
+% copied from pinana
+V = struct.sol(:,:,4);     % electric potential
+% Calculate energy levels and chemical potential         
+V = V - p.EA;                                % Electric potential
+Ecb = p.EA-V-p.EA;  % Conduction band potential
+n = struct.sol(:,:,1);
+P = struct.sol(:,:,2);
+Efn = real(-V+p.Ei+(p.kB*p.T/p.q)*log(n/p.ni)); % Electron quasi-Fermi level
+Efp = real(-V+p.Ei-(p.kB*p.T/p.q)*log(P/p.ni)); % Hole quasi-Fermi level
+
 Efn = Efn(end, :);
 Efp = Efp(end, :);
 V = struct.sol(end,:,4);     % electric potential

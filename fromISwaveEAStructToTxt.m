@@ -29,12 +29,15 @@ for i = 1:length(t_array)
     [~, t_index(i)] = min(abs(struct.t - t_array(i))); % Finds the index for the time value given
 end
 
-[~, ~, ~, Efn, Efp, ~] = pinAna(struct);
-
+% copied from pinana
 V = struct.sol(:,:,4);     % electric potential
 % Calculate energy levels and chemical potential         
 V = V - p.EA;                                % Electric potential
 Ecb = p.EA-V-p.EA;  % Conduction band potential
+n = struct.sol(:,:,1);
+P = struct.sol(:,:,2);
+Efn = real(-V+p.Ei+(p.kB*p.T/p.q)*log(n/p.ni)); % Electron quasi-Fermi level
+Efp = real(-V+p.Ei-(p.kB*p.T/p.q)*log(P/p.ni)); % Hole quasi-Fermi level
 
 Ecb_Vmax = Ecb(t_index(1), :);
 Efn_Vmax = Efn(t_index(1), :);
