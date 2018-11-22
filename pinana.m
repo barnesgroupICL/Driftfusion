@@ -55,7 +55,7 @@ switch p.JV % Current voltage array
     case 2
         Vapp_arr = p.Vapp_func(p.Vapp_params, p.t);
     otherwise
-        Vapp_arr = NaN;
+        Vapp_arr = Efn(:, end) - Efp(:, 1);
 end
 
 %% Recombination
