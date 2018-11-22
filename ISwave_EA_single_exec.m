@@ -93,7 +93,7 @@ p.J_E_func_tilted = @(coeff, t, tilting, t_middle) p.J_E_func(coeff, t) + tiltin
 p.E2_func = @(coeff, t) coeff(1) + coeff(2) * sin(-pi/2 + coeff(3) + 4 * pi * freq * t);
 
 %% first run
-disp([mfilename ' - Int: ' num2str(p.Int) '; Vdc: ' num2str(Efn(end, end) - Efp(end, 1)) ' V; Freq: ' num2str(freq) ' Hz']);
+disp([mfilename ' - Int: ' num2str(p.Int) '; Vdc: ' num2str(Vapp_arr(end)) ' V; Freq: ' num2str(freq) ' Hz']);
 asymstruct_ISwave = pindrift(asymstruct_Int, p);
 
 %% run until oscillating stabilization
@@ -104,7 +104,7 @@ asymstruct_ISwave = pindrift(asymstruct_Int, p);
 i = 0;
 if reach_stability
     warning('off', 'pindrift:verifyStabilization'); % verifyStabilization warnings are substituted by others here
-    while ~verifyStabilization(asymstruct_ISwave.sol, asymstruct_ISwave.t, round(periods / 2) / periods)
+    while ~verifyStabilization(asymstruct_ISwave.sol, asymstruct_ISwave.t, floor(periods / 2) / periods)
         disp([mfilename ' - solution was not stabilized, trying again'])
         asymstruct_ISwave = pindrift(asymstruct_ISwave, p);
         i = i+1;
