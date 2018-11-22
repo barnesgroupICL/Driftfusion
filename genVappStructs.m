@@ -20,7 +20,7 @@ function structCell = genVappStructs(asymstruct, Vapp_array)
 %     generates dark solutions at a list of applied voltages, remember that
 %     the list will have an ascending ordering in the output structure
 %
-% Other m-files required: pindrift, pinAna
+% Other m-files required: pindrift, pinana
 % Subfunctions: none
 % MAT-files required: none
 %
@@ -71,8 +71,8 @@ for i = 1:length(Vapp_array)
     % boundary conditions have to be changed more slowly 
     % the solver needs at least one point at the starting voltage, before switching to short circuit
     p.JV = 2; % new mode for arbitrary Vapp profiles
-    [~, ~, ~, Efn, Efp, ~] = pinAna(asymstruct_Vapp); % quasi-fermi levels are needed for knowing the current Voc
-    Vstart = Efn(end, end) - Efp(end, 1); % current Voc
+    [~, Vapp_arr, ~, ~] = pinana(asymstruct_Vapp); % quasi-fermi levels are needed for knowing the current Voc
+    Vstart = Vapp_arr(end); % current Voc
     Vend = Vapp_array(i); % final Voc
     
     % the third parameter is the time point when the change from the old
