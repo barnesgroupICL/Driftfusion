@@ -31,7 +31,7 @@ function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq,
 %     and using a starting relative tolerance of 1e-8,
 %     calculate also the electronic current needed by impedance simulations
 %
-% Other m-files required: pindrift, verifyStabilization, pinAna
+% Other m-files required: pindrift, verifyStabilization, pinana
 % Subfunctions: none
 % MAT-files required: none
 %
@@ -76,10 +76,10 @@ p.RelTol = RelTol;
 p.JV = 2; % mode for arbitrary Vapp functions
 
 % get Efn and Efp
-[~, ~, ~, Efn, Efp, ~] = pinAna(asymstruct_Int);
+[~, Vapp_arr, ~, ~] = pinana(asymstruct_Int);
 
 % take current voltage, as defined in pinana
-Vstart = Efn(end, end) - Efp(end, 1);
+Vstart = Vapp_arr(end);
 
 % applied voltage profile
 p.Vapp_params = [Vstart, deltaV, 0, 2 * pi * freq];

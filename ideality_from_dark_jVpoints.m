@@ -59,7 +59,7 @@ function [current, asymstruct_newVapp] = IgiveCurrentForVoltage(asymstruct, Vapp
 
     asymstruct_newVapp = stabilize(asymstruct_newVapp);
 
-    [~, ~, Jn, ~, ~, ~] = pinAna(asymstruct_newVapp);
+    [~, ~, Jn, ~] = pinana(asymstruct_newVapp);
 
     current = Jn(end);
     

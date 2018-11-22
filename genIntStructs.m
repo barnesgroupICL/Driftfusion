@@ -74,7 +74,7 @@ for i = 1:length(Int_array)
         changeLight_tmax = max(struct_Int.p.tmax / 5, 1e-8); % time to use for next iteration
     end
 
-    [V_temp, ~, J_temp, ~, ~, ~] = pinAna(struct_Int);
+    [V_temp, ~, J_temp, ~] = pinana(struct_Int);
     V_array(i) = V_temp(end);
     J_array(i) = J_temp(end);
 

@@ -256,7 +256,7 @@ p.Int = original_p.Int;
 ssol_i_1S_SR = changeLight(ssol_i_eq_SR, p.Int, false);
 ssol_i_1S_SR = stabilize(ssol_i_1S_SR);
 
-%% re-enamble figson, pinAna and calcJ options
+%% re-enamble figson, pinana and calcJ options
 
 sol_eq.p.figson = 1; % re-enable figures creation for this solution
 sol_eq.p.Ana = 1;
@@ -286,7 +286,7 @@ ssol_i_1S_SR.p.figson = 1; % re-enable figures creation for this solution
 ssol_i_1S_SR.p.Ana = 1;
 ssol_i_1S_SR.p.calcJ = original_p.calcJ;
 
-pinAna(ssol_i_1S_SR); % for the last simulation draw graphics
+pinana(ssol_i_1S_SR); % for the last simulation draw graphics
 
 disp('EQUILIBRATION COMPLETE')
 toc

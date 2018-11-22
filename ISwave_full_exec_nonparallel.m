@@ -49,7 +49,7 @@ function ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFr
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
 %   ISwave_single_analysis, ISwave_full_analysis_nyquist,
-%   IS_full_analysis_impedance, ISwave_full_analysis_phase, pinAna
+%   IS_full_analysis_impedance, ISwave_full_analysis_phase, pinana
 % Subfunctions: none
 % MAT-files required: none
 %
@@ -134,8 +134,8 @@ for i = 1:length(structs(1, :))
         asymstruct_Int = stabilize(asymstruct_Int);
     end
     % calculate currently applied DC voltage, as defined in pinana
-    [~, ~, ~, Efn, Efp, ~] = pinAna(asymstruct_Int);
-    Vdc_array(i) = Efn(end, end) - Efp(end, 1);
+    [~, Vapp_arr, ~, ~] = pinana(asymstruct_Int);
+    Vdc_array(i) = Vapp_arr(end);
     % in case the simulation without moving ions is requested, freeze them
     if frozen_ions
         asymstruct_Int.p.mui = 0;

@@ -9,7 +9,7 @@ Voc_array = NaN(1, size(structs_oc, 2));
 for i = 1:size(structs_oc, 2)
     Int_array(i) = structs_oc{1, i}.p.Int;
     structs_oc{1, i}.p.figson = 0;
-    [V_temp, ~, ~, ~, ~, ~] = pinAna(structs_oc{1, i});
+    [V_temp, ~, ~, ~] = pinana(structs_oc{1, i});
     Voc_array(i) = V_temp(end);
 end
 

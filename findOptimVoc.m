@@ -23,11 +23,11 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 %   [sol_i_1S_SR_OC, VOC_1S] = findOptimVoc(asymmetricize(ssol_i_1S_SR))
 %     get closer to the real VOC and save the VOC value in VOC_1S variable
 %
-% Other m-files required: pindrift, pinAna, stabilize
+% Other m-files required: pindrift, pinana, stabilize
 % Subfunctions: IgiveCurrentForVoltage
 % MAT-files required: none
 %
-% See also pindrift, asymmetricize, findVoc, pinAna.
+% See also pindrift, asymmetricize, findVoc, pinana.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -47,7 +47,7 @@ asymstruct.p.Ana = 1;
 asymstruct.p.JV = 0;
 
 % find residual current
-[~, ~, originalCurrent, ~, ~, ~] = pinAna(asymstruct);
+[~, ~, originalCurrent, ~] = pinana(asymstruct);
 
 disp([mfilename ' - Original voltage: ' num2str(asymstruct.p.Vapp, 8) ' V; original current: ' num2str(originalCurrent(end)) ' mA/cm2'])
 
@@ -187,7 +187,7 @@ while ~verifyStabilization(asymstruct_newVapp.sol, asymstruct_newVapp.t, 1e-2) %
 end
 warning('on', 'pindrift:verifyStabilization');
 
-[~, ~, Jn, ~, ~, ~] = pinAna(asymstruct_newVapp);
+[~, ~, Jn, ~] = pinana(asymstruct_newVapp);
 
 current = Jn(end);
 % I want the absolute value, but it's nicer to take the squared rather than

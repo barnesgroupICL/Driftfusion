@@ -31,7 +31,7 @@ function [n_coeff, i_coeff, U_coeff, dQ_coeff, n_noionic_coeff] = ISwave_single_
 %     do plot
 %
 % Other m-files required: ISwave_subtracting_analysis,
-%   ISwave_EA_single_fit, ISwave_EA_single_demodulation, pinAna
+%   ISwave_EA_single_fit, ISwave_EA_single_demodulation, pinana
 % Subfunctions: none
 % MAT-files required: none
 %
@@ -82,7 +82,7 @@ fit_t = s.t(fit_t_index:end)';
 fit_J = s.Jn(fit_t_index:end) / 1000; % in Ampere
 
 % recombination current profile to be analyzed
-[~, ~, ~, ~, ~, U] = pinAna(s);
+[~, ~, ~, U] = pinana(s);
 fit_U = U(fit_t_index:end) / 1000; % in Ampere
 
 % accumulating current profile to be analyzed

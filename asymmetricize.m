@@ -39,7 +39,7 @@ p.tpoints = 10; % rough, just for re-stabilization at Vapp
 p.Ana = 0;
 
 % get the Voc value at the final time step
-[Voc, ~, ~, ~, ~, ~] = pinAna(symstruct);
+[Voc, ~, ~, ~] = pinana(symstruct);
 p.Vapp = Voc(end); % use potential value in the middle as new applied voltage
 
 % set an initial time for stabilization tmax

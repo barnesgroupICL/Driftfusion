@@ -39,7 +39,7 @@ p = struct.p;
 p.tpoints = 10;
 p.tmesh_type = 2; % log spaced time mesh
 
-% disable Ana, as the ploting done in pinAna results in an error if the simulation doesn't reach the final time point
+% disable Ana, as the ploting done in pinana results in an error if the simulation doesn't reach the final time point
 p.Ana = 0;
 
 %% estimate a good tmax
