@@ -1,4 +1,4 @@
-function [Voc, Vapp_arr, Jtot, Efn, Efp, U_overt] = pinana(solstruct)
+function [Voc, Vapp_arr, Jtot, U_overt] = pinana(solstruct)
 % pinana analyses the input solution and plots various useful graphs.
 % Many plots are available to the user although currently these are
 % commented out. In future
