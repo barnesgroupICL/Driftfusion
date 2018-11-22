@@ -1,5 +1,5 @@
-function [Voc, Vapp_arr, Jtot, Efn, Efp, U_overt] = pinAna(solstruct)
-% pinAna analyses the input solution and plots various useful graphs.
+function [Voc, Vapp_arr, Jtot, Efn, Efp, U_overt] = pinana(solstruct)
+% pinana analyses the input solution and plots various useful graphs.
 % Many plots are available to the user although currently these are
 % commented out. In future
 
@@ -347,10 +347,16 @@ if p.figson == 1
             grid off
     
     %% Currents as a function of position
-    if p.calcJ == 1 || p.calcJ == 5
         figure('Name', ['Current - ' inputname(1)], 'NumberTitle', 'off');
-            plot(xnm,Jndiff(end, :),xnm,Jndrift(end, :),xnm,Jpdiff(end, :),xnm,Jpdrift(end, :),xnm,Jidiff(end, :),xnm,Jidrift(end, :),xnm,Jpart(end, :), xnm, U(end, :));
-            legend('Jn diff','Jn drift','Jp diff','Jp drift','Ji diff','Ji drift','Total J', 'Rec');
+            hold off
+            plot(xnm, U(end, :));
+            hold on
+            legendText = ['Rec'];
+            if p.calcJ == 1 || p.calcJ == 5
+                plot(xnm,Jndiff(end, :),xnm,Jndrift(end, :),xnm,Jpdiff(end, :),xnm,Jpdrift(end, :),xnm,Jidiff(end, :),xnm,Jidrift(end, :),xnm,Jpart(end, :));
+                legendText= [legendText, 'Jn diff','Jn drift','Jp diff','Jp drift','Ji diff','Ji drift','Total J'];
+            end
+            legend(legendText)
             xlabel('Position [nm]');
             ylabel('Current Density [mA cm^-2]');
             set(legend,'FontSize',12);
@@ -358,7 +364,6 @@ if p.figson == 1
             xlim([0, xnmend]);
             grid off;
             drawnow;
-    end
     
     %% Currents as a function of time
     if p.calcJ
