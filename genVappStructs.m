@@ -71,7 +71,7 @@ for i = 1:length(Vapp_array)
     % boundary conditions have to be changed more slowly 
     % the solver needs at least one point at the starting voltage, before switching to short circuit
     p.JV = 2; % new mode for arbitrary Vapp profiles
-    [~, Vapp_arr, ~, ~] = pinana(asymstruct_Vapp); % quasi-fermi levels are needed for knowing the current Voc
+    [Vapp_arr, ~, ~] = pinana(asymstruct_Vapp); % quasi-fermi levels are needed for knowing the current Voc
     Vstart = Vapp_arr(end); % current Voc
     Vend = Vapp_array(i); % final Voc
     

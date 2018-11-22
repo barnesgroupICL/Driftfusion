@@ -490,11 +490,11 @@ solstruct.p = p;
 
 if p.Ana == 1
     
-    [Voc, Vapp_arr, Jn, ~] = pinana(solstruct);
+    [Vapp_arr, Jn, ~] = pinana(solstruct);
     
     if p.OC == 1
         
-        solstruct.Voc = Voc;
+        solstruct.Voc = Vapp_arr;
         
     end
     

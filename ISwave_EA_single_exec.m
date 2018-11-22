@@ -76,7 +76,7 @@ p.RelTol = RelTol;
 p.JV = 2; % mode for arbitrary Vapp functions
 
 % get Efn and Efp
-[~, Vapp_arr, ~, ~] = pinana(asymstruct_Int);
+[Vapp_arr, ~, ~] = pinana(asymstruct_Int);
 
 % take current voltage, as defined in pinana
 Vstart = Vapp_arr(end);

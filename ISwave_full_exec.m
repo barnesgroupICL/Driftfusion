@@ -117,7 +117,7 @@ for i = 1:length(structs(1, :))
     % breaking
     asymstruct_Int = stabilize(asymstruct_Int);
     % calculate currently applied DC voltage, as defined in pinana
-    [~, Vapp_arr, ~, ~] = pinana(asymstruct_Int);
+    [Vapp_arr, ~, ~] = pinana(asymstruct_Int);
     Vdc_array(i) = Vapp_arr(end);
     Vdc_temp = Vdc_array(i); % convert from array to var for avoiding complaints from parfor
     % in case the simulation without moving ions is requested, freeze them

@@ -47,7 +47,7 @@ asymstruct.p.Ana = 1;
 asymstruct.p.JV = 0;
 
 % find residual current
-[~, ~, originalCurrent, ~] = pinana(asymstruct);
+[~, originalCurrent, ~] = pinana(asymstruct);
 
 disp([mfilename ' - Original voltage: ' num2str(asymstruct.p.Vapp, 8) ' V; original current: ' num2str(originalCurrent(end)) ' mA/cm2'])
 
@@ -187,7 +187,7 @@ while ~verifyStabilization(asymstruct_newVapp.sol, asymstruct_newVapp.t, 1e-2) %
 end
 warning('on', 'pindrift:verifyStabilization');
 
-[~, ~, Jn, ~] = pinana(asymstruct_newVapp);
+[~, Jn, ~] = pinana(asymstruct_newVapp);
 
 current = Jn(end);
 % I want the absolute value, but it's nicer to take the squared rather than

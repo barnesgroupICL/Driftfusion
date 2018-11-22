@@ -82,7 +82,7 @@ fit_t = s.t(fit_t_index:end)';
 fit_J = s.Jn(fit_t_index:end) / 1000; % in Ampere
 
 % recombination current profile to be analyzed
-[~, ~, ~, U] = pinana(s);
+[~, ~, U] = pinana(s);
 fit_U = U(fit_t_index:end) / 1000; % in Ampere
 
 % accumulating current profile to be analyzed

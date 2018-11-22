@@ -134,7 +134,7 @@ for i = 1:length(structs(1, :))
         asymstruct_Int = stabilize(asymstruct_Int);
     end
     % calculate currently applied DC voltage, as defined in pinana
-    [~, Vapp_arr, ~, ~] = pinana(asymstruct_Int);
+    [Vapp_arr, ~, ~] = pinana(asymstruct_Int);
     Vdc_array(i) = Vapp_arr(end);
     % in case the simulation without moving ions is requested, freeze them
     if frozen_ions
