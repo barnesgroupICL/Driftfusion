@@ -1,0 +1,12 @@
+% soleq_toy_ntypewf_nobulksrh = equilibrate(par.toy.ntype_wf_nobulksrh);
+% soleq_toy_ptypewf_nobulksrh = equilibrate(par.toy.ptype_wf_nobulksrh);
+JV_toy_ntypewf_nobulksrh.JV0p5mVs = doJV(soleq_toy_ntypewf_nobulksrh.i_sr, 0.5e-3, 100, 1, 1, 0, 1.4, 2);
+JV_toy_ptypewf_nobulksrh.JV0p5mVs = doJV(soleq_toy_ptypewf_nobulksrh.i_sr, 0.5e-3, 100, 1, 1, 0, 1.4, 2);
+% JV_toy_ntypewf_nobulksrh.JV5mVs = doJV(soleq_toy_ntypewf_nobulksrh.i_sr, 5e-3, 100, 1, 1, 0, 1.4, 2);
+% JV_toy_ptypewf_nobulksrh.JV5mVs = doJV(soleq_toy_ptypewf_nobulksrh.i_sr, 5e-3, 100, 1, 1, 0, 1.4, 2);
+% JV_toy_ntypewf_nobulksrh.JV50mVs = doJV(soleq_toy_ntypewf_nobulksrh.i_sr, 50e-3, 100, 1, 1, 0, 1.4, 2);
+% JV_toy_ptypewf_nobulksrh.JV50mVs = doJV(soleq_toy_ptypewf_nobulksrh.i_sr, 50e-3, 100, 1, 1, 0, 1.4, 2);
+% JV_toy_ntypewf_nobulksrh.JV500mVs = doJV(soleq_toy_ntypewf_nobulksrh.i_sr, 500e-3, 100, 1, 1, 0, 1.4, 2);
+% JV_toy_ptypewf_nobulksrh.JV500mVs = doJV(soleq_toy_ptypewf_nobulksrh.i_sr, 500e-3, 100, 1, 1, 0, 1.4, 2);
+% JV_toy_ntypewf_nobulksrh.JV5000mVs = doJV(soleq_toy_ntypewf_nobulksrh.i_sr, 5000e-3, 100, 1, 1, 0, 1.2, 2);
+% JV_toy_ptypewf_nobulksrh.JV5000mVs = doJV(soleq_toy_ptypewf_nobulksrh.i_sr, 5000e-3, 100, 1, 1, 0, 1.2, 2);
