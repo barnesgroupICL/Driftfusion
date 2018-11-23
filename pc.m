@@ -16,20 +16,20 @@ classdef pc
         
         % Temperature [K]
         T = 300;
-        % TiO2
+        
         % Device Dimensions [cm]
+        % TiO2
         % dcell = {{180e-7, 20e-7}; {30e-7, 450e-7, 30e-7}; {50e-7}};       % Layer thickness array
         % pcell = {{90, 40}; {60, 225, 60}; {100}};             % Spatial mesh points array
-        
         % PEDOT
-        dcell = {{30e-7}; {30e-7, 450e-7, 30e-7}; {30e-7, 30e-7}};       % Layer thickness array
-        pcell = {{100}; {60, 225, 60}; {60, 30}};             % Spatial mesh points array
+        %dcell = {{30e-7}; {30e-7, 450e-7, 30e-7}; {30e-7, 30e-7}};       % Layer thickness array
+        %pcell = {{100}; {60, 225, 60}; {60, 30}};    
         
         % TOY
-        %dcell = {{180e-7, 20e-7}; {30e-7, 450e-7, 30e-7}; {20e-7, 180e-7}};       % Layer thickness array
-        %pcell = {{90, 20}; {30, 225, 30}; {20, 90}};             % Spatial mesh points array
+        dcell = {{180e-7, 20e-7}; {30e-7, 450e-7, 30e-7}; {20e-7, 180e-7}};       % Layer thickness array
+        pcell = {{90, 20}; {30, 225, 30}; {20, 90}};             % Spatial mesh points array
         dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3), this is related to Space Charge Region, read below for wp and wn parameters
-        pint = 100;          % Interfacial points (x_mesh_type = 3)
+        pint = 40;          % Interfacial points (x_mesh_type = 3)
         
         % Define spatial cordinate system
         % m=0 cartesian
@@ -81,20 +81,20 @@ classdef pc
         % EA = [-1.9, -3.8, -4.1];
         % IP = [-4.9, -5.4, -7.4];
         % PEDOT
-        EA = [-3.0, -3.8, -3.8];
-        IP = [-5.1, -5.4, -6.2];
+        %EA = [-3.0, -3.8, -3.8];
+        %IP = [-5.1, -5.4, -6.2];
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         % TOY
-        %EA = [-3.4, -3.8, -3.8];
-        %IP = [-5.4, -5.4, -5.8];        
+        EA = [-3.4, -3.8, -3.8];
+        IP = [-5.4, -5.4, -5.8];        
         
         %% Equilibrium Fermi energies - defines doping density
         %TiO2
         % E0 = [-4.8, -4.6, -4.2];
         % PEDOT
-        E0 = [-5.0, -4.6, -3.9];
+        %E0 = [-5.0, -4.6, -3.9];
         %TOY
-        %E0 = [-5.3, -4.6, -3.9];        
+        E0 = [-5.3, -4.6, -4.1];        
         
         % SRH trap energies- currently set to mid gap - always set
         % respective to energy levels to avoid conflicts
@@ -104,9 +104,9 @@ classdef pc
         %TiO2 Vbi1.1V
         %Et_bulk = [-3.5, -4.6, -5.6];
         % PEDOT
-        Et_bulk =[-4.05, -4.6, -5.0];
+        %Et_bulk =[-4.05, -4.6, -5.0];
         % TOY
-        %Et_bulk =[-4.4, -4.6, -4.8];
+        Et_bulk =[-4.4, -4.6, -4.8];
         
         
         % Currently redundant
@@ -115,14 +115,14 @@ classdef pc
         %PhiA = -4.8;
         %PhiC = -4.2;        
         %PEDOT
-        PhiA = -5.0;
-        PhiC = -3.9;
+        %PhiA = -5.0;
+        %PhiC = -3.9;
         % TOY
-        %PhiA = -5.3;
-        %PhiC = -3.9;       
+        PhiA = -5.3;
+        PhiC = -4.1;       
         
         % Effective Density Of States
-        N0 = [1e19, 1e19, 1e19];
+        N0 = [1e17, 1e17, 2.3973e+20];
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
@@ -136,11 +136,11 @@ classdef pc
         %mue = [0.02, 20, 0.09];         % electron mobility [cm2V-1s-1]
         %muh = [0.02, 20, 0.09];         % hole mobility [cm2V-1s-1]
         % PEDOT
-        mue = [0.01, 20, 1e-3];         % electron mobility [cm2V-1s-1]
-        muh = [0.01, 20, 1e-3];         % hole mobility [cm2V-1s-1]
+        %mue = [0.01, 20, 1e-3];         % electron mobility [cm2V-1s-1]
+        %muh = [0.01, 20, 1e-3];         % hole mobility [cm2V-1s-1]
         % TOY
-        %mue = [1, 20, 1];         % electron mobility [cm2V-1s-1]
-        %muh = [1, 20, 1];         % hole mobility [cm2V-1s-1]
+        mue = [1, 20, 1];         % electron mobility [cm2V-1s-1]
+        muh = [1, 20, 1];         % hole mobility [cm2V-1s-1]
         
         muion = [0, 1e-10, 0];                   % ion mobility [cm2V-1s-1]
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
@@ -152,10 +152,10 @@ classdef pc
         %TiO2
         %epp = [4,23,12];       
         %PEDOT
-        epp = [4,23,4];
+        % epp = [4,23,4];
         % TiO2 Wypych2014
         % TOY
-        %epp = [40,23,40];    
+        epp = [4,23,4];    
                 
         %%% Generation %%%%%
         G0 = [0, 2.6409e+21, 0];        % Uniform generation rate @ 1 Sun
@@ -167,24 +167,27 @@ classdef pc
         %krad = [3.18e-11, 3.6e-12, 1.54e-10];  % [cm3 s-1] Radiative Recombination coefficient
         % p-type/pi-interface/intrinsic/in-interface/n-type
         % PEDOT
-        krad = [6.3e-11, 3.6e-12, 6.8e-11];
+        % krad = [6.3e-11, 3.6e-12, 6.8e-11];
         %TOY
-        %krad = [1e-11, 3.6e-12, 1e-11];
+        krad = [1e-11, 3.6e-12, 1e-11];
         
         % Bulk SRH time constants for each layer
-        taun_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for electrons
-        taup_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for holes
+        %taun_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for electrons
+        %taup_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for holes
+        %TOY
+        taun_bulk = [1e6, 1e6, 1e6];           % [s] SRH time constant for electrons
+        taup_bulk = [1e6, 1e6, 1e6];           % [s] SRH time constant for holes        
         
         % Interfacial SRH time constants - should be of length (number of layers)-1
         % TiO2
         %taun_inter = [1e-9, 1e-12];
         %taup_inter = [1e-9, 1e-12];        
         % PEDOT
-        taun_inter = [1e-13, 1e-6];
-        taup_inter = [1e-13, 1e-6];
+        % taun_inter = [1e-13, 1e-6];
+        % taup_inter = [1e-13, 1e-6];
         % TOY
-        %taun_inter = [1e6, 1e-12];
-        %taup_inter = [1e6, 1e-12];    
+        taun_inter = [1e6, 1e-12];
+        taup_inter = [1e6, 1e-12];    
         
         % Surface recombination and extraction coefficients
         sn_r = 1e8;            % [cm s-1] electron surface recombination velocity (rate constant for recombination at interface)
@@ -816,9 +819,9 @@ classdef pc
                 
             end
             
-%             dev.gradN0 = gradient(dev.N0, xx);
-%             dev.gradEA = gradient(dev.EA, xx);
-%             dev.gradIP = gradient(dev.IP, xx);
+%            dev.gradN0 = gradient(dev.N0, xx);
+%            dev.gradEA = gradient(dev.EA, xx);
+%            dev.gradIP = gradient(dev.IP, xx);
             
             dev.nt = F.nfun(dev.N0, dev.EA, dev.Et, par.T, par.stats);
             dev.pt = F.pfun(dev.N0, dev.IP, dev.Et, par.T, par.stats);
