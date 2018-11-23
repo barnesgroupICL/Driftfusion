@@ -15,7 +15,8 @@ capfigon = 0;
 cardent = 0;
 recfigon = 0;
 ddcur = 0;
-transfigon =1;
+transfigon = 0;
+rs = 0;
 
 % tarr is a time time array for the time you wish to plot
 if length(varargin) == 1
@@ -134,7 +135,7 @@ ptot = trapz(x, p, 2);
 if par.JV == 1
     
     Vapp_arr = par.Vstart + ((par.Vend-par.Vstart)*t*(1/par.tmax));
-    
+
 else
     
     Vapp_arr = ones(1, length(t)).*par.Vapp;
@@ -340,7 +341,7 @@ Jrec2 = Jp(:, pcum(4)-1);
 Vinj1 = (Efp(1, pcum(3))-Evb(1, pcum(3)))-(Efp(:, pcum(3))-Evb(:, pcum(3)));
 Vinj2 = (Ecb(1, pcum(4)-1)- Efn(1, pcum(4)-1))-(Ecb(:, pcum(4)-1)- Efn(:, pcum(4)-1));
 Jinj1 = Jp(:, pcum(3));
-Jinj2 = Jn(:, pcum(4));
+Jinj2 = Jn(:, pcum(4)-1);
 
 Jbulk = trapz(x(pcum(3):pcum(4)-1), U(pcum(3):pcum(4)-1));
 
@@ -348,7 +349,6 @@ Jbulk = trapz(x(pcum(3):pcum(4)-1), U(pcum(3):pcum(4)-1));
 %Figures
 if par.figson == 1
     
-    rs = 0;
     %% Specify ranges for plotting- should be an input argument
     % whole device
     xrange = [xnm(pcum(1)), xnm(pcum(end))];
@@ -404,9 +404,9 @@ if par.figson == 1
         figure(110)
         plot(xnm, Jn(pparr(i), :), xnm, Jp(pparr(i), :), xnm, Jtot(pparr(i), :))
         xlabel('Position [nm]')
-        ylabel('J [A]')    
+        ylabel('J [A]')
+        legend('Jn', 'Jp', 'Jtot')
         xlim([xrange(1), xrange(2)])
-        hold on
 
         if transfigon == 1
             
@@ -416,25 +416,25 @@ if par.figson == 1
             ylabel('Jrec [A]')
             legend('Jrec1', 'Jrec2')
             
-            lnJ = log(Jtot(end));
+            lnJ = log(Jtot(:, end));
             lnJrec1 = log(Jrec1);
             lnJrec2 = log(Jrec2);
             
             lnJinj1 = log(Jinj1);
             lnJinj2 = log(Jinj2);
-            
-            p1 = find(Vrec1 > 0.3);
+
+            p1 = find(Vrec1 > 0.01);
             p1 = p1(1);
             
-            p2 = find(Vrec1 > 0.4);
+            p2 = find(Vrec1 > 0.02);
             p2 = p2(1);
-            
+
             fitJrec1 = fit(Vrec1(p1:p2), lnJrec1(p1:p2), 'poly1');
             
-            p1 = find(Vrec2 > 0.2);
+            p1 = find(Vrec2 > 0.01);
             p1 = p1(1);
             
-            p2 = find(Vrec2 > 0.3);
+            p2 = find(Vrec2 > 0.02);
             p2 = p2(1);           
             
             fitJrec2 = fit(Vrec2(p1:p2), lnJrec2(p1:p2), 'poly1');
@@ -445,49 +445,68 @@ if par.figson == 1
             xlabel('Vrec1 [V]')
             ylabel('ln(Jrec)')
             legend('Jrec1')
-%             dim = [.2 .5 .3 .3];
-%             anno = ['gradient =' num2str(round(fitJrec1.p1, 2)), newline, 'intercept =', num2str(round(fitJrec1.p2, 2))];
-%             annotation('textbox',dim,'String',anno,'FitBoxToText','on', 'Fontsize', 16);
-            
+            dim = [.2 .5 .3 .3];
+            anno = ['n_{id} =' num2str(round(1/(fitJrec1.p1*0.0257),2)), newline, 'Js =', num2str(round(fitJrec1.p2, 2))];
+            annotation('textbox',dim,'String',anno,'FitBoxToText','on', 'Fontsize', 16);
+ 
             figure(92)
-            plot(Vrec2, lnJrec2)
+            plot(fitJrec2 , Vrec2, lnJrec2)
             xlabel('Vrec2 [V]')
             ylabel('ln(Jrec)')
             legend('Jrec2')
-%             dim = [.2 .5 .3 .3];
-%             anno = ['gradient =' num2str(round(fitJrec2.p1, 2)), newline, 'intercept =', num2str(round(fitJrec2.p2, 2))];
-%             annotation('textbox',dim,'String',anno,'FitBoxToText','on', 'Fontsize', 16);
+            dim = [.2 .5 .3 .3];
+            anno = ['n_{id} =' num2str(round(1/(fitJrec2.p1*0.0257),2)), newline, 'Js =', num2str(round(fitJrec2.p2, 2))];
+            annotation('textbox',dim,'String',anno,'FitBoxToText','on', 'Fontsize', 16);
  
             figure(93)
-            plot(Vapp_arr, lnJrec1, Vapp_arr, lnJrec2, Vapp_arr, lnJinj1, Vapp_arr, lnJinj2)
+            plot(Vapp_arr, lnJrec1, Vapp_arr, lnJrec2, Vapp_arr, lnJinj1, Vapp_arr, lnJinj2, Vapp_arr, lnJ)
             xlabel('Vapp [V]')
             ylabel('ln(Jinj)')
-            legend('Jrec1', 'Jrec2', 'Jinj1', 'Jinj2')
+            legend('Jrec1', 'Jrec2', 'Jinj1', 'Jinj2', 'Jtot')
 %             dim = [.2 .5 .3 .3];
 %             anno = ['gradient =' num2str(round(fitJinj1.p1, 2)), newline, 'intercept =', num2str(round(fitJinj1.p2, 2))];
 %             annotation('textbox',dim,'String',anno,'FitBoxToText','on', 'Fontsize', 16);
+            p1 = find(Vinj1 > 0.01);
+            p1 = p1(1);
+            
+            p2 = find(Vinj1 > 0.02);
+            p2 = p2(1);           
+            
+            fitJinj1 = fit(Vinj1(p1:p2), lnJinj1(p1:p2), 'poly1');
             
             figure(94)
-            plot(Vinj2, lnJinj2)
+            plot(fitJinj1, Vinj1, [lnJinj1, lnJ])
+            xlabel('Vinj1 [V]')
+            ylabel('ln(Jinj)')
+            legend('Jinj1', 'Jtot')
+            dim = [.2 .5 .3 .3];
+            anno = ['n_{id} =' num2str(round(fitJinj1.p1*0.0257,2)), newline, 'Js =', num2str(round(fitJinj1.p2, 2))];
+            annotation('textbox',dim,'String',anno,'FitBoxToText','on', 'Fontsize', 16);
+            
+            p1 = find(Vinj2 > 0.01);
+            p1 = p1(1);
+            
+            p2 = find(Vinj2 > 0.02);
+            p2 = p2(1);           
+            
+            fitJinj2 = fit(Vinj2(p1:p2), lnJinj2(p1:p2), 'poly1');            
+            
+            figure(95)
+            plot(fitJinj2, Vinj2, lnJinj2)
             xlabel('Vinj2 [V]')
             ylabel('ln(Jinj)')
             legend('Jinj2')
-%             dim = [.2 .5 .3 .3];
-%             anno = ['gradient =' num2str(round(fitJinj2.p1, 2)), newline, 'intercept =', num2str(round(fitJinj2.p2, 2))];
-%             annotation('textbox',dim,'String',anno,'FitBoxToText','on', 'Fontsize', 16);
+            dim = [.2 .5 .3 .3];
+            anno = ['n_{id} =' num2str(round(fitJinj2.p1*0.0257,2), 2), newline, 'Js =', num2str(round(fitJinj2.p2, 2))];
+            annotation('textbox',dim,'String',anno,'FitBoxToText','on', 'Fontsize', 16);
             
-            figure(95)
+            figure(96)
             plot(Vapp_arr, Vrec1, Vapp_arr, Vrec2)
             xlabel('Vapp [V]')
             ylabel('Vrec [V]')
             xlim([Vapp_arr(1), 1])%Vapp_arr(end)])
-            legend('Vrec1', 'Vrec2')  
+            legend('Vrec1', 'Vrec2')              
             
-            figure(9)
-            plot(Vapp_arr, log(Jtot(:, end)))
-            xlabel('Vapp [V]')
-            ylabel('ln(J)')
-            xlim([Vapp_arr(1), Vapp_arr(end)])
             
         end
         
@@ -514,15 +533,17 @@ if par.figson == 1
                 Ubtb_bulk(j) = trapz(x(pcum(3):pcum(4)-1), Ubtb(j, pcum(3):pcum(4)-1),2);
                 Ubtb_int1(j) = trapz(x(pcum(2):pcum(3)-1), Ubtb(j, pcum(2):pcum(3)-1),2);
                 Ubtb_int2(j) = trapz(x(pcum(4):pcum(5)-1), Ubtb(j, pcum(4):pcum(5)-1),2);
+                
+                Ubtb_integral(j) = trapz(x, Ubtb(j, :),2);
             end
             % srh as a function off time
             
             if par.JV ==1
                 figure(61)
-                semilogy(Vapp_arr, Usrh_bulk, Vapp_arr, Usrh_int1, Vapp_arr, Usrh_int2)
+                semilogy(Vapp_arr, Usrh_bulk, Vapp_arr, Usrh_int1, Vapp_arr, Usrh_int2, Vapp_arr, Ubtb_integral)
                 xlabel('Vapp [V]')
-                ylabel('SRH rate [cm-2s-1]')
-                legend('bulk', 'int1', 'int2')
+                ylabel('Rec rate [cm-2s-1]')
+                legend('SRH- bulk', 'SRH- int1', 'SRH- int2', 'BTB')
                 
                 if rs == 0
                     xlim([Vapp_arr(1), Vapp_arr(end)])
