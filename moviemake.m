@@ -283,11 +283,11 @@ xrange = [0, xnm(end)];
 pp1 = find(Vapp_arr < 1);
 pp1 = pp1(end);
 
-for i=1:length(Vapp_arr)
+for i=1:pp1%length(Vapp_arr)
     
     fig1 = figure(30)
     clf
-%{    
+
     % Field
     Field = -gradient(V(i,:), x);
     
@@ -394,17 +394,18 @@ xlabel('Position')
 ylabel('Ion density [cm^{-3}]')
 xlim([0, xnm(end)])
 ylim([-1e18, 4e18])
-%}
 
+%{
         % electron and hole currents as function of position from continuity
         %figure(110)
-        semilogy(xnm, Jn(i, :), xnm, Jp(i, :), xnm, Jtot(i, :))
+        plot(xnm, Jn(i, :), xnm, Jp(i, :), xnm, Jtot(i, :), '--')
         xlabel('Position [nm]')
         ylabel('J [A]')    
         xlim([xrange(1), xrange(2)])
-        ylim([1e-9, 10])
+        ylim([-8, 8])
+        %legend('Jn', 'Jp', 'Jtot')
         %hold on
-
+%}
 % semilogy(xnm, Usrh(i, :))
 % xlabel('Position [nm]')
 % ylabel('Urec [cm^{-3}s^{-1}]')
