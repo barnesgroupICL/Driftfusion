@@ -3,13 +3,14 @@ classdef explore
     methods (Static)
         
         function parexsol = explore2par(par_base, parnames, parvalues)
-            
-            % par_base is the base parameter set
-            % parnames is a cell array with the parameter names in - check these
+            % EXPLOREPAR is used to explore 2 different parameters using a parallel pool.
+            % The code is likely to require modification for individual parameters
+            % owing to possible dependencies.
+            % PAR_BASE is the base parameter set
+            % PARNAMES is a cell array with the parameter names in - check these
             % carefully to avoid heartache later
-            % parvalues is matrix with the parameter value ranges e.g.
+            % PARVALUES is matrix with the parameter value ranges e.g.
             
-            % Current version for 2 parameters only- will be extended in the future
             tic
             disp('Starting parameter exploration');
             disp(['Parameter 1: ', parnames(1)]);
@@ -45,7 +46,7 @@ classdef explore
                     disp(['Run no. ', num2str(runN), ', taun = ', num2str(parval1(i)), ', E0 = ', num2str(parval2(j))]);
                     
                     par = exploreparhelper(par, str2, parval2(j));
-                            
+                    
                     soleq = equilibrate(par);
                     % JV = doJV(soleq.i_sr, 50e-3, 100, 1, 1e-10, 0, 1.5, 2);
                     JV = doJV(soleq.eq_sr, 50e-3, 100, 1, 0, 0, 1.3, 2);
@@ -60,9 +61,9 @@ classdef explore
                     FF_r(j) = JV.stats.FF_r;
                     
                     % For PL
-%                     [sol_Voc, Voc] = findVoc(soleq.i_sr, 1e-6, Voc_f(j), (Voc_f(j)+0.1))
-%                     Voc_stable(j) = Voc;
-%                     PLint(j) = sol_Voc.PLint(end);
+                    %                     [sol_Voc, Voc] = findVoc(soleq.i_sr, 1e-6, Voc_f(j), (Voc_f(j)+0.1))
+                    %                     Voc_stable(j) = Voc;
+                    %                     PLint(j) = sol_Voc.PLint(end);
                     
                 end
                 
@@ -74,8 +75,8 @@ classdef explore
                 F(i,:) = mpp_r;
                 G(i,:) = FF_f;
                 H(i,:) = FF_r;
-%                 J(i,:) = Voc_stable;
-%                 K(i,:) = PLint;
+                %                 J(i,:) = Voc_stable;
+                %                 K(i,:) = PLint;
                 
             end
             
@@ -87,8 +88,8 @@ classdef explore
             parexsol.stats.mpp_r = F;
             parexsol.stats.FF_f = G;
             parexsol.stats.FF_r = H;
-%             parexsol.stats.Voc_stable = J;
-%             parexsol.stats.PLint = K;
+            %             parexsol.stats.Voc_stable = J;
+            %             parexsol.stats.PLint = K;
             parexsol.parnames = parnames;
             parexsol.parvalues = parvalues;
             parexsol.parval1 = parval1;
@@ -170,7 +171,7 @@ classdef explore
             caxis([0.75, 0.95])
             %caxis([1.05, 1.15])
         end
-
+        
         
         function plotJscF(parexsol)
             

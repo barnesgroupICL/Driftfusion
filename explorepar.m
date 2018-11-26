@@ -1,40 +1,42 @@
-function parexsol = explorepar(par_base)
+function parexsol = explorepar(par_base, parnames, parvalues)
 
-% par_base is the base parameter set
+
+% Current version for 2 parameters only- will be extended in the future
 tic
 disp('Starting parameter exploration');
-% disp(['Parameter 1: ', parname1]);
-% disp(['Parameter 2: ', parname2]);
-tau_ptype = logspace(-13, -6, 8);
-E0_ptype = (-5.0:0.1:-4.4);
+disp(['Parameter 1: ', parnames(1)]);
+disp(['Parameter 2: ', parnames(2)]);
+parval1 = cell2mat(parvalues(1));
+parval2 = cell2mat(parvalues(2));
+str1 = char(parnames(1));
+str2 = char(parnames(2));
+
 j = 1;
 
-pararr1 = tau_ptype;
-pararr2 = E0_ptype;
-
-parfor i = 1:length(pararr1)
+parfor i = 1:length(parval1)
  
     par = par_base;
     par.Ana = 0;
-    par.taun(1) = tau_ptype(i)
-    par.taup(1) = tau_ptype(i);
+    par = exploreparhelper(par, str1, parval1(i));
+    par.taup(1) = par.taun(1)
     
-    Voc_f = zeros(1, length(pararr2));
-    Voc_r = zeros(1, length(pararr2));    
-    Jsc_f = zeros(1, length(pararr2));
-    Jsc_r = zeros(1, length(pararr2));
-    mpp_f = zeros(1, length(pararr2));
-    mpp_r = zeros(1, length(pararr2));
-    FF_f = zeros(1, length(pararr2));
-    FF_r = zeros(1, length(pararr2));
-    Voc_stable = zeros(1, length(pararr2));
-    PLint = zeros(1, length(pararr2));
+    Voc_f = zeros(1, length(parval2));
+    Voc_r = zeros(1, length(parval2));    
+    Jsc_f = zeros(1, length(parval2));
+    Jsc_r = zeros(1, length(parval2));
+    mpp_f = zeros(1, length(parval2));
+    mpp_r = zeros(1, length(parval2));
+    FF_f = zeros(1, length(parval2));
+    FF_r = zeros(1, length(parval2));
+    Voc_stable = zeros(1, length(parval2));
+    PLint = zeros(1, length(parval2));
 
-    for j = 1:length(pararr2)
+    for j = 1:length(parval2)
         
-        runN = (i-1)*length(pararr2) + j;
-        disp(['Run no. ', num2str(runN), ', taun = ', num2str(pararr1(i)), ', E0 = ', num2str(pararr2(j))]);
-        par.E0(1) = E0_ptype(j);
+        runN = (i-1)*length(parval2) + j;
+        disp(['Run no. ', num2str(runN), ', taun = ', num2str(parval1(i)), ', E0 = ', num2str(parval2(j))]);
+  
+        par = exploreparhelper(par, str2, parval2(j));
         
         soleq = equilibrate(par);
         JV = doJV(soleq.i_sr, 50e-3, 100, 1, 1e-10, 0, 1.5, 2);
@@ -78,19 +80,22 @@ parexsol.stats.FF_f = G;
 parexsol.stats.FF_r = H;
 parexsol.stats.Voc_stable = J;
 parexsol.stats.PLint = K;
-parexsol.tau_ptype = tau_ptype;
-parexsol.E0_ptype = E0_ptype;
+parexsol.parnames = parnames;
+parexsol.parvalues = parvalues;
+parexsol.parval1 = parval1;
+parexsol.parval2 = parval2;
+
 
 % 
 % figure(3000)
-% surf(pararr2-par.IP(1), pararr1, parexsol.Voc_f)
-% ylabel('pararr1 [cm-3]')
+% surf(parval2-par.IP(1), parval1, parexsol.Voc_f)
+% ylabel('parval1 [cm-3]')
 % xlabel('Fermi level offset [eV]')
 % zlabel('Voc F scan [V]')
 % 
 % figure(3001)
-% surf(pararr2-par.IP(1), pararr1, parexsol.Voc_r)
-% ylabel('pararr1 [cm-3]')
+% surf(parval2-par.IP(1), parval1, parexsol.Voc_r)
+% ylabel('parval1 [cm-3]')
 % xlabel('Fermi level offset [eV]')
 % zlabel('Voc R scan [V]')
 
