@@ -43,9 +43,9 @@ classdef pc
         % PINT.
 
         dcell = {{30e-7}; {30e-7, 450e-7, 30e-7}; {30e-7, 30e-7}};         % Layer and subsection thickness array
-        pcell = {{100}; {60, 225, 60}; {60, 30}};                          % Number of points in layers and subsections array  
+        pcell = {{90}; {60, 225, 60}; {60, 30}};                          % Number of points in layers and subsections array  
         dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3)
-        pint = 40;          % Interfacial points (x_mesh_type = 3)
+        pint = 20;          % Interfacial points (x_mesh_type = 3)
         
         % Define spatial cordinate system- typeically this will be kept at
         % 0 for most applications
@@ -127,14 +127,14 @@ classdef pc
         PhiC = -3.9;
         
         %% Effective Density Of States (eDOS) [cm-3]
-        N0 = [1e17, 1e17, 2.3973e+20];
+        N0 = [1e19, 1e19, 1e19];
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
         
         %% Mobile ions
         % Mobile ion defect density [cm-3] 
-        Nion = [0, 1e19, 0];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.     
+        Nion = [0, 1e18, 0];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.     
         % Approximate density of iodide sites [cm-3]
         % Limits the density of iodide vancancies
         DOSion = [1e-6, 1.21e22, 1e-6];                 % P. Calado thesis           
@@ -352,9 +352,6 @@ classdef pc
                 error(msg);
             elseif length(par.Et_bulk) ~= length(par.d)
                 msg = 'Bulk SRH trap energy array (Et_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                error(msg);
-            elseif length(par.Et_inter) ~= length(par.d)-1
-                msg = 'Interfacial SRH trap energy array (Et_bulk) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
                 error(msg);
             elseif length(par.taun_inter) ~= length(par.d)-1
                 msg = 'Interfacial electron SRH time constant array (taun_inter) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
