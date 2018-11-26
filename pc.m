@@ -41,9 +41,8 @@ classdef pc
         % are inserted automatically between each layer with a width
         % defined by the property DINT and number of points defined by
         % PINT.
-
-        dcell = {{30e-7}; {30e-7, 450e-7, 30e-7}; {30e-7, 30e-7}};         % Layer and subsection thickness array
-        pcell = {{90}; {60, 225, 60}; {60, 30}};                          % Number of points in layers and subsections array  
+        dcell = {{50e-7}; {30e-7, 450e-7, 30e-7}; {60e-7}};         % Layer and subsection thickness array
+        pcell = {{50}; {30, 225, 30}; {60}};                          % Number of points in layers and subsections array  
         dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3)
         pint = 20;          % Interfacial points (x_mesh_type = 3)
         
