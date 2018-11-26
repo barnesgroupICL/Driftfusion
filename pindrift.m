@@ -198,14 +198,18 @@ elseif p.Int ~= 0 && p.OM == 2
   
 % Uniform Generation
 elseif p.OM == 0
- 
-           g = p.Int*p.dev.G0;
-
+            
+           if t < p.tmax*0.05
+               
+                g = (p.Int*p.dev.G0/(p.tmax*0.05))*t;
+           else
+               g = p.Int*p.dev.G0;
+           end
         % Add pulse
         if p.pulseon == 1
             if  t >= p.pulsestart && t < p.pulselen + p.pulsestart
                 
-                g = g+(p.pulseint*p.G0);
+                g = g+(p.pulseint.*p.dev.G0);
             
             end
         end
