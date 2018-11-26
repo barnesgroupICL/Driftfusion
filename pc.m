@@ -45,12 +45,6 @@ classdef pc
         % TiO2
         % dcell = {{180e-7, 20e-7}; {30e-7, 450e-7, 30e-7}; {50e-7}};       % Layer and subsection thickness array
         % pcell = {{90, 40}; {60, 225, 60}; {100}};                         % Number of points in layers and subsections array        
-        % PEDOT
-        %dcell = {{30e-7}; {30e-7, 450e-7, 30e-7}; {30e-7, 30e-7}};         % Layer and subsection thickness array
-        %pcell = {{100}; {60, 225, 60}; {60, 30}};                          % Number of points in layers and subsections array  
-        % TOY
-        dcell = {{180e-7, 20e-7}; {30e-7, 450e-7, 30e-7}; {20e-7, 180e-7}}; % Layer and subsection thickness array
-        pcell = {{90, 20}; {30, 225, 30}; {20, 90}};                        % Number of points in layers and subsections array    
         
         dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3)
         pint = 40;          % Interfacial points (x_mesh_type = 3)

@@ -1,4 +1,6 @@
-function [sol_Voc, Voc] = findVoc(sol_ini, mobi, x0, x1)
+function [sol_Voc, Voc] = findVoc(sol_ini, mobseti, x0, x1, tol)
+% FINDVOC finds the open cicuit voltage of a device using a
+% Newton-Raphson iteration
 
 %% Instructions
 % Before running the code, run a JV scan to get the approximate Voc value.
@@ -6,15 +8,12 @@ function [sol_Voc, Voc] = findVoc(sol_ini, mobi, x0, x1)
 % x0 and x1.
 
 %% Input arguments
-
-% sol_ini - initial state of the device
-% mobi - ion mobility
-% x0 - Lower initial guess
-% x1 - Higher initial guess
-
-% tol - current tolerence in mA- the value that the current should drop to below
+% SOL_INI- initial state of the device
+% MOBSETI - ion mobility switch
+% X0 - lower initial guess
+% X1 - upper initial guess
+% TOL - current tolerence in Acm-2 - the value that the current should drop to below
 % before the procedure stops running
-tol = 1e-6;
 
 p = sol_ini.p;
 
@@ -28,20 +27,11 @@ JVscan_rate = 1;        %Vs-1
 %% Save Surface rec coefficients
 taun = p.taun;       % [s] SRH time constant for electrons
 taup = p.taup;
-% 
-% % Switch off surface rec
-% p.taun_etl = 1e6;       % [s] SRH time constant for electrons
-% p.taup_etl = p.taun_etl;      % [s] SRH time constant for holes
-% p.taun_htl = p.taun_etl; 
-% p.taup_htl = p.taun_etl; 
-
-% Set ion mobility
-p.mui = mobi;
 
 %% 1 Sun quasi equilibrium solution
-
 disp('1 Sun quasi-equilibrium solution')
-p.JV = 0;         % Switch ion mobility off for illumination step
+p.mobseti = 0;      % switch off ion mobility for illumination step
+p.JV = 0;
 p.Int = 1;
 
 % Log time mesh
@@ -53,7 +43,7 @@ sol = pindrift(sol_ini, p);
 disp('Complete.')
 
 %% Run JV to new potential
-
+p.mobseti = mobseti;
 p.Ana = 1;
 p.JV = 1;
 p.Vstart = p.Vapp;
