@@ -160,8 +160,8 @@ classdef pc
         krad = [6.3e-11, 3.6e-12, 6.8e-11];
         
         %% Bulk SRH time constants for each layer [s]
-        taun_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for electrons
-        taup_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for holes   
+        taun_bulk = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for electrons
+        taup_bulk = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for holes   
         
         %% Interfacial SRH time constants [s]
         % Must be a row vector of length (number of layers)-1  
