@@ -28,7 +28,7 @@ function all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also pindrift.
+% See also DF.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -69,7 +69,7 @@ for i = 1:length(sol_matrix(1, 1, :))
         
     else
         
-        warning('pindrift:verifyStabilization',...
+        warning('Driftfusion:verifyStabilization',...
             'Comparing final solutions at %s s and %s s showed that the %s distribution did not reach stability. Consider trying with a greater tmax.',...
             num2str(t_array(time_index)), num2str(t_array(end)), names(i));
     end
