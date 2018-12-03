@@ -1,4 +1,4 @@
-function F = moviemake(solstruct)
+function Framefile = moviemake(solstruct)
 
 % Makes a frame file F from a solution
 % Currently configured to output the band diagram
