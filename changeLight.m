@@ -20,11 +20,11 @@ function struct_Int = changeLight(struct, newInt, tmax)
 %   changeLight(ssol_i_light, 1e-3, 0)
 %     as above, but estimate a good time for stabilization
 %
-% Other m-files required: pindrift, verifyStabilization
+% Other m-files required: df, verifyStabilization
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also genIntStructs, pindrift.
+% See also genIntStructs, df.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -76,17 +76,17 @@ Int_array = logspace(log10(oldInt), log10(newInt), steps);
 for i = 2:length(Int_array)
     disp([mfilename ' - Go from light intensity ' num2str(p.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(p.tmax) ' s'])
     p.Int = Int_array(i); % set new light intensity
-    struct_Int = pindrift(struct_Int, p);
+    struct_Int = df(struct_Int, p);
 end
 
 %% stabilize
-warning('off', 'pindrift:verifyStabilization');
+warning('off', 'df:verifyStabilization');
 while ~verifyStabilization(struct_Int.sol, struct_Int.t, 1e-8) % check stability in a strict way
     p.tmax = tmax_temp;
     disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
-    struct_Int = pindrift(struct_Int, p);
+    struct_Int = df(struct_Int, p);
     tmax_temp = p.tmax * 10;
 end
-warning('on', 'pindrift:verifyStabilization');
+warning('on', 'df:verifyStabilization');
 
 %------------- END OF CODE --------------

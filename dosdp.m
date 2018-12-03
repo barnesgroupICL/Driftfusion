@@ -1,4 +1,4 @@
-function sdpsol = sdp(sol_ini, tdwell_arr, Vjump, pulselen, pulseint, scalefactor)
+function sdpsol = dosdp(sol_ini, tdwell_arr, Vjump, pulselen, pulseint, scalefactor)
 
 % tarr =  a time array containing the dwell times
 % Vjump = the jump to voltage. Vpre is defined by sol_ini which should be
@@ -28,7 +28,7 @@ par.Int = 0;
 par.Vapp = Vjump;
 par.JV = 0;
 
-sol_stab = pindrift(jump1.dk.f, par);
+sol_stab = df(jump1.dk.f, par);
 
 for i = 1:length(tdwell_arr)
     msg = ['SDP scan, ', num2str(i), ' tdwell = ', num2str(tdwell_arr(i))];
@@ -39,7 +39,7 @@ for i = 1:length(tdwell_arr)
     %accelerate ions
     par.mobseti = scalefactor;
     
-    sol_dk = pindrift(sol_stab, par);
+    sol_dk = df(sol_stab, par);
     
     % Use end point of dark current as baseline- could average if noisy
     sdpsol.Jdk = sol_dk.Jtotr(end, end);
@@ -49,7 +49,7 @@ for i = 1:length(tdwell_arr)
     % switch off ion during pulse
     par.mobseti = 1;
     
-    sol_pulse = pindrift(sol_dk, par);
+    sol_pulse = df(sol_dk, par);
     sdpsol.t_Jtr = sol_pulse.t;
     
     % Jtr has baseline already removed

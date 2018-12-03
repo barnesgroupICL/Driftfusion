@@ -1,8 +1,5 @@
 function soleq = equilibrate(varargin)
-% Uses analytical initial conditions and runs to equilibrium
-% Note that tmax is consistently adjusted to appropriate values for to
-% ensure there are numerous mesh points where large gradients in the time
-% dimension are present
+% Uses initial conditions defined in PINDRIFT and runs to equilibrium
 if length(varargin) == 1
     p = varargin{1,1};
 else
@@ -10,10 +7,9 @@ else
 end
 
 tic;    % Start stopwatch
-
 %% Initial arguments
 % Setting sol.sol = 0 enables a parameters structure to be read into
-% pindrift but indicates that the initial conditions should be the
+% DF but indicates that the initial conditions should be the
 % analytical solutions
 sol.sol = 0;    
 
@@ -21,7 +17,6 @@ p_original = p;
 
 % Store initial mobility of intrinsic layer- note all mobilities will be
 % set to this value during the equilibration procedure.
-
 sn_l = p.sn_l;
 sn_r = p.sn_r;
 sp_l = p.sp_l;
@@ -32,6 +27,7 @@ BC = p.BC;
 %% Start with low interfacial recombination coefficients
 p.taun_inter = [1e6, 1e6];       % [s] SRH time constant for electrons
 p.taup_inter = [1e6, 1e6];      % [s] SRH time constant for holes
+p.SRHset = 0;
 p.dev = pc.builddev(p);
 
 % Raditative recombination could also be set to low values initially if required. 
@@ -65,7 +61,7 @@ p.sp_r = 0;
 
 %% Initial solution with zero mobility
 disp('Initial solution, zero mobility')
-sol = pindrift(sol, p);
+sol = df(sol, p);
 disp('Complete')
 
 % Switch on mobilities
@@ -82,18 +78,18 @@ p.t0 = p.tmax/1e3;
 
 %% Soluition with mobility switched on
 disp('Solution with mobility switched on')
-sol = pindrift(sol, p);
+sol = df(sol, p);
 
 % switch to desired mobilities
 p.mue = p_original.mue;          % electron mobility
 p.muh = p_original.muh;      % hole mobility
 
-sol = pindrift(sol, p);
+sol = df(sol, p);
 
 p.tmax = 1e-3;
 p.t0 = p.tmax/1e6;
 
-sol = pindrift(sol, p);
+sol = df(sol, p);
 
 all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
 
@@ -107,7 +103,7 @@ while any(all_stable) == 0
     p.tmax = p.tmax*10;
     p.t0 = p.tmax/1e6;
 
-    sol = pindrift(sol, p);
+    sol = df(sol, p);
     
     all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
 
@@ -120,21 +116,23 @@ disp('Complete')
 disp('Switching on interfacial recombination')
 p.taun_inter = p_original.taun_inter;
 p.taup_inter = p_original.taup_inter;
+p.SRHset = 1;
 p.dev = pc.builddev(p);
 
 p.calcJ = 0;
 p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
 
-soleq.eq_sr = pindrift(soleq.eq, p);
+soleq.eq_sr = df(soleq.eq, p);
 disp('Complete')
 
-%% Start with low recombination coefficients
+%% Equilibrium solutions with ion mobility switched on
+
+% Start with low recombination coefficients
 p.taun_inter = [1e6, 1e6];       % [s] SRH time constant for electrons
 p.taup_inter = [1e6, 1e6];      % [s] SRH time constant for holes
+p.SRHset = 0;
 
-%% Equilibrium solutions with ion mobility switched on
-%% Closed circuit conditions
 disp('Closed circuit equilibrium with ions')
 
 p.mobseti = 1;
@@ -144,14 +142,14 @@ p.t0 = p.tmax/1e3;
 p.muion = [0,1e-6,0];           % Ions are accelerated to reach equilibrium
 p.dev = pc.builddev(p);
 
-sol = pindrift(soleq.eq, p);
+sol = df(soleq.eq, p);
 
 % Much longer second step to ensure that ions have migrated
 p.calcJ = 0;
 p.tmax = 1e-2;
 p.t0 = p.tmax/1e3;
 
-sol = pindrift(sol, p);
+sol = df(sol, p);
 
 all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
 
@@ -165,7 +163,7 @@ while any(all_stable) == 0
     % use mobseti as a multiplier- bit dangerous? But fine for now
     p.mobseti = p.mobseti*10;
     
-    sol = pindrift(sol, p);
+    sol = df(sol, p);
     
     all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
 
@@ -178,18 +176,18 @@ soleq.i = sol;
 
 disp('Ion equilibrium solution complete')
 
-
 %% Ion equilibrium with surface recombination
 disp('Switching on surface recombination')
 p.taun_inter = p_original.taun_inter;
 p.taup_inter = p_original.taup_inter;
+p.SRHset = 1;
 p.dev = pc.builddev(p);
 
 p.calcJ = 0;
 p.tmax = 1e-6;
 p.t0 = p.tmax/1e3;
 
-soleq.i_sr = pindrift(soleq.i, p);
+soleq.i_sr = df(soleq.i, p);
 disp('Complete')
 
 disp('EQUILIBRATION COMPLETE')

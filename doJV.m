@@ -1,7 +1,7 @@
 function JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 disp('Current voltage scan')
 
-% A procedure for running JV scans using pindrift
+% A procedure for running JV scans using DF
 %% Input arguments
 % sol_ini   	= an initial solution - must be at the same Vapp as the
 % starting voltage for the scan- currently set to Vapp = 0 V
@@ -40,7 +40,7 @@ if option ==1 || option ==3
         %% Dark forward scan
         
         disp('Dark forward scan...')
-        JV.dk.f = pindrift(sol_ini, p);
+        JV.dk.f = df(sol_ini, p);
         
         disp('Complete.')
         
@@ -51,7 +51,7 @@ if option ==1 || option ==3
         p.Vend = Vstart;
         p.JV = 1;
         
-        JV.dk.r = pindrift(JV.dk.f, p);
+        JV.dk.r = df(JV.dk.f, p);
         
         disp('Complete.')
         
@@ -71,7 +71,7 @@ if option ==2 || option ==3
         p.tmax = 1e-3;
         p.t0 = p.tmax*1e-6;
         
-        sol_i_1S = pindrift(sol_ini, p);
+        sol_i_1S = df(sol_ini, p);
         disp('Complete.')
         
         %% Light forward
@@ -89,7 +89,7 @@ if option ==2 || option ==3
         p.tmesh_type = 1;
         p.tpoints = p.JVscan_pnts;
         
-        JV.ill.f = pindrift(sol_i_1S, p);
+        JV.ill.f = df(sol_i_1S, p);
         
         disp('Complete.')
         
@@ -99,7 +99,7 @@ if option ==2 || option ==3
         p.Vstart = Vend;
         p.Vend = Vstart;
         
-        JV.ill.r = pindrift(JV.ill.f, p);
+        JV.ill.r = df(JV.ill.f, p);
         disp('Complete.')
         
         figure(11)

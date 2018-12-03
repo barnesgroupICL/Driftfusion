@@ -12,7 +12,7 @@ p.tpoints = 400;
 p.deltat = p.tmax/(1e4*p.tpoints);
 p.calcJ = 0;
 
-sol_Jtran = pindrift(sol_ini, p);
+sol_Jtran = df(sol_ini, p);
 sol_Jtran.p.pulseon = 0;
 
 end
