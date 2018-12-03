@@ -1,12 +1,12 @@
 classdef pc
     % Authors: Philip Calado, Piers Barnes, Ilario Gelmetti, Ben Hillman, 2018 Imperial College London
     % PC (Parameters Class) defines all the required properties for your
-    % device. PC.BUILDDEV builds a structure PC.DEV that defines the
-    % properties of the device at every spatial mesh point, including
+    % device. PC.BUILDDEV builds a structure PO.DEV (where PO is a Parameters Object)
+    % that defines the properties of the device at every spatial mesh point, including
     % interfaces. Whenever PROPERTIES are overwritten, the device should 
-    % be rebuilt using PC.BUILDDEV. The spatial mesh is a linear piece-wise mesh and is built by the
-    % MESHGEN_X function. Details of how to define the mesh are given below
-    % in the SPATIAL MESH SUBSECTION.
+    % be rebuilt using PC.BUILDDEV. The spatial mesh is a linear piece-wise mesh 
+    % and is built by the MESHGEN_X function. Details of how to define the mesh 
+    % are given below in the SPATIAL MESH SUBSECTION.
     
     properties (Constant)
         %% Physical constants
@@ -736,7 +736,7 @@ classdef pc
                             if par.stats == 'Fermi'
                                 % Build diffusion coefficient structure
                                 startlim = dev.IP(j);
-                                endlim = dev.EA(j)+0.6;
+                                endlim = dev.EA(j)+1.0;
                                 interval = (endlim-startlim)/400;
                                 
                                 Dfd_struct_n_temp = F.Dn_fd_fun(dev.N0(j), dev.EA(j), startlim:interval:endlim, dev.mue(j), par.T);
@@ -745,7 +745,7 @@ classdef pc
                                 dev.n_fd(j,:) = Dfd_struct_n_temp.n_fd;
                                 dev.Efn(j,:) = Dfd_struct_n_temp.Efn;
                                 
-                                startlim = dev.IP(j)-0.6;
+                                startlim = dev.IP(j)-1.0;
                                 endlim = dev.EA(j);
                                 interval = (endlim-startlim)/400;
                                 
