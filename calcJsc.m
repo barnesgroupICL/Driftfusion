@@ -1,4 +1,4 @@
-function [EgArr, Jsc_vs_Eg] = calcJsc(T)
+function [EgArr, Jsc_vs_Eg] = calcJsc
 % CALCJSC calcualtes the maximum theoretical short circuit current 
 % as a function of band gap (Eg) using a step function absorption spectrum
 % T - temperature of the device
