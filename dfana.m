@@ -35,7 +35,7 @@ end
 
 % Simple structure names
 sol = solstruct.sol;
-par = solstruct.p;
+par = solstruct.par;
 x = solstruct.x;
 t = solstruct.t;
 

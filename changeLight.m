@@ -37,29 +37,29 @@ function struct_Int = changeLight(struct, newInt, tmax)
 
 %------------- BEGIN CODE --------------
 
-p = struct.p;
-p.pulseon = 0;
-p.tmesh_type = 2;
-p.t0 = 1e-10;
-p.tpoints = 30;
+par = struct.par;
+par.pulseon = 0;
+par.tmesh_type = 2;
+par.t0 = 1e-10;
+par.tpoints = 30;
 struct_Int = struct;
 
 % set an initial time for stabilization tmax
 if tmax
     tmax_temp = tmax;
 else % if tmax was zero, estimate a good one
-    if p.muion
-        tmax_temp = min(1, 2^(-log10(p.muion)) / 10 + 2^(-log10(p.mue(1))));
+    if par.muion
+        tmax_temp = min(1, 2^(-log10(par.muion)) / 10 + 2^(-log10(par.mue(1))));
     else
-        tmax_temp = min(1e-3, 2^(-log10(p.mue(1))));
+        tmax_temp = min(1e-3, 2^(-log10(par.mue(1))));
     end
 end
-p.tmax = tmax_temp;
+par.tmax = tmax_temp;
 
 % find the initial illumination intensity, if it's zero (dark) just use
 % 1e-4, so that the first stabilization will be from dark to 1e-3
-if p.Int
-    oldInt = p.Int;
+if par.Int
+    oldInt = par.Int;
     steps = 1 + ceil(abs(log10(newInt / oldInt)));
 else
     oldInt = 1e-3;
@@ -76,9 +76,9 @@ Int_array = logspace(log10(oldInt), log10(newInt), steps);
 % skip first value in the array as is the initial Int (and does not get through pindrift again) or, in case the input
 % was in dark, the first value is 1e-3 and gets skipped
 for i = 2:length(Int_array)
-    disp([mfilename ' - Go from light intensity ' num2str(p.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(p.tmax) ' s'])
-    p.Int = Int_array(i); % set new light intensity
-    struct_Int = df(struct_Int, p);
+    disp([mfilename ' - Go from light intensity ' num2str(par.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(par.tmax) ' s'])
+    par.Int = Int_array(i); % set new light intensity
+    struct_Int = df(struct_Int, par);
 end
 
 %% stabilize

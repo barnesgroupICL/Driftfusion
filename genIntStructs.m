@@ -51,7 +51,7 @@ if include_dark
     Int_array = [Int_array, 0];
 end
 % decrease annoiance by figures popping up
-struct_eq.p.figson = 0;
+struct_eq.par.figson = 0;
 
 Int_array = sort(Int_array, 'ascend'); % from high intensity to low, beware to not use changeLight for reaching dark as logspace to zero doesn't work
 
@@ -67,11 +67,11 @@ for i = 1:length(Int_array)
     disp([mfilename ' - illumination intensity ' num2str(Int_array(i))])
     name = matlab.lang.makeValidName([inputname(1) '_Int_' num2str(Int_array(i))]);
     % decrease annoiance by figures popping up
-    struct_Int.p.figson = 0;
+    struct_Int.par.figson = 0;
     % in any case except dark (it would work, should not be needed), stabilize at the new intensity
     if Int_array(i)
         struct_Int = changeLight(struct_Int, Int_array(i), changeLight_tmax); % change light intensity
-        changeLight_tmax = max(struct_Int.p.tmax / 5, 1e-8); % time to use for next iteration
+        changeLight_tmax = max(struct_Int.par.tmax / 5, 1e-8); % time to use for next iteration
     end
 
     [V_temp, J_temp] = dfana(struct_Int);
@@ -79,7 +79,7 @@ for i = 1:length(Int_array)
     J_array(i) = J_temp(end);
 
     % restore figson before saving
-    struct_Int.p.figson = 1;
+    struct_Int.par.figson = 1;
     structCell{1, i} = struct_Int;
     structCell{2, i} = name;
 end

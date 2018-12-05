@@ -43,8 +43,8 @@ end
 sol_eq = solstruct_eq.sol;
 sol = solstruct.sol;
 sol_rev = solstruct_rev.sol;
-par = solstruct.p;
-par_eq = solstruct_eq.p;
+par = solstruct.par;
+par_eq = solstruct_eq.par;
 x = solstruct.x;
 t = solstruct.t;
 t_eq = solstruct_eq.t;

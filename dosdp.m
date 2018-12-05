@@ -9,7 +9,7 @@ function sdpsol = dosdp(sol_ini, tdwell_arr, Vjump, pulselen, pulseint, scalefac
 % scalefactor = accelerates ions in case of bad convergence. Set to
 
 % Fast initial scan
-par = sol_ini.p;
+par = sol_ini.par;
 t = sol_ini.t;
 V0 = par.Vapp;
 V1 = Vjump;

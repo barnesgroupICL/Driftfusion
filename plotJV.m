@@ -1,8 +1,7 @@
 function plotJV(JV, option)
-
-% option        1 = dark only, 2 = light only, 3 = dark & light
+% JV - a soultion from doJV
+% OPTION - 1 = dark only, 2 = light only, 3 = dark & light
 % JV is a structure containing dark and illuminated JVs
-
 
 
 if option == 1 || option == 3

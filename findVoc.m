@@ -15,59 +15,59 @@ function [sol_Voc, Voc] = findVoc(sol_ini, mobseti, x0, x1, tol)
 % TOL - current tolerence in Acm-2 - the value that the current should drop to below
 % before the procedure stops running
 
-p = sol_ini.p;
+par = sol_ini.par;
 
 %% Initital settings
-p.OC = 0;
-p.calcJ = 0;
-p.pulseon = 0;
+par.OC = 0;
+par.calcJ = 0;
+par.pulseon = 0;
 Suns = 1;               % Intensity
 JVscan_rate = 1;        %Vs-1
 
 %% Save Surface rec coefficients
-taun = p.taun;       % [s] SRH time constant for electrons
-taup = p.taup;
+taun = par.taun_inter;       % [s] SRH time constant for electrons
+taup = par.taup_inter;
 
 %% 1 Sun quasi equilibrium solution
 disp('1 Sun quasi-equilibrium solution')
-p.mobseti = 0;      % switch off ion mobility for illumination step
-p.JV = 0;
-p.Int = 1;
+par.mobseti = 0;      % switch off ion mobility for illumination step
+par.JV = 0;
+par.Int = 1;
 
 % Log time mesh
-p.tmesh_type = 2;
-p.tmax = 1e-3;
-p.t0 = p.tmax*1e-6;
+par.tmesh_type = 2;
+par.tmax = 1e-3;
+par.t0 = par.tmax*1e-6;
 
-sol = pindrift(sol_ini, p);
+sol = df(sol_ini, par);
 disp('Complete.')
 
 %% Run JV to new potential
-p.mobseti = mobseti;
-p.Ana = 1;
-p.JV = 1;
-p.Vstart = p.Vapp;
-p.Vend = x0;
-p.calcJ = 0;
-p.tmax = abs(p.Vend- p.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
-p.t0 = 0;
-p.tmesh_type = 1;
-p.tpoints = p.JVscan_pnts;
-p.pulseon = 0;
-p.Int = Suns;
+par.mobseti = mobseti;
+par.Ana = 1;
+par.JV = 1;
+par.Vstart = par.Vapp;
+par.Vend = x0;
+par.calcJ = 0;
+par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
+par.t0 = 0;
+par.tmesh_type = 1;
+par.tpoints = par.JVscan_pnts;
+par.pulseon = 0;
+par.Int = Suns;
       
-sol = pindrift(sol, p);         
+sol = df(sol, par);         
 
 %% Stabilised solution
 disp('Initial stabilised solution')
-p.JV = 0;
-p.Vapp = x0;
-p.tmesh_type = 2;
-p.tmax = 1e-2;
-p.t0 = p.tmax/1e4;
-%p = mobsetfun(1, 0, p); 
+par.JV = 0;
+par.Vapp = x0;
+par.tmesh_type = 2;
+par.tmax = 1e-2;
+par.t0 = par.tmax/1e4;
+%par = mobsetfun(1, 0, par); 
 
-sol = pindrift(sol, p);
+sol = df(sol, par);
 
 disp('Complete')
 
@@ -89,15 +89,15 @@ while abs(fx1) > tol
     %% Scan to new potential x1
     disp('Scan to new potential x1')
     
-    p.JV = 1;
-    p.Vstart = x0;
-    p.Vend = x1;
-    p.tmax = abs(p.Vend- p.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
-    p.t0 = 0;
-    p.tmesh_type = 1;
-    p.tpoints = p.JVscan_pnts;
+    par.JV = 1;
+    par.Vstart = x0;
+    par.Vend = x1;
+    par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
+    par.t0 = 0;
+    par.tmesh_type = 1;
+    par.tpoints = par.JVscan_pnts;
 
-    sol = pindrift(sol, p);         
+    sol = df(sol, par);         
     
     disp('Complete')
     
@@ -105,60 +105,60 @@ while abs(fx1) > tol
     
     disp('Stabilised solution')
     
-    p.JV = 0;
-    p.Vapp = x1;
-    p.tmesh_type = 2;
-    p.tmax = 1e-2;
-    p.t0 = p.tmax/1e4;
-    %p = mobsetfun(1, 0, p); 
+    par.JV = 0;
+    par.Vapp = x1;
+    par.tmesh_type = 2;
+    par.tmax = 1e-2;
+    par.t0 = par.tmax/1e4;
+    %par = mobsetfun(1, 0, par); 
 
-    sol = pindrift(sol, p);
+    sol = df(sol, par);
     
     disp('Complete')
     fx1 = sol.Jtotr(end, end);
 % 
-%     p.tmesh_type = 2;
-%     p.tmax = 1e-9;
-%     p.t0 = p.tmax/1e3;
-%     p.Vapp = x1;
-%     p.pulseon = 0;
-%     p.Int = 0;
+%     par.tmesh_type = 2;
+%     par.tmax = 1e-9;
+%     par.t0 = par.tmax/1e3;
+%     par.Vapp = x1;
+%     par.pulseon = 0;
+%     par.Int = 0;
 % 
-%     sol = pindrift(sol_eq, p);         
+%     sol = df(sol_eq, par);         
 %     
-%     p.BC = 1;
-%     p.tmax = 1e-6;
-%     p.t0 = p.tmax/1e4;
-%     p = mobsetfun(1, 0, p); 
+%     par.BC = 1;
+%     par.tmax = 1e-6;
+%     par.t0 = par.tmax/1e4;
+%     par = mobsetfun(1, 0, par); 
 % 
-%     sol = pindrift(sol, p); 
+%     sol = df(sol, par); 
 %     
 %     % Switch on surface rec
-%     p.taun_etl = 1e6;       % [s] SRH time constant for electrons
-%     p.taup_etl = p.taun_etl;      % [s] SRH time constant for holes
-%     p.taun_htl = p.taun_etl; 
-%     p.taup_htl = p.taun_etl; 
+%     par.taun_etl = 1e6;       % [s] SRH time constant for electrons
+%     par.taup_etl = par.taun_etl;      % [s] SRH time constant for holes
+%     par.taun_htl = par.taun_etl; 
+%     par.taup_htl = par.taun_etl; 
 %     
-%     sol = pindrift(sol, p);
+%     sol = df(sol, par);
 %     
-%     p.Int = Suns;
-%     p.tmax = 1e-3;
-%     p.t0 = p.tmax/1e4;
+%     par.Int = Suns;
+%     par.tmax = 1e-3;
+%     par.t0 = par.tmax/1e4;
 % 
-%     sol = pindrift(sol, p);
+%     sol = df(sol, par);
 % 
-%     p = mobsetfun(1, mobi, p); 
+%     par = mobsetfun(1, mobi, par); 
 % 
-%     p.tmax = 1e0;
-%     p.t0 = p.tmax/1e4;
+%     par.tmax = 1e0;
+%     par.t0 = par.tmax/1e4;
 % 
-%     sol = pindrift(sol, p);
+%     sol = df(sol, par);
 % 
-%     p.tmax = 1e-6;
-%     p.t0 = p.tmax/1e4;
-%     p.calcJ = 2;
+%     par.tmax = 1e-6;
+%     par.t0 = par.tmax/1e4;
+%     par.calcJ = 2;
 % 
-%     sol_V1 = pindrift(sol, p);
+%     sol_V1 = df(sol, par);
 % 
 %     fx1 = sol_V1.Jn(end);
     

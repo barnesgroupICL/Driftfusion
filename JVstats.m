@@ -1,16 +1,18 @@
 function stats = JVstats(JV)
+% A function to pull statistics from a JV sweep using DOJV
+% JV - a solution from DOJV
 
 if isfield(JV, 'ill')
     
     if isfield(JV.ill, 'f')
         
-        p = find(JV.ill.f.Vapp >= 0);
-        p = p(1);
-        stats.Jsc_f = JV.ill.f.Jtotr(p, end);
+        p1 = find(JV.ill.f.Vapp >= 0);
+        p1 = p1(1);
+        stats.Jsc_f = JV.ill.f.Jtotr(p1, end);
         
-        p = find(JV.ill.f.Jtotr(:, end) >= 0);
-        p = p(1);
-        stats.Voc_f = JV.ill.f.Vapp(p);
+        p2 = find(JV.ill.f.Jtotr(:, end) >= 0);
+        p2 = p2(1);
+        stats.Voc_f = JV.ill.f.Vapp(p2);
         
         pow_f = JV.ill.f.Jtotr(:,end).*JV.ill.f.Vapp';
         stats.mpp_f = min(pow_f);
@@ -25,13 +27,13 @@ if isfield(JV, 'ill')
     
     if isfield(JV.ill, 'r')
         
-        p = find(JV.ill.r.Vapp <= 0);
-        p = p(1);
-        stats.Jsc_r = JV.ill.r.Jtotr(p, end);
+        p1 = find(JV.ill.r.Vapp <= 0);
+        p1 = p1(1);
+        stats.Jsc_r = JV.ill.r.Jtotr(p1, end);
         
-        p = find(JV.ill.r.Jtotr(:, end) <= 0);
-        p = p(1);
-        stats.Voc_r = JV.ill.r.Vapp(p);
+        p2 = find(JV.ill.r.Jtotr(:, end) <= 0);
+        p2 = p2(1);
+        stats.Voc_r = JV.ill.r.Vapp(p2);
         
         pow_r = JV.ill.r.Jtotr(:,end).*JV.ill.r.Vapp';
         stats.mpp_r = min(pow_r);

@@ -2,48 +2,51 @@ function VappStruct = genVappStructs_PC(solini, Vapp_arr)
 
 % solstruct should be a stablised solution
 
-p = solini.p;    
-pini = p;           % Save initial params
+par = solini.par;    
+pini = par;           % Save initial params
 
-Vapp_arr = [solini.p.Vapp, Vapp_arr];    % include intial potential in array
+
+Vapp_arr = [solini.par.Vapp, Vapp_arr];    % include intial potential in array
 
 % General settings
-p.Ana = 1;
-p.figson = 1;
-p.pulseon = 0;
-p.Int = 0;
+par.Ana = 1;
+par.figson = 1;
+par.pulseon = 0;
+par.Int = 0;
 
 for i = 1:length(Vapp_arr)-1
     
     disp([mfilename ' - applied voltage ' num2str(Vapp_arr(i+1))])
     name = matlab.lang.makeValidName([inputname(1) '_Vapp_' num2str(Vapp_arr(i+1))]);
-    % run initial sweep with ion mobility off
-    p.mui = 1e-6;
-    p.JV = 1;
-    p.Vapp = solini.p.Vapp;
-    p.Vstart = Vapp_arr(1);
-    p.Vend = Vapp_arr(i+1);
-    p.tmesh_type = 1;
-    p.tmax = 1e-2;
-    p.t0 = 0;%p.tmax/1e6;
+
+    par.mobseti = 1e4;
+    par.JV = 1;
+    par.Vapp = solini.par.Vapp;
+    par.Vstart = Vapp_arr(1);
+    par.Vend = Vapp_arr(i+1);
+    par.tmesh_type = 1;
+    par.tmax = 1e-2;
+    par.t0 = 0;%par.tmax/1e6;
     
-    sol = pindrift(solini, p);
+    sol = df(solini, par);
     
     % store new applied potential
-    sol.p.Vapp = p.Vend;
-    p.Vapp = p.Vend;
+    sol.par.Vapp = par.Vend;
+    par.Vapp = par.Vend;
     %Switch on ion mobility and stabilise
-    %p.mui = 1e-6;
-    p.JV = 0;
-    p.tmesh_type = 2;
-    p.tpoints = 200;
-    p.tmax = 1;
-    p.t0 = p.tmax/1e8;
+    %par.mui = 1e-6;
+    par.JV = 0;
+    par.tmesh_type = 2;
+    par.tpoints = 100;
+    par.tmax = 1;
+    par.t0 = par.tmax/1e8;
     
-    sol = pindrift(sol, p);
+    sol = df(sol, par);
    
     verifyStabilization(sol.sol, sol.t, 0.7);
-       
+    
+    sol.par.mobseti = 1;
+    
     % if there's only one solution then duplicate sol structure
     if length(Vapp_arr)-1 == 1
         

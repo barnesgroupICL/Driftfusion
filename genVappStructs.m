@@ -39,10 +39,10 @@ function structCell = genVappStructs(asymstruct, Vapp_array)
 asymstruct_Vapp = asymstruct;
 
 % estimate a good tmax
-if asymstruct_Vapp.p.muion
-    tmax_temp = min(1e1, 2^(-log10(asymstruct_Vapp.p.muion)) / 10 + 2^(-log10(asymstruct_Vapp.p.mue(1))));
+if asymstruct_Vapp.par.muion
+    tmax_temp = min(1e1, 2^(-log10(asymstruct_Vapp.par.muion)) / 10 + 2^(-log10(asymstruct_Vapp.par.mue(1))));
 else
-    tmax_temp = min(1e-2, 2^(-log10(asymstruct_Vapp.p.mue(1))));
+    tmax_temp = min(1e-2, 2^(-log10(asymstruct_Vapp.par.mue(1))));
 end
 
 % usually the solution in short circuit is given in input, so start from
@@ -57,47 +57,47 @@ for i = 1:length(Vapp_array)
     disp([mfilename ' - applied voltage ' num2str(Vapp_array(i))])
     name = matlab.lang.makeValidName([inputname(1) '_Vapp_' num2str(Vapp_array(i))]);
     % decrease annoiance by figures popping up
-    asymstruct_Vapp.p.figson = 0;
+    asymstruct_Vapp.par.figson = 0;
     
-    p = asymstruct_Vapp.p;
+    par = asymstruct_Vapp.par;
     % prepare parameters for the voltage change
-    p.tmesh_type = 2;
-    p.t0 = 1e-10;
-    p.tpoints = 50; % wide, does not matter much but have to be bigger than t_npoints_V_step
-    p.calcJ = 0; % we do not need to calculate current here
-    p.tmax = tmax_temp;
+    par.tmesh_type = 2;
+    par.t0 = 1e-10;
+    par.tpoints = 50; % wide, does not matter much but have to be bigger than t_npoints_V_step
+    par.calcJ = 0; % we do not need to calculate current here
+    par.tmax = tmax_temp;
 
     % ideal sudden change is voltage maybe cannot be solved
     % boundary conditions have to be changed more slowly 
     % the solver needs at least one point at the starting voltage, before switching to short circuit
-    p.JV = 2; % new mode for arbitrary Vapp profiles
+    par.JV = 2; % new mode for arbitrary Vapp profiles
     [Vapp_arr, ~] = dfana(asymstruct_Vapp); % quasi-fermi levels are needed for knowing the current Voc
     Vstart = Vapp_arr(end); % current Voc
     Vend = Vapp_array(i); % final Voc
     
     % the third parameter is the time point when the change from the old
     % voltage to the new one happens
-    p.Vapp_params = [Vstart, Vend, 10 * p.t0];
+    par.Vapp_params = [Vstart, Vend, 10 * par.t0];
     % starts at Vstart, linear Vapp decrease for the first points, then constant to Vend
-    p.Vapp_func = @(coeff, t) (coeff(1) + (coeff(2)-coeff(1)).*t/coeff(3)) .* (t < coeff(3)) + coeff(2) .* (t >= coeff(3));
+    par.Vapp_func = @(coeff, t) (coeff(1) + (coeff(2)-coeff(1)).*t/coeff(3)) .* (t < coeff(3)) + coeff(2) .* (t >= coeff(3));
 
     % go to the new Vapp
-    asymstruct_Vapp = df(asymstruct_Vapp, p);
+    asymstruct_Vapp = df(asymstruct_Vapp, par);
     
     %% stabilize
     
     % should be set anyway, but for avoiding risks, set Vapp
-    asymstruct_Vapp.p.Vapp = Vend;
+    asymstruct_Vapp.par.Vapp = Vend;
     % eliminate JV configuration before saving (useless as stabilize would eliminate it anyway...)
-    asymstruct_Vapp.p.JV = 0;
+    asymstruct_Vapp.par.JV = 0;
     
     asymstruct_Vapp = stabilize(asymstruct_Vapp); % go to steady state
     
     % restore figson before saving
-    asymstruct_Vapp.p.figson = 1;
+    asymstruct_Vapp.par.figson = 1;
 
     % re-establish the original calcJ
-    asymstruct_Vapp.p.calcJ = asymstruct.p.calcJ;
+    asymstruct_Vapp.par.calcJ = asymstruct.par.calcJ;
 
     structCell{1, i} = asymstruct_Vapp;
     structCell{2, i} = name;

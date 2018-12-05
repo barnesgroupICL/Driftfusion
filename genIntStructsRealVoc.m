@@ -42,7 +42,7 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startIn
 
 %------------- BEGIN CODE --------------
 
-if ~struct_eq.p.OC
+if ~struct_eq.par.OC
     disp([mfilename ' - the input solution is in short circuit! ' mfilename ' runs much faster when starting from OC conditions!']);
 end
 
@@ -63,11 +63,11 @@ goodVocAsymStructCell = badVocStructCell;
 for i = 1:nsolutions
     
     % decrease annoiance by figures popping up
-    badVocStructCell{1, i}.p.figson = 0;
+    badVocStructCell{1, i}.par.figson = 0;
     
     % in case the solution is symmetric, break it in halves
-    if badVocStructCell{1, i}.p.OC
-        disp([mfilename ' - asymmetricize solution at illumination intensity ' num2str(badVocStructCell{1, i}.p.Int)])
+    if badVocStructCell{1, i}.par.OC
+        disp([mfilename ' - asymmetricize solution at illumination intensity ' num2str(badVocStructCell{1, i}.par.Int)])
         asymstruct_Int = asymmetricize(badVocStructCell{1, i});
     else
         asymstruct_Int = badVocStructCell{1, i};
@@ -78,11 +78,11 @@ for i = 1:nsolutions
     
     % use findOptimVoc for finding the applied voltage that minimizes the
     % residual current
-    disp([mfilename ' - finding real Voc for illumination intensity ' num2str(badVocStructCell{1, i}.p.Int)])
+    disp([mfilename ' - finding real Voc for illumination intensity ' num2str(badVocStructCell{1, i}.par.Int)])
     [asymstruct_Int_Voc, VOC] = findOptimVoc(asymstruct_Int);
     
     % restore figson before saving
-    asymstruct_Int_Voc.p.figson = 1;
+    asymstruct_Int_Voc.par.figson = 1;
     % replace the solution at the bad VOC with the new one
     goodVocAsymStructCell{1, i} = asymstruct_Int_Voc;
     % populate the array containing VOCs

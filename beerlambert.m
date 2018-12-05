@@ -1,8 +1,16 @@
-function Gentot = beerlambert(params, x, source_type, laserlambda, figson)
+function Gentot = beerlambert(par, x, source_type, laserlambda, figson)
 
-%% arguments
-% laserlambda = pulse wavelength only applied when 'laser' is chosen as the source 
+%% Input arguments
+% PAR - Parameters object
+% SOURCE_TYPE - Currently either 'AM15' or 'laser'
+% LASERLAMBDA - pulse wavelength only applied when 'laser' is chosen as the
+% source. must be between 300 - 767 nm (owing to n & k data limits)
+% FIGSON - logical toggling figures
 
+%% Output arguments
+% GENTOT - 
+
+% Author: Philip Calado, Imperial College London, 2018
 % n & k loader taken from Stanford Transfer Matrix Code
 
 % Constants
@@ -11,7 +19,7 @@ c = 2.998e8;
 
 lambda = 300:767;          % wavelength range - currently limited by database MUST BE IN nm
 
-layers = params.stack;
+layers = par.stack;
 
 switch source_type
     
@@ -20,12 +28,17 @@ switch source_type
         I0 = lightsource('AM15', lambda);
         
     case 'laser'
+        % Throw up error if LASERLAMBDA is not within the acceptable range
+        if laserlambda < lambda(1) || laserlambda > lambda(end)
+            msg = ['Error in BEERLAMBERT - laser wavelength must be in the range ', num2str(lambda(1)), ' - ', num2str(lambda(end)), ' nm']
+            error(msg);
+        end
         
         I0 = zeros(length(lambda));
-        I0(laserlambda-lambda(1)) = 1e-3*params.pulsepow;   % convert to wcm-2
+        I0(laserlambda-lambda(1)) = 1e-3*par.pulsepow;   % convert to wcm-2
         
 end
-        
+
 Eph = h*c./(lambda*1e-9);    % Photon energy in Joules
 
 % Load in index of refraction for each material
@@ -42,8 +55,8 @@ end
 % For the time being, the optical properties are changed abruptly mid-way
 % through the interface. Grading of the optical properties is desirable
 % in future versions.
-xarr = [0, params.d+0.5*params.dint];
-xarr(end) = xarr(end) +0.5*params.dint; % Adjustment required as no interface at end of device
+xarr = [0, par.d+0.5*par.dint];
+xarr(end) = xarr(end) +0.5*par.dint; % Adjustment required as no interface at end of device
 xcum = cumsum(xarr);
 
 % calculate absorption coefficient from k
@@ -110,6 +123,20 @@ plot(x, Gentot)
 xlabel('Position [nm]')
 ylabel('Gen rate [cm-2s-1]')
 
+end
+
+end
+
+function AM15 = lightsource(source_type, lambda)
+% loads light sources for use with BeerLambert function
+% lambda - range of wavelengths in nanometers
+
+if source_type == 'AM15'
+    
+    % Load AM1.5
+    AM15_data=xlsread('AM15.xls');
+    AM15=1e-3*interp1(AM15_data(:,1), AM15_data(:,2), lambda, 'linear', 'extrap');
+    
 end
 
 end

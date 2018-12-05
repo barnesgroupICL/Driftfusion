@@ -1,4 +1,4 @@
-function sdpana(sdpsol, Jtr_time)
+function anasdp(sdpsol, Jtr_time)
 
 % sdpsol.t_Jtr
 % sdpsol.Jtr

@@ -14,44 +14,44 @@ disp('Current voltage scan')
 
 %[JV.dk.f, JV.dk.r, JV.ill.f, JV.ill.r] = deal(0);
 
-% Read parameters structure into structure P
-p = sol_ini.p;
+% Read parameters structure into structure par
+par = sol_ini.par;
 
 %%Initial settings
-p.Ana = 1;
-p.figson = 1;
-p.Int = 0;
-p.pulseon = 0;
-p.mobseti = mobseti;
+par.Ana = 1;
+par.figson = 1;
+par.Int = 0;
+par.pulseon = 0;
+par.mobseti = mobseti;
 
 %% JV settings
-p.JV = 1;
-p.Vstart = Vstart;
-p.Vend = Vend;
-p.calcJ = 0;
-p.JVscan_pnts = JVscan_pnts;
-p.tmax = abs(p.Vend- p.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
-p.t0 = 0;
-p.tmesh_type = 1;
-p.tpoints = p.JVscan_pnts;
+par.JV = 1;
+par.Vstart = Vstart;
+par.Vend = Vend;
+par.calcJ = 0;
+par.JVscan_pnts = JVscan_pnts;
+par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
+par.t0 = 0;
+par.tmesh_type = 1;
+par.tpoints = par.JVscan_pnts;
 
 if option ==1 || option ==3
         
         %% Dark forward scan
         
         disp('Dark forward scan...')
-        JV.dk.f = df(sol_ini, p);
+        JV.dk.f = df(sol_ini, par);
         
         disp('Complete.')
         
         %% Dark reverse scan
         
         disp('Dark reverse scan...')
-        p.Vstart = Vend;
-        p.Vend = Vstart;
-        p.JV = 1;
+        par.Vstart = Vend;
+        par.Vend = Vstart;
+        par.JV = 1;
         
-        JV.dk.r = df(JV.dk.f, p);
+        JV.dk.r = df(JV.dk.f, par);
         
         disp('Complete.')
         
@@ -62,44 +62,44 @@ if option ==2 || option ==3
         %% 1 Sun quasi equilibrium solution
         
         disp('1 Sun quasi-equilibrium solution')
-        p.JV = 0;
-        p.mobseti = 0;          % Switch ion mobility off for illumination step
-        p.Int = Intensity;
+        par.JV = 0;
+        par.mobseti = 0;          % Switch ion mobility off for illumination step
+        par.Int = Intensity;
         
         % Log time mesh
-        p.tmesh_type = 2;
-        p.tmax = 1e-3;
-        p.t0 = p.tmax*1e-6;
+        par.tmesh_type = 2;
+        par.tmax = 1e-3;
+        par.t0 = par.tmax*1e-6;
         
-        sol_i_1S = df(sol_ini, p);
+        sol_i_1S = df(sol_ini, par);
         disp('Complete.')
         
         %% Light forward
         
         disp('Light forward scan...')
-        p.mobseti = mobseti;
+        par.mobseti = mobseti;
         
         %% JV settings
-        p.JV = 1;
-        p.Vstart = Vstart;
-        p.Vend = Vend;
-        p.calcJ = 0;
-        p.tmax = abs(p.Vend- p.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
-        p.t0 = 0;
-        p.tmesh_type = 1;
-        p.tpoints = p.JVscan_pnts;
+        par.JV = 1;
+        par.Vstart = Vstart;
+        par.Vend = Vend;
+        par.calcJ = 0;
+        par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
+        par.t0 = 0;
+        par.tmesh_type = 1;
+        par.tpoints = par.JVscan_pnts;
         
-        JV.ill.f = df(sol_i_1S, p);
+        JV.ill.f = df(sol_i_1S, par);
         
         disp('Complete.')
         
         %% Light reverse
       
         disp('Light reverse scan...')
-        p.Vstart = Vend;
-        p.Vend = Vstart;
+        par.Vstart = Vend;
+        par.Vend = Vstart;
         
-        JV.ill.r = df(JV.ill.f, p);
+        JV.ill.r = df(JV.ill.f, par);
         disp('Complete.')
         
         figure(11)
@@ -112,3 +112,32 @@ end
 
 end
 
+function plotJV(JV, option)
+% JV - a soultion from doJV
+% OPTION - 1 = dark only, 2 = light only, 3 = dark & light
+% JV is a structure containing dark and illuminated JVs
+
+
+if option == 1 || option == 3
+    dfana(JV.dk.f);
+    figure(11)
+    %xlim([-0.2, 1.15])
+    ylim([-25e-3, 5e-3]);
+    hold on
+    dfana(JV.dk.r);
+    
+end
+
+if option == 2 || option == 3
+    dfana(JV.ill.f);
+    
+    figure(11)
+    %xlim([-0.2, 1.15])
+    ylim([-25e-3, 5e-3]);
+    hold on
+    dfana(JV.ill.r);
+end
+
+hold off
+
+end
