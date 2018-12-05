@@ -195,22 +195,9 @@ classdef pc
         JVscan_pnts = 100;      % JV scan points
         
         %% Dynamically created variables
-<<<<<<< HEAD
-        genspace = [];          % Vector containing generation profile
-        x = [];                 % Spatial, x mesh
-        xx = [];                % Spatial mesh copy
-        t = [];                 % Time, t mesh
-        xpoints = [];           % Total number of points in spatial mesh        
-        dev;                    % The dev sturcture- see BUILDDEV below
-        
-        %% Solver options
-        % See help on ODESET for details
-        RelTol = 1e-3;          % Relative tolerance. 1e-3 is the default
-        AbsTol = 1e-6;          % Absolute tolerance
-
-=======
         genspace = [];
         x = [];
+        xx = [];
         t = [];
         xpoints = [];
         Vapp_params = [];
@@ -223,9 +210,7 @@ classdef pc
         AbsTol = 1e-6;
         
         dev;
-        xx;
-        
->>>>>>> Driftfusion-v2-Fermi-Dirac
+
     end
     
     

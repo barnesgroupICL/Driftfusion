@@ -23,11 +23,11 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 %   [sol_i_1S_SR_OC, VOC_1S] = findOptimVoc(asymmetricize(ssol_i_1S_SR))
 %     get closer to the real VOC and save the VOC value in VOC_1S variable
 %
-% Other m-files required: pindrift, pinAna, stabilize
+% Other m-files required: df, pinAna, stabilize
 % Subfunctions: IgiveCurrentForVoltage
 % MAT-files required: none
 %
-% See also pindrift, asymmetricize, findVoc, pinAna.
+% See also df, asymmetricize, findVoc, pinAna.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -39,7 +39,7 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 
 %------------- BEGIN CODE --------------
 
-assert(logical(asymstruct.p.calcJ), [mfilename ' - calcJ needs to be set and different from zero']);
+%assert(logical(asymstruct.p.calcJ), [mfilename ' - calcJ needs to be set and different from zero']);
 
 asymstruct.p.figson = 0;
 asymstruct.p.tpoints = 10;
@@ -47,7 +47,7 @@ asymstruct.p.Ana = 1;
 asymstruct.p.JV = 0;
 
 % find residual current
-[~, ~, originalCurrent] = pinana(asymstruct);
+[~, originalCurrent] = dfana(asymstruct);
 
 disp([mfilename ' - Original voltage: ' num2str(asymstruct.p.Vapp, 8) ' V; original current: ' num2str(originalCurrent(end)) ' mA/cm2'])
 
@@ -129,7 +129,7 @@ asymstruct.p.Vapp_params = [Vstart, Vend, 10 * asymstruct.p.t0];
 % starts at Vstart, linear Vapp decrease for the first points, then constant to Vend
 asymstruct.p.Vapp_func = @(coeff, t) (coeff(1) + (coeff(2)-coeff(1)).*t/coeff(3)) .* (t < coeff(3)) + coeff(2) .* (t >= coeff(3));
 
-asymstruct_voc = pindrift(asymstruct, asymstruct.p);
+asymstruct_voc = df(asymstruct, asymstruct.p);
 
 %% stabilize
 
@@ -165,12 +165,12 @@ p.Vapp_func = @(coeff, t) (coeff(1) + (coeff(2)-coeff(1)).*t/coeff(3)) .* (t < c
 
 % the voltage step simulation can fail, shortening tmax (as in the catch block) could solve
 try
-    asymstruct_newVapp = pindrift(asymstruct, p);
+    asymstruct_newVapp = df(asymstruct, p);
 catch
     disp([mfilename ' - the voltage change failed, trying again with shorter tmax'])
     p.tmax = p.tmax / 10;
     p.t0 = p.t0 / 10;
-    asymstruct_newVapp = pindrift(asymstruct, p);
+    asymstruct_newVapp = df(asymstruct, p);
 end
 
 % eliminate JV configuration before stabilizing
@@ -178,16 +178,16 @@ p.JV = 0;
 % set Vapp as single value
 p.Vapp = Vend;
 
-warning('off', 'pindrift:verifyStabilization');
+warning('off', 'df:verifyStabilization');
 while ~verifyStabilization(asymstruct_newVapp.sol, asymstruct_newVapp.t, 1e-2) % check stability
     disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
-    asymstruct_newVapp = pindrift(asymstruct_newVapp, p);
+    asymstruct_newVapp = df(asymstruct_newVapp, p);
     p.tmax = p.tmax * 5;
     p.t0 = p.t0 * 5;
 end
-warning('on', 'pindrift:verifyStabilization');
+warning('on', 'df:verifyStabilization');
 
-[~, ~, Jn] = pinana(asymstruct_newVapp);
+[~, Jn] = dfana(asymstruct_newVapp);
 
 current = Jn(end);
 % I want the absolute value, but it's nicer to take the squared rather than

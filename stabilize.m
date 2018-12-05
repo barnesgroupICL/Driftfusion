@@ -13,11 +13,11 @@ function steadystate_struct = stabilize(struct)
 %   ssol_i_1S_SR = stabilize(ssol_i_1S_SR);
 %     checks if a solution reached steady state and replaces it with its steady state condition
 %
-% Other m-files required: pindrift, verifyStabilization
+% Other m-files required: df, verifyStabilization
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also pindrift, verifyStabilization.
+% See also df, verifyStabilization.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -82,12 +82,12 @@ if struct.p.tmax < p.tmax
 end
 
 % the warnings are not needed here
-warning('off', 'pindrift:verifyStabilization');
+warning('off', 'df:verifyStabilization');
 
 while forceStabilization || ~verifyStabilization(steadystate_struct.sol, steadystate_struct.t, 1e-3) % check stability
     disp([mfilename ' - Stabilizing ' inputname(1) ' over ' num2str(p.tmax) ' s with an applied voltage of ' num2str(p.Vapp) ' V']);
     % every cycle starts from the last timepoint of the previous cycle
-    steadystate_struct = pindrift(steadystate_struct, p);
+    steadystate_struct = df(steadystate_struct, p);
     if size(steadystate_struct.sol, 1) ~= steadystate_struct.p.tpoints % simulation failed
         % if the stabilization breaks (does not reach the final time point), reduce the tmax
         p.tmax = p.tmax / 10;
@@ -112,6 +112,6 @@ end
 steadystate_struct.p.Ana = struct.p.Ana;
 
 % re-enable the warnings
-warning('on', 'pindrift:verifyStabilization');
+warning('on', 'df:verifyStabilization');
 
 %------------- END OF CODE --------------

@@ -4,7 +4,7 @@ function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, end
 % Syntax:  [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
 %
 % Inputs:
-%   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions, or a logic false for not having the dark.
+%   STRUCT_EQ - a solution struct as created by df in dark conditions, or a logic false for not having the dark.
 %   STARTINT - higher requested illumination.
 %   ENDINT - lower requested illumination.
 %   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
@@ -25,11 +25,11 @@ function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, end
 %   [structs_sc, ~, JSCs] = genIntStructs(sol_i_eq_SR, 100, 0.1, 4, false)
 %     prepare short circuit solutions at 100, 10, 1 and 0.1 illumination intensities
 %
-% Other m-files required: changeLight, pindrift, pinana
+% Other m-files required: changeLight, df, dfana
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also genVappStructs, changeLight, pindrift.
+% See also genVappStructs, changeLight, df.
 
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -74,7 +74,7 @@ for i = 1:length(Int_array)
         changeLight_tmax = max(struct_Int.p.tmax / 5, 1e-8); % time to use for next iteration
     end
 
-    [V_temp, ~, J_temp] = pinana(struct_Int);
+    [V_temp, J_temp] = dfana(struct_Int);
     V_array(i) = V_temp(end);
     J_array(i) = J_temp(end);
 

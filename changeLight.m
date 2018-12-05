@@ -20,11 +20,8 @@ function struct_Int = changeLight(struct, newInt, tmax)
 %   ssol_i_1S_SR_1mS = changeLight(ssol_i_1S_SR, 1e-3, 0)
 %     as above, but estimate a good time for stabilization
 %
-<<<<<<< HEAD
+
 % Other m-files required: df, verifyStabilization
-=======
-% Other m-files required: pindrift, stabilize
->>>>>>> Driftfusion-v2-Fermi-Dirac
 % Subfunctions: none
 % MAT-files required: none
 %
@@ -85,17 +82,6 @@ for i = 2:length(Int_array)
 end
 
 %% stabilize
-<<<<<<< HEAD
-warning('off', 'df:verifyStabilization');
-while ~verifyStabilization(struct_Int.sol, struct_Int.t, 1e-8) % check stability in a strict way
-    p.tmax = tmax_temp;
-    disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
-    struct_Int = df(struct_Int, p);
-    tmax_temp = p.tmax * 10;
-end
-warning('on', 'df:verifyStabilization');
-=======
 struct_Int = stabilize(struct_Int); % go to steady state
->>>>>>> Driftfusion-v2-Fermi-Dirac
 
 %------------- END OF CODE --------------
