@@ -1,307 +1,194 @@
-function [sol_eq, sol_i_eq, ssol_eq, ssol_i_eq, sol_i_eq_SR, ssol_i_eq_SR, ssol_i_1S_SR ] = equilibrate(option)
-% Uses analytical initial conditions and runs to equilibrium
-% Note that tmax is consistently adjusted to appropriate values for to
-% ensure there are numerous mesh points where large gradients in the time
-% dimension are present
-
-%% options
-% 1 = closed circuit only no interfacial rec
-% 2 = closed circuit including interfacial rec
-% 3 = open circuit
+function soleq = equilibrate(varargin)
+% Uses initial conditions defined in PINDRIFT and runs to equilibrium
+if length(varargin) == 1
+    par = varargin{1,1};
+else
+    par = pc;
+end
 
 tic;    % Start stopwatch
-
 %% Initial arguments
 % Setting sol.sol = 0 enables a parameters structure to be read into
-% pindrift but indicates that the initial conditions should be the
+% DF but indicates that the initial conditions should be the
 % analytical solutions
 sol.sol = 0;    
 
-p = pinParams;
-p_initial = p;       % Store initial params
+p_original = par;
 
-%% Start with low recombination coefficients
-p.klin = 0;
-p.klincon = 0;
-p.taun_etl = 1e6;       % [s] SRH time constant for electrons
-p.taup_etl = 1e6;      % [s] SRH time constant for holes
-p.taun_htl = 1e6;       %%%% USE a high value of (e.g.) 1 to switch off
-p.taup_htl = 1e6;
+% Store initial mobility of intrinsic layer- note all mobilities will be
+% set to this value during the equilibration procedure.
+sn_l = par.sn_l;
+sn_r = par.sn_r;
+sp_l = par.sp_l;
+sp_r = par.sp_r;
+
+BC = par.BC;
+
+%% Start with low interfacial recombination coefficients
+par.taun_inter = [1e6, 1e6];       % [s] SRH time constant for electrons
+par.taup_inter = [1e6, 1e6];      % [s] SRH time constant for holes
+par.SRHset = 0;
+par.dev = pc.builddev(par);
 
 % Raditative recombination could also be set to low values initially if required. 
-% p.krad = 1e-20;
-% p.kradetl = 1e-20;
-% p.kradhtl = 1e-20;
+% par.krad = 1e-20;
+% par.kradetl = 1e-20;
+% par.kradhtl = 1e-20;
 
 %% General initial parameters
-p.tmesh_type = 2;
-p.tpoints = 200;
+par.tmesh_type = 2;
+par.tpoints = 40;
 
-p.Ana = 0;
-p.JV = 0;
-p.Vapp = 0;
-p.Int = 0;
-p.pulseon = 0; 
-p.OC = 0;
-p.BC = p_initial.BC;
-p.tmesh_type = 2;
-p.tmax = 1e-9;
-p.t0 = p.tmax/1e4;
+par.JV = 0;
+par.Vapp = 0;
+par.Int = 0;
+par.pulseon = 0; 
+par.OC = 0;
+par.BC = BC;
+par.tmesh_type = 2;
+par.tmax = 1e-9;
+par.t0 = par.tmax/1e4;
 
 %% Switch off mobilities
-p.mue_i = 0;          % electron mobility
-p.muh_i = 0;      % hole mobility
-p.mue_p = 0;
-p.muh_p = 0;
-p.mue_n = 0;
-p.muh_n = 0;
-p.mui = 0;
+par.mobset = 0;
+par.mobseti= 0;
 
 % Switch off extraction and recombination
-p.sn_ext = 0;
-p.sn_rec = 0;
-p.sp_ext = 0;
-p.sp_rec = 0;
+par.sn_l = 0;
+par.sn_r = 0;
+par.sp_l = 0;
+par.sp_r = 0;
 
 %% Initial solution with zero mobility
 disp('Initial solution, zero mobility')
-sol = pindrift(sol, p);
+sol = df(sol, par);
 disp('Complete')
 
 % Switch on mobilities
-p.mue_i = p_initial.mue_i;          % electron mobility
-p.muh_i = p_initial.muh_i;      % hole mobility
-p.mue_p = p_initial.mue_p;
-p.muh_p = p_initial.muh_p;
-p.mue_n = p_initial.mue_n;
-p.muh_n = p_initial.muh_n;
-p.mui = 0;
+par.mobset = 1;
 
-p.sn_ext = p_initial.sn_ext;
-p.sn_rec = p_initial.sn_rec;
-p.sp_ext = p_initial.sp_ext;
-p.sp_rec = p_initial.sp_rec;
+par.sn_l = p_original.sn_l;
+par.sn_r = p_original.sn_r;
+par.sp_l = p_original.sp_l;
+par.sp_r = p_original.sp_r;
 
-p.figson = 1;
-p.tmax = 1e-9;
-p.t0 = p.tmax/1e3;
+par.figson = 1;
+par.tmax = 1e-9;
+par.t0 = par.tmax/1e3;
 
 %% Soluition with mobility switched on
 disp('Solution with mobility switched on')
-sol = pindrift(sol, p);
+sol = df(sol, par);
 
-p.Ana = 1;
-p.calcJ = 0;
-p.tmax = 1e-2;
-p.t0 = p.tmax/1e10;
+% switch to desired mobilities
+par.mue = p_original.mue;          % electron mobility
+par.muh = p_original.muh;      % hole mobility
 
-sol_eq = pindrift(sol, p);
+sol = df(sol, par);
 
-verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
+par.tmax = 1e-3;
+par.t0 = par.tmax/1e6;
+
+sol = df(sol, par);
+
+all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+
+% loop to check ions have reached stable config- if not accelerate ions by
+% order of mag
+j = 1;
+
+while any(all_stable) == 0
+    disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
+    
+    par.tmax = par.tmax*10;
+    par.t0 = par.tmax/1e6;
+
+    sol = df(sol, par);
+    
+    all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+
+end
+
+soleq.eq = sol;
 
 disp('Complete')
 
-if option == 3
-    
-    %% Set up solution for open circuit
-    disp('Switching boundary conditions to zero flux')
-    %p.Ana = 0;
-    p.BC = 0;
-    p.tmax = 1e-9;
-    p.t0 = p.tmax/1e3;    
+disp('Switching on interfacial recombination')
+par.taun_inter = p_original.taun_inter;
+par.taup_inter = p_original.taup_inter;
+par.SRHset = 1;
+par.dev = pc.builddev(par);
 
-    sol = pindrift(sol_eq, p);
-    disp('Complete')
-    
-    %% Symmetricise the solution
-    disp('Symmetricise solution for open circuit')
-    symsol = symmetricize(sol);
-    disp('Complete')
+par.calcJ = 0;
+par.tmax = 1e-6;
+par.t0 = par.tmax/1e3;
 
-    %% Equilibrium solution with mirrored cell and OC boundary conditions, mobility zero
-    disp('Initial equilibrium open circuit solution')
-    p.BC = p_initial.BC;
-    p.OC = 1;
-    p.calcJ = 0;
-
-    %% Switch off mobilities
-    p.mue_i = 0;          % electron mobility
-    p.muh_i = 0;      % hole mobility
-    p.mue_p = 0;
-    p.muh_p = 0;
-    p.mue_n = 0;
-    p.muh_n = 0;
-    p.mui = 0;
-
-    ssol = pindrift(symsol, p);
-    disp('Complete')
-
-    %% OC with mobility switched on
-    disp('Open circuit solution with mobility switched on')
-    p.tmax = 1e-6;
-    p.t0 = p.tmax/1e3;
-    % Switch on mobilities
-    p.mue_i = p_initial.mue_i;          % electron mobility
-    p.muh_i = p_initial.muh_i;      % hole mobility
-    p.mue_p = p_initial.mue_p;
-    p.muh_p = p_initial.muh_p;
-    p.mue_n = p_initial.mue_n;
-    p.muh_n = p_initial.muh_n;
-    p.mui = 0;
-
-    ssol = pindrift(ssol, p);
-
-    % Longer time step to ensure equilibrium has been reached
-    p.tmax = 1e-2;
-    p.t0 = p.tmax/1e3;
-
-    verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
-    
-    ssol_eq = pindrift(ssol, p);
-    disp('Complete')
-
-end
+soleq.eq_sr = df(soleq.eq, par);
+disp('Complete')
 
 %% Equilibrium solutions with ion mobility switched on
-%% Closed circuit conditions
+
+% Start with low recombination coefficients
+par.taun_inter = [1e6, 1e6];       % [s] SRH time constant for electrons
+par.taup_inter = [1e6, 1e6];      % [s] SRH time constant for holes
+par.SRHset = 0;
+
 disp('Closed circuit equilibrium with ions')
 
-p.OC = 0;
-p.tmax = 1e-9;
-p.t0 = p.tmax/1e3;
-p.mui = 1e-6;           % Ions are accelerated to reach equilibrium
+par.mobseti = 1;
+par.OC = 0;
+par.tmax = 1e-9;
+par.t0 = par.tmax/1e3;
+par.muion = [0,1e-6,0];           % Ions are accelerated to reach equilibrium
+par.dev = pc.builddev(par);
 
-sol = pindrift(sol_eq, p);
+sol = df(soleq.eq, par);
 
 % Much longer second step to ensure that ions have migrated
-p.calcJ = 2;
-p.tmax = 1e-2;
-p.t0 = p.tmax/1e3;
+par.calcJ = 0;
+par.tmax = 1e-2;
+par.t0 = par.tmax/1e3;
 
-verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
+sol = df(sol, par);
 
-sol_i_eq = pindrift(sol, p);
+all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+
+% loop to check ions have reached stable config- if not accelerate ions by
+% order of mag
+j = 1;
+
+while any(all_stable) == 0
+    disp(['Accelerating ions for equilibrium solution, mui = ', num2str(par.mui*10^j)]);
+    
+    % use mobseti as a multiplier- bit dangerous? But fine for now
+    par.mobseti = par.mobseti*10;
+    
+    sol = df(sol, par);
+    
+    all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+
+end
+par.muion = p_original.muion;           % Ions are accelerated to reach equilibrium
+par.dev = pc.builddev(par);
+sol.par=par;
+% write solution and reset ion mobility
+soleq.i = sol;
+
+disp('Ion equilibrium solution complete')
+
+%% Ion equilibrium with surface recombination
+disp('Switching on surface recombination')
+par.taun_inter = p_original.taun_inter;
+par.taup_inter = p_original.taup_inter;
+par.SRHset = 1;
+par.dev = pc.builddev(par);
+
+par.calcJ = 0;
+par.tmax = 1e-6;
+par.t0 = par.tmax/1e3;
+
+soleq.i_sr = df(soleq.i, par);
 disp('Complete')
-
-if option == 2 || option == 3
-    
-    %% Ion equilibrium with surface recombination
-    disp('Switching on surface recombination')
-    p.taun_etl = p_initial.taun_etl;
-    p.taup_etl = p_initial.taup_etl;
-    p.taun_htl = p_initial.taun_htl;
-    p.taup_htl = p_initial.taup_htl;
-    
-    p.calcJ = 0;
-    p.tmax = 1e-6;
-    p.t0 = p.tmax/1e3;
-    
-    verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
-    
-    sol_i_eq_SR = pindrift(sol_i_eq, p);
-    disp('Complete')
-    
-    % Switch off SR
-    p.taun_etl = 1e6;
-    p.taup_etl = 1e6;
-    p.taun_htl = 1e6;
-    p.taup_htl = 1e6;
-    
-end
-
-if option == 3
-    
-    %% Symmetricise closed circuit condition
-    disp('Symmetricise equilibriumion solution')
-    symsol = symmetricize(sol_i_eq);
-    disp('Complete')
-    
-    p.OC = 1;
-    p.tmax = 1e-9;
-    p.t0 = p.tmax/1e3;
-    
-    %% Switch off mbilities
-    p.mue_i = 0;          % electron mobility
-    p.muh_i = 0;      % hole mobility
-    p.mue_p = 0;
-    p.muh_p = 0;
-    p.mue_n = 0;
-    p.muh_n = 0;
-    p.mui = 0;
-    
-    %% OC condition with ions at equilbirium
-    disp('Open circuit equilibrium with ions')
-    ssol_sym = pindrift(symsol, p);
-    
-    p.tmax = 1e-9;
-    p.t0 = p.tmax/1e3;
-    
-    % Switch on mobilities
-    p.mue_i = p_initial.mue_i;          % electron mobility
-    p.muh_i = p_initial.muh_i;      % hole mobility
-    p.mue_p = p_initial.mue_p;
-    p.muh_p = p_initial.muh_p;
-    p.mue_n = p_initial.mue_n;
-    p.muh_n = p_initial.muh_n;
-    p.mui = 0;
-    
-    ssol = pindrift(ssol_sym, p);
-    
-    % Switch on ion mobility to ensure equilibrium has been reached
-    p.tmax = 1e-9;
-    p.t0 = p.tmax/1e3;
-    p.mui = 1e-6;
-    
-    ssol = pindrift(ssol, p);
-    
-    p.tmax = 1;
-    p.t0 = p.tmax/1e6;
-    
-    verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
-    
-    ssol_i_eq = pindrift(ssol, p);
-    
-    disp('Complete')
-    
-    %% Ions, OC Surface recombination
-    p.taun_etl = p_initial.taun_etl;
-    p.taup_etl = p_initial.taup_etl;
-    p.taun_htl = p_initial.taun_htl;
-    p.taup_htl = p_initial.taup_htl;
-    
-    p.tmax = 1e-3;
-    p.t0 = p.tmax/1e6;
-    
-    verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
-    
-    ssol_i_eq_SR = pindrift(ssol_i_eq , p);
-    
-    %% 1 Sun quasi equilibrium
-    disp('1 Sun quasi equilibrium')
-    p.tmax = 1e-3;
-    p.t0 = p.tmax/1e6;
-    p.Int = 1;
-    
-    verifyStabilization(sol_eq.sol, sol_eq.t, 0.7) ;
-    
-    ssol_i_1S_SR = pindrift(ssol_i_eq_SR, p);
-    
-    disp('Complete')
-    
-end
-
-if option ~= 2
-    
-    sol_i_eq_SR = 0;
-    
-end
-
-if option ~= 3
-    
-    ssol_eq = 0;
-    ssol_i_eq = 0;
-    ssol_i_eq_SR = 0;
-    ssol_i_1S_SR = 0;
 
 disp('EQUILIBRATION COMPLETE')
 toc
