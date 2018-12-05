@@ -137,7 +137,7 @@ if par.JV == 1
     
 else
     
-    Vapp_arr = ones(1, length(t)).*par.Vapp;
+    Vapp_arr = Efn(:, end) - Efp(:, 1);
     
 end
 
