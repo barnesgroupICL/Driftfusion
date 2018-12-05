@@ -1,8 +1,9 @@
 function all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
-%VERIFYSTABILIZATION - Checks if the solution reached a stabilized status
-%at the final time point
+%VERIFYSTABILIZATION - Checks if the solution reached a stabilized status comparing the final time point with a manually specified time point
+% beware that this can have false positives when the analyzed solution had
+% a tmax so small that the ionic movement did not even start
 %
-% Syntax:  all_stable = verifyStabilization(sol_matrix, t, time_fraction)
+% Syntax:  all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
 %
 % Inputs:
 %   SOL_MATRIX - a solution matrix, not the full struct, as contained in
@@ -20,7 +21,7 @@ function all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
 %     stability
 %
 % Example:
-%   verifyStabilization(ssol_i_light.sol, ssol_i_light.t, 1e-3)
+%   verifyStabilization(ssol_i_1S_SR.sol, ssol_i_1S_SR.t, 1e-3)
 %     check if the solution did not change much from a time which is one
 %     thousandth of the final time point and the final time point
 %
@@ -40,8 +41,10 @@ function all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
 
 %------------- BEGIN CODE --------------
 
+% name of the variables
 names = ["electrons", "holes", "ions", "potential"];
-log = [true, true, false, false]; % which values to check when representing in log10 form or not
+% which values have to be considered in a linear or in a log10 scale
+compare_log = [true, true, false, false];
 all_stable = true;
 
 % no need to calculate end_time for each of the 4 solutions: if they
@@ -54,26 +57,28 @@ end_time = t_array(length(sol_matrix(:, 1, 1)));
 for i = 1:length(sol_matrix(1, 1, :))
     profile_at_time = sol_matrix(time_index, :, i); % take profile of values at a certain time of evolution
     profile_end = sol_matrix(end, :, i); % take profile of values at the end of time
-    if log(i) % for variables ranging on huge scales comparing the log values makes more sense
+    if compare_log(i) % for variables ranging on huge scales comparing the log values makes more sense
         profile_at_time = log10(profile_at_time);
         profile_end = log10(profile_end);
     end
 
     difference = sum(abs(profile_end - profile_at_time)); % sum up all the differences between the profiles
+    % if the values change more than one tenthousandth, the solution is
+    % considered not stable
     threshold = 1e-4 * sum(abs(profile_end - mean(profile_end))); % sum up absolute values, ignore constant bias
     stable = difference <= threshold;
 
-    if stable
-        
-        display(['variable ', num2str(i), ' stabilisation verified']);
-        
-    else
-        
+    if ~stable
         warning('pindrift:verifyStabilization',...
             'Comparing final solutions at %s s and %s s showed that the %s distribution did not reach stability. Consider trying with a greater tmax.',...
             num2str(t_array(time_index)), num2str(t_array(end)), names(i));
     end
+    % true just if all the variables are stabilized
     all_stable = all_stable && stable;
+end
+
+if all_stable
+    disp("Stabilisation verified");
 end
 
 %------------- END OF CODE --------------
