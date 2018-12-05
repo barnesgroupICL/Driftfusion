@@ -279,10 +279,11 @@ end
 % coefficient.
 function [pl,ql,pr,qr] = pdex4bc(xl,ul,xr,ur,t)
 
-if p.JV == 1
-        
-    p.Vapp = p.Vstart + ((p.Vend-p.Vstart)*t*(1/p.tmax));
-    
+switch p.JV
+    case 1
+        p.Vapp = p.Vstart + ((p.Vend-p.Vstart)*t*(1/p.tmax));
+    case 2 % for custom profile of voltage
+        p.Vapp = p.Vapp_func(p.Vapp_params, t);
 end        
     
 % Open circuit condition- symmetric model

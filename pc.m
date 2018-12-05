@@ -213,7 +213,9 @@ classdef pc
         x = [];
         t = [];
         xpoints = [];
-        
+        Vapp_params = [];
+        Vapp_func = @(str) [];
+     
         % Define the default relative tolerance for the pdepe solver
         % 1e-3 is the default, can be decreased if more precision is needed
         % Solver options
