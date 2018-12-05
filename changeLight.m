@@ -14,13 +14,13 @@ function struct_Int = changeLight(struct, newInt, tmax)
 %   STRUCT_INT - a solution struct at NEWINT light intensity
 %
 % Example:
-%   changeLight(ssol_i_light, 1e-3, 5)
+%   ssol_i_1S_SR_1mS = changeLight(ssol_i_1S_SR, 1e-3, 5)
 %     take the solution ssol_i_light and stabilize to a new light intensity
 %     of 0.001, use as stabilization time 5 seconds
-%   changeLight(ssol_i_light, 1e-3, 0)
+%   ssol_i_1S_SR_1mS = changeLight(ssol_i_1S_SR, 1e-3, 0)
 %     as above, but estimate a good time for stabilization
 %
-% Other m-files required: pindrift, verifyStabilization
+% Other m-files required: pindrift, stabilize
 % Subfunctions: none
 % MAT-files required: none
 %
@@ -38,7 +38,6 @@ function struct_Int = changeLight(struct, newInt, tmax)
 
 p = struct.p;
 p.pulseon = 0;
-p.calcJ = 0;
 p.tmesh_type = 2;
 p.t0 = 1e-10;
 p.tpoints = 30;
@@ -48,10 +47,10 @@ struct_Int = struct;
 if tmax
     tmax_temp = tmax;
 else % if tmax was zero, estimate a good one
-    if p.mui
-        tmax_temp = min(1e3, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i)));
+    if p.muion
+        tmax_temp = min(1, 2^(-log10(p.muion)) / 10 + 2^(-log10(p.mue(1))));
     else
-        tmax_temp = min(1, 2^(-log10(p.mue_i)));
+        tmax_temp = min(1e-3, 2^(-log10(p.mue(1))));
     end
 end
 p.tmax = tmax_temp;
@@ -62,7 +61,7 @@ if p.Int
     oldInt = p.Int;
     steps = 1 + ceil(abs(log10(newInt / oldInt)));
 else
-    oldInt = 1e-4;
+    oldInt = 1e-3;
     steps = 1 + ceil(max(1, log10(newInt / oldInt)));
 end
 
@@ -72,7 +71,9 @@ Int_array = logspace(log10(oldInt), log10(newInt), steps);
 %% change light in steps
 % not needed to reach a good stabilized solution in
 % each step, so stabilization is not verified here
-% skip first value in the array as is the initial Int
+
+% skip first value in the array as is the initial Int (and does not get through pindrift again) or, in case the input
+% was in dark, the first value is 1e-3 and gets skipped
 for i = 2:length(Int_array)
     disp([mfilename ' - Go from light intensity ' num2str(p.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(p.tmax) ' s'])
     p.Int = Int_array(i); % set new light intensity
@@ -80,13 +81,6 @@ for i = 2:length(Int_array)
 end
 
 %% stabilize
-warning('off', 'pindrift:verifyStabilization');
-while ~verifyStabilization(struct_Int.sol, struct_Int.t, 1e-8) % check stability in a strict way
-    p.tmax = tmax_temp;
-    disp([mfilename ' - Stabilizing over ' num2str(p.tmax) ' s']);
-    struct_Int = pindrift(struct_Int, p);
-    tmax_temp = p.tmax * 10;
-end
-warning('on', 'pindrift:verifyStabilization');
+struct_Int = stabilize(struct_Int); % go to steady state
 
 %------------- END OF CODE --------------
