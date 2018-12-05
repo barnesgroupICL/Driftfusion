@@ -195,6 +195,7 @@ classdef pc
         JVscan_pnts = 100;      % JV scan points
         
         %% Dynamically created variables
+<<<<<<< HEAD
         genspace = [];          % Vector containing generation profile
         x = [];                 % Spatial, x mesh
         xx = [];                % Spatial mesh copy
@@ -207,6 +208,24 @@ classdef pc
         RelTol = 1e-3;          % Relative tolerance. 1e-3 is the default
         AbsTol = 1e-6;          % Absolute tolerance
 
+=======
+        genspace = [];
+        x = [];
+        t = [];
+        xpoints = [];
+        Vapp_params = [];
+        Vapp_func = @(str) [];
+     
+        % Define the default relative tolerance for the pdepe solver
+        % 1e-3 is the default, can be decreased if more precision is needed
+        % Solver options
+        RelTol = 1e-3;
+        AbsTol = 1e-6;
+        
+        dev;
+        xx;
+        
+>>>>>>> Driftfusion-v2-Fermi-Dirac
     end
     
     
