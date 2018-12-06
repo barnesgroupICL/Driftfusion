@@ -17,7 +17,7 @@ jump1 = doJV(sol_ini,1,100,0,0,V0,V1,1);
 
 par.Vapp = V1;
 par.mobseti = 1;
-par.tmax = trelax;
+par.tmax = tdwell;
 par.t0 = 0;%par.tmax/1e6;
 par.tmesh_type = 1;
 par.tpoints = 200;
