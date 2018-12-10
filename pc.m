@@ -41,8 +41,8 @@ classdef pc
         % are inserted automatically between each layer with a width
         % defined by the property DINT and number of points defined by
         % PINT.
-        dcell = {{50e-7}; {30e-7, 450e-7, 30e-7}; {60e-7}};         % Layer and subsection thickness array
-        pcell = {{50}; {30, 225, 30}; {60}};                          % Number of points in layers and subsections array  
+        dcell = {{50e-7}; {30e-7, 450e-7, 30e-7}; {100e-7}; {60e-7}};         % Layer and subsection thickness array
+        pcell = {{50}; {30, 225, 30}; {50}; {60}};                          % Number of points in layers and subsections array  
         dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3)
         pint = 20;          % Interfacial points (x_mesh_type = 3)
         
@@ -101,22 +101,22 @@ classdef pc
         % library. The names here do not influence the electrical properties of the
         % device. See INDEX OF REFRACTION LIBRARY for choices- names must be enetered 
         % exactly as given in the column headings with the '_n', '_k' omitted
-        stack = {'PEDOT', 'MAPICl', 'PCBM'}
+        stack = {'PEDOT', 'MAPICl', 'P3HT', 'PCBM'}
         
         %% Energy levels [eV] 
-        EA = [-3.0, -3.8, -3.8];           % Electron affinity
-        IP = [-5.1, -5.4, -6.2];           % Ionisation potential
+        EA = [-3.0, -3.8, -3.5, -3.8];           % Electron affinity
+        IP = [-5.1, -5.4, -5.2, -6.2];           % Ionisation potential
         % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html 
         
         %% Equilibrium Fermi energies [eV]
         % These define the doping density in each layer- see NA and ND calculations in methods         
-        E0 = [-5.0, -4.6, -3.9];   
+        E0 = [-5.0, -4.6, -4.35, -3.9];   
         
         %% SRH trap energies [eV]
         % These must exist within the energy gap of the appropriate layers
         % and define the variables PT and NT in the expression:
         % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-        Et_bulk =[-4.05, -4.6, -5.0];
+        Et_bulk =[-4.05, -4.6, -4.35, -5.0];
         
         %% Electrode Fermi energies [eV]
         % Fermi energies of the metal electrode. These define the built-in voltage, Vbi 
@@ -126,47 +126,47 @@ classdef pc
         PhiC = -3.9;
         
         %% Effective Density Of States (eDOS) [cm-3]
-        N0 = [1e19, 1e19, 1e19];
+        N0 = [1e19, 1e19, 1e19, 1e19];
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
         
         %% Mobile ions
         % Mobile ion defect density [cm-3] 
-        Nion = [0, 1e18, 0];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.     
+        Nion = [0, 1e18, 0, 0];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.     
         % Approximate density of iodide sites [cm-3]
         % Limits the density of iodide vancancies
-        DOSion = [1e-6, 1.21e22, 1e-6];                 % P. Calado thesis           
+        DOSion = [1e-6, 1.21e22, 1e-6, 1e-6];                 % P. Calado thesis           
         
         %% Mobilities   [cm2V-1s-1]
-        mue = [0.01, 20, 1e-3];         % electron mobility 
-        muh = [0.01, 20, 1e-3];         % hole mobility
+        mue = [0.01, 20, 1e-3, 1e-3];         % electron mobility 
+        muh = [0.01, 20, 1e-3, 1e-3];         % hole mobility
         
-        muion = [0, 1e-10, 0];          % ion mobility
+        muion = [0, 1e-10, 0, 0];          % ion mobility
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
         % TiO2 mue = 0.09 cm2V-1s-1 Bak2008
         % Spiro muh = 0.02 cm2V-1s-1 Hawash2018
         
         %% Relative dielectric constants
-        epp = [4,23,4];    
+        epp = [4, 23, 4, 4];    
                 
         %% Uniform generation rate [cm-3s-1]
-        G0 = [0, 2.6409e+21, 0];        % Approximate Uniform generation rate @ 1 Sun for 510 nm active layer thickness
+        G0 = [0, 2.6409e+21, 0, 0];        % Approximate Uniform generation rate @ 1 Sun for 510 nm active layer thickness
         
         %% Recombination
         % Radiative recombination, U = k(np - ni^2)
         % [cm3 s-1] Radiative Recombination coefficient
-        krad = [6.3e-11, 3.6e-12, 6.8e-11];
+        krad = [6.3e-11, 3.6e-12, 1e-12, 6.8e-11];
         
         %% Bulk SRH time constants for each layer [s]
-        taun_bulk = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for electrons
-        taup_bulk = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for holes   
+        taun_bulk = [1e-6, 1e-6, 1e-6, 1e-6];           % [s] SRH time constant for electrons
+        taup_bulk = [1e-6, 1e-6, 1e-6, 1e-6];           % [s] SRH time constant for holes   
         
         %% Interfacial SRH time constants [s]
         % Must be a row vector of length (number of layers)-1  
-        taun_inter = [1e-13, 1e-6];
-        taup_inter = [1e-13, 1e-6];
+        taun_inter = [1e-13, 1e-6, 1e-6];
+        taup_inter = [1e-13, 1e-6, 1e-6];
 
         %% Surface recombination and extraction coefficients [cm s-1]
         % Descriptions given in the comments considering that holes are
@@ -449,9 +449,7 @@ classdef pc
         %% Intrinsic Fermi Energies
         % Currently uses Boltzmann stats as approximation should always be 
         function value = get.Eif(par)
-            value = [0.5*((par.EA(1)+par.IP(1))+par.kB*par.T*log(par.N0(1)/par.N0(1))),...
-                0.5*((par.EA(2)+par.IP(2))+par.kB*par.T*log(par.N0(2)/par.N0(2))),...
-                0.5*((par.EA(3)+par.IP(3))+par.kB*par.T*log(par.N0(3)/par.N0(3)))];  
+            value = 0.5.*(par.EA+par.IP)+par.kB*par.T*log(par.N0./par.N0);
         end
         
         %% Conduction band gradients at interfaces
@@ -471,33 +469,28 @@ classdef pc
         
         %% Donor densities
         function value = get.ND(par) 
-            value = [0, 0, F.nfun(par.N0(3), par.EA(3), par.E0(3), par.T, par.stats)];  
+            value = F.nfun(par.N0, par.EA, par.E0, par.T, par.stats);  
         end
         
         %% Donor densities
         function value = get.NA(par)
-            value = [F.pfun(par.N0(1), par.IP(1), par.E0(1), par.T, par.stats), 0, 0];
+            value = F.pfun(par.N0, par.IP, par.E0, par.T, par.stats);
         end
         
         %% Intrinsic carrier densities (Boltzmann)
         function value = get.ni(par)
-            value = [par.N0(1)*(exp(-par.Eg(1)/(2*par.kB*par.T))),...
-                par.N0(2)*(exp(-par.Eg(2)/(2*par.kB*par.T))),...
-                par.N0(3)*(exp(-par.Eg(3)/(2*par.kB*par.T)))];   
+            value = par.N0.*exp(-par.Eg./(2*par.kB*par.T)); 
         end
         
         %% Equilibrium electron densities
         function value = get.n0(par)
-            value = [F.nfun(par.N0(1), par.EA(1), par.E0(1), par.T, par.stats),...
-                F.nfun(par.N0(2), par.EA(2), par.E0(2), par.T, par.stats),...
-                F.nfun(par.N0(3), par.EA(3), par.E0(3), par.T, par.stats)];
+            value = F.nfun(par.N0, par.EA, par.E0, par.T, par.stats);
         end
         
         %% Equilibrium hole densitis
         function value = get.p0(par)
-            value = [F.pfun(par.N0(1), par.IP(1), par.E0(1), par.T, par.stats),...
-                F.pfun(par.N0(2), par.IP(2), par.E0(2), par.T, par.stats),...
-                F.pfun(par.N0(3), par.IP(3), par.E0(3), par.T, par.stats)];
+            value = F.pfun(par.N0, par.IP, par.E0, par.T, par.stats);
+
         end
         
         %% Boundary electron and hole densities
