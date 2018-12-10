@@ -25,10 +25,7 @@ sp_r = par.sp_r;
 BC = par.BC;
 
 %% Start with low interfacial recombination coefficients
-par.taun_inter = [1e6, 1e6, 1e6];       % [s] SRH time constant for electrons
-par.taup_inter = [1e6, 1e6, 1e6];      % [s] SRH time constant for holes
 par.SRHset = 0;
-par.dev = pc.builddev(par);
 
 % Raditative recombination could also be set to low values initially if required. 
 % par.krad = 1e-20;
