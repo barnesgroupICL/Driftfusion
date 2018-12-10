@@ -25,8 +25,8 @@ sp_r = par.sp_r;
 BC = par.BC;
 
 %% Start with low interfacial recombination coefficients
-par.taun_inter = [1e6, 1e6];       % [s] SRH time constant for electrons
-par.taup_inter = [1e6, 1e6];      % [s] SRH time constant for holes
+par.taun_inter = [1e6, 1e6, 1e6];       % [s] SRH time constant for electrons
+par.taup_inter = [1e6, 1e6, 1e6];      % [s] SRH time constant for holes
 par.SRHset = 0;
 par.dev = pc.builddev(par);
 
@@ -129,18 +129,14 @@ disp('Complete')
 %% Equilibrium solutions with ion mobility switched on
 
 % Start with low recombination coefficients
-par.taun_inter = [1e6, 1e6];       % [s] SRH time constant for electrons
-par.taup_inter = [1e6, 1e6];      % [s] SRH time constant for holes
 par.SRHset = 0;
 
 disp('Closed circuit equilibrium with ions')
 
-par.mobseti = 1;
+par.mobseti = 1e4;           % Ions are accelerated to reach equilibrium
 par.OC = 0;
 par.tmax = 1e-9;
-par.t0 = par.tmax/1e3;
-par.muion = [0,1e-6,0];           % Ions are accelerated to reach equilibrium
-par.dev = pc.builddev(par);
+par.t0 = par.tmax/1e3; 
 
 sol = df(soleq.eq, par);
 
@@ -155,24 +151,22 @@ all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
 
 % loop to check ions have reached stable config- if not accelerate ions by
 % order of mag
-j = 1;
 
 while any(all_stable) == 0
-    disp(['Accelerating ions for equilibrium solution, mui = ', num2str(par.mui*10^j)]);
+    disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
     
-    % use mobseti as a multiplier- bit dangerous? But fine for now
-    par.mobseti = par.mobseti*10;
-    
+    par.tmax = par.tmax*10;
+    par.t0 = par.tmax/1e6;
+
     sol = df(sol, par);
     
     all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
 
 end
-par.muion = p_original.muion;           % Ions are accelerated to reach equilibrium
-par.dev = pc.builddev(par);
-sol.par=par;
+
 % write solution and reset ion mobility
 soleq.i = sol;
+soleq.i.par.mobseti = 1;
 
 disp('Ion equilibrium solution complete')
 
