@@ -48,6 +48,24 @@ par.t = t;        % For backwards compatibility
 
 xpoints = length(x);
 
+j = 1;
+k = 1;
+% Iteration around number of layers and desired points
+for i=1:2*length(par.parr)-1
+    
+    if rem(i, 2) == 1
+        parrint(j) = par.parr(k);
+        j = j+1;
+        k = k+1;
+    elseif rem(i, 2) == 0
+        parrint(j) = par.pint;
+        j = j+1;
+    end
+end
+pcum = cumsum(parrint);
+pcum = [0,pcum]+1;
+pcum(end) = pcum(end)-1;
+
 %% ANALYSIS %%
 xnm = x*1e7;    % x in nm for plotting
 
