@@ -59,6 +59,12 @@ p = sol(:,:,2);
 a = sol(:,:,3);
 V = sol(:,:,4);
 
+% Set minority carrier densities to zero to avoid errors
+nmod = n;
+nmod(:, 1:pcum(3)) = 0;
+pmod = p;
+pmod(:, pcum(4):pcum(end))=0;
+
 % Create 2D matrices for multiplication with solutions
 EAmat = repmat(par.dev.EA, length(t), 1);
 IPmat = repmat(par.dev.IP, length(t), 1);
@@ -90,16 +96,16 @@ if par.stats == 'Fermi'
     
     for i = 1:size(n,1)           % time
         for j = 1:size(n,2)       % position
-            Efn(i,j) = F.Efn_fd_fun(n(i,j), par.dev.Efn(j,:),  par.dev.n_fd(j,:));
-            Efp(i,j) = F.Efp_fd_fun(p(i,j), par.dev.Efp(j,:),  par.dev.p_fd(j,:));
+            Efn(i,j) = F.Efn_fd_fun(nmod(i,j), par.dev.Efn(j,:),  par.dev.n_fd(j,:));
+            Efp(i,j) = F.Efp_fd_fun(pmod(i,j), par.dev.Efp(j,:),  par.dev.p_fd(j,:));
         end
     end
     Efn = Efn-V;
     Efp = Efp-V;
     
 elseif par.stats == 'Boltz'
-    Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./N0mat));        % Electron quasi-Fermi level
-    Efp = real(Evb-(par.kB*par.T/par.q)*log(p./N0mat));        % Hole quasi-Fermi level
+    Efn = real(Ecb+(par.kB*par.T/par.q)*log(nmod./N0mat));        % Electron quasi-Fermi level
+    Efp = real(Evb-(par.kB*par.T/par.q)*log(pmod./N0mat));        % Hole quasi-Fermi level
 end
 
 % Remove ionic charge densities from contact regions
