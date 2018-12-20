@@ -452,19 +452,29 @@ classdef pc
             value = 0.5.*(par.EA+par.IP)+par.kB*par.T*log(par.N0./par.N0);
         end
         
-        %% Conduction band gradients at interfaces
+       %% Conduction band gradients at interfaces
         function value = get.dEAdx(par)
-            value = [(par.EA(2)-par.EA(1))/(2*par.dint), (par.EA(3)-par.EA(2))/(2*par.dint)];
+            value = zeros(length(par.stack)-1);
+            for i = 1:length(par.stack)-1
+                value(i) = (par.EA(i+1)-par.EA(i))/(par.dint);
+            end
+            %value = [(par.EA(2)-par.EA(1))/(2*par.dint), (par.EA(3)-par.EA(2))/(2*par.dint)];
         end
         
         %% Valence band gradients at interfaces
         function value = get.dIPdx(par)
-            value = [(par.IP(2)-par.IP(1))/(2*par.dint), (par.IP(3)-par.IP(2))/(2*par.dint)];
+            value = zeros(length(par.stack)-1);
+            for i = 1:length(par.stack)-1
+                value(i) = (par.IP(i+1)-par.IP(i))/(par.dint);
+            end
         end
         
         %% eDOS gradients at interfaces
-        function value = get.dN0dx(par)    
-            value = [(par.N0(2)-par.N0(1))/(2*par.dint), (par.N0(3)-par.N0(2))/(2*par.dint)];
+        function value = get.dN0dx(par)  
+            value = zeros(length(par.stack)-1);
+            for i = 1:length(par.stack)-1
+                value(i) = (par.N0(i+1)-par.N0(i))/(par.dint);
+            end
         end
         
         %% Donor densities
