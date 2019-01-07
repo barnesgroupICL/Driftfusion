@@ -205,15 +205,17 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         legend_array = [legend_array, strcat("Recombination current ", num2str(-U_mean, '%+.4g'), " mA/cm2")];
         i=i+1; h(i) = plot(s.t, -dQ_t * 1000, 'b:', 'LineWidth', 2); % mA
         legend_array = [legend_array, "Accumulating current"];
-        i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(n_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
+        fitted_Jn = s.p.J_E_func_tilted(n_coeff, fit_t, tilting, t_middle); % A
+        i=i+1; h(i) = plot(fit_t, fitted_Jn * 1000, 'kx-'); % mA
         legend_array = [legend_array, "Fit of Current"];
         i=i+1; h(i) = plot(s.t, Jn_inphase*1000, 'm-', 'LineWidth', 1, 'Marker', 'o', 'MarkerSize', 7); % mA
         legend_array = [legend_array, "In phase J"];
         i=i+1; h(i) = plot(s.t, Jn_quadrature*1000, 'm-', 'LineWidth', 1, 'Marker', 'x', 'MarkerSize', 7); % mA
         legend_array = [legend_array, "Out of phase J"];
         if s.p.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
-            i=i+1; h(i) = plot(s.t, Ji_disp * 1000, 'g--', 'LineWidth', 2); % mA
-            legend_array = [legend_array, "Ionic displacement current"];
+            i_normalization_factor = 10^round(log10(max(fitted_Jn)/max(Ji_disp)));
+            i=i+1; h(i) = plot(s.t, Ji_disp * 1000 * i_normalization_factor, 'g--', 'LineWidth', 2); % mA
+            legend_array = [legend_array, strcat("Ionic displacement current x ", num2str(i_normalization_factor))];
             i=i+1; h(i) = plot(s.t, Jn_noionic * 1000, 'c-.', 'LineWidth', 2); % mA
             legend_array = [legend_array, "Non-ionic electronic current"];
             i=i+1; h(i) = plot(s.t, Jn_noionic_inphase*1000, 'm--', 'LineWidth', 1, 'Marker', '+', 'MarkerSize', 7); % mA
