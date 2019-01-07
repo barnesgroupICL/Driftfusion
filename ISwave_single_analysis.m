@@ -184,6 +184,7 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
     end
 
     Vapp = s.p.Vapp_func(s.p.Vapp_params, s.t);
+    U_mean = mean(fit_U*1000); % mA
 
     % fourth value of Vapp_params is pulsatance
     figure('Name', ['Single ISwave, Int ' num2str(s.p.Int) ' Freq '...
@@ -200,8 +201,8 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         i=i+1; h(i) = plot(s.t, s.Jn, 'k-', 'LineWidth', 2); % mA
         legend_array = [legend_array, "Current"];
         hold on
-        i=i+1; h(i) = plot(s.t, U, 'k--'); % mA
-        legend_array = [legend_array, "Recombination current"];
+        i=i+1; h(i) = plot(s.t, U - U_mean, 'k--'); % mA
+        legend_array = [legend_array, strcat("Recombination current ", num2str(-U_mean, '%+.4g'), " mA/cm2")];
         i=i+1; h(i) = plot(s.t, -dQ_t * 1000, 'b:', 'LineWidth', 2); % mA
         legend_array = [legend_array, "Accumulating current"];
         i=i+1; h(i) = plot(fit_t, s.p.J_E_func_tilted(n_coeff, fit_t, tilting, t_middle) * 1000, 'kx-'); % mA
