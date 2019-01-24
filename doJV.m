@@ -1,4 +1,5 @@
 function JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
+tic
 disp('Current voltage scan')
 
 % A procedure for running JV scans using DF
@@ -109,5 +110,5 @@ if option ==2 || option ==3
         plotJV(JV, option)
         JV.stats = JVstats(JV);
 end
-
+toc
 end
