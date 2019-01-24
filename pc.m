@@ -13,12 +13,10 @@ classdef pc
         kB = 8.617330350e-5;     % Boltzmann constant [eV K^-1]
         epp0 = 552434;           % Epsilon_0 [e^2 eV^-1 cm^-1] - Checked (02-11-15)
         q = 1;                   % Charge of the species in units of e.
-        e = 1.61917e-19;         % Elementary charge in Coulombs.
-        
+        e = 1.61917e-19;         % Elementary charge in Coulombs.      
     end
     
-    properties
-        
+    properties      
         % Temperature [K]
         T = 300;
         
@@ -41,12 +39,12 @@ classdef pc
         % are inserted automatically between each layer with a width
         % defined by the property DINT and number of points defined by
         % PINT.
-        dcell = {{50e-7}; {30e-7, 450e-7, 30e-7}; {60e-7}};         % Layer and subsection thickness array
+        dcell = {{50e-7}; {30e-7, 450e-7, 30e-7}; {60e-7}};         % Layer and subsection thickness array  
         pcell = {{50}; {30, 225, 30}; {60}};                          % Number of points in layers and subsections array  
-        dint = 4e-7;        % Interfacial region thickness (x_mesh_type = 3)
+        dint = 2e-7;        % Interfacial region thickness (x_mesh_type = 3)
         pint = 20;          % Interfacial points (x_mesh_type = 3)
         
-        % Define spatial cordinate system- typeically this will be kept at
+        % Define spatial cordinate system- typically this will be kept at
         % 0 for most applications
         % m=0 cartesian
         % m=1 cylindrical polar coordinates
@@ -63,10 +61,10 @@ classdef pc
         % are read out and so does not influence convergence. Defining an
         % unecessarily high number of points however can be expensive owing
         % to interpolation of the solution.
+        tmesh_type = 2;             % Mesh type- for use with meshgen_t
         t0 = 1e-16;                 % Initial log mesh time value
         tmax = 1e-12;               % Max time value
         tpoints = 100;              % Number of time points
-        tmesh_type = 2;             % Mesh type- for use with meshgen_t
         
         %% GENERAL CONTROL PARAMETERS
         OC = 0;                 % Closed circuit = 0, Open Circuit = 1
@@ -160,8 +158,8 @@ classdef pc
         krad = [6.3e-11, 3.6e-12, 6.8e-11];
         
         %% Bulk SRH time constants for each layer [s]
-        taun_bulk = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for electrons
-        taup_bulk = [1e-6, 1e-6, 1e-6];           % [s] SRH time constant for holes   
+        taun_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for electrons
+        taup_bulk = [1e-6, 1e-7, 1e-6];           % [s] SRH time constant for holes   
         
         %% Interfacial SRH time constants [s]
         % Must be a row vector of length (number of layers)-1  
@@ -361,8 +359,7 @@ classdef pc
                 error(msg);
             elseif length(par.taup_inter) ~= length(par.d)-1
                 msg = 'Interfacial hole SRH time constant array (taup_inter) does not have the correct number of elements. SRH properties for interfaces must have length(d)-1 elements.';
-                error(msg);
-                
+                error(msg);            
             end
             
             % Build the device- properties are defined at each point
@@ -497,7 +494,7 @@ classdef pc
             value = F.nfun(par.N0, par.EA, par.E0, par.T, par.stats);
         end
         
-        %% Equilibrium hole densitis
+        %% Equilibrium hole densities
         function value = get.p0(par)
             value = F.pfun(par.N0, par.IP, par.E0, par.T, par.stats);
 
