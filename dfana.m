@@ -852,18 +852,16 @@ if par.figson == 1
         %     PLint(pparr(i));
         %
         % Band Diagram
-        %FH1 = figure(1);
+        FH1 = figure(1);
         %set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
-        %PH1 = subplot(3,1,1);
-        figure(70)
+        PH1 = subplot(3,1,1);
+        %figure(70)
         plot (xnm, Efn(pparr(i),:), '--', xnm, Efp(pparr(i),:), '--', xnm, Ecb(pparr(i), :), xnm, Evb(pparr(i) ,:));
-        %legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
+        legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
         set(legend,'FontSize',12);
         xlabel('Position [nm]');
         ylabel('Energy [eV]');
         xlim([xrange(1), xrange(2)]);
-        %xlim([0, xnm(end)]);
-        %ylim([-inf, 0.5]);
         set(legend,'FontSize',12);
         set(legend,'EdgeColor',[1 1 1]);
         grid off;
@@ -873,13 +871,12 @@ if par.figson == 1
         
         % Final Charge Densities
         %figure(2)
-        %PH2 = subplot(3,1,2);
-        figure(71)
+        PH2 = subplot(3,1,2);
+        %figure(71)
         semilogy(xnm, n(pparr(i), :), xnm, p(pparr(i), :));
         ylabel('{\itn, p} [cm^{-3}]')
-        %legend('\itn', '\itp')
+        legend('\itn', '\itp')
         xlabel('Position [nm]')
-        %xlim([0, xnm(end)]);
         xlim([xrange(1), xrange(2)]);
         ylim([1e0, 1e20]);
         set(legend,'FontSize',12);
@@ -888,12 +885,11 @@ if par.figson == 1
         
         hold on
         
-        %PH3 = subplot(3,1,3);
-        figure(72)
+        PH3 = subplot(3,1,3);
+        %figure(72)
         plot(xnm, (rhoa(pparr(i),:))/1e18, 'black');
         ylabel('{\it\rho a} [x10^{18} cm^{-3}]');
         xlabel('Position [nm]');
-        %xlim([0, xnm(end)]);
         xlim([xrange(1), xrange(2)]);
         %ylim([0, 1.1*(max(sol(pparr(i),:,3))/1e19)]);
         set(legend,'FontSize',12);
@@ -970,19 +966,19 @@ title('Electric Field');
         
     end
     
-    %     figure(1)
-    %     subplot(3,1,1);
-    %     hold off
-    %     subplot(3,1,2);
-    %     hold off
-    %     subplot(3,1,3);
-    %     hold off
-    figure(70)
-    hold off
-    figure(71)
-    hold off
-    figure(72)
-    hold off
+        figure(1)
+        subplot(3,1,1);
+        hold off
+        subplot(3,1,2);
+        hold off
+        subplot(3,1,3);
+        hold off
+%     figure(70)
+%     hold off
+%     figure(71)
+%     hold off
+%     figure(72)
+%     hold off
     
     if ionfigon ==1
         figure(3)
