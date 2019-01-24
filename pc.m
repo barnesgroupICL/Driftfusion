@@ -88,7 +88,7 @@ classdef pc
         % Uniform generation uses 
         % 0 = Uniform Generation
         % 1 = Beer Lambert
-        OM = 0;
+        OM = 1;
         
         %%%%%%%%%%% LAYER MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
         % Numerical values should be given as a row vector with the number of 
