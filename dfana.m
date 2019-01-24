@@ -38,6 +38,7 @@ sol = solstruct.sol;
 par = solstruct.par;
 x = solstruct.x;
 t = solstruct.t;
+dev = par.dev;
 
 if par.OM == 1
     gx = solstruct.gx;
@@ -193,7 +194,7 @@ switch par.OM
     % Uniform generation
     case 0
         
-        g = par.Int*par.dev.G0;
+        g = par.Int*dev.G0;
         
     case 1
         
