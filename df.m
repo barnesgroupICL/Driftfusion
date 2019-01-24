@@ -152,8 +152,27 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
 function [c,f,s,iterations] = pdex4pde(x,t,u,DuDx)
 
+i = find(par.xx <= x);
+i = i(end);
+
+% Uniform Generation
+if par.OM == 0   
+        if par.Int ~= 0 
+            g = par.Int*dev.G0(i);
+        else
+            g = 0;
+        end
+        % Add pulse
+        if par.pulseon == 1
+            if  t >= par.pulsestart && t < par.pulselen + par.pulsestart
+                
+                g = g+(par.pulseint.*dev.G0);
+            
+            end
+        end      
+        
 % Beer Lambert or Transfer Matrix 1 Sun
-if par.OM == 1
+elseif par.OM == 1
     %AM15
     if par.Int ~= 0 
         gxAM15 = par.Int*interp1(xmesh, gx.AM15, x);
@@ -193,28 +212,13 @@ elseif par.Int ~= 0 && par.OM == 2
         end
     end
   
-% Uniform Generation
-elseif par.OM == 0   
-               g = par.Int*par.dev.G0;
-        % Add pulse
-        if par.pulseon == 1
-            if  t >= par.pulsestart && t < par.pulselen + par.pulsestart
-                
-                g = g+(par.pulseint.*par.dev.G0);
-            
-            end
-        end
-        
 else
-        g = 0;
+   g = 0;
         
 end
 
 % Prefactors set to 1 for time dependent components - can add other
 % functions if you want to include the multiple trapping model
-i = find(par.xx <= x);
-i = i(end);
-
 c = [1
      1
      1
