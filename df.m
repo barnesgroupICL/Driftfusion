@@ -104,9 +104,7 @@ t = meshgen_t(par);
 %% Generation
 % Beer Lambert
 if par.OM == 1
-    
-    xmesh = x;  % Duplicates x the xmesh for interpolation later- there may be an easier way to do this since the beer lambert code matches the mesh.
-    
+        
     % AM15 bias light
     if par.Int ~= 0 % OM = Optical Model
         if input_solstruct.gx.AM15 == 0        % Only call BEERLAMBERT if no AM15 solution exists
@@ -115,14 +113,14 @@ if par.OM == 1
             gx.AM15 = input_solstruct.gx.AM15;    % Use previous AM15 generation profile to avoid recalculation
         end
     else
-        gx.AM15 = 0;
+        gx.AM15 = zeros(length(x), 1);
     end
     
     % laser pulse
     if par.pulseon == 1
         gx.las = beerlambert(par, x, 'laser', par.laserlambda, 0);
     else
-        gx.las = 0;
+        gx.las = zeros(length(x), 1);
     end
     
 end
@@ -174,14 +172,10 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                     end
                 end
                 
-                % Beer Lambert
+            % Beer Lambert
             case 1
                 %AM15
-                if par.Int ~= 0
                     gxAM15 = par.Int*gx.AM15(i);
-                else
-                    gxAM15 = 0;
-                end
                 %Pulse
                 if par.pulseon == 1   % Applies pulse for duration set by user
                     if  t >= par.pulsestart && t < par.pulselen + par.pulsestart
@@ -195,7 +189,7 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 
                 g = gxAM15 + gxlas;
                 
-                % Transfer Matrix- not currently working!
+            % Transfer Matrix- not currently working!
             case 2
                 
                 if par.Int ~= 0
