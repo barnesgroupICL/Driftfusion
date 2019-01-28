@@ -20,7 +20,7 @@ elseif length(varargin) == 1
     % Call input parameters function
     icsol = varargin{1, 1}.sol;
     icx = varargin{1, 1}.x;
-    par = pinParams;
+    par = pc;
     
 elseif length(varargin) == 2
     
@@ -215,9 +215,9 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
         
         % Prefactors set to 1 for time dependent components - can add other
         % functions if you want to include the multiple trapping model
-        c = [1
-            1
-            1
+        c = [1;
+            1;
+            1;
             0];
         
         if par.stats == 'Fermi'
