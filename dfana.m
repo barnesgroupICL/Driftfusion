@@ -99,8 +99,8 @@ nimat = repmat(par.dev.ni, length(t), 1);
 kradmat = repmat(par.dev.krad, length(t), 1);
 taunmat = repmat(par.dev.taun, length(t), 1);
 taupmat = repmat(par.dev.taup, length(t), 1);
-ntmat =  repmat(par.dev.nt, length(t), 1);
-ptmat =  repmat(par.dev.pt, length(t), 1);
+ntmat = repmat(par.dev.nt, length(t), 1);
+ptmat = repmat(par.dev.pt, length(t), 1);
 
 Ecb = EAmat-V;                                 % Conduction band potential
 Evb = IPmat-V;                                 % Valence band potential
@@ -140,18 +140,15 @@ if par.OC == 0 && par.pulseon == 1
     
 end
 
-
 for i=1:length(t)
     
     Fp(i,:) = -gradient(V(i, :), x);                      % Electric field calculated from V
     
 end
 
-Potp = V(end, :);
-
 rhoctot = trapz(x, rhoc, 2)/par.dcum(end);   % Net charge
 
-Irho = a - Nionmat;                  % Net ionic charge
+Irho = a - Nionmat;                          % Net ionic charge
 Irhotot = trapz(x, Irho, 2)/par.dcum(end);   % Total Net ion charge
 
 ntot = trapz(x, n, 2);     % Total
@@ -168,9 +165,7 @@ else
 end
 
 %% Current calculation from continuity equations
-
 for j = 1:size(n, 2)
-    
     dndt(:,j) = gradient(n(:,j), t);
     dpdt(:,j) = gradient(p(:,j), t);
     dadt(:,j) = gradient(a(:,j), t);
@@ -297,9 +292,11 @@ for i=1:2*length(par.parr)-1
         j = j+1;
     end
 end
+
 pcum = cumsum(parrint);
 pcum = [0,pcum]+1;
 pcum(end) = pcum(end)-1;
+
 for i=1:length(t)
     % Charge densities across interfaces
     rhoint1(i) = trapz(x(pcum(1):pcum(2)-1), rho(i, pcum(1):pcum(2)-1))*par.e;
@@ -346,7 +343,7 @@ end
 
 % Electric field
 for i = 1:length(t)
-    Field(i, :) = gradient(V(i, :), x);
+    Field(i, :) = -gradient(V(i, :), x);
 end
 
 % Vrec - this doesn't really work as we need the maxima and minima
@@ -386,28 +383,7 @@ if par.figson == 1
     
     yrange = [-inf, inf];
     % yrange = [-5e-7, 5e-7];
-    % ion currents
-    
-    %%%%% FIGURES %%%%%
-    % Plotting defaults
-    set(0,'DefaultLineLinewidth',1);
-    set(0,'DefaultAxesFontSize',16);
-    set(0,'DefaultFigurePosition', [600, 400, 450, 300]);
-    set(0,'DefaultAxesXcolor', [0, 0, 0]);
-    set(0,'DefaultAxesYcolor', [0, 0, 0]);
-    set(0,'DefaultAxesZcolor', [0, 0, 0]);
-    set(0,'DefaultTextColor', [0, 0, 0]);
-    
-    
-    % Field strength at centre of active layer and mean field
-    % strength across perovskite as function of time
-%     figure(2)
-%     plot(Vapp_arr(2:end), -Field((2:end), pcum(3)+round(parrint(3)/2)));%, t, mean(Field(:, pcum(3):pcum(4)), 2))
-%     xlabel('Vapp [V]')
-%     ylabel('Electric field [Vcm-1]')
-    %legstr = [par.stack(1), num2str(round(mean(Vapp_arr/t)), 2),'Vs-1'];
-    %legend([par.stack(1), num2str(round(mean(Vapp_arr/t))),'Vs-1'])
-    
+    % ion current
     
     for i=1:length(tarr)
         
@@ -755,9 +731,7 @@ if par.figson == 1
             ylabel('Jp [A]')
             legend('Drift', 'Diff')
             hold on
-        end
-        
-        
+        end  
         
         if ionfigon ==1
             
@@ -979,6 +953,9 @@ title('Electric Field');
 %     hold off
 %     figure(72)
 %     hold off
+    
+    figure(4000)
+    hold off
     
     if ionfigon ==1
         figure(3)
