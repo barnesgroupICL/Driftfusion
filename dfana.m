@@ -954,9 +954,6 @@ title('Electric Field');
 %     figure(72)
 %     hold off
     
-    figure(4000)
-    hold off
-    
     if ionfigon ==1
         figure(3)
         hold off
