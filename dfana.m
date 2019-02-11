@@ -900,7 +900,6 @@ if par.figson == 1
         % set(legend,'FontSize',14);
         % set(legend,'EdgeColor',[1 1 1]);
         % grid off
-        
         %
         if par.OM == 1 && par.Int~=0 || par.OM == 2 && par.Int~=0
             
