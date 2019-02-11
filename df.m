@@ -388,6 +388,11 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 % be more reliable at high currents than BC2 since does not rely on
                 % integrating continuity equations across the device.
             elseif par.BC == 3
+                Jn_r = -par.e*par.sn_r*(ur(1) - nright);
+                Jp_r = par.e*par.sp_r*(ur(1) - pright);
+                
+                Jr = Jn_r*Jp_r;
+                Vres = Jr*par.Rs;
                 
                 pl = [-par.sn_l*(ul(1) - nleft);
                     -par.sp_l*(ul(2) - pleft);
@@ -402,7 +407,7 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 pr = [par.sn_r*(ur(1) - nright);
                     par.sp_r*(ur(2) - pright);
                     0;
-                    -ur(4)+Vbi-par.Vapp;];
+                    -ur(4)+Vbi-par.Vapp+Vres;];
                 
                 qr = [1;
                     1;
