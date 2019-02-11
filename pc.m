@@ -174,6 +174,9 @@ classdef pc
         sp_l = 1e8;     % hole extraction left boundary         
         sp_r = 1e8;     % hole surface recombination velocity right boundary
         
+        %% Series resistance
+        Rs = 0;
+              
         %% Defect recombination rate coefficient
         % Currently not used
         k_defect_p = 0;
