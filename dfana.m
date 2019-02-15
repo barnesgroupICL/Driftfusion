@@ -149,7 +149,7 @@ for i=1:length(t)
     Fp(i,:) = -gradient(V(i, :), x);                      % Electric field calculated from V
 end
 
-% Frho = 
+Frho = cumtrapz(x, rho./(eppmat.*par.epp0), 2) + Fp(:,1);
 
 rhoctot = trapz(x, rhoc, 2)/par.dcum(end);   % Net charge
 
@@ -278,7 +278,7 @@ ja = 0 + deltaja;
 % displacement flux
 jdisp = zeros(length(t), length(x));
 for j = 1:length(x) 
-    jdisp(:,j) = par.epp0.*eppmat(:,j).*(gradient(Fp(:,j), t));
+    jdisp(:,j) = par.epp0.*eppmat(:,j).*(gradient(Frho(:,j), t));
 end
 
 Jn = -jn*par.e;
