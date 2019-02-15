@@ -146,10 +146,10 @@ if par.OC == 0 && par.pulseon == 1
 end
 
 for i=1:length(t)
-    
     Fp(i,:) = -gradient(V(i, :), x);                      % Electric field calculated from V
-    
 end
+
+% Frho = 
 
 rhoctot = trapz(x, rhoc, 2)/par.dcum(end);   % Net charge
 
@@ -275,18 +275,19 @@ jn = jn_l + deltajn;
 jp = jp_l + deltajp;
 ja = 0 + deltaja;
 
+% displacement flux
+jdisp = zeros(length(t), length(x));
+for j = 1:length(x) 
+    jdisp(:,j) = par.epp0.*eppmat(:,j).*(gradient(Fp(:,j), t));
+end
+
 Jn = -jn*par.e;
 Jp = jp*par.e;
 Ja = ja*par.e;
+Jdisp = jdisp*abs(par.e);
 
-% Displacement current
-Jdisp = zeros(length(t), length(x));
-for i = 1:length(x)
-    Jdisp(:, i) = par.epp0.*eppmat(:,i).*gradient(FV(:, i), t);
-end
-    
 % Total current
-Jtot = Jn + Jp + Ja;% + Jdisp;
+Jtot = Jn + Jp + Ja + Jdisp;
 
 %% Capacitance of the interfaces
 j = 1;
