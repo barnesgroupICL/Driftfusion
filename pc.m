@@ -169,10 +169,10 @@ classdef pc
         %% Surface recombination and extraction coefficients [cm s-1]
         % Descriptions given in the comments considering that holes are
         % extracted at left boundary, electrons at right boundary
-        sn_l = 1e8;     % electron surface recombination velocity left boundary
-        sn_r = 1e8;     % electron extraction velocity right boundary
-        sp_l = 1e8;     % hole extraction left boundary         
-        sp_r = 1e8;     % hole surface recombination velocity right boundary
+        sn_l = 1e7;     % electron surface recombination velocity left boundary
+        sn_r = 1e7;     % electron extraction velocity right boundary
+        sp_l = 1e7;     % hole extraction left boundary         
+        sp_r = 1e7;     % hole surface recombination velocity right boundary
         
         %% Series resistance
         Rs = 0;
@@ -696,40 +696,15 @@ classdef pc
                             % Ion mobility
                             dmuiondx = (par.muion(i+1)-par.muion(i))/(par.dint);
                             dev.muion(j) = par.muion(i) + xprime*dmuiondx;
-                            % Effective density of states
-                            dN0dx = (par.N0(i+1)-par.N0(i))/(par.dint);
-                            dev.N0(j) = par.N0(i) + xprime*dN0dx;
-                            dev.gradN0(j) = dN0dx;
-                            % Acceptor density
-                            dNAdx = (par.NA(i+1)-par.NA(i))/(par.dint);
-                            dev.NA(j) = par.NA(i) + xprime*dNAdx;
-                            % Donor density
-                            dNDdx = (par.ND(i+1)-par.ND(i))/(par.dint);
-                            dev.ND(j) = par.ND(i) + xprime*dNDdx;
                             % Dielectric constants
                             deppdx = (par.epp(i+1)-par.epp(i))/(par.dint);
                             dev.epp(j) = par.epp(i) + xprime*deppdx;
-                            % Intrinsic carrier densities
-                            dnidx = (par.ni(i+1)-par.ni(i))/(par.dint);
-                            dev.ni(j) = par.ni(i) + xprime*dnidx;
-                            % Equilibrium carrier densities
-                            dn0dx = (par.n0(i+1)-par.n0(i))/(par.dint);
-                            dev.n0(j) = par.n0(i) + xprime*dn0dx;
-                            % Equilibrium carrier densities
-                            dp0dx = (par.p0(i+1)-par.p0(i))/(par.dint);
-                            dev.p0(j) = par.p0(i) + xprime*dp0dx;
                             % Equilibrium Fermi energy
                             dE0dx = (par.E0(i+1)-par.E0(i))/(par.dint);
                             dev.E0(j) = par.E0(i) + xprime*dE0dx;
                             % Uniform generation rate
                             dG0dx = (par.G0(i+1)-par.G0(i))/(par.dint);
                             dev.G0(j) = par.G0(i) + xprime*dG0dx;
-                            % Static ion background density
-                            dNiondx = (par.Nion(i+1)-par.Nion(i))/(par.dint);
-                            dev.Nion(j) = par.Nion(i) + xprime*dNiondx;
-                            % Ion density of states
-                            dDOSiondx = (par.DOSion(i+1)-par.DOSion(i))/(par.dint);
-                            dev.DOSion(j) = par.DOSion(i) + xprime*dDOSiondx;
                             % Radiative recombination coefficient
                             dkraddx = (par.krad(i+1)-par.krad(i))/(par.dint);
                             dev.krad(j) = par.krad(i) + xprime*dkraddx;
@@ -739,6 +714,34 @@ classdef pc
                             % SRH time constants
                             dev.taun(j) = par.taun_inter(i);
                             dev.taup(j) = par.taup_inter(i);
+                             % Static ion background density
+                            dNiondx = (par.Nion(i+1)-par.Nion(i))/(par.dint);
+                            dev.Nion(j) = par.Nion(i) + xprime*dNiondx;
+                            % Ion density of states
+                            dDOSiondx = (par.DOSion(i+1)-par.DOSion(i))/(par.dint);
+                            dev.DOSion(j) = par.DOSion(i) + xprime*dDOSiondx;
+                            
+                            %% logarithmically graded variables
+                            % Effective density of states
+                            dlogN0dx = (log(par.N0(i+1))-log(par.N0(i)))/(par.dint);
+                            dev.N0(j) = exp(log(par.N0(i)) + xprime*dlogN0dx);
+                            % Acceptor density
+                            dlogNAdx = (log(par.NA(i+1))-log(par.NA(i)))/(par.dint);
+                            dev.NA(j) = exp(log(par.NA(i)) + xprime*dlogNAdx);
+                            % Donor density
+                            dlogNDdx = (log(par.ND(i+1))-log(par.ND(i)))/(par.dint);
+                            dev.ND(j) = exp(log(par.ND(i)) + xprime*dlogNDdx);
+                            % Intrinsic carrier densities
+                            dlognidx = (log(par.ni(i+1))-log(par.ni(i)))/(par.dint);
+                            dev.ni(j) = exp(log(par.ni(i)) + xprime*dlognidx);
+                            % Equilibrium carrier densities
+                            dlogn0dx = (log(par.n0(i+1))-log(par.n0(i)))/(par.dint);
+                            dev.n0(j) = exp(log(par.n0(i)) + xprime*dlogn0dx);
+                            % Equilibrium carrier densities
+                            dlogp0dx = (log(par.p0(i+1))-log(par.p0(i)))/(par.dint);
+                            dev.p0(j) = exp(log(par.p0(i)) + xprime*dlogp0dx);
+                            
+
                             
                             if par.stats == 'Fermi'
                                 % Build diffusion coefficient structure
@@ -769,9 +772,9 @@ classdef pc
             end
             
 %             Alternative gradient calculation appears less stable
-%             dev.gradN0 = gradient(dev.N0, xx);
-%             dev.gradEA = gradient(dev.EA, xx);
-%             dev.gradIP = gradient(dev.IP, xx);
+            dev.gradN0 = gradient(dev.N0, xx);
+            dev.gradEA = gradient(dev.EA, xx);
+            dev.gradIP = gradient(dev.IP, xx);
              dev.nt = F.nfun(dev.N0, dev.EA, dev.Et, par.T, par.stats);
              dev.pt = F.pfun(dev.N0, dev.IP, dev.Et, par.T, par.stats);
         end
