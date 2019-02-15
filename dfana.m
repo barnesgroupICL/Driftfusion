@@ -78,6 +78,11 @@ p = sol(:,:,2);
 a = sol(:,:,3);
 V = sol(:,:,4);
 
+% Electric field
+for i = 1:length(t)
+    FV(i, :) = -gradient(V(i, :), x);
+end
+
 % Set minority carrier densities to zero to avoid errors
 nmod = n;
 nmod(:, 1:pcum(3)) = 0;
@@ -274,8 +279,14 @@ Jn = -jn*par.e;
 Jp = jp*par.e;
 Ja = ja*par.e;
 
+% Displacement current
+Jdisp = zeros(length(t), length(x));
+for i = 1:length(x)
+    Jdisp(:, i) = par.epp0.*eppmat(:,i).*gradient(FV(:, i), t);
+end
+    
 % Total current
-Jtot = Jn + Jp + Ja;
+Jtot = Jn + Jp + Ja;% + Jdisp;
 
 %% Capacitance of the interfaces
 j = 1;
@@ -332,8 +343,6 @@ if ioncur == 1
     xlabel('Time [s]')
     ylabel('log10(Ja) [norm]')
     
-    fitob
-    
     figure(40)
     plot(t, Ja_mid)
     xlabel('Time [s]')
@@ -341,10 +350,6 @@ if ioncur == 1
     
 end
 
-% Electric field
-for i = 1:length(t)
-    Field(i, :) = -gradient(V(i, :), x);
-end
 
 % Vrec - this doesn't really work as we need the maxima and minima
 % TiO2
@@ -403,10 +408,10 @@ if par.figson == 1
         
         % electron and hole currents as function of position from continuity
         figure(110)
-        plot(xnm, Jn(pparr(i), :), xnm, Jp(pparr(i), :), xnm, Jtot(pparr(i), :))
+        plot(xnm, Jn(pparr(i), :), xnm, Jp(pparr(i), :), xnm, Ja(pparr(i), :), xnm, Jdisp(pparr(i), :), xnm, Jtot(pparr(i), :))
         xlabel('Position [nm]')
         ylabel('J [A]')
-        legend('Jn', 'Jp', 'Jtot')
+        legend('Jn', 'Jp', 'Ja', 'Jdisp', 'Jtot')
         xlim([xrange(1), xrange(2)])
 
         if transfigon == 1
@@ -680,7 +685,7 @@ if par.figson == 1
         end
         
         
-        % Field
+        % FV
         Fieldpoint = -gradient(V(pparr(i),:), x);
         
         % Calculates current at every point and all times -
@@ -929,12 +934,12 @@ if par.figson == 1
             hold on
         end
         %{
-% Electric Field
+% Electric FV
 figure(9);
 surf(xnm, t, Floct);
 xlabel('Position [m]');
 ylabel('time [s]');
-title('Electric Field');
+title('Electric FV');
         %}
         
     end

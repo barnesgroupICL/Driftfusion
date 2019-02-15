@@ -741,8 +741,6 @@ classdef pc
                             dlogp0dx = (log(par.p0(i+1))-log(par.p0(i)))/(par.dint);
                             dev.p0(j) = exp(log(par.p0(i)) + xprime*dlogp0dx);
                             
-
-                            
                             if par.stats == 'Fermi'
                                 % Build diffusion coefficient structure
                                 startlim = dev.IP(j);
