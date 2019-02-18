@@ -389,7 +389,7 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 % integrating continuity equations across the device.
             elseif par.BC == 3
                 Jn_r = -par.e*par.sn_r*(ur(1) - nright);
-                Jp_r = par.e*par.sp_r*(ur(1) - pright);
+                Jp_r = par.e*par.sp_r*(ur(2) - pright);
                 
                 Jr = Jn_r+Jp_r;
                 Vres = Jr*par.Rs;
