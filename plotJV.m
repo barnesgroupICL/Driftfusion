@@ -5,7 +5,7 @@ function plotJV(JV, option)
 
 if option == 1 || option == 3
     JV.dk.f.par.JV = 1;
-    JV.dk.f.par.JV = 1;
+    JV.dk.r.par.JV = 1;
     
     dfana(JV.dk.f);
     figure(11)
@@ -15,12 +15,12 @@ if option == 1 || option == 3
     dfana(JV.dk.r);
 
     JV.dk.f.par.JV = 0;
-    JV.dk.f.par.JV = 0;
+    JV.dk.r.par.JV = 0;
 end
 
 if option == 2 || option == 3
     JV.ill.f.par.JV = 1;
-    JV.ill.f.par.JV = 1;
+    JV.ill.r.par.JV = 1;
     
     dfana(JV.ill.f);
     
@@ -31,7 +31,7 @@ if option == 2 || option == 3
     dfana(JV.ill.r);
     
     JV.ill.f.par.JV = 0;
-    JV.ill.f.par.JV = 0;
+    JV.ill.r.par.JV = 0;
 end
 
 hold off
