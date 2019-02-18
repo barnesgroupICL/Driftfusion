@@ -391,7 +391,7 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 Jn_r = -par.e*par.sn_r*(ur(1) - nright);
                 Jp_r = par.e*par.sp_r*(ur(1) - pright);
                 
-                Jr = Jn_r*Jp_r;
+                Jr = Jn_r+Jp_r;
                 Vres = Jr*par.Rs;
                 
                 pl = [-par.sn_l*(ul(1) - nleft);

@@ -45,6 +45,7 @@ par.BC = BC;
 par.tmesh_type = 2;
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e4;
+par.Rs = 0;
 
 %% Switch off mobilities
 par.mobset = 0;
@@ -106,6 +107,14 @@ while any(all_stable) == 0
 
 end
 
+disp('Switching on series resistance')
+
+par.Rs = p_original.Rs;  
+par.tmax = 1e-6;
+par.t0 = 1e-12;
+
+sol = df(sol, par);
+
 soleq.eq = sol;
 
 disp('Complete')
@@ -127,6 +136,7 @@ disp('Complete')
 
 % Start with low recombination coefficients
 par.SRHset = 0;
+par.Rs = 0;
 
 disp('Closed circuit equilibrium with ions')
 
@@ -160,6 +170,14 @@ while any(all_stable) == 0
     all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
 
 end
+
+disp('Switching on series resistance')
+
+par.Rs = p_original.Rs;  
+par.tmax = 1e-6;
+par.t0 = 1e-12;
+
+sol = df(sol, par);
 
 % write solution and reset ion mobility
 soleq.i = sol;

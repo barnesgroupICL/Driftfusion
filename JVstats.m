@@ -65,7 +65,7 @@ if isfield(JV, 'ill')
         catch
             
             warning('No Voc available- try increasing applied voltage range')
-            stats.Voc_f = 0;
+            stats.Voc_r = 0;
             
         end
         
