@@ -175,7 +175,7 @@ classdef pc
         sp_r = 1e7;     % hole surface recombination velocity right boundary
         
         %% Series resistance
-        Rs = 10;
+        Rs = 0;
               
         %% Defect recombination rate coefficient
         % Currently not used
