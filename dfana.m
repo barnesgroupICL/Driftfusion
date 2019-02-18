@@ -992,7 +992,7 @@ title('Electric FV');
     if par.calcJ == 0 || par.calcJ == 1
         
         if par.JV == 1
-            %JV
+
             figure(11)
             plot(Vapp_arr, Jtot(:, end))
             xlabel('V_{app} [V]')
