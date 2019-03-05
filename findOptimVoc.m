@@ -109,7 +109,9 @@ asymstruct.p.t0 = asymstruct.p.t0 / 10;
 fun = @(Vapp) IgiveCurrentForVoltage(asymstruct, Vapp);
 
 % StepTolerance is usually what stops the minimization here
-options = optimoptions('fmincon', 'StepTolerance', 1e-7, 'FunctionTolerance', 1e-13, 'OptimalityTolerance', 1e-13, 'Algorithm', 'active-set', 'Display', 'notify');
+% MaxFunctionEvaluations is 100 by default, reducing to 50 but even smaller
+% values could be enough
+options = optimoptions('fmincon', 'StepTolerance', 1e-7, 'FunctionTolerance', 1e-11, 'OptimalityTolerance', 1e-11, 'Algorithm', 'active-set', 'Display', 'notify', 'MaxFunctionEvaluations', 50);
 
 % the starting point is the currently present voltage
 % the constraints does not work when using the default interior-point
