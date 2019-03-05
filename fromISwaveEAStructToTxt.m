@@ -9,7 +9,7 @@ p = struct.p;
 %% create header
 
 headerBand = ["x", "CB_Vmax", "Efn_Vmax", "Efp_Vmax", "CB_V0decr", "Efn_V0decr", "Efp_V0decr", "CB_Vmin", "Efn_Vmin", "Efp_Vmin", "CB_V0incr", "Efn_V0incr", "Efp_V0incr"];
-headerCurrent = ["t", "Vapp", "total", "ionic", "nonionic", "accumulating", "total_inphase", "total_outofphase", "nonionic_inphase", "nonionic_outofphase"];
+headerCurrent = ["t", "Vapp", "total", "accumulating", "total_inphase", "total_outofphase", "recombination"];
 
 %% get measure units
 
@@ -65,21 +65,6 @@ Vapp = p.Vapp_func(p.Vapp_params, struct.t); % row
 
 Jn = struct.Jn; % in mA, column
 
-% block taken from ISwave_single_analysis
-% Intrinsic points logical array
-itype_points= (struct.x >= p.tp & struct.x <= p.tp + p.ti);
-% subtract background ion concentration, for having less noise in trapz
-i_matrix = struct.sol(:, :, 3) - p.NI;
-% calculate electric field due to ions
-Efield_i = p.e * cumtrapz(struct.x, i_matrix, 2) / p.eppi;
-% an average would be enough if the spatial mesh was homogeneous in the
-% intrinsic, indeed I have to use trapz for considering the spatial mesh
-Efield_i_mean = trapz(struct.x(itype_points), Efield_i(:, itype_points), 2) / p.ti;
-% calculate displacement current due to ions
-Ji_disp = -p.eppi * gradient(Efield_i_mean, struct.t) * 1000; % in mA, column
-
-J_noionic = Jn - Ji_disp; % in mA, column
-
 % try to calculate the accumulated charge
 [dQ_t, ~] = ISwave_subtracting_analysis(struct);
 
@@ -92,12 +77,39 @@ Jn_inphase = p.J_E_func([n_coeff(1)*cos(n_coeff(3)), n_coeff(2)*cos(n_coeff(3)),
 % out of phase electronic current
 Jn_quadrature = p.J_E_func([n_coeff(1)*sin(n_coeff(3)), n_coeff(2)*sin(n_coeff(3)), pi/2], struct.t);
 
-% in phase electronic current
-Jn_noionic_inphase =  p.J_E_func([n_noionic_coeff(1)*cos(n_noionic_coeff(3)), n_noionic_coeff(2)*cos(n_noionic_coeff(3)), 0], struct.t);
-% out of phase electronic current
-Jn_noionic_quadrature = p.J_E_func([n_noionic_coeff(1)*sin(n_noionic_coeff(3)), n_noionic_coeff(2)*sin(n_noionic_coeff(3)), pi/2], struct.t);
+% recombination current
+[~, ~, U] = pinana(struct); % mA
 
-data_current = [time', Vapp', Jn, Ji_disp, J_noionic, J_accumulating', 1000*Jn_inphase', 1000*Jn_quadrature', 1000*Jn_noionic_inphase', 1000*Jn_noionic_quadrature'];
+data_current = [time', Vapp', Jn, J_accumulating', 1000*Jn_inphase', 1000*Jn_quadrature', U];
+
+if struct.p.mui
+    headerCurrentIonic = ["ionic", "nonionic", "nonionic_inphase", "nonionic_outofphase"];
+    headerCurrent = [headerCurrent, headerCurrentIonic];
+    unitsCurrent = [unitsCurrent, repelem("mA/cm\+(2)", length(headerCurrentIonic))];
+
+    % block taken from ISwave_single_analysis
+    % Intrinsic points logical array
+    itype_points= (struct.x >= p.tp & struct.x <= p.tp + p.ti);
+    % subtract background ion concentration, for having less noise in trapz
+    i_matrix = struct.sol(:, :, 3) - p.NI;
+    % calculate electric field due to ions
+    Efield_i = p.e * cumtrapz(struct.x, i_matrix, 2) / p.eppi;
+    % an average would be enough if the spatial mesh was homogeneous in the
+    % intrinsic, indeed I have to use trapz for considering the spatial mesh
+    Efield_i_mean = trapz(struct.x(itype_points), Efield_i(:, itype_points), 2) / p.ti;
+    % calculate displacement current due to ions
+    Ji_disp = -p.eppi * gradient(Efield_i_mean, struct.t) * 1000; % in mA, column
+
+    J_noionic = Jn - Ji_disp; % in mA, column
+    
+    % in phase electronic current
+    Jn_noionic_inphase =  p.J_E_func([n_noionic_coeff(1)*cos(n_noionic_coeff(3)), n_noionic_coeff(2)*cos(n_noionic_coeff(3)), 0], struct.t);
+    % out of phase electronic current
+    Jn_noionic_quadrature = p.J_E_func([n_noionic_coeff(1)*sin(n_noionic_coeff(3)), n_noionic_coeff(2)*sin(n_noionic_coeff(3)), pi/2], struct.t);
+
+    data_current = [data_current, Ji_disp, J_noionic, 1000*Jn_noionic_inphase', 1000*Jn_noionic_quadrature'];
+end
+
 
 %% join fields
 
