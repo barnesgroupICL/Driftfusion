@@ -129,7 +129,7 @@ Simulate the impedance spectroscopy with oscillating voltage on a cell containin
 
 Complete documentation for each function is in the header of the relative file, which can be found [here](https://github.com/barnesgroupICL/Driftfusion/tree/2018-EIS).
 
-This page can be accessed also in the Driftfusion [wiki](https://github.com/barnesgroupICL/Driftfusion/wiki/2018-Impedance-Spectroscopy).
+This page can be accessed also in the Driftfusion [wiki](https://github.com/barnesgroupICL/Driftfusion/wiki/2018-Impedance-Spectroscopy-on-homojunction-model).
 
 ## Unit testing
 
