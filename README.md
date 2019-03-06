@@ -41,3 +41,14 @@ The various input arguments are discussed in the comments of each code. At any t
 Try using doJV as a model for writing functions of your own.
 
 Good luck!
+
+## Replicating published paper's data
+
+### Impedance Spectroscopy on homojunction model, applying an oscillating voltage profile
+
+Submitted [on arXiv on may 2018](https://arxiv.org/abs/1805.06446), published on Energy & Environmental Science on march 2019.
+
+Check out the `2018-EIS` branch of this repository or [download directly just this branch](https://github.com/barnesgroupICL/Driftfusion/archive/2018-EIS.zip).
+
+Then follow the instructions in the branch readme or on this [wiki page](https://github.com/barnesgroupICL/Driftfusion/wiki/2018-Impedance-Spectroscopy-on-homojunction-model).
+
