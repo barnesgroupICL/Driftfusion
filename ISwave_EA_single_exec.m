@@ -25,11 +25,17 @@ function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq,
 %     oscillating voltage
 %
 % Example:
-%   ssol_i_1S_SR_is_100mHz_2mV = ISwave_EA_single_exec(asymmetricize(ssol_i_1S_SR), 2e-3, 1e-2, 20, 40, true, false, 1e-8)
+%   sol_i_eq_SR_is_100mHz_2mV = ISwave_EA_single_exec(sol_i_eq_SR, 2e-3, 1e-2, 20, 40, true, false, 1e-8)
 %     simulate an oscillating voltage at 0.1 Hz and 2 mV of half peak to peak voltage amplitude,
 %     20 periods and 40 time points per period, taking care of reaching a stable solution,
-%     and using a starting relative tolerance of 1e-8,
+%     and using a starting relative tolerance of 1e-8, starting from a dark
+%     solution at zero applied voltage
 %     calculate also the electronic current needed by impedance simulations
+%   sol_i_1S_SR_is_100mHz_2mV = ISwave_EA_single_exec(sol_i_1S_SR, 2e-3, 1e-2, 20, 40, true, false, 1e-8)
+%     as above, but with 1 sun illumination starting from short circuit
+%     conditions
+%   asymssol_i_1S_SR_is_100mHz_2mV = ISwave_EA_single_exec(asymmetricize(ssol_i_1S_SR), 2e-3, 1e-2, 20, 40, true, false, 1e-8)
+%     as above, but at starting from open circuit conditions
 %
 % Other m-files required: pindrift, verifyStabilization, pinana
 % Subfunctions: none
