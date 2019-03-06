@@ -25,12 +25,16 @@ function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_poi
 %   ISWAVE_RESULTS - a struct containing the most important results of the simulation
 %
 % Example:
-%   ISwave_oc = ISwave_full_exec(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 23, 2e-3, false, true, true)
+%   ISwave_oc = ISwave_full_exec(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, true, true)
 %     calculate on 8 different illumination intensities including dark, do not freeze ions, use a half peak to peak
 %     voltage oscillation amplitude of 2 mV, on 23 points from frequencies of 1 GHz to
 %     0.01 Hz
-%   ISwave_oc_frozenions = ISwave_full_exec(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 23, 2e-3, true, true, true)
+%   ISwave_oc_frozenions = ISwave_full_exec(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, true, true, true)
 %     as above but freezing ions during voltage oscillation
+%   ISwave_sc = ISwave_full_exec(genIntStructs(sol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, true, true)
+%     as the first example but starting from short circuit conditions
+%   ISwave_vapp = ISwave_full_exec(genVappStructs(sol_i_eq_SR, 0:0.2:1), 1e9, 1e-2, 56, 2e-3, false, true, true)
+%     as the first example but in dark and applying various voltages
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
 %   ISwave_single_analysis, ISwave_full_analysis_nyquist,

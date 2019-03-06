@@ -34,7 +34,7 @@ function ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFr
 %   ISWAVE_RESULTS - a struct containing the most important results of the simulation
 %
 % Example:
-%   ISwave_oc = ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 23, 2e-3, false, false, true, true, true)
+%   ISwave_oc = ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, false, true, true, true)
 %     calculate on 8 different illumination intensities including dark,
 %     on 23 points from frequencies of 1 GHz to 0.01 Hz,
 %     use a half peak to peak voltage oscillation amplitude of 2 mV,
@@ -43,9 +43,13 @@ function ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFr
 %     using demodulation instead of fitting,
 %     plot all graphics, including the ones for each solution,
 %     save to base workspace the single solutions
-%   ISwave_oc_sequential = ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 23, 2e-3, true, false, true, true, true)
+%   ISwave_oc_sequential = ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, true, false, true, true, true)
 %     as above but starting each simulation from the last point of the
 %     previous simulation, without reaching a stable solution
+%   ISwave_sc = ISwave_full_exec_nonparallel(genIntStructs(sol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, false, true, true, true)
+%     as the first example but starting from short circuit conditions
+%   ISwave_vapp = ISwave_full_exec_nonparallel(genVappStructs(sol_i_eq_SR, 0:0.2:1), 1e9, 1e-2, 56, 2e-3, false, false, true, true, true)
+%     as the first example but in dark and applying various voltages
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
 %   ISwave_single_analysis, ISwave_full_analysis_nyquist,
