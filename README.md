@@ -46,7 +46,7 @@ Good luck!
 
 ### Impedance Spectroscopy on homojunction model, applying an oscillating voltage profile
 
-Submitted [on arXiv on may 2018](https://arxiv.org/abs/1805.06446), published on Energy & Environmental Science on march 2019.
+Submitted [on arXiv on may 2018](https://arxiv.org/abs/1805.06446), published on [Energy & Environmental Science on march 2019](https://pubs.rsc.org/en/content/articlelanding/2019/ee/c8ee02362j).
 
 Check out the `2018-EIS` branch of this repository or [download directly just this branch](https://github.com/barnesgroupICL/Driftfusion/archive/2018-EIS.zip).
 
