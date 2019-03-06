@@ -50,7 +50,7 @@ function coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
 
 % if the input is provided in two different directions, weird output is produced
 assert(size(t, 2) == 1, [mfilename ' - ' inputname(1) ' has to be provided as a single column']);
-assert(size(y, 1) == size(t, 1), [mfilename ' - ' inputname(1) ' and ' inputname(2) ' need to have the same number of rows']);
+assert(size(y, 1) == size(t, 1), [mfilename ' - ' inputname(1) ' and ' inputname(2) ' need to have the same number of rows, indeed the size of the first is ' num2str(size(t)) ' while the size of the second is ' num2str(size(y))]);
 % verify if the first and last point are identical, or into the double
 % precision error, maybe checking with ismembertol would be enough
 assert(Vapp_func(Vapp_params, t(1)) < Vapp_func(Vapp_params, t(end)) + 100*eps && Vapp_func(Vapp_params, t(1)) > Vapp_func(Vapp_params, t(end)) - 100*eps, [mfilename ' - It is suggested to provide a whole period, including the first and last repeated points']);
