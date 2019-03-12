@@ -1,5 +1,5 @@
 function struct_Int = changeLight(struct, newInt, tmax)
-%CHANGELIGHT - Stabilize solutions at a new light intensity
+%CHANGELIGHT - Generate solutions at a new light intensity
 %
 % Syntax:  struct_Int = changeLight(struct, newInt, tmax)
 %

@@ -26,7 +26,7 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startIn
 %     prepare solutions at 100, 10, 1, 0.1 and 0 illumination intensities
 %
 % Other m-files required: changeLight, pindrift, genIntStructs,
-%   asymmetricize, findOptimVoc
+%   asymmetricize, findOptimVoc, stabilize
 % Subfunctions: none
 % MAT-files required: none
 %

@@ -38,7 +38,8 @@ function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_poi
 %
 % Other m-files required: asymmetricize, ISwave_EA_single_exec,
 %   ISwave_single_analysis, ISwave_full_analysis_nyquist,
-%   IS_full_analysis_impedance, ISwave_full_analysis_phase, pinana
+%   IS_full_analysis_impedance, ISwave_full_analysis_phase, pinana,
+%   stabilize
 % Subfunctions: none
 % MAT-files required: none
 %
@@ -118,7 +119,7 @@ for i = 1:length(structs(1, :))
         asymstruct_Int = struct;
     end
     % the asymmetricized solution could require some stabilization after
-    % breaking
+    % breaking (mostly when both high illumination and mobile ions are present)
     asymstruct_Int = stabilize(asymstruct_Int);
     % calculate currently applied DC voltage, as defined in pinana
     [Vapp_arr, ~, ~] = pinana(asymstruct_Int);
