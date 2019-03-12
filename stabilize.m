@@ -1,10 +1,13 @@
-function steadystate_struct = stabilize(struct)
+function steadystate_struct = stabilize(struct, forceStabilization)
 %STABILIZE - Simulates the solution increasing the maximum time until when steady state is reached
 %
-% Syntax:  steadystate_struct = stabilize(struct)
+% Syntax:  steadystate_struct = stabilize(struct, forceStabilization)
 %
 % Inputs:
 %   STRUCT - a solution struct as created by PINDRIFT.
+%   FORCESTABILIZATION - optional boolean, true by default, 
+%     if true forces the simulation to run at least once, if false the
+%     stabilization is run just when needed
 %
 % Outputs:
 %   STEADYSTATE_STRUCT - a solution struct that reached its steady state
@@ -67,20 +70,28 @@ p.t0 = p.tmax / 1e8;
 % this
 steadystate_struct = struct;
 
-forceStabilization = false;
-% checks if the input structure reached the final time point
-if size(steadystate_struct.sol, 1) ~= steadystate_struct.p.tpoints
-    % in case the provided solution did not reach the final time point,
-    % force stabilization
-    forceStabilization = true;
-end
-% check if the prefious step was run over sufficient time. In case it was
-% not, the solution could seem stable to verifyStabilization just because
-% the solution did not evolve much in a time that was very short
-if struct.p.tmax < p.tmax
+% if forceStabilization option has not been set, don't force stabilization
+if ~exist('forceStabilization', 'var')
     forceStabilization = true;
 end
 
+% anyway, even if forceStabilization was set false,
+% there are some cases where the stabilization is absolutely needed
+if ~forceStabilization
+    % checks if the input structure reached the final time point
+    if size(steadystate_struct.sol, 1) ~= steadystate_struct.p.tpoints
+        % in case the provided solution did not reach the final time point,
+        % force stabilization
+        forceStabilization = true;
+    end
+    % check if the prefious step was run over sufficient time. In case it was
+    % not, the solution could seem stable to verifyStabilization just because
+    % the solution did not evolve much in a time that was very short
+    if struct.p.tmax < p.tmax
+        forceStabilization = true;
+    end
+end
+    
 % the warnings are not needed here
 warning('off', 'pindrift:verifyStabilization');
 
