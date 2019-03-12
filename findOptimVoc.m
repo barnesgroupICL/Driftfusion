@@ -140,7 +140,8 @@ asymstruct_voc.p.JV = 0;
 % should be set anyway, but for avoiding risks, set Vapp
 asymstruct_voc.p.Vapp = Vend;
 
-asymstruct_voc = stabilize(asymstruct_voc); % go to steady state
+% go to steady state, actually run stabilization just if needed
+asymstruct_voc = stabilize(asymstruct_voc, false);
 
 % save Vend also in Vapp field of the struct
 asymstruct_voc.Vapp = Vend;
