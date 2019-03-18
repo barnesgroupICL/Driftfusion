@@ -42,7 +42,7 @@ classdef pc
         dcell = {{50e-7}; {30e-7, 450e-7, 30e-7}; {60e-7}};         % Layer and subsection thickness array  
         pcell = {{50}; {30, 225, 30}; {60}};                          % Number of points in layers and subsections array  
         dint = 2e-7;        % Interfacial region thickness (x_mesh_type = 3)
-        pint = 20;          % Interfacial points (x_mesh_type = 3)
+        pint = 40;          % Interfacial points (x_mesh_type = 3)
         
         % Define spatial cordinate system- typically this will be kept at
         % 0 for most applications
@@ -131,10 +131,10 @@ classdef pc
         
         %% Mobile ions
         % Mobile ion defect density [cm-3] 
-        Nion = [0, 1e18, 0];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.     
+        Nion = [1e18, 1e18, 1e18];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.     
         % Approximate density of iodide sites [cm-3]
         % Limits the density of iodide vancancies
-        DOSion = [1e-6, 1.21e22, 1e-6];                 % P. Calado thesis           
+        DOSion = [1.21e22, 1.21e22, 1.21e22];                 % P. Calado thesis           
         
         %% Mobilities   [cm2V-1s-1]
         mue = [0.01, 20, 1e-3];         % electron mobility 
