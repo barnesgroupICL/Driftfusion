@@ -85,9 +85,7 @@ end
 
 % Set minority carrier densities to zero to avoid errors
 nmod = n;
-nmod(:, 1:pcum(3)) = 0;
 pmod = p;
-pmod(:, pcum(4):pcum(end))=0;
 
 % Create 2D matrices for multiplication with solutions
 EAmat = repmat(par.dev.EA, length(t), 1);
@@ -309,21 +307,6 @@ pcum = cumsum(parrint);
 pcum = [0,pcum]+1;
 pcum(end) = pcum(end)-1;
 
-for i=1:length(t)
-    % Charge densities across interfaces
-    rhoint1(i) = trapz(x(pcum(1):pcum(2)-1), rho(i, pcum(1):pcum(2)-1))*par.e;
-    rhoion1(i) = trapz(x(pcum(2):(pcum(3)-1)+round(parrint(3)/2)), rho(i, pcum(2):(pcum(3)-1)+round(parrint(3)/2)))*par.e;
-    rhoint2(i) = trapz(x(pcum(5):pcum(6)-1), rho(i, pcum(5):pcum(6)-1))*par.e;
-    rhoion2(i) = trapz(x(pcum(3)+round(parrint(3)/2):pcum(5)-1), rho(i, pcum(3)+round(parrint(3)/2):pcum(5)-1))*par.e;
-end
-
-% Voltage drop across the interfaces
-Vint1 = -(V(:, pcum(1)) - V(:, pcum(3)+30));
-Vint2 = -(V(:, pcum(4)-30) - V(:, end));
-
-% Voltage drop within the perovskite
-Vint1_per = -(V(:, pcum(2)) - V(:, pcum(3)+30));
-Vint2_per = -(V(:, pcum(4)-30) - V(:, pcum(5)));
 
 if ioncur == 1
     %% ion current at centre of active layer as a function of time
@@ -351,27 +334,6 @@ if ioncur == 1
     
 end
 
-
-% Vrec - this doesn't really work as we need the maxima and minima
-% TiO2
-Vrec1_0 = Ecb(1, pcum(3))- Efn(1, pcum(3));
-Vrec2_0 = Efp(1, pcum(4)-1) - Evb(1, pcum(4)-1);
-VRec0_verf = Vrec1_0 + Vrec2_0;
-
-Vrec1 = Vrec1_0-(Ecb(:, pcum(3))- Efn(:, pcum(3)));
-Vrec2 = Vrec2_0-(Efp(:, pcum(4)-1) - Evb(:, pcum(4)-1)); 
-Efint = Efn(:, pcum(3)) - Efp(:, pcum(4)-1);
-Everf = Vrec1 + Vrec2;
-Jrec1 = Jn(:, pcum(3));
-Jrec2 = Jp(:, pcum(4)-1);
-
-% Vinj
-Vinj1 = (Efp(1, pcum(3))-Evb(1, pcum(3)))-(Efp(:, pcum(3))-Evb(:, pcum(3)));
-Vinj2 = (Ecb(1, pcum(4)-1)- Efn(1, pcum(4)-1))-(Ecb(:, pcum(4)-1)- Efn(:, pcum(4)-1));
-Jinj1 = Jp(:, pcum(3));
-Jinj2 = Jn(:, pcum(4)-1);
-
-Jbulk = trapz(x(pcum(3):pcum(4)-1), U(pcum(3):pcum(4)-1));
 
 
 %Figures
@@ -714,7 +676,7 @@ if par.figson == 1
         
         % Displacement Current at right hand side
         Fend = -(dVdx(:, end));
-        Jdispr = (par.e)*par.epp(3)*-gradient(dVdx(:, end), t);
+        Jdispr = (par.e)*par.epp(end)*-gradient(dVdx(:, end), t);
         Jdispr = Jdispr';
         
         
