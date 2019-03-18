@@ -76,7 +76,7 @@ dVlimit = 1.3;
 % look for the residual current at a new voltage,
 % if the sign of the residual current is different use the voltage
 % variation as a search range limit
-for dV = [0.01, 0.7, repelem(0.05, 11)]
+for dV = [0.01, repelem(0.2, 4), repelem(0.05, 9)]
     % this assumes that a more positive voltage results in more positive
     % current
     [~, newCurrent, asymstruct_newVapp] = IgiveCurrentForVoltage(asymstruct, asymstruct.par.Vapp - sign(previousCurrent) * dV);
@@ -109,7 +109,9 @@ asymstruct.par.t0 = asymstruct.par.t0 / 10;
 fun = @(Vapp) IgiveCurrentForVoltage(asymstruct, Vapp);
 
 % StepTolerance is usually what stops the minimization here
-options = optimoptions('fmincon', 'StepTolerance', 1e-7, 'FunctionTolerance', 1e-13, 'OptimalityTolerance', 1e-13, 'Algorithm', 'active-set', 'Display', 'notify');
+% MaxFunctionEvaluations is 100 by default, reducing to 50 but even smaller
+% values could be enough
+options = optimoptions('fmincon', 'StepTolerance', 1e-7, 'FunctionTolerance', 1e-11, 'OptimalityTolerance', 1e-11, 'Algorithm', 'active-set', 'Display', 'notify', 'MaxFunctionEvaluations', 50);
 
 % the starting point is the currently present voltage
 % the constraints does not work when using the default interior-point
