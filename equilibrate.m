@@ -120,8 +120,8 @@ soleq.eq = sol;
 disp('Complete')
 
 disp('Switching on interfacial recombination')
-par.taun_inter = p_original.taun_inter;
-par.taup_inter = p_original.taup_inter;
+par.taun = p_original.taun;
+par.taup = p_original.taup;
 par.SRHset = 1;
 par.dev = pc.builddev(par);
 
@@ -187,8 +187,8 @@ disp('Ion equilibrium solution complete')
 
 %% Ion equilibrium with surface recombination
 disp('Switching on surface recombination')
-par.taun_inter = p_original.taun_inter;
-par.taup_inter = p_original.taup_inter;
+par.taun = p_original.taun;
+par.taup = p_original.taup;
 par.SRHset = 1;
 par.dev = pc.builddev(par);
 
