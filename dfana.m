@@ -291,22 +291,6 @@ Jtot = Jn + Jp + Ja + Jdisp;
 j = 1;
 k = 1;
 % Iteration around number of layers and desired points
-for i=1:2*length(par.parr)-1
-    
-    if rem(i, 2) == 1
-        parrint(j) = par.parr(k);
-        j = j+1;
-        k = k+1;
-    elseif rem(i, 2) == 0
-        parrint(j) = par.pint;
-        j = j+1;
-    end
-end
-
-pcum = cumsum(parrint);
-pcum = [0,pcum]+1;
-pcum(end) = pcum(end)-1;
-
 
 if ioncur == 1
     %% ion current at centre of active layer as a function of time
@@ -341,7 +325,7 @@ if par.figson == 1
     
     %% Specify ranges for plotting- should be an input argument
     % whole device
-    xrange = [xnm(pcum(1)), xnm(pcum(end))];
+    xrange = [xnm(par.pcum0(1)), xnm(par.pcum0(end))];
     % bulk
     % xrange = [xnm(pcum(2)), xnm(pcum(5))];
     % Interface 1:
