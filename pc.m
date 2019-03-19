@@ -39,11 +39,18 @@ classdef pc
         % are inserted automatically between each layer with a width
         % defined by the property DINT and number of points defined by
         % PINT.
-        layer_type = {'layer'}
         dcell = 200e-7;         % Layer and subsection thickness array
         pcell = 200;                          % Number of points in layers and subsections array
         dint = 2e-7;        % Interfacial region thickness (x_mesh_type = 3)
         pint = 20;          % Interfacial points (x_mesh_type = 3)
+        
+                %% Layer description
+        % Currently STACK is used for reading the optical properties
+        % library. The names here do not influence the electrical properties of the
+        % device. See INDEX OF REFRACTION LIBRARY for choices- names must be enetered
+        % exactly as given in the column headings with the '_n', '_k' omitted
+        layer_type = {'layer'}
+        stack = {'MAPICl'}
         
         % Define spatial cordinate system- typically this will be kept at
         % 0 for most applications
@@ -94,13 +101,6 @@ classdef pc
         %%%%%%%%%%% LAYER MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
         % Numerical values should be given as a row vector with the number of
         % entries equal to the number of layers specified in STACK
-        
-        %% Layer description
-        % Currently STACK is used for reading the optical properties
-        % library. The names here do not influence the electrical properties of the
-        % device. See INDEX OF REFRACTION LIBRARY for choices- names must be enetered
-        % exactly as given in the column headings with the '_n', '_k' omitted
-        stack = {'MAPICl'}
         
         %% Energy levels [eV]
         EA = [0];           % Electron affinity
