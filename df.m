@@ -51,9 +51,6 @@ end
 % Can also use AbortSet in class def
 
 dcum = par.dcum;
-dEAdx = par.dEAdx;
-dIPdx = par.dIPdx;
-dN0dx = par.dN0dx;
 E0 = par.E0;
 Eg = par.Eg;
 Eif = par.Eif;
@@ -451,6 +448,5 @@ if par.Ana == 1
     solstruct.Jtotr = Jtotr;
     
 end
-
 
 end
