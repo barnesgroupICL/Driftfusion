@@ -13,8 +13,13 @@ function steadystate_struct = stabilize(struct, forceStabilization)
 %   STEADYSTATE_STRUCT - a solution struct that reached its steady state
 %
 % Example:
+%   ssol_i_1S_SR = stabilize(ssol_i_1S_SR, false);
+%     check if the provided solution is at its stabilized steady state,
+%     if so nothing is done, otherwise runs df until a stabilized solution
+%     is obtained
 %   ssol_i_1S_SR = stabilize(ssol_i_1S_SR);
-%     checks if a solution reached steady state and replaces it with its steady state condition
+%     runs df on the provided input, then checks if the stabilized steady
+%     state has been reached and run df again until stabilization is achieved
 %
 % Other m-files required: pindrift, verifyStabilization
 % Subfunctions: none
@@ -49,17 +54,20 @@ p.Ana = 0;
 % a tmax too short would make the solution look stable even
 % if it's not; too large and the simulation could fail
 
-min_tmax_ions = 10;
-min_tmax_freecharges = 1e-3;
+max_startingtmax_ions = 10;
+
+% for the no-ions case, the lower the light intensity the slower the
+% stabilization. 1 second is ok at least down to 1E-10 suns
+max_startingtmax_freecharges = 1;
 
 % if both mobilities are set
 if p.mui && p.mue_i
-    p.tmax = min([min_tmax_ions, p.tmax*1e4, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i))]);
-    min_tmax = min_tmax_ions;
+    p.tmax = min([max_startingtmax_ions, p.tmax*1e4, 2^(-log10(p.mui)) / 10 + 2^(-log10(p.mue_i))]);
+    min_tmax = max_startingtmax_ions;
 % if ionic mobility is zero but free charges mobility is set
 elseif p.mue_i
-    p.tmax = min([min_tmax_freecharges, p.tmax*1e4, 2^(-log10(p.mue_i))]);
-    min_tmax = min_tmax_freecharges;
+    p.tmax = min([max_startingtmax_freecharges, p.tmax*1e4, 2^(-log10(p.mue_i))]);
+    min_tmax = max_startingtmax_freecharges;
 end
 
 p.t0 = p.tmax / 1e8;
