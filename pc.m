@@ -450,24 +450,6 @@ classdef pc
             value = 0.5.*(par.EA+par.IP)+par.kB*par.T*log(par.Nc./par.Nv);
         end
         
-%         %% Conduction band gradients at interfaces
-%         function value = get.dEAdx(par)
-%             value = zeros(length(par.stack)-1);
-%             for i = 1:length(par.stack)-1
-%                 value(i) = (par.EA(i+1)-par.EA(i))/(par.dint);
-%             end
-%             %value = [(par.EA(2)-par.EA(1))/(2*par.dint), (par.EA(3)-par.EA(2))/(2*par.dint)];
-%         end
-        
-%         %% Valence band gradients at interfaces
-%         function value = get.dIPdx(par)
-%             value = zeros(length(par.stack)-1);
-%             for i = 1:length(par.stack)-1
-%                 value(i) = (par.IP(i+1)-par.IP(i))/(par.dint);
-%             end
-%         end
-%         
-        
         %% Donor densities
         function value = get.ND(par)
             value = F.nfun(par.Nc, par.EA, par.E0, par.T, par.stats);
