@@ -95,7 +95,8 @@ muhmat = repmat(par.dev.muh, length(t), 1);
 muionmat = repmat(par.dev.muion, length(t), 1);
 NAmat = repmat(par.dev.NA, length(t), 1);
 NDmat = repmat(par.dev.ND, length(t), 1);
-N0mat = repmat(par.dev.N0, length(t), 1);
+Ncmat = repmat(par.dev.Nc, length(t), 1);
+Nvmat = repmat(par.dev.Nv, length(t), 1);
 Nionmat = repmat(par.dev.Nion, length(t), 1);
 eppmat = repmat(par.dev.epp, length(t), 1);
 nimat = repmat(par.dev.ni, length(t), 1);
@@ -126,8 +127,8 @@ if par.stats == 'Fermi'
     Efp = Efp-V;
     
 elseif par.stats == 'Boltz'
-    Efn = real(Ecb+(par.kB*par.T/par.q)*log(nmod./N0mat));        % Electron quasi-Fermi level
-    Efp = real(Evb-(par.kB*par.T/par.q)*log(pmod./N0mat));        % Hole quasi-Fermi level
+    Efn = real(Ecb+(par.kB*par.T/par.q)*log(nmod./Ncmat));        % Electron quasi-Fermi level
+    Efp = real(Evb-(par.kB*par.T/par.q)*log(pmod./Nvmat));        % Hole quasi-Fermi level
 end
 
 % Remove ionic charge densities from contact regions
