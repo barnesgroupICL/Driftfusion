@@ -635,6 +635,8 @@ classdef pc
                         % Interfaces
                         if xx(j) > par.dcum0(i) && xx(j) < par.dcum0(i+1)
                             
+                            
+                            switch 
                             xprime = xx(j)-par.dcum0(i);
                             % Electron affiniity
                             dEAdxprime = (par.EA(i+1)-par.EA(i-1))/(par.d(i));
@@ -708,6 +710,41 @@ classdef pc
                             % Equilibrium carrier densities
                             dlogp0dx = (log(par.p0(i+1))-log(par.p0(i-1)))/(par.d(i));
                             dev.p0(j) = exp(log(par.p0(i-1)) + xprime*dlogp0dx);
+                            
+                            
+                            case 'erf'
+                                    
+                                    %% error function
+                                    dev.erf(j) = ((erf(2*pi*(xprime-par.dint/2)/(par.dint))+1)/2);
+                                    dev.EA(j) = par.EA(i) + (par.EA(i+1)-par.EA(i))*dev.erf(j);
+                                    dev.IP(j) = par.IP(i) + (par.IP(i+1)-par.IP(i))*dev.erf(j);
+                                    dev.Eif(j) = par.Eif(i) + (par.Eif(i+1)-par.Eif(i))*dev.erf(j);
+                                    dev.mue(j) = par.mue(i) + (par.mue(i+1)-par.mue(i))*dev.erf(j);
+                                    dev.muh(j) = par.muh(i) + (par.muh(i+1)-par.muh(i))*dev.erf(j);
+                                    dev.muion(j) = par.muion(i) + (par.muion(i+1)-par.muion(i))*dev.erf(j);
+                                    dev.epp(j) = par.epp(i) + (par.epp(i+1)-par.epp(i))*dev.erf(j);
+                                    dev.E0(j) = par.E0(i) + (par.E0(i+1)-par.E0(i))*dev.erf(j);
+                                    dev.G0(j) = par.G0(i) + (par.G0(i+1)-par.G0(i))*dev.erf(j);
+                                    dev.krad(j) = par.krad(i) + (par.krad(i+1)-par.krad(i))*dev.erf(j);
+                                    dev.Et(j) = par.Et_bulk(i) + (par.Et_bulk(i+1)-par.Et_bulk(i))*dev.erf(j);
+                                    dev.Nion(j) = par.Nion(i) + (par.Nion(i+1)-par.Nion(i))*dev.erf(j);
+                                    dev.DOSion(j) = par.DOSion(i) + (par.DOSion(i+1)-par.DOSion(i))*dev.erf(j);
+                                    dev.N0(j) = par.N0(i) + (par.N0(i+1)-par.N0(i))*dev.erf(j);
+                                    dev.NA(j) = par.NA(i) + (par.NA(i+1)-par.NA(i))*dev.erf(j);
+                                    dev.ND(j) = par.ND(i) + (par.ND(i+1)-par.ND(i))*dev.erf(j);
+                                    % SRH time constants
+                                    dev.taun(j) = par.taun_inter(i);
+                                    dev.taup(j) = par.taup_inter(i);
+                                    
+                            end
+                            
+                            %% logarithmically graded variables
+                            dev.ni(j) = F.nfun(dev.N0(j), dev.EA(j), dev.Eif(j), par.T, par.stats);
+                            dev.n0(j) = F.nfun(dev.N0(j), dev.EA(j), dev.E0(j), par.T, par.stats);
+                            dev.p0(j) = F.pfun(dev.N0(j), dev.IP(j), dev.E0(j), par.T, par.stats);
+                            dev.ND(j) = F.nfun(dev.N0(j), dev.EA(j), dev.E0(j), par.T, par.stats);
+                            dev.NA(j) = F.pfun(dev.N0(j), dev.IP(j), dev.E0(j), par.T, par.stats);
+                            
                             
                             if par.stats == 'Fermi'
                                 % Build diffusion coefficient structure
