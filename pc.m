@@ -649,6 +649,10 @@ classdef pc
                                     dIPdxprime = (par.IP(i+1)-par.IP(i-1))/(par.d(i));
                                     dev.IP(j) = par.IP(i-1) + xprime*dIPdxprime;
                                     dev.gradIP(j) = dIPdxprime;
+                                    % Intrinsic Fermi level
+                                    dEifdxprime = (par.Eif(i+1)-par.Eif(i))/(par.dint);
+                                    dev.Eif(j) = par.Eif(i) + xprime*dEifdxprime;
+                                    dev.gradEif(j) = dEifdxprime;
                                     % Electon mobility
                                     dmuedx = (par.mue(i+1)-par.mue(i-1))/(par.d(i));
                                     dev.mue(j) = par.mue(i-1) + xprime*dmuedx;
