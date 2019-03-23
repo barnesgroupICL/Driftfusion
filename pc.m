@@ -125,7 +125,8 @@ classdef pc
         PhiC = -0.4;
         
         %% Effective Density Of States (eDOS) [cm-3]
-        N0 = [1e19];
+        Nc = [1e19];
+        Nv = [1e19];
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
@@ -219,7 +220,8 @@ classdef pc
         dcum0           % includes first entry as zero
         dEAdx
         dIPdx
-        dN0dx
+        dNcdx
+        dNvdx
         Dn
         Eg
         Eif
@@ -273,7 +275,7 @@ classdef pc
             
             % Warn if doping density exceeds eDOS
             for i = 1:length(par.ND)
-                if par.ND(i) >= par.N0(i) || par.NA(i) >= par.N0(i)
+                if par.ND(i) >= par.Nc(i) || par.NA(i) >= par.Nc(i)
                     msg = 'Doping density must be less than eDOS. For consistent values ensure electrode workfunctions are within the band gap and check expressions for doping density in Dependent variables.';
                     error(msg);
                 end
@@ -335,8 +337,11 @@ classdef pc
             elseif length(par.ND) ~= length(par.d)
                 msg = 'Donor density array (ND) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.N0) ~= length(par.d)
-                msg = 'Effective density of states array (N0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.Nc) ~= length(par.d)
+                msg = 'Effective density of states array (Nc) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                error(msg);
+            elseif length(par.Nv) ~= length(par.d)
+                msg = 'Effective density of states array (Nv) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.Nion) ~= length(par.d)
                 msg = 'Background ion density (Nion) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
@@ -399,7 +404,7 @@ classdef pc
         
         function par = set.ND(par, value)
             for i = 1:length(par.ND)
-                if value(i) >= par.N0(i)
+                if value(i) >= par.Nc(i)
                     error('Doping density must be less than eDOS. For consistent values ensure electrode workfunctions are within the band gap.')
                 end
             end
@@ -407,7 +412,7 @@ classdef pc
         
         function par = set.NA(par, value)
             for i = 1:length(par.ND)
-                if value(i) >= par.N0(i)
+                if value(i) >= par.Nv(i)
                     error('Doping density must be less than eDOS. For consistent values ensure electrode workfunctions are within the band gap.')
                 end
             end
@@ -442,7 +447,7 @@ classdef pc
         %% Intrinsic Fermi Energies
         % Currently uses Boltzmann stats as approximation should always be
         function value = get.Eif(par)
-            value = 0.5.*(par.EA+par.IP)+par.kB*par.T*log(par.N0./par.N0);
+            value = 0.5.*(par.EA+par.IP)+par.kB*par.T*log(par.Nc./par.Nv);
         end
         
 %         %% Conduction band gradients at interfaces
@@ -462,37 +467,30 @@ classdef pc
 %             end
 %         end
 %         
-%         %% eDOS gradients at interfaces
-%         function value = get.dN0dx(par)
-%             value = zeros(length(par.stack)-1);
-%             for i = 1:length(par.stack)-1
-%                 value(i) = (par.N0(i+1)-par.N0(i))/(par.dint);
-%             end
-%         end
         
         %% Donor densities
         function value = get.ND(par)
-            value = F.nfun(par.N0, par.EA, par.E0, par.T, par.stats);
+            value = F.nfun(par.Nc, par.EA, par.E0, par.T, par.stats);
         end
         
         %% Donor densities
         function value = get.NA(par)
-            value = F.pfun(par.N0, par.IP, par.E0, par.T, par.stats);
+            value = F.pfun(par.Nv, par.IP, par.E0, par.T, par.stats);
         end
         
         %% Intrinsic carrier densities (Boltzmann)
         function value = get.ni(par)
-            value = par.N0.*exp(-par.Eg./(2*par.kB*par.T));
+            value = par.Nc.*exp(-par.Eg./(2*par.kB*par.T));
         end
         
         %% Equilibrium electron densities
         function value = get.n0(par)
-            value = F.nfun(par.N0, par.EA, par.E0, par.T, par.stats);
+            value = F.nfun(par.Nc, par.EA, par.E0, par.T, par.stats);
         end
         
         %% Equilibrium hole densities
         function value = get.p0(par)
-            value = F.pfun(par.N0, par.IP, par.E0, par.T, par.stats);
+            value = F.pfun(par.Nv, par.IP, par.E0, par.T, par.stats);
             
         end
         
@@ -500,22 +498,22 @@ classdef pc
         % Uses metal Fermi energies to calculate boundary densities
         % Electrons left boundary
         function value = get.nleft(par)
-            value = F.nfun(par.N0(1), par.EA(1), par.PhiA, par.T, par.stats);
+            value = F.nfun(par.Nc(1), par.EA(1), par.PhiA, par.T, par.stats);
         end
         
         % Electrons right boundary
         function value = get.nright(par)
-            value = F.nfun(par.N0(end), par.EA(end), par.PhiC, par.T, par.stats);
+            value = F.nfun(par.Nc(end), par.EA(end), par.PhiC, par.T, par.stats);
         end
         
         % Holes left boundary
         function value = get.pleft(par)
-            value = F.pfun(par.N0(1), par.IP(1), par.PhiA, par.T, par.stats);
+            value = F.pfun(par.Nv(1), par.IP(1), par.PhiA, par.T, par.stats);
         end
         
         % holes right boundary
         function value = get.pright(par)
-            value = F.pfun(par.N0(end), par.IP(end), par.PhiC, par.T, par.stats);
+            value = F.pfun(par.Nv(end), par.IP(end), par.PhiC, par.T, par.stats);
         end
 
         function value = get.dcum(par)
@@ -561,7 +559,8 @@ classdef pc
             dev.muion = zeros(1, length(xx));
             dev.NA = zeros(1, length(xx));
             dev.ND = zeros(1, length(xx));
-            dev.N0 = zeros(1, length(xx));
+            dev.Nc = zeros(1, length(xx));
+            dev.Nv = zeros(1, length(xx));
             dev.Nion = zeros(1, length(xx));
             dev.ni = zeros(1, length(xx));
             dev.n0 = zeros(1, length(xx));
@@ -571,7 +570,8 @@ classdef pc
             dev.krad = zeros(1, length(xx));
             dev.gradEA = zeros(1, length(xx));
             dev.gradIP = zeros(1, length(xx));
-            dev.gradN0 = zeros(1, length(xx));
+            dev.gradNc = zeros(1, length(xx));
+            dev.gradNv = zeros(1, length(xx));
             dev.E0 = zeros(1, length(xx));
             dev.G0 = zeros(1, length(xx));
             dev.taun = zeros(1, length(xx));
@@ -587,7 +587,7 @@ classdef pc
                     endlim = par.EA(i)+0.6;
                     interval = (endlim-startlim)/400;
                     
-                    Dfd_struct_n(i) = F.Dn_fd_fun(par.N0(i), par.EA(i), startlim:interval:endlim, par.mue(i), par.T);
+                    Dfd_struct_n(i) = F.Dn_fd_fun(par.Nc(i), par.EA(i), startlim:interval:endlim, par.mue(i), par.T);
                     
                     startlim = par.IP(i)-0.6;
                     endlim = par.EA(i);
@@ -595,7 +595,7 @@ classdef pc
                     
                     range = startlim:interval:endlim;
                     
-                    Dfd_struct_p(i) = F.Dp_fd_fun(par.N0(i), par.IP(i), range, par.mue(i), par.T);
+                    Dfd_struct_p(i) = F.Dp_fd_fun(par.Nv(i), par.IP(i), range, par.mue(i), par.T);
                 end
             end
             
@@ -616,7 +616,8 @@ classdef pc
                             dev.mue(j) = par.mue(i);
                             dev.muh(j) = par.muh(i);
                             dev.muion(j) = par.muion(i);
-                            dev.N0(j) = par.N0(i);
+                            dev.Nc(j) = par.Nc(i);
+                            dev.Nv(j) = par.Nv(i);
                             dev.NA(j) = par.NA(i);
                             dev.ND(j) = par.ND(i);
                             dev.epp(j) = par.epp(i);
@@ -630,7 +631,8 @@ classdef pc
                             dev.G0(j) = par.G0(i);
                             dev.gradEA(j) = 0;
                             dev.gradIP(j) = 0;
-                            dev.gradN0(j) = 0;
+                            dev.gradNc(j) = 0;
+                            dev.gradNv(j) = 0;
                             dev.taun(j) = par.taun(i);
                             dev.taup(j) = par.taup(i);
                             dev.Et(j) = par.Et_bulk(i);
@@ -693,11 +695,22 @@ classdef pc
                             % Ion density of states
                             dDOSiondx = (par.DOSion(i+1)-par.DOSion(i-1))/(par.d(i));
                             dev.DOSion(j) = par.DOSion(i-1) + xprime*dDOSiondx;
+                            % CB effective density of states 
+                            dNcdx = (par.Nc(i+1)-par.Nc(i-1))/(par.d(i));
+                            dev.Nc(j) = par.Nc(i-1) + xprime*dNcdx;
+                            % VB effective density of states
+                            dNvdx = (par.Nv(i+1)-par.Nv(i-1))/(par.d(i));
+                            dev.Nv(j) = par.Nv(i-1) + xprime*dNvdx;                          
                             
                             %% logarithmically graded variables
-                            % Effective density of states
-                            dlogN0dx = (log(par.N0(i+1))-log(par.N0(i-1)))/(par.d(i));
-                            dev.N0(j) = exp(log(par.N0(i-1)) + xprime*dlogN0dx);
+                            % CB effective density of states 
+                            dlogNcdx = (log(par.Nc(i+1))-log(par.Nc(i-1)))/(par.d(i));
+                            dev.Nc(j) = exp(log(par.Nc(i-1)) + xprime*dlogNcdx);
+                            %gradNc = (dev.Nc(j)-dev.Nc(j-1))/par.xx(j);
+                            % VB effective density of states
+                            dlogNvdx = (log(par.Nv(i+1))-log(par.Nv(i-1)))/(par.d(i));
+                            dev.Nv(j) = exp(log(par.Nv(i-1)) + xprime*dlogNvdx);
+                            %gradNv = (dev.Nv(j)-dev.Nv(j-1))/par.xx(j);
                             % Acceptor density
                             dlogNAdx = (log(par.NA(i+1))-log(par.NA(i-1)))/(par.d(i));
                             dev.NA(j) = exp(log(par.NA(i-1)) + xprime*dlogNAdx);
@@ -720,7 +733,7 @@ classdef pc
                                 endlim = dev.EA(j)+1.0;
                                 interval = (endlim-startlim)/400;
                                 
-                                Dfd_struct_n_temp = F.Dn_fd_fun(dev.N0(j), dev.EA(j), startlim:interval:endlim, dev.mue(j), par.T);
+                                Dfd_struct_n_temp = F.Dn_fd_fun(dev.Nc(j), dev.EA(j), startlim:interval:endlim, dev.mue(j), par.T);
                                 
                                 dev.Dnfun(j,:) = Dfd_struct_n_temp.Dnfun;
                                 dev.n_fd(j,:) = Dfd_struct_n_temp.n_fd;
@@ -730,7 +743,7 @@ classdef pc
                                 endlim = dev.EA(j);
                                 interval = (endlim-startlim)/400;
                                 
-                                Dfd_struct_p_temp = F.Dp_fd_fun(dev.N0(j), dev.IP(j), startlim:interval:endlim, dev.mue(j), par.T);
+                                Dfd_struct_p_temp = F.Dp_fd_fun(dev.Nv(j), dev.IP(j), startlim:interval:endlim, dev.mue(j), par.T);
                                 
                                 dev.Dpfun(j,:) = Dfd_struct_p_temp.Dpfun;
                                 dev.p_fd(j,:) = Dfd_struct_p_temp.p_fd;
@@ -743,11 +756,12 @@ classdef pc
             end
             
             %             Alternative gradient calculation appears less stable
-            dev.gradN0 = gradient(dev.N0, xx);
-            dev.gradEA = gradient(dev.EA, xx);
-            dev.gradIP = gradient(dev.IP, xx);
-            dev.nt = F.nfun(dev.N0, dev.EA, dev.Et, par.T, par.stats);
-            dev.pt = F.pfun(dev.N0, dev.IP, dev.Et, par.T, par.stats);
+            dev.gradNc = gradient(dev.Nc, xx);
+            dev.gradNv = gradient(dev.Nv, xx);
+%             dev.gradEA = gradient(dev.EA, xx);
+%             dev.gradIP = gradient(dev.IP, xx);
+            dev.nt = F.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.stats);
+            dev.pt = F.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.stats);
         end
         
         function par = importproperties(par, filepath)
@@ -763,7 +777,8 @@ classdef pc
             par.IP = T{:, 'IP'}';
             par.E0 = T{:, 'E0'}';
             par.Et_bulk = T{:,'Et_bulk'}';
-            par.N0 = T{:, 'N0'}';
+            par.Nc = T{:, 'Nc'}';
+            par.Nv = T{:, 'Nv'}';
             par.Nion = T{:, 'Nion'}';
             par.DOSion = T{:, 'DOSion'}';
             par.mue = T{:, 'mue'}';
