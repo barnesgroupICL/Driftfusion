@@ -44,7 +44,7 @@ classdef pc
         dint = 2e-7;        % Interfacial region thickness (x_mesh_type = 3)
         pint = 20;          % Interfacial points (x_mesh_type = 3)
         
-                %% Layer description
+        %% Layer description
         % Currently STACK is used for reading the optical properties
         % library. The names here do not influence the electrical properties of the
         % device. See INDEX OF REFRACTION LIBRARY for choices- names must be enetered
@@ -91,6 +91,7 @@ classdef pc
         JV = 0;                 % Toggle run JV scan on/off
         Ana = 1;                % Toggle on/off analysis
         stats = 'Boltz';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
+        intgradfun = 'linear'      % Interface gradient function 'linear' = linear, 'erf' = 'error function'
         
         %% OM = Optical Model
         % Uniform generation uses
@@ -423,7 +424,7 @@ classdef pc
             % For backwards comptibility. pcell and parr arre the now the
             % same thing
             value = par.dcell;
-
+            
         end
         
         %% Layer points
@@ -431,7 +432,7 @@ classdef pc
             % For backwards comptibility. pcell and parr arre the now the
             % same thing
             value = par.pcell;
-
+            
         end
         
         %% Band gap energies    [eV]
@@ -497,7 +498,7 @@ classdef pc
         function value = get.pright(par)
             value = F.pfun(par.Nv(end), par.IP(end), par.PhiC, par.T, par.stats);
         end
-
+        
         function value = get.dcum(par)
             value = cumsum(par.dcell);
         end
@@ -635,117 +636,119 @@ classdef pc
                         % Interfaces
                         if xx(j) > par.dcum0(i) && xx(j) < par.dcum0(i+1)
                             
-                            
-                            switch 
                             xprime = xx(j)-par.dcum0(i);
-                            % Electron affiniity
-                            dEAdxprime = (par.EA(i+1)-par.EA(i-1))/(par.d(i));
-                            dev.EA(j) = par.EA(i-1) + xprime*dEAdxprime;
-                            dev.gradEA(j) = dEAdxprime;
-                            % Ionisation potential
-                            dIPdxprime = (par.IP(i+1)-par.IP(i-1))/(par.d(i));
-                            dev.IP(j) = par.IP(i-1) + xprime*dIPdxprime;
-                            dev.gradIP(j) = dIPdxprime;
-                            % Electon mobility
-                            dmuedx = (par.mue(i+1)-par.mue(i-1))/(par.d(i));
-                            dev.mue(j) = par.mue(i-1) + xprime*dmuedx;
-                            % Hole mobility
-                            dmuhdx = (par.muh(i+1)-par.muh(i-1))/(par.d(i));
-                            dev.muh(j) = par.muh(i-1) + xprime*dmuhdx;
-                            % Ion mobility
-                            dmuiondx = (par.muion(i+1)-par.muion(i-1))/(par.d(i));
-                            dev.muion(j) = par.muion(i-1) + xprime*dmuiondx;
-                            % Dielectric constants
-                            deppdx = (par.epp(i+1)-par.epp(i-1))/(par.d(i));
-                            dev.epp(j) = par.epp(i-1) + xprime*deppdx;
-                            % Equilibrium Fermi energy
-                            dE0dx = (par.E0(i+1)-par.E0(i-1))/(par.d(i));
-                            dev.E0(j) = par.E0(i-1) + xprime*dE0dx;
-                            % Uniform generation rate
-                            dG0dx = (par.G0(i+1)-par.G0(i-1))/(par.d(i));
-                            dev.G0(j) = par.G0(i-1) + xprime*dG0dx;
-                            % Radiative recombination coefficient
-                            dkraddx = (par.krad(i+1)-par.krad(i-1))/(par.d(i));
-                            dev.krad(j) = par.krad(i-1) + xprime*dkraddx;
-                            % SRH trap elvel
-                            dEtdx = (par.Et_bulk(i+1)-par.Et_bulk(i-1))/(par.d(i));
-                            dev.Et(j) = par.Et_bulk(i-1) + xprime*dEtdx;
-                            % SRH time constants
-                            dev.taun(j) = par.taun(i);
-                            dev.taup(j) = par.taup(i);
-                            % Static ion background density
-                            dNiondx = (par.Nion(i+1)-par.Nion(i-1))/(par.d(i));
-                            dev.Nion(j) = par.Nion(i-1) + xprime*dNiondx;
-                            % Ion density of states
-                            dDOSiondx = (par.DOSion(i+1)-par.DOSion(i-1))/(par.d(i));
-                            dev.DOSion(j) = par.DOSion(i-1) + xprime*dDOSiondx;
-                            % CB effective density of states 
-                            dNcdx = (par.Nc(i+1)-par.Nc(i-1))/(par.d(i));
-                            dev.Nc(j) = par.Nc(i-1) + xprime*dNcdx;
-                            % VB effective density of states
-                            dNvdx = (par.Nv(i+1)-par.Nv(i-1))/(par.d(i));
-                            dev.Nv(j) = par.Nv(i-1) + xprime*dNvdx;                          
                             
-                            %% logarithmically graded variables
-                            % CB effective density of states 
-                            dlogNcdx = (log(par.Nc(i+1))-log(par.Nc(i-1)))/(par.d(i));
-                            dev.Nc(j) = exp(log(par.Nc(i-1)) + xprime*dlogNcdx);
-                            %gradNc = (dev.Nc(j)-dev.Nc(j-1))/par.xx(j);
-                            % VB effective density of states
-                            dlogNvdx = (log(par.Nv(i+1))-log(par.Nv(i-1)))/(par.d(i));
-                            dev.Nv(j) = exp(log(par.Nv(i-1)) + xprime*dlogNvdx);
-                            %gradNv = (dev.Nv(j)-dev.Nv(j-1))/par.xx(j);
-                            % Acceptor density
-                            dlogNAdx = (log(par.NA(i+1))-log(par.NA(i-1)))/(par.d(i));
-                            dev.NA(j) = exp(log(par.NA(i-1)) + xprime*dlogNAdx);
-                            % Donor density
-                            dlogNDdx = (log(par.ND(i+1))-log(par.ND(i-1)))/(par.d(i));
-                            dev.ND(j) = exp(log(par.ND(i-1)) + xprime*dlogNDdx);
-                            % Intrinsic carrier densities
-                            dlognidx = (log(par.ni(i+1))-log(par.ni(i-1)))/(par.d(i));
-                            dev.ni(j) = exp(log(par.ni(i-1)) + xprime*dlognidx);
-                            % Equilibrium carrier densities
-                            dlogn0dx = (log(par.n0(i+1))-log(par.n0(i-1)))/(par.d(i));
-                            dev.n0(j) = exp(log(par.n0(i-1)) + xprime*dlogn0dx);
-                            % Equilibrium carrier densities
-                            dlogp0dx = (log(par.p0(i+1))-log(par.p0(i-1)))/(par.d(i));
-                            dev.p0(j) = exp(log(par.p0(i-1)) + xprime*dlogp0dx);
-                            
-                            
-                            case 'erf'
+                            switch par.intgradfun
+                                case 'linear'
+                                    
+                                    % Electron affiniity
+                                    dEAdxprime = (par.EA(i+1)-par.EA(i-1))/(par.d(i));
+                                    dev.EA(j) = par.EA(i-1) + xprime*dEAdxprime;
+                                    dev.gradEA(j) = dEAdxprime;
+                                    % Ionisation potential
+                                    dIPdxprime = (par.IP(i+1)-par.IP(i-1))/(par.d(i));
+                                    dev.IP(j) = par.IP(i-1) + xprime*dIPdxprime;
+                                    dev.gradIP(j) = dIPdxprime;
+                                    % Electon mobility
+                                    dmuedx = (par.mue(i+1)-par.mue(i-1))/(par.d(i));
+                                    dev.mue(j) = par.mue(i-1) + xprime*dmuedx;
+                                    % Hole mobility
+                                    dmuhdx = (par.muh(i+1)-par.muh(i-1))/(par.d(i));
+                                    dev.muh(j) = par.muh(i-1) + xprime*dmuhdx;
+                                    % Ion mobility
+                                    dmuiondx = (par.muion(i+1)-par.muion(i-1))/(par.d(i));
+                                    dev.muion(j) = par.muion(i-1) + xprime*dmuiondx;
+                                    % Dielectric constants
+                                    deppdx = (par.epp(i+1)-par.epp(i-1))/(par.d(i));
+                                    dev.epp(j) = par.epp(i-1) + xprime*deppdx;
+                                    % Equilibrium Fermi energy
+                                    dE0dx = (par.E0(i+1)-par.E0(i-1))/(par.d(i));
+                                    dev.E0(j) = par.E0(i-1) + xprime*dE0dx;
+                                    % Uniform generation rate
+                                    dG0dx = (par.G0(i+1)-par.G0(i-1))/(par.d(i));
+                                    dev.G0(j) = par.G0(i-1) + xprime*dG0dx;
+                                    % Radiative recombination coefficient
+                                    dkraddx = (par.krad(i+1)-par.krad(i-1))/(par.d(i));
+                                    dev.krad(j) = par.krad(i-1) + xprime*dkraddx;
+                                    % SRH trap elvel
+                                    dEtdx = (par.Et_bulk(i+1)-par.Et_bulk(i-1))/(par.d(i));
+                                    dev.Et(j) = par.Et_bulk(i-1) + xprime*dEtdx;
+                                    % SRH time constants
+                                    dev.taun(j) = par.taun(i);
+                                    dev.taup(j) = par.taup(i);
+                                    % Static ion background density
+                                    dNiondx = (par.Nion(i+1)-par.Nion(i-1))/(par.d(i));
+                                    dev.Nion(j) = par.Nion(i-1) + xprime*dNiondx;
+                                    % Ion density of states
+                                    dDOSiondx = (par.DOSion(i+1)-par.DOSion(i-1))/(par.d(i));
+                                    dev.DOSion(j) = par.DOSion(i-1) + xprime*dDOSiondx;
+                                    % CB effective density of states
+                                    dNcdx = (par.Nc(i+1)-par.Nc(i-1))/(par.d(i));
+                                    dev.Nc(j) = par.Nc(i-1) + xprime*dNcdx;
+                                    % VB effective density of states
+                                    dNvdx = (par.Nv(i+1)-par.Nv(i-1))/(par.d(i));
+                                    dev.Nv(j) = par.Nv(i-1) + xprime*dNvdx;
+                                    
+                                    %% logarithmically graded variables
+                                    % CB effective density of states
+                                    dlogNcdx = (log(par.Nc(i+1))-log(par.Nc(i-1)))/(par.d(i));
+                                    dev.Nc(j) = exp(log(par.Nc(i-1)) + xprime*dlogNcdx);
+                                    %gradNc = (dev.Nc(j)-dev.Nc(j-1))/par.xx(j);
+                                    % VB effective density of states
+                                    dlogNvdx = (log(par.Nv(i+1))-log(par.Nv(i-1)))/(par.d(i));
+                                    dev.Nv(j) = exp(log(par.Nv(i-1)) + xprime*dlogNvdx);
+                                    %gradNv = (dev.Nv(j)-dev.Nv(j-1))/par.xx(j);
+                                    % Acceptor density
+                                    dlogNAdx = (log(par.NA(i+1))-log(par.NA(i-1)))/(par.d(i));
+                                    dev.NA(j) = exp(log(par.NA(i-1)) + xprime*dlogNAdx);
+                                    % Donor density
+                                    dlogNDdx = (log(par.ND(i+1))-log(par.ND(i-1)))/(par.d(i));
+                                    dev.ND(j) = exp(log(par.ND(i-1)) + xprime*dlogNDdx);
+                                    % Intrinsic carrier densities
+                                    dlognidx = (log(par.ni(i+1))-log(par.ni(i-1)))/(par.d(i));
+                                    dev.ni(j) = exp(log(par.ni(i-1)) + xprime*dlognidx);
+                                    % Equilibrium carrier densities
+                                    dlogn0dx = (log(par.n0(i+1))-log(par.n0(i-1)))/(par.d(i));
+                                    dev.n0(j) = exp(log(par.n0(i-1)) + xprime*dlogn0dx);
+                                    % Equilibrium carrier densities
+                                    dlogp0dx = (log(par.p0(i+1))-log(par.p0(i-1)))/(par.d(i));
+                                    dev.p0(j) = exp(log(par.p0(i-1)) + xprime*dlogp0dx);
+                                    
+                                    
+                                case 'erf'
                                     
                                     %% error function
-                                    dev.erf(j) = ((erf(2*pi*(xprime-par.dint/2)/(par.dint))+1)/2);
-                                    dev.EA(j) = par.EA(i) + (par.EA(i+1)-par.EA(i))*dev.erf(j);
-                                    dev.IP(j) = par.IP(i) + (par.IP(i+1)-par.IP(i))*dev.erf(j);
-                                    dev.Eif(j) = par.Eif(i) + (par.Eif(i+1)-par.Eif(i))*dev.erf(j);
-                                    dev.mue(j) = par.mue(i) + (par.mue(i+1)-par.mue(i))*dev.erf(j);
-                                    dev.muh(j) = par.muh(i) + (par.muh(i+1)-par.muh(i))*dev.erf(j);
-                                    dev.muion(j) = par.muion(i) + (par.muion(i+1)-par.muion(i))*dev.erf(j);
-                                    dev.epp(j) = par.epp(i) + (par.epp(i+1)-par.epp(i))*dev.erf(j);
-                                    dev.E0(j) = par.E0(i) + (par.E0(i+1)-par.E0(i))*dev.erf(j);
-                                    dev.G0(j) = par.G0(i) + (par.G0(i+1)-par.G0(i))*dev.erf(j);
-                                    dev.krad(j) = par.krad(i) + (par.krad(i+1)-par.krad(i))*dev.erf(j);
-                                    dev.Et(j) = par.Et_bulk(i) + (par.Et_bulk(i+1)-par.Et_bulk(i))*dev.erf(j);
-                                    dev.Nion(j) = par.Nion(i) + (par.Nion(i+1)-par.Nion(i))*dev.erf(j);
-                                    dev.DOSion(j) = par.DOSion(i) + (par.DOSion(i+1)-par.DOSion(i))*dev.erf(j);
-                                    dev.N0(j) = par.N0(i) + (par.N0(i+1)-par.N0(i))*dev.erf(j);
-                                    dev.NA(j) = par.NA(i) + (par.NA(i+1)-par.NA(i))*dev.erf(j);
-                                    dev.ND(j) = par.ND(i) + (par.ND(i+1)-par.ND(i))*dev.erf(j);
+                                    dev.erf(j) = ((erf(2*pi*(xprime-par.d(i)/2)/(par.d(i)))+1)/2);
+                                    dev.EA(j) = par.EA(i-1) + (par.EA(i+1)-par.EA(i-1))*dev.erf(j);
+                                    dev.IP(j) = par.IP(i-1) + (par.IP(i+1)-par.IP(i-1))*dev.erf(j);
+                                    dev.Eif(j) = par.Eif(i-1) + (par.Eif(i+1)-par.Eif(i-1))*dev.erf(j);
+                                    dev.mue(j) = par.mue(i-1) + (par.mue(i+1)-par.mue(i-1))*dev.erf(j);
+                                    dev.muh(j) = par.muh(i-1) + (par.muh(i+1)-par.muh(i-1))*dev.erf(j);
+                                    dev.muion(j) = par.muion(i-1) + (par.muion(i+1)-par.muion(i-1))*dev.erf(j);
+                                    dev.epp(j) = par.epp(i-1) + (par.epp(i+1)-par.epp(i-1))*dev.erf(j);
+                                    dev.E0(j) = par.E0(i-1) + (par.E0(i+1)-par.E0(i-1))*dev.erf(j);
+                                    dev.G0(j) = par.G0(i-1) + (par.G0(i+1)-par.G0(i-1))*dev.erf(j);
+                                    dev.krad(j) = par.krad(i-1) + (par.krad(i+1)-par.krad(i-1))*dev.erf(j);
+                                    dev.Et(j) = par.Et_bulk(i-1) + (par.Et_bulk(i+1)-par.Et_bulk(i-1))*dev.erf(j);
+                                    dev.Nion(j) = par.Nion(i-1) + (par.Nion(i+1)-par.Nion(i-1))*dev.erf(j);
+                                    dev.DOSion(j) = par.DOSion(i-1) + (par.DOSion(i+1)-par.DOSion(i-1))*dev.erf(j);
+                                    dev.Nc(j) = par.Nc(i-1) + (par.Nc(i+1)-par.Nc(i-1))*dev.erf(j);
+                                    dev.Nv(j) = par.Nv(i-1) + (par.Nv(i+1)-par.Nv(i-1))*dev.erf(j);
+                                    dev.NA(j) = par.NA(i-1) + (par.NA(i+1)-par.NA(i-1))*dev.erf(j);
+                                    dev.ND(j) = par.ND(i-1) + (par.ND(i+1)-par.ND(i-1))*dev.erf(j);
                                     % SRH time constants
-                                    dev.taun(j) = par.taun_inter(i);
-                                    dev.taup(j) = par.taup_inter(i);
+                                    dev.taun(j) = par.taun(i);
+                                    dev.taup(j) = par.taup(i);
                                     
                             end
                             
                             %% logarithmically graded variables
-                            dev.ni(j) = F.nfun(dev.N0(j), dev.EA(j), dev.Eif(j), par.T, par.stats);
-                            dev.n0(j) = F.nfun(dev.N0(j), dev.EA(j), dev.E0(j), par.T, par.stats);
-                            dev.p0(j) = F.pfun(dev.N0(j), dev.IP(j), dev.E0(j), par.T, par.stats);
-                            dev.ND(j) = F.nfun(dev.N0(j), dev.EA(j), dev.E0(j), par.T, par.stats);
-                            dev.NA(j) = F.pfun(dev.N0(j), dev.IP(j), dev.E0(j), par.T, par.stats);
-                            
-                            
+                            dev.ni(j) = F.nfun(dev.Nc(j), dev.EA(j), dev.Eif(j), par.T, par.stats);
+                            dev.n0(j) = F.nfun(dev.Nc(j), dev.EA(j), dev.E0(j), par.T, par.stats);
+                            dev.p0(j) = F.pfun(dev.Nv(j), dev.IP(j), dev.E0(j), par.T, par.stats);
+                            dev.ND(j) = F.nfun(dev.Nc(j), dev.EA(j), dev.E0(j), par.T, par.stats);
+                            dev.NA(j) = F.pfun(dev.Nv(j), dev.IP(j), dev.E0(j), par.T, par.stats);
+
                             if par.stats == 'Fermi'
                                 % Build diffusion coefficient structure
                                 startlim = dev.IP(j);
@@ -777,8 +780,8 @@ classdef pc
             %             Alternative gradient calculation appears less stable
             dev.gradNc = gradient(dev.Nc, xx);
             dev.gradNv = gradient(dev.Nv, xx);
-%             dev.gradEA = gradient(dev.EA, xx);
-%             dev.gradIP = gradient(dev.IP, xx);
+            %             dev.gradEA = gradient(dev.EA, xx);
+            %             dev.gradIP = gradient(dev.IP, xx);
             dev.nt = F.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.stats);
             dev.pt = F.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.stats);
         end
@@ -816,7 +819,7 @@ classdef pc
             par.PhiC = T{1, 'PhiC'};
             par.Rs = T{1, 'Rs'};
             
-        end    
+        end
     end
     
 end
