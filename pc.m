@@ -565,21 +565,21 @@ classdef pc
             if par.stats == 'Fermi'
                 % Build diffusion coefficient structure
                     for i =1:length(par.dcum)
-                      
-                        startlim = par.IP(i);
-                        endlim = par.EA(i)+0.6;
-                        interval = (endlim-startlim)/400;
-                        
-                        Dfd_struct_n(i) = F.Dn_fd_fun(par.Nc(i), par.EA(i), startlim:interval:endlim, par.mue(i), par.T);
-                        
-                        startlim = par.IP(i)-0.6;
-                        endlim = par.EA(i);
-                        interval = (endlim-startlim)/400;
-                        
-                        range = startlim:interval:endlim;
-                        
-                        Dfd_struct_p(i) = F.Dp_fd_fun(par.Nv(i), par.IP(i), range, par.mue(i), par.T);
-                        
+                        if strcmp(par.layer_type{1,i}, 'layer') == 1
+                            startlim = par.IP(i);
+                            endlim = par.EA(i)+0.6;
+                            interval = (endlim-startlim)/400;
+                            
+                            Dfd_struct_n(i) = F.Dn_fd_fun(par.Nc(i), par.EA(i), startlim:interval:endlim, par.mue(i), par.T);
+                            
+                            startlim = par.IP(i)-0.6;
+                            endlim = par.EA(i);
+                            interval = (endlim-startlim)/400;
+                            
+                            range = startlim:interval:endlim;
+                            
+                            Dfd_struct_p(i) = F.Dp_fd_fun(par.Nv(i), par.IP(i), range, par.mue(i), par.T);
+                        end
                 end
             end
             

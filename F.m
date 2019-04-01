@@ -17,25 +17,24 @@ classdef F
             kT = F.kB*T;
             
             if stats == 'Fermi'
-            
-            % Fermi dirac integral for obtaining electron densities
-            % Nc = conduction band density of states
-            % Ec = conduction band energy
-            % Ef = Fermi level
-            % T = temperature
-            % See Schubert 2015, pp. 130
-            n = zeros(length(Nc));
-            
-            for i=1:length(Nc)
-                                
-                fn = @(E) ((E/kT).^0.5)./(1 + exp((E-Efn(i)+Ec(i))/kT));
                 
-                n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(fn, 0, F.uplimit));
+                % Fermi dirac integral for obtaining electron densities
+                % Nc = conduction band density of states
+                % Ec = conduction band energy
+                % Ef = Fermi level
+                % T = temperature
+                % See Schubert 2015, pp. 130
+                n = zeros(length(Nc));
                 
-            end
-            
+                for i=1:length(Nc)
+                    if isnan(Nc(i)) == 0    % ignores interfaces
+                        fn = @(E) ((E/kT).^0.5)./(1 + exp((E-Efn(i)+Ec(i))/kT));
+                        n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(fn, 0, F.uplimit));
+                    end
+                end
+                
             elseif stats == 'Boltz'
-            
+                
                 n = Nc.*exp((Efn-Ec)./kT);
             end
             
@@ -46,35 +45,37 @@ classdef F
             kT = F.kB*T;
             
             if stats == 'Fermi'
-            % Fermi dirac integral for obtaining electron densities
-            % Nc = conduction band density of states
-            % Ec = conduction band energy
-            % Ef = Fermi level
-            % T = temperature
-            % See Schubert 2015, pp. 130
-            p = zeros(length(Nv));
-            
-            % Reflecting the energy makes the integral easier for some
-            % reason- doesn't seem to like integrating from negative
-            % infinitiy...
-            Efp = Ev-(Efp-Ev);
-            
-            for i=1:length(Nv)
+                % Fermi dirac integral for obtaining electron densities
+                % Nc = conduction band density of states
+                % Ec = conduction band energy
+                % Ef = Fermi level
+                % T = temperature
+                % See Schubert 2015, pp. 130
+                p = zeros(length(Nv));
                 
-                fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));        
-                p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, 0, F.uplimit));
+                % Reflecting the energy makes the integral easier for some
+                % reason- doesn't seem to like integrating from negative
+                % infinitiy...
+                Efp = Ev-(Efp-Ev);
                 
-            end
-            
+                for i=1:length(Nv)
+                    if isnan(Nv(i)) == 0        % ignores interfaces
+                        fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));
+                        p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, 0, F.uplimit));
+                    end
+                end
+                
             elseif stats == 'Boltz'
                 
                 p = Nv.*exp((Ev-Efp)./kT);
-            
+                
             end
             
         end
         
         function Dnfd = Dn_fd_fun(Nc, Ec, Efn, mue, T)
+            if isnan(Ec) == 0    % ignores interfaces
+            
             % Calculates Fermi Dirac diffusion coefficient function
             % Currently uses upper limit for the integral of CB +16eV- using
             % higher values causes problems resulting in Nan results for Dn
@@ -91,23 +92,28 @@ classdef F
             
             for i = 1:length(Efn)
                 
-                f = @(E) 1./(1 + exp((E-Efn(i)+Ec)/kT));    % Fermi- Dirac function
-                dfdE = @(E) exp((E-Efn(i)+Ec)/kT)./(kT*(exp((E-Efn(i)+Ec)/kT)+1).^2);
+                    f = @(E) 1./(1 + exp((E-Efn(i)+Ec)/kT));    % Fermi- Dirac function
+                    dfdE = @(E) exp((E-Efn(i)+Ec)/kT)./(kT*(exp((E-Efn(i)+Ec)/kT)+1).^2);
+                    
+                    g = @(E) (E/kT).^0.5;                        % DOS function based on 3D semiconductor
+                    h = @(E) g(E).*f(E);
+                    k = @(E) g(E).*dfdE(E);
+                    
+                    n(i) = real(((2*Nc)/(kT*pi^0.5))*integral(f, 0, F.uplimit));
+                    dndE(i) = ((2*Nc)/(kT*pi^0.5))*integral(dfdE, 0, F.uplimit);
                 
-                g = @(E) (E/kT).^0.5;                        % DOS function based on 3D semiconductor
-                h = @(E) g(E).*f(E);
-                k = @(E) g(E).*dfdE(E);
-                
-                n(i) = real(((2*Nc)/(kT*pi^0.5))*integral(f, 0, F.uplimit));
-                dndE(i) = ((2*Nc)/(kT*pi^0.5))*integral(dfdE, 0, F.uplimit);
             end
             
             Dnfd.Dnfun = mue*(n./dndE);
             Dnfd.n_fd = n;
             Dnfd.Efn = Efn;
+            
+            end
         end
         
         function Dpfd = Dp_fd_fun(Nv, Ev, Efp, muh, T)
+            if isnan(Ev) == 0    % ignores interfaces
+            
             % Calculates Fermi Dirac diffusion coefficient function
             % Currently uses upper limit for the integral of CB +16eV- using
             % higher values causes problems resulting in Nan results for Dn
@@ -128,21 +134,22 @@ classdef F
             e = 1.61917e-19;         % Elementary charge in Coulombs.
             
             for i = 1:length(Efp)
-                
-                f = @(E) 1./(1 + exp((E-Efp_trans(i)+Ev)/kT));    % Fermi- Dirac function
-                dfdE = @(E) exp((E-Efp_trans(i)+Ev)/kT)./(kT*(exp((E-Efp_trans(i)+Ev)/kT)+1).^2);
-                
-                g = @(E) (E/kT).^0.5;                        % DOS function based on 3D semiconductor
-                h = @(E) g(E).*f(E);
-                k = @(E) g(E).*dfdE(E);
-                
-                p(i) = real(((2*Nv)/(kT*pi^0.5))*integral(f, 0, F.uplimit));
-                dpdE(i) = ((2*Nv)/(kT*pi^0.5))*integral(dfdE, 0, F.uplimit);
+                    f = @(E) 1./(1 + exp((E-Efp_trans(i)+Ev)/kT));    % Fermi- Dirac function
+                    dfdE = @(E) exp((E-Efp_trans(i)+Ev)/kT)./(kT*(exp((E-Efp_trans(i)+Ev)/kT)+1).^2);
+                    
+                    g = @(E) (E/kT).^0.5;                        % DOS function based on 3D semiconductor
+                    h = @(E) g(E).*f(E);
+                    k = @(E) g(E).*dfdE(E);
+                    
+                    p(i) = real(((2*Nv)/(kT*pi^0.5))*integral(f, 0, F.uplimit));
+                    dpdE(i) = ((2*Nv)/(kT*pi^0.5))*integral(dfdE, 0, F.uplimit);
             end
             
             Dpfd.Dpfun = muh*(p./dpdE);
             Dpfd.p_fd = p;
             Dpfd.Efp = Efp;
+            
+            end
         end
         
         function Dsol = D(n, Dnfun, n_fd)
