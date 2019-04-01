@@ -106,7 +106,6 @@ classdef pc
         %% Energy levels [eV]
         EA = [0];           % Electron affinity
         IP = [-1];           % Ionisation potential
-        % PCBM: Sigma Aldrich https://www.sigmaaldrich.com/technical-documents/articles/materials-science/organic-electronics/pcbm-n-type-semiconductors.html
         
         %% Equilibrium Fermi energies [eV]
         % These define the doping density in each layer- see NA and ND calculations in methods
