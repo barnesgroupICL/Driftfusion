@@ -565,20 +565,22 @@ classdef pc
             
             if par.stats == 'Fermi'
                 % Build diffusion coefficient structure
-                for i =1:length(par.dcum)
-                    startlim = par.IP(i);
-                    endlim = par.EA(i)+0.6;
-                    interval = (endlim-startlim)/400;
-                    
-                    Dfd_struct_n(i) = F.Dn_fd_fun(par.Nc(i), par.EA(i), startlim:interval:endlim, par.mue(i), par.T);
-                    
-                    startlim = par.IP(i)-0.6;
-                    endlim = par.EA(i);
-                    interval = (endlim-startlim)/400;
-                    
-                    range = startlim:interval:endlim;
-                    
-                    Dfd_struct_p(i) = F.Dp_fd_fun(par.Nv(i), par.IP(i), range, par.mue(i), par.T);
+                    for i =1:length(par.dcum)
+                      
+                        startlim = par.IP(i);
+                        endlim = par.EA(i)+0.6;
+                        interval = (endlim-startlim)/400;
+                        
+                        Dfd_struct_n(i) = F.Dn_fd_fun(par.Nc(i), par.EA(i), startlim:interval:endlim, par.mue(i), par.T);
+                        
+                        startlim = par.IP(i)-0.6;
+                        endlim = par.EA(i);
+                        interval = (endlim-startlim)/400;
+                        
+                        range = startlim:interval:endlim;
+                        
+                        Dfd_struct_p(i) = F.Dp_fd_fun(par.Nv(i), par.IP(i), range, par.mue(i), par.T);
+                        
                 end
             end
             
@@ -650,8 +652,8 @@ classdef pc
                                     dev.IP(j) = par.IP(i-1) + xprime*dIPdxprime;
                                     dev.gradIP(j) = dIPdxprime;
                                     % Intrinsic Fermi level
-                                    dEifdxprime = (par.Eif(i+1)-par.Eif(i))/(par.dint);
-                                    dev.Eif(j) = par.Eif(i) + xprime*dEifdxprime;
+                                    dEifdxprime = (par.Eif(i+1)-par.Eif(i-1))/(par.dint);
+                                    dev.Eif(j) = par.Eif(i-1) + xprime*dEifdxprime;
                                     dev.gradEif(j) = dEifdxprime;
                                     % Electon mobility
                                     dmuedx = (par.mue(i+1)-par.mue(i-1))/(par.d(i));
@@ -752,7 +754,7 @@ classdef pc
                             dev.p0(j) = F.pfun(dev.Nv(j), dev.IP(j), dev.E0(j), par.T, par.stats);
                             dev.ND(j) = F.nfun(dev.Nc(j), dev.EA(j), dev.E0(j), par.T, par.stats);
                             dev.NA(j) = F.pfun(dev.Nv(j), dev.IP(j), dev.E0(j), par.T, par.stats);
-
+                            
                             if par.stats == 'Fermi'
                                 % Build diffusion coefficient structure
                                 startlim = dev.IP(j);
@@ -784,8 +786,8 @@ classdef pc
             %             Alternative gradient calculation appears less stable
             dev.gradNc = gradient(dev.Nc, xx);
             dev.gradNv = gradient(dev.Nv, xx);
-            %             dev.gradEA = gradient(dev.EA, xx);
-            %             dev.gradIP = gradient(dev.IP, xx);
+            dev.gradEA = gradient(dev.EA, xx);
+            dev.gradIP = gradient(dev.IP, xx);
             dev.nt = F.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.stats);
             dev.pt = F.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.stats);
         end
