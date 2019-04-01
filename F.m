@@ -55,14 +55,13 @@ classdef F
             p = zeros(length(Nv));
             
             % Reflecting the energy makes the integral easier for some
-            % reason- doesn't seem to liek integrating from negative
+            % reason- doesn't seem to like integrating from negative
             % infinitiy...
             Efp = Ev-(Efp-Ev);
             
             for i=1:length(Nv)
                 
-                fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));
-                
+                fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));        
                 p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, 0, F.uplimit));
                 
             end
