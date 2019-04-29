@@ -69,7 +69,7 @@ steadystate_struct = struct;
 
 forceStabilization = false;
 % checks if the input structure reached the final time point
-if size(steadystate_struct.sol, 1) ~= steadystate_struct.par.tpoints
+if size(steadystate_struct.u, 1) ~= steadystate_struct.par.tpoints
     % in case the provided solution did not reach the final time point,
     % force stabilization
     forceStabilization = true;
