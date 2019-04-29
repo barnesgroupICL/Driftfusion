@@ -14,31 +14,41 @@ Please log bug fixes through GitHub.
 
 To get started do the following:
  
-1.	If your new to GitHub it is highly recommended that you download GitHub desktop at: https://desktop.github.com/
+1.	If you are new to GitHub it is highly recommended that you download GitHub desktop at: https://desktop.github.com/
 You can simply download Driftfusion standalone as a folder but you won’t easily be able to synch to the latest version.
 
 2.	Fork the Driftfusion GitHub repository (project). Instructions can be found here: https://help.github.com/en/articles/fork-a-repo 
 
 3.	Navigate to your repository/project folder in MATLAB.
 
-4.	The parameters class PC defines all the parameters for your device. Create a parameters object by typing:
+4.	Type 'initialise_df' into the command prompt. This adds the subfolders and associated functions to the file path.
+
+5.	The parameters class PC defines all the parameters for your device. You can edit the parameters directly in pc and create  a parameters object by typing:
  
 `par = pc;`
-	
-The default parameters simulate an inverted PEDOT/perovskite/PCBM stack. The  names of properties and their units are given in the commented code in the PC class.
 
-5.	Get equilibrium solutions – type:
+The  names of properties and their units are given in the commented code in the PC class.
+	
+6. 	A more user-friendly way of defining your device is to use the .csv files contained in the '/input_files' folder. For example, to create a parameters object with default parameters to simulate an inverted PEDOT/perovskite/PCBM stack type:
+
+`par = pc('input_files/pcbm.csv');`
+
+It is recommended to duplicate the existing csv files to define your own device and use Excel or Open Office to edit them. Ensure that the material name given in the 'stack' column matches with one of the materials in the Index of Refraction library if you wish to use the Beer-Lambert optical model.
+
+7.	Obtain equilibrium solutions for your device by typing:
  
 `soleq = equilibrate(par)`
  
 Inside soleq are 4 solutions. For perovskites you should generally use soleq.i_sr (i = ion and sr = surface recombination).
  
-6.	Try running a JV using:
+8.	Try running a JV using:
  
-`JV = doJV(soleq.i_sr, 1e-2, 100, 1, 1, 0, 1.4, 2)`
+`JV = doJV(soleq.i_sr, 1e-2, 100, 1, 1, 0, 1.4, 3)`
  
-The various input arguments are discussed in the comments of each code. At any time you can plot the JV using plotJV(JVsol).
+The various input arguments are discussed in the comments of each code. At any time you can plot the JV using dfplot.JV(JVsol,3).
 Try using doJV as a model for writing functions of your own.
+
+The example script shows you how to produce two devices with different transport layers and scan current-voltage scans at 50 mVs-1 for each.
 
 Good luck!
 
