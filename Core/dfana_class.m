@@ -21,7 +21,7 @@ classdef dfana_class
             % u is the solution structure
             % Simple structure names
             [u,t,x,par,dev,n,p,a,V] = dfana_class.splitsol(sol);
-                       
+            
             % Create 2D matrices for multiplication with solutions
             EAmat = repmat(par.dev.EA, length(t), 1);
             IPmat = repmat(par.dev.IP, length(t), 1);
@@ -210,7 +210,7 @@ classdef dfana_class
         function [FV, Frho] = calcF(sol)
             % Electric field caculation
             % FV = Field calculated from the gradient of the potential
-            % Frho = Field calculated from integrated space charge density  
+            % Frho = Field calculated from integrated space charge density
             [u,t,x,par,dev,n,p,a,V] = dfana_class.splitsol(sol);
             rho = dfana_class.calcrho(sol);
             eppmat = repmat(dev.epp, length(t), 1);
@@ -223,7 +223,6 @@ classdef dfana_class
             
         end
         
-        
         function rho = calcrho(sol)
             % Calculates the space charge density
             [u,t,x,par,dev,n,p,a,V] = dfana_class.splitsol(sol);
@@ -234,11 +233,25 @@ classdef dfana_class
             
             % charge density
             rho = -n + p + a -NAmat + NDmat - Nionmat;
-            
         end
         
         
-        
+        function Vapp = calcVapp(sol, option)
+            par = sol.par;
+            t = sol.t;
+            % This is temporary, Vapp should be stored with the solution in
+            % future updates
+            
+            if option == 1
+                Vapp = par.Vstart + ((par.Vend-par.Vstart)*t*(1/par.tmax));
+            elseif option == 2   
+                Vapp = par.Vapp_func(par.Vapp_params, t);
+            else
+                [Ecb, Evb, Efn, Efp] = dfana_class.QFLs(sol);
+                Vapp = Efn(:, end) - Efp(:, 1);
+            end
+                        
+        end
         
     end
     

@@ -2,46 +2,6 @@ classdef dfplot
     
     methods (Static)
         
-        function JV(JV, option)
-            % JV - a soultion from doJV
-            % OPTION - 1 = dark only, 2 = light only, 3 = dark & light
-            % JV is a structure containing dark and illuminated JVs
-            
-            if option == 1 || option == 3
-                JV.dk.f.par.JV = 1;
-                JV.dk.r.par.JV = 1;
-                
-                dfana(JV.dk.f);
-                figure(11)
-                %xlim([-0.2, 1.15])
-                ylim([-30e-3, 10e-3]);
-                hold on
-                dfana(JV.dk.r);
-                
-                JV.dk.f.par.JV = 0;
-                JV.dk.r.par.JV = 0;
-            end
-            
-            if option == 2 || option == 3
-                JV.ill.f.par.JV = 1;
-                JV.ill.r.par.JV = 1;
-                
-                dfana(JV.ill.f);
-                
-                figure(11)
-                %xlim([-0.2, 1.15])
-                ylim([-30e-3, 10e-3]);
-                hold on
-                dfana(JV.ill.r);
-                
-                JV.ill.f.par.JV = 0;
-                JV.ill.r.par.JV = 0;
-            end
-            
-            hold off
-            
-        end
-        
         function EL(varargin)
             % Energy Level diagram plotter
             % SOL = the solution structure
@@ -173,6 +133,43 @@ classdef dfplot
             
         end
         
+        function JV(JV, option)
+            % JV - a soultion from doJV
+            % OPTION - 1 = dark only, 2 = light only, 3 = dark & light
+            % JV is a structure containing dark and illuminated JVs
+            
+            if option == 1 || option == 3    
+                [j, J.dk.f] = dfana_class.calcJ(JV.dk.f);
+                Vapp.dk.f = dfana_class.calcVapp(JV.dk.f, 1);
+                [j, J.dk.r] = dfana_class.calcJ(JV.dk.r);
+                Vapp.dk.r = dfana_class.calcVapp(JV.dk.r, 1);
+                
+                figure(4)
+                plot(Vapp.dk.f, J.dk.f.tot(:,end), '--', Vapp.dk.r, J.dk.r.tot(:,end));
+                hold on
+
+            end
+            
+            if option == 2 || option == 3
+                
+                [j, J.ill.f] = dfana_class.calcJ(JV.ill.f);
+                Vapp.ill.f = dfana_class.calcVapp(JV.ill.f, 1);
+                [j, J.ill.r] = dfana_class.calcJ(JV.ill.r);
+                Vapp.ill.r = dfana_class.calcVapp(JV.ill.r, 1);
+                
+                figure(4)
+                plot(Vapp.ill.f, J.ill.f.tot(:,end),'--')%, 'Color', [0, 0.4470, 0.7410]);
+                hold on
+                plot(Vapp.ill.r, J.ill.r.tot(:,end));%,'Color', [0, 0.4470, 0.7410]);
+            end
+            
+            figure(4)
+            ylim([-30e-3, 10e-3]);
+            xlabel('Applied voltage [V]')
+            ylabel('Current density [Acm-2]');
+            hold off
+            
+        end
         
         % multiplot 1
         function mp1(varargin)

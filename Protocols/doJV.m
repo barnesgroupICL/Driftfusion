@@ -19,8 +19,8 @@ disp('Current voltage scan')
 par = sol_ini.par;
 
 %%Initial settings
-par.Ana = 1;
-par.figson = 1;
+par.Ana = 0;
+par.figson = 0;
 par.Int = 0;
 par.pulseon = 0;
 par.OC = 0;
@@ -95,8 +95,7 @@ if option ==2 || option ==3
         JV.ill.f.par.JV = 0;
         disp('Complete.')
         
-        %% Light reverse
-      
+        %% Light reverse   
         disp('Light reverse scan...')
         par.Vstart = Vend;
         par.Vend = Vstart;
@@ -105,11 +104,9 @@ if option ==2 || option ==3
         JV.ill.r.par.JV = 0;
         disp('Complete.')
         
-        figure(11)
-        hold off
         disp('JV scan complete.')
         
-        plotJV(JV, option)
+        dfplot.JV(JV,option)
         JV.stats = JVstats(JV);
 end
 toc
