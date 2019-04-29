@@ -23,13 +23,13 @@ You can simply download Driftfusion standalone as a folder but you won’t easil
 
 4.	Type 'initialise_df' into the command prompt. This adds the subfolders and associated functions to the file path.
 
-5.	The parameters class PC defines all the parameters for your device. You can edit the parameters directly in pc and create  a parameters object by typing:
+5.	The parameters class PC defines all the parameters for your device. You can edit the parameters directly in pc (found in the '/Core folder' and create  a parameters object by typing:
  
 `par = pc;`
 
 The  names of properties and their units are given in the commented code in the PC class.
 	
-6. 	A more user-friendly way of defining your device is to use the .csv files contained in the '/input_files' folder. For example, to create a parameters object with default parameters to simulate an inverted PEDOT/perovskite/PCBM stack type:
+6. 	A more better way of defining your device is to use the .csv files contained in the '/input_files' folder. For example, to create a parameters object with default parameters to simulate an inverted PEDOT/perovskite/PCBM stack type:
 
 `par = pc('input_files/pcbm.csv');`
 
