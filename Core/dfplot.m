@@ -138,7 +138,7 @@ classdef dfplot
             % OPTION - 1 = dark only, 2 = light only, 3 = dark & light
             % JV is a structure containing dark and illuminated JVs
             
-            if option == 1 || option == 3    
+            if option == 1 || option == 3
                 [j, J.dk.f] = dfana_class.calcJ(JV.dk.f);
                 Vapp.dk.f = dfana_class.calcVapp(JV.dk.f, 1);
                 [j, J.dk.r] = dfana_class.calcJ(JV.dk.r);
@@ -147,7 +147,7 @@ classdef dfplot
                 figure(4)
                 plot(Vapp.dk.f, J.dk.f.tot(:,end), '--', Vapp.dk.r, J.dk.r.tot(:,end));
                 hold on
-
+                
             end
             
             if option == 2 || option == 3
@@ -169,6 +169,46 @@ classdef dfplot
             ylabel('Current density [Acm-2]');
             hold off
             
+        end
+        
+        function ddx(varargin)
+            % figure(5)
+            % drift and diffusion currents as a function of position
+            
+            if length(varargin) == 1
+                sol = varargin{1};
+                time = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                time = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                time = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+
+            % get drift and diffusion currents
+            Jdd = dfana_class.Jddxt(sol);
+            xnm = sol.x*1e7;
+            
+            figure(5)
+            for i = 1:length(time)
+                % find the time
+                p1 = find(sol.t <= time);
+                p1 = p1(end);
+                
+                plot(xnm, Jdd.ndiff(p1,:), xnm, Jdd.ndrift(p1,:), xnm, Jdd.pdiff(p1,:),...
+                    xnm, Jdd.pdrift(p1,:), xnm, Jdd.adiff(p1,:), xnm, Jdd.adrift(p1,:));
+                hold on
+            end
+            xlabel('Position [nm]')
+            ylabel('Current density [Acm-2]') 
+            legend('n,diff', 'n,drift', 'p,diff', 'p,drift', 'a,diff', 'a,drift')
         end
         
         % multiplot 1
