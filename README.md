@@ -45,7 +45,7 @@ Inside soleq are 4 solutions. For perovskites you should generally use soleq.i_s
  
 `JV = doJV(soleq.i_sr, 1e-2, 100, 1, 1, 0, 1.4, 3)`
  
-The various input arguments are discussed in the comments of each code. At any time you can plot the JV using dfplot.JV(JVsol,3).
+The various input arguments are discussed in the comments of each code. At any time you can plot the JV using `dfplot.JV(JVsol,3)`.
 Try using doJV as a model for writing functions of your own.
 
 The example script shows you how to produce two devices with different transport layers and scan current-voltage scans at 50 mVs-1 for each.
