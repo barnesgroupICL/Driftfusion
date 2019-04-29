@@ -8,10 +8,10 @@ end
 
 tic;    % Start stopwatch
 %% Initial arguments
-% Setting sol.sol = 0 enables a parameters structure to be read into
+% Setting sol.u = 0 enables a parameters structure to be read into
 % DF but indicates that the initial conditions should be the
 % analytical solutions
-sol.sol = 0;    
+sol.u = 0;    
 
 p_original = par;
 
@@ -90,7 +90,7 @@ par.t0 = par.tmax/1e6;
 
 sol = df(sol, par);
 
-all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 % loop to check ions have reached stable config- if not accelerate ions by
 % order of mag
@@ -104,7 +104,7 @@ while any(all_stable) == 0
 
     sol = df(sol, par);
     
-    all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 end
 
@@ -155,7 +155,7 @@ par.t0 = par.tmax/1e3;
 
 sol = df(sol, par);
 
-all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 % loop to check ions have reached stable config- if not accelerate ions by
 % order of mag
@@ -168,7 +168,7 @@ while any(all_stable) == 0
 
     sol = df(sol, par);
     
-    all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 end
 
@@ -199,6 +199,9 @@ par.t0 = par.tmax/1e3;
 
 soleq.i_sr = df(soleq.i, par);
 disp('Complete')
+
+dfplot.EL(soleq.i_sr);
+dfplot.Jx(soleq.i_sr)
 
 disp('EQUILIBRATION COMPLETE')
 toc
