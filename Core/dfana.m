@@ -25,7 +25,7 @@ elseif length(varargin) == 3
 end
 
 % Simple structure names
-sol = solstruct.sol;
+u = solstruct.u;
 par = solstruct.par;
 x = solstruct.x;
 t = solstruct.t;
@@ -64,10 +64,10 @@ xnm = x*1e7;    % x in nm for plotting
 %%%%% ANALYSIS %%%%%
 
 % split the solution into its component parts (e.g. electrons, holes and efield)
-n = sol(:,:,1);
-p = sol(:,:,2);
-a = sol(:,:,3);
-V = sol(:,:,4);
+n = u(:,:,1);
+p = u(:,:,2);
+a = u(:,:,3);
+V = u(:,:,4);
 
 % Electric field
 for i = 1:length(t)
@@ -809,7 +809,7 @@ if par.figson == 1
         ylabel('{\it\rho a} [x10^{18} cm^{-3}]');
         xlabel('Position [nm]');
         xlim([xrange(1), xrange(2)]);
-        %ylim([0, 1.1*(max(sol(pparr(i),:,3))/1e19)]);
+        %ylim([0, 1.1*(max(u(pparr(i),:,3))/1e19)]);
         set(legend,'FontSize',12);
         set(legend,'EdgeColor',[1 1 1]);
         grid off
