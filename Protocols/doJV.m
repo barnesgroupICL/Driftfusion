@@ -20,7 +20,7 @@ par = sol_ini.par;
 
 %%Initial settings
 par.Ana = 1;
-par.figson = 1;
+par.figson = 0;
 par.Int = 0;
 par.pulseon = 0;
 par.OC = 0;
@@ -63,7 +63,7 @@ if option ==2 || option ==3
         
         %% 1 Sun quasi equilibrium solution
         
-        disp('1 Sun quasi-equilibrium solution')
+        disp('Illuminated quasi-equilibrium solution')
         par.JV = 0;
         par.mobseti = 0;          % Switch ion mobility off for illumination step
         par.Int = Intensity;
@@ -78,7 +78,7 @@ if option ==2 || option ==3
         
         %% Light forward
         
-        disp('Light forward scan...')
+        disp('Illuminated forward scan...')
         par.mobseti = mobseti;
         
         %% JV settings
@@ -95,9 +95,8 @@ if option ==2 || option ==3
         JV.ill.f.par.JV = 0;
         disp('Complete.')
         
-        %% Light reverse
-      
-        disp('Light reverse scan...')
+        %% Light reverse   
+        disp('Illuminated reverse scan...')
         par.Vstart = Vend;
         par.Vend = Vstart;
         
@@ -105,12 +104,10 @@ if option ==2 || option ==3
         JV.ill.r.par.JV = 0;
         disp('Complete.')
         
-        figure(11)
-        hold off
         disp('JV scan complete.')
         
-        plotJV(JV, option)
-        JV.stats = JVstats(JV);
+        dfplot.JV(JV,option)
+        JV.stats = dfana.JVstats(JV);
 end
 toc
 end

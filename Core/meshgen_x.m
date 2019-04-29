@@ -61,11 +61,6 @@ switch par.xmesh_type
         
     case 3
         
-%         parrcum = [0, cumsum(par.parr)];
-%         parr = par.parr;
-%         darr = par.d;
-%         dcum = [0, par.dcum];
-        
         % build number array from dcell (cell array containing lengths)
         dcellarr = 0;
         for i = 1:size(par.dcell, 1)
@@ -136,6 +131,24 @@ switch par.xmesh_type
         
         % To account for rounding errors
         x(end) = darrintcum(end);
+
+    case 4
+        
+        d = par.dcell;
+        p = par.pcell;
+        dcum = cumsum(par.dcell);
+        dcum = [0, dcum];
+        pcum = cumsum(par.pcell);
+        pcum = [0, pcum];
+        
+        for i=1:length(par.pcell)
+            
+            linarr = linspace(dcum(i), dcum(i+1)-(d(i)/p(i)), p(i));
+            x(1, (pcum(i)+1):pcum(i+1)) = linarr;
+            
+        end
+        % To account for rounding errors
+        x(end) = dcum(end);
         
     otherwise
         error('DrIFtFUSION:xmesh_type', [mfilename ' - xmesh_type not recognized'])

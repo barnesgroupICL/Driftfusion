@@ -18,13 +18,13 @@ if length(varargin) == 0
 elseif length(varargin) == 1
     
     % Call input parameters function
-    icsol = varargin{1, 1}.sol;
+    icsol = varargin{1, 1}.u;
     icx = varargin{1, 1}.x;
     par = pc;
     
 elseif length(varargin) == 2
     
-    if max(max(max(varargin{1, 1}.sol))) == 0
+    if max(max(max(varargin{1, 1}.u))) == 0
         
         par = varargin{2};
         
@@ -32,13 +32,13 @@ elseif length(varargin) == 2
         
         input_solstruct = varargin{1, 1};
         par = input_solstruct.par;
-        icsol = input_solstruct.sol;
+        icsol = input_solstruct.u;
         icx = input_solstruct.x;
         
     else
         
         input_solstruct = varargin{1, 1};
-        icsol = input_solstruct.sol;
+        icsol = input_solstruct.u;
         icx = input_solstruct.x;
         par = varargin{2};
         
@@ -51,9 +51,6 @@ end
 % Can also use AbortSet in class def
 
 dcum = par.dcum;
-dEAdx = par.dEAdx;
-dIPdx = par.dIPdx;
-dN0dx = par.dN0dx;
 E0 = par.E0;
 Eg = par.Eg;
 Eif = par.Eif;
@@ -67,15 +64,12 @@ ni = par.ni;
 p0 = par.p0;
 pleft = par.pleft;
 pright = par.pright;
-wn = par.wn;
-wp = par.wp;
-wscr = par.wscr;
 dmax = par.dcum(end);
 xx = par.xx;
 dev = par.dev;
 
 %%%% Spatial mesh %%%%
-if length(varargin) == 0 || max(max(max(varargin{1, 1}.sol))) == 0
+if length(varargin) == 0 || max(max(max(varargin{1, 1}.u))) == 0
     
     % Generate mesh - had problems with using the mesh generated in pc-
     % leads to very slow solving time - mesh must be being regnerated
@@ -89,7 +83,7 @@ else
 end
 
 % Define the x points to give the initial
-if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
+if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.u))) == 0
     
     icx = x;
     
@@ -145,7 +139,7 @@ options = odeset('MaxStep', 0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'A
 %% Call solver
 % inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
-sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
+u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 
 %% Subfunctions
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
@@ -228,8 +222,8 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
             Dp = dev.muh(i)*par.kB*par.T;
         end
         
-        f = [par.mobset*(dev.mue(i)*(u(1)*(-DuDx(4)+dev.gradEA(i)-(dev.gradN0(i)*par.kB*par.T/dev.N0(i))))+(Dn*DuDx(1)));
-            par.mobset*(dev.muh(i)*(u(2)*(DuDx(4)-dev.gradIP(i)-(dev.gradN0(i)*par.kB*par.T/dev.N0(i))))+(Dp*DuDx(2)));
+        f = [par.mobset*(dev.mue(i)*u(1)*(-DuDx(4)+dev.gradEA(i))+(Dn*(DuDx(1)-((u(1)/dev.Nc(i))*dev.gradNc(i)))));
+            par.mobset*(dev.muh(i)*u(2)*(DuDx(4)-dev.gradIP(i))+(Dp*(DuDx(2)-((u(2)/dev.Nv(i))*dev.gradNv(i)))));
             par.mobseti*(dev.muion(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(dev.DOSion(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
             (dev.epp(i)/max(par.epp))*DuDx(4);];
         
@@ -244,7 +238,7 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 % Define initial conditions.
     function u0 = pdex4ic(x)
         
-        if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) == 0
+        if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) == 0
             
             i = find(par.xx <= x);
             i = i(end);
@@ -254,7 +248,7 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 dev.Nion(i);
                 dev.E0(i)];
             
-        elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) ~= 0
+        elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
             % insert previous solution and interpolate the x points
             u0 = [interp1(icx,icsol(end,:,1),x)
                 interp1(icx,icsol(end,:,2),x)
@@ -423,7 +417,7 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 %% Analysis, graphing-  required to obtain J and Voc
 
 % Readout solutions to structure
-solstruct.sol = sol;
+solstruct.u = u;
 solstruct.x = x;
 solstruct.t = t;
 
@@ -436,24 +430,12 @@ end
 solstruct.par = par;
 
 if par.OM == 2 && par.Int ~= 0
-    
     solstruct.g = par.Int*interp1(par.genspace, Gx1S, (x-dcum(1)));
-    
 end
 
 if par.Ana == 1
-    
-    [Vapp_arr, Jtotr] = dfana(solstruct, t(end));
-    
-    if par.JV == 1
-        
-        solstruct.Vapp = Vapp_arr;
-        
-    end
-    
-    solstruct.Jtotr = Jtotr;
-    
+    solstruct.Vapp = dfana.calcVapp(solstruct, par.JV);    
+    [j,solstruct.J] = dfana.calcJ(solstruct);
 end
-
 
 end

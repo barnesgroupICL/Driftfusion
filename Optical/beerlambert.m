@@ -8,7 +8,7 @@ function Gentot = beerlambert(par, x, source_type, laserlambda, figson)
 % FIGSON - logical toggling figures
 
 %% Output arguments
-% GENTOT - 
+% GENTOT - Generation rate integrated across the spectrum
 
 % Author: Philip Calado, Imperial College London, 2018
 % n & k loader taken from Stanford Transfer Matrix Code
@@ -37,7 +37,9 @@ switch source_type
         
         I0 = zeros(length(lambda));
         I0(laserlambda-lambda(1)) = 1e-3*par.pulsepow;   % convert to wcm-2
-        
+    otherwise
+        warning('Light source unknown. Usinng AM1.5 as default')
+        I0 = lightsource('AM15', lambda);
 end
 
 Eph = h*c./(lambda*1e-9);    % Photon energy in Joules
@@ -47,7 +49,13 @@ n = zeros(size(layers,2),size(lambda,2));
 k = zeros(size(layers,2),size(lambda,2));
 try
     for index = 1:size(layers,2)
-        [n(index,:), k(index,:)] = LoadRefrIndex(layers{index},lambda);
+        if strcmp(par.layer_type{1,index}, 'layer') 
+            [n(index,:), k(index,:)] = LoadRefrIndex(layers{index},lambda);
+        else
+        % Currently holds the optical properties from previous layer across
+        % the interface. This could be changed at some point
+            [n(index,:), k(index,:)] = LoadRefrIndex(layers{index-1},lambda);
+        end
     end
 catch
     error('Material name in stack does not match that in the Index of Refraction Library. Please check the names contained in the ''stack'' cell of the parameters object are correct.')
@@ -56,9 +64,9 @@ end
 % For the time being, the optical properties are changed abruptly mid-way
 % through the interface. Grading of the optical properties is desirable
 % in future versions.
-xarr = [0, par.d+0.5*par.dint];
-xarr(end) = xarr(end) +0.5*par.dint; % Adjustment required as no interface at end of device
-xcum = cumsum(xarr);
+xarr = [0, par.d];
+xarr(end) = xarr(end); % Adjustment required as no interface at end of device
+xcum = par.pcum;
 
 % calculate absorption coefficient from k
 for i = 1:length(layers)

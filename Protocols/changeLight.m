@@ -1,17 +1,17 @@
-function struct_Int = changeLight(struct, newInt, tmax)
+function sol_int = changeLight(sol, newInt, tmax)
 %CHANGELIGHT - Stabilize solutions at a new light intensity
 %
-% Syntax:  struct_Int = changeLight(struct, newInt, tmax)
+% Syntax:  sol_int = changeLight(sol, newInt, tmax)
 %
 % Inputs:
-%   STRUCT - a solution struct as created by PINDRIFT.
+%   sol - a solution sol as created by PINDRIFT.
 %   NEWINT - the requested light intensity, zero is not supported as it is
 %     much more robust to obtain a dark solution directly from equilibrate
 %   TMAX - the initial stabilization time, can be zero for an automatic
 %     guess
 %
 % Outputs:
-%   STRUCT_INT - a solution struct at NEWINT light intensity
+%   sol_int - a solution sol at NEWINT light intensity
 %
 % Example:
 %   ssol_i_1S_SR_1mS = changeLight(ssol_i_1S_SR, 1e-3, 5)
@@ -37,12 +37,12 @@ function struct_Int = changeLight(struct, newInt, tmax)
 
 %------------- BEGIN CODE --------------
 
-par = struct.par;
+par = sol.par;
 par.pulseon = 0;
 par.tmesh_type = 2;
 par.t0 = 1e-10;
 par.tpoints = 30;
-struct_Int = struct;
+sol_int = sol;
 
 % set an initial time for stabilization tmax
 if tmax
@@ -78,10 +78,10 @@ Int_array = logspace(log10(oldInt), log10(newInt), steps);
 for i = 2:length(Int_array)
     disp([mfilename ' - Go from light intensity ' num2str(par.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(par.tmax) ' s'])
     par.Int = Int_array(i); % set new light intensity
-    struct_Int = df(struct_Int, par);
+    sol_int = df(sol_int, par);
 end
 
 %% stabilize
-struct_Int = stabilize(struct_Int); % go to steady state
+sol_int = stabilize(sol_int); % go to steady state
 
 %------------- END OF CODE --------------

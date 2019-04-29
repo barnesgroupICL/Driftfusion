@@ -8,10 +8,10 @@ end
 
 tic;    % Start stopwatch
 %% Initial arguments
-% Setting sol.sol = 0 enables a parameters structure to be read into
+% Setting sol.u = 0 enables a parameters structure to be read into
 % DF but indicates that the initial conditions should be the
 % analytical solutions
-sol.sol = 0;    
+sol.u = 0;    
 
 p_original = par;
 
@@ -46,6 +46,7 @@ par.tmesh_type = 2;
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e4;
 par.Rs = 0;
+par.Ana = 0;
 
 %% Switch off mobilities
 par.mobset = 0;
@@ -89,7 +90,7 @@ par.t0 = par.tmax/1e6;
 
 sol = df(sol, par);
 
-all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 % loop to check ions have reached stable config- if not accelerate ions by
 % order of mag
@@ -103,7 +104,7 @@ while any(all_stable) == 0
 
     sol = df(sol, par);
     
-    all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 end
 
@@ -120,8 +121,8 @@ soleq.eq = sol;
 disp('Complete')
 
 disp('Switching on interfacial recombination')
-par.taun_inter = p_original.taun_inter;
-par.taup_inter = p_original.taup_inter;
+par.taun = p_original.taun;
+par.taup = p_original.taup;
 par.SRHset = 1;
 par.dev = pc.builddev(par);
 
@@ -154,7 +155,7 @@ par.t0 = par.tmax/1e3;
 
 sol = df(sol, par);
 
-all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 % loop to check ions have reached stable config- if not accelerate ions by
 % order of mag
@@ -167,7 +168,7 @@ while any(all_stable) == 0
 
     sol = df(sol, par);
     
-    all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 end
 
@@ -187,8 +188,8 @@ disp('Ion equilibrium solution complete')
 
 %% Ion equilibrium with surface recombination
 disp('Switching on surface recombination')
-par.taun_inter = p_original.taun_inter;
-par.taup_inter = p_original.taup_inter;
+par.taun = p_original.taun;
+par.taup = p_original.taup;
 par.SRHset = 1;
 par.dev = pc.builddev(par);
 
@@ -198,6 +199,9 @@ par.t0 = par.tmax/1e3;
 
 soleq.i_sr = df(soleq.i, par);
 disp('Complete')
+
+dfplot.ELx(soleq.i_sr);
+dfplot.Jx(soleq.i_sr)
 
 disp('EQUILIBRATION COMPLETE')
 toc
