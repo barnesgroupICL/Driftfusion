@@ -46,6 +46,7 @@ par.tmesh_type = 2;
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e4;
 par.Rs = 0;
+par.Ana = 0;
 
 %% Switch off mobilities
 par.mobset = 0;

@@ -14,7 +14,7 @@ classdef dfplot
                 dfana(JV.dk.f);
                 figure(11)
                 %xlim([-0.2, 1.15])
-                ylim([-25e-3, 5e-3]);
+                ylim([-30e-3, 10e-3]);
                 hold on
                 dfana(JV.dk.r);
                 
@@ -30,7 +30,7 @@ classdef dfplot
                 
                 figure(11)
                 %xlim([-0.2, 1.15])
-                ylim([-25e-3, 5e-3]);
+                ylim([-30e-3, 10e-3]);
                 hold on
                 dfana(JV.ill.r);
                 
