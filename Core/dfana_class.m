@@ -23,23 +23,15 @@ classdef dfana_class
             [u,t,x,par,dev,n,p,a,V] = dfana_class.splitsol(sol);
             
             % Create 2D matrices for multiplication with solutions
-            EAmat = repmat(par.dev.EA, length(t), 1);
-            IPmat = repmat(par.dev.IP, length(t), 1);
-            muemat = repmat(par.dev.mue, length(t), 1);
-            muhmat = repmat(par.dev.muh, length(t), 1);
-            muionmat = repmat(par.dev.muion, length(t), 1);
-            NAmat = repmat(par.dev.NA, length(t), 1);
-            NDmat = repmat(par.dev.ND, length(t), 1);
-            Ncmat = repmat(par.dev.Nc, length(t), 1);
-            Nvmat = repmat(par.dev.Nv, length(t), 1);
-            Nionmat = repmat(par.dev.Nion, length(t), 1);
-            eppmat = repmat(par.dev.epp, length(t), 1);
-            nimat = repmat(par.dev.ni, length(t), 1);
-            kradmat = repmat(par.dev.krad, length(t), 1);
-            taunmat = repmat(par.dev.taun, length(t), 1);
-            taupmat = repmat(par.dev.taup, length(t), 1);
-            ntmat = repmat(par.dev.nt, length(t), 1);
-            ptmat = repmat(par.dev.pt, length(t), 1);
+            EAmat = repmat(dev.EA, length(t), 1);
+            IPmat = repmat(dev.IP, length(t), 1);
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            Ncmat = repmat(dev.Nc, length(t), 1);
+            Nvmat = repmat(dev.Nv, length(t), 1);
+            Nionmat = repmat(dev.Nion, length(t), 1);
+            eppmat = repmat(dev.epp, length(t), 1);
+            nimat = repmat(dev.ni, length(t), 1);
             
             Ecb = EAmat-V;                                 % Conduction band potential
             Evb = IPmat-V;                                 % Valence band potential
@@ -207,6 +199,35 @@ classdef dfana_class
             J.tot = J.n + J.p + J.a + J.disp;
         end
         
+        function Jdd = Jddxt(sol)
+            % obtain SOL components for easy referencing
+            [u,t,x,par,dev,n,p,a,V] = dfana_class.splitsol(sol);
+            
+            muemat = repmat(dev.mue, length(t), 1);
+            muhmat = repmat(dev.muh, length(t), 1);
+            muionmat = repmat(dev.muion, length(t), 1);
+            % Calculates drift and diffusion currents at every point and all times -
+            % NOTE: UNRELIABLE FOR TOTAL CURRENT as errors in the calculation of the
+            % spatial gradients mean that the currents do not cancel properly
+            for i = 1:length(t)
+                [nloc(i,:),dnlocdx(i,:)] = pdeval(0,x,n(i,:),x);
+                [ploc(i,:),dplocdx(i,:)] = pdeval(0,x,p(i,:),x);
+                [aloc(i,:),dalocdx(i,:)] = pdeval(0,x,a(i,:),x);
+                [Vloc(i,:), dVdx(i,:)] = pdeval(0,x,V(i,:),x);
+            end
+            
+            % Particle currents
+            Jdd.ndiff = dev.mue.*par.kB*par.T.*dnlocdx*par.e;
+            Jdd.ndrift = -dev.mue.*nloc.*dVdx*par.e;
+            
+            Jdd.pdiff = -dev.muh*par.kB*par.T.*dplocdx*par.e;
+            Jdd.pdrift = -dev.muh.*ploc.*dVdx*par.e;
+            
+            Jdd.adiff = -dev.muion*par.kB*par.T.*dalocdx*par.e;
+            Jdd.adrift = -dev.muion.*aloc.*dVdx*par.e;
+            
+        end
+        
         function [FV, Frho] = calcF(sol)
             % Electric field caculation
             % FV = Field calculated from the gradient of the potential
@@ -244,14 +265,92 @@ classdef dfana_class
             
             if option == 1
                 Vapp = par.Vstart + ((par.Vend-par.Vstart)*t*(1/par.tmax));
-            elseif option == 2   
+            elseif option == 2
                 Vapp = par.Vapp_func(par.Vapp_params, t);
             else
                 [Ecb, Evb, Efn, Efp] = dfana_class.QFLs(sol);
                 Vapp = Efn(:, end) - Efp(:, 1);
             end
-                        
+            
         end
+        
+        function stats = JVstats(JV)
+            % A function to pull statistics from a JV sweep using DOJV
+            % JV - a solution from DOJV
+            
+            if isfield(JV, 'ill')
+                if isfield(JV.ill, 'f')
+                    try
+                        p1 = find(JV.ill.f.Vapp >= 0);
+                        p1 = p1(1);
+                        stats.Jsc_f = JV.ill.f.J.tot(p1, end);
+                    catch
+                        warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
+                        stats.Jsc_f = 0;
+                    end
+                    
+                    try
+                        p2 = find(JV.ill.f.J.tot(:, end) >= 0);
+                        p2 = p2(1);
+                        stats.Voc_f = JV.ill.f.Vapp(p2);
+                    catch
+                        warning('No Voc available- try increasing applied voltage range')
+                        stats.Voc_f = 0;
+                    end
+                    
+                    if stats.Jsc_f ~= 0 && stats.Voc_f ~= 0
+                        pow_f = JV.ill.f.J.tot(:,end).*JV.ill.f.Vapp';
+                        stats.mpp_f = min(pow_f);
+                        stats.FF_f = stats.mpp_f/(stats.Jsc_f*stats.Voc_f);
+                    end
+                    
+                else
+                    stats.Jsc_f = nan;
+                    stats.Voc_f = nan;
+                    stats.mpp_f = nan;
+                    stats.FF_f = nan;
+                end
+                
+                if isfield(JV.ill, 'r')
+                    try
+                        p1 = find(JV.ill.r.Vapp <= 0);
+                        p1 = p1(1);
+                        stats.Jsc_r = JV.ill.r.J.tot(p1, end);
+                    catch
+                        warning('No Jsc available- Vapp must pass through 0')
+                        stats.Jsc_r = 0;
+                    end
+                    
+                    try
+                        p2 = find(JV.ill.r.J.tot(:, end) <= 0);
+                        p2 = p2(1);
+                        stats.Voc_r = JV.ill.r.Vapp(p2);
+                        
+                    catch
+                        warning('No Voc available- try increasing applied voltage range')
+                        stats.Voc_r = 0;
+                        
+                    end
+                    
+                    if stats.Jsc_r ~= 0 && stats.Voc_r ~= 0
+                        pow_r = JV.ill.r.J.tot(:,end).*JV.ill.r.Vapp';
+                        stats.mpp_r = min(pow_r);
+                        stats.FF_r = stats.mpp_r/(stats.Jsc_r*stats.Voc_r);
+                    end
+                    
+                else
+                    stats.Jsc_r = nan;
+                    stats.Voc_r = nan;
+                    stats.mpp_r = nan;
+                    stats.FF_r = nan;
+                end
+            else
+                
+                
+            end
+            
+        end
+        
         
     end
     
