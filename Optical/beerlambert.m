@@ -8,7 +8,7 @@ function Gentot = beerlambert(par, x, source_type, laserlambda, figson)
 % FIGSON - logical toggling figures
 
 %% Output arguments
-% GENTOT - 
+% GENTOT - Generation rate integrated across the spectrum
 
 % Author: Philip Calado, Imperial College London, 2018
 % n & k loader taken from Stanford Transfer Matrix Code
