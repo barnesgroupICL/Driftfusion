@@ -42,15 +42,47 @@ classdef dfplot
             
         end
         
-        function EL
+        function EL(varargin)
+            % Energy Level diagram plotter
+            % SOL = the solution structure
+            % TIME = the time that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
             
+            % tarr is a time time array for the time you wish to plot
+            if length(varargin) == 1
+                sol = varargin{1};
+                time = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                time = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                time = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+            
+            % find the time
+            p1 = find(sol.t <= time);
+            p1 = p1(end);
+            
+            % Call dfana_class to obtain band energies and QFLs
+            [u,t,x,par,dev,n,p,a,V] = dfana_class.splitsol(sol);
+            [Ecb, Evb, Efn, Efp] = dfana_class.QFLs(sol);
+            
+            % calc static background ion matrix
+            Nionmat = repmat(par.dev.Nion, length(t), 1);
+            
+            xnm = x*1e7;    % x in nm for plotting
             
             % Band Diagram
             FH1 = figure(1);
-            %set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
             PH1 = subplot(3,1,1);
-            %figure(70)
-            plot (xnm, Efn(pparr(i),:), '--', xnm, Efp(pparr(i),:), '--', xnm, Ecb(pparr(i), :), xnm, Evb(pparr(i) ,:));
+            plot (xnm, Efn(p1,:), '--', xnm, Efp(p1,:), '--', xnm, Ecb(p1, :), xnm, Evb(p1 ,:));
             legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
             set(legend,'FontSize',12);
             xlabel('Position [nm]');
@@ -61,13 +93,9 @@ classdef dfplot
             grid off;
             drawnow;
             
-            hold on
-            
             % Final Charge Densities
-            %figure(2)
             PH2 = subplot(3,1,2);
-            %figure(71)
-            semilogy(xnm, n(pparr(i), :), xnm, p(pparr(i), :));
+            semilogy(xnm, n(p1, :), xnm, p(p1, :));
             ylabel('{\itn, p} [cm^{-3}]')
             legend('\itn', '\itp')
             xlabel('Position [nm]')
@@ -77,20 +105,74 @@ classdef dfplot
             set(legend,'EdgeColor',[1 1 1]);
             grid off
             
-            hold on
-            
+            % Ionic space charge density
             PH3 = subplot(3,1,3);
-            %figure(72)
-            plot(xnm, (rhoa(pparr(i),:))/1e18, 'black');
-            ylabel('{\it\rho a} [x10^{18} cm^{-3}]');
+            plot(xnm, a(p1,:)-Nionmat, 'black');
+            ylabel('{\it\rho a} [cm^{-3}]');
             xlabel('Position [nm]');
             xlim([xrange(1), xrange(2)]);
-            %ylim([0, 1.1*(max(sol(pparr(i),:,3))/1e19)]);
             set(legend,'FontSize',12);
             set(legend,'EdgeColor',[1 1 1]);
             grid off
-        
+            
         end
+        
+        function Jt(sol)
+            % Currents as a function of time
+            t = sol.t;
+            [j, J] = dfana_class.calcJ(sol);
+            
+            figure(2);
+            plot(t, J.n(:, end),t, J.p(:, end),t, J.a(:, end),t, J.tot(:, end));
+            legend('Jn', 'Jp', 'Ja', 'Jtotal')
+            xlabel('time [s]');
+            ylabel('J [A cm^{-2}]');
+            set(legend,'FontSize',16);
+            set(legend,'EdgeColor',[1 1 1]);
+            grid off;
+            drawnow;
+        end
+        
+        function Jx(varargin)
+            % Plots the currents
+            % SOL = the solution structure
+            % TIME = the time that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+            % tarr is a time time array for the time you wish to plot
+            if length(varargin) == 1
+                sol = varargin{1};
+                time = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                time = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                time = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+            
+            % find the time
+            p1 = find(sol.t <= time);
+            p1 = p1(end);
+            
+            xnm = sol.x*1e7;
+            [j, J] = dfana_class.calcJ(sol);
+            
+            % electron and hole currents as function of position from continuity
+            figure(3)
+            plot(xnm, J.n(p1, :), xnm, J.p(p1, :), xnm, J.a(p1, :), xnm, J.disp(p1, :), xnm, J.tot(p1, :))
+            xlabel('Position [nm]')
+            ylabel('J [A]')
+            legend('Jn', 'Jp', 'Ja', 'Jdisp', 'Jtot')
+            xlim([xrange(1), xrange(2)])
+            
+        end
+        
         
         % multiplot 1
         function mp1(varargin)
