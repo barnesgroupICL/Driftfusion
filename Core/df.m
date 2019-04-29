@@ -18,13 +18,13 @@ if length(varargin) == 0
 elseif length(varargin) == 1
     
     % Call input parameters function
-    icsol = varargin{1, 1}.sol;
+    icsol = varargin{1, 1}.u;
     icx = varargin{1, 1}.x;
     par = pc;
     
 elseif length(varargin) == 2
     
-    if max(max(max(varargin{1, 1}.sol))) == 0
+    if max(max(max(varargin{1, 1}.u))) == 0
         
         par = varargin{2};
         
@@ -32,13 +32,13 @@ elseif length(varargin) == 2
         
         input_solstruct = varargin{1, 1};
         par = input_solstruct.par;
-        icsol = input_solstruct.sol;
+        icsol = input_solstruct.u;
         icx = input_solstruct.x;
         
     else
         
         input_solstruct = varargin{1, 1};
-        icsol = input_solstruct.sol;
+        icsol = input_solstruct.u;
         icx = input_solstruct.x;
         par = varargin{2};
         
@@ -69,7 +69,7 @@ xx = par.xx;
 dev = par.dev;
 
 %%%% Spatial mesh %%%%
-if length(varargin) == 0 || max(max(max(varargin{1, 1}.sol))) == 0
+if length(varargin) == 0 || max(max(max(varargin{1, 1}.u))) == 0
     
     % Generate mesh - had problems with using the mesh generated in pc-
     % leads to very slow solving time - mesh must be being regnerated
@@ -83,7 +83,7 @@ else
 end
 
 % Define the x points to give the initial
-if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.sol))) == 0
+if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.u))) == 0
     
     icx = x;
     
@@ -139,7 +139,7 @@ options = odeset('MaxStep', 0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'A
 %% Call solver
 % inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
-sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
+u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 
 %% Subfunctions
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
@@ -238,7 +238,7 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 % Define initial conditions.
     function u0 = pdex4ic(x)
         
-        if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) == 0
+        if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) == 0
             
             i = find(par.xx <= x);
             i = i(end);
@@ -248,7 +248,7 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 dev.Nion(i);
                 dev.E0(i)];
             
-        elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.sol))) ~= 0
+        elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
             % insert previous solution and interpolate the x points
             u0 = [interp1(icx,icsol(end,:,1),x)
                 interp1(icx,icsol(end,:,2),x)
@@ -417,7 +417,7 @@ sol = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 %% Analysis, graphing-  required to obtain J and Voc
 
 % Readout solutions to structure
-solstruct.sol = sol;
+solstruct.u = u;
 solstruct.x = x;
 solstruct.t = t;
 
