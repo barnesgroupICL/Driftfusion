@@ -434,8 +434,8 @@ if par.OM == 2 && par.Int ~= 0
 end
 
 if par.Ana == 1
-    solstruct.Vapp = dfana_class.calcVapp(solstruct, par.JV);    
-    [j,solstruct.J] = dfana_class.calcJ(solstruct);
+    solstruct.Vapp = dfana.calcVapp(solstruct, par.JV);    
+    [j,solstruct.J] = dfana.calcJ(solstruct);
 end
 
 end

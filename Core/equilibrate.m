@@ -200,7 +200,7 @@ par.t0 = par.tmax/1e3;
 soleq.i_sr = df(soleq.i, par);
 disp('Complete')
 
-dfplot.EL(soleq.i_sr);
+dfplot.ELx(soleq.i_sr);
 dfplot.Jx(soleq.i_sr)
 
 disp('EQUILIBRATION COMPLETE')
