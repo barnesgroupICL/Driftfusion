@@ -1,4 +1,4 @@
-function [sol_Voc, Voc] = findVoc(sol_ini, mobseti, x0, x1, tol)
+function [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol)
 % FINDVOC finds the open cicuit voltage of a device using a
 % Newton-Raphson iteration
 
@@ -21,7 +21,6 @@ par = sol_ini.par;
 par.OC = 0;
 par.calcJ = 0;
 par.pulseon = 0;
-Suns = 1;               % Intensity
 JVscan_rate = 1;        %Vs-1
 
 %% Save Surface rec coefficients
@@ -54,7 +53,7 @@ par.t0 = 0;
 par.tmesh_type = 1;
 par.tpoints = par.JVscan_pnts;
 par.pulseon = 0;
-par.Int = Suns;
+par.Int = Int;
       
 sol = df(sol, par);         
 
@@ -141,7 +140,7 @@ while abs(fx1) > tol
 %     
 %     sol = df(sol, par);
 %     
-%     par.Int = Suns;
+%     par.Int = Int;
 %     par.tmax = 1e-3;
 %     par.t0 = par.tmax/1e4;
 % 
