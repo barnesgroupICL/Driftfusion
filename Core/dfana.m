@@ -769,7 +769,7 @@ if par.figson == 1
         %     % Pl intensity at time point
         %     PLint(pparr(i));
         %
-        % Band Diagram
+        % Energy level Diagram
         FH1 = figure(1);
         %set(FigHandle, 'units','normalized','position',[.1 .1 .4 .4]);
         PH1 = subplot(3,1,1);
