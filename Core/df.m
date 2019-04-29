@@ -430,23 +430,12 @@ end
 solstruct.par = par;
 
 if par.OM == 2 && par.Int ~= 0
-    
     solstruct.g = par.Int*interp1(par.genspace, Gx1S, (x-dcum(1)));
-    
 end
 
 if par.Ana == 1
-    
-    [Vapp_arr, Jtotr] = dfana(solstruct, t(end));
-    
-    if par.JV == 1
-        
-        solstruct.Vapp = Vapp_arr;
-        
-    end
-    
-    solstruct.Jtotr = Jtotr;
-    
+    solstruct.Vapp = dfana_class.calcVapp(solstruct, par.JV);    
+    [j,solstruct.J] = dfana_class.calcJ(solstruct);
 end
 
 end
