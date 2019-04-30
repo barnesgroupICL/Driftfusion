@@ -14,8 +14,8 @@ Please log bug fixes through GitHub.
 
 To get started do the following:
  
-1.	If you are new to GitHub it is highly recommended that you download GitHub desktop at: https://desktop.github.com/
-You can simply download Driftfusion standalone as a folder but you won’t easily be able to synch to the latest version.
+1.	If you are new to GitHub it is highly recommended that you download GitHub desktop at: https://desktop.github.com/.
+Alternatively, you can download Driftfusion standalone as a folder but you won’t easily be able to synch to the latest version.
 
 2.	Fork the Driftfusion GitHub repository (project). Instructions can be found here: https://help.github.com/en/articles/fork-a-repo 
 
@@ -23,17 +23,17 @@ You can simply download Driftfusion standalone as a folder but you won’t easil
 
 4.	Type 'initialise_df' into the command prompt. This adds the subfolders and associated functions to the file path.
 
-5.	The parameters class PC defines all the parameters for your device. You can edit the parameters directly in pc (found in the '/Core folder' and create  a parameters object by typing:
+5.	The parameters class `pc` defines all the parameters for your device. You can edit the parameters directly in `pc` (found in the `/Core folder` and create  a parameters object by typing:
  
 `par = pc;`
 
-The  names of properties and their units are given in the commented code in the PC class.
+The  names of properties and their units are given in the commented code in the `pc` class.
 	
-6. 	A more better way of defining your device is to use the .csv files contained in the '/input_files' folder. For example, to create a parameters object with default parameters to simulate an inverted PEDOT/perovskite/PCBM stack type:
+6. 	A better way of defining your device is to use the .csv files contained in the `/input_files` folder. For example, to create a parameters object with default parameters to simulate an inverted PEDOT/perovskite/PCBM stack type:
 
 `par = pc('input_files/pcbm.csv');`
 
-It is recommended to duplicate the existing csv files to define your own device and use Excel or Open Office to edit them. Ensure that the material name given in the 'stack' column matches with one of the materials in the Index of Refraction library if you wish to use the Beer-Lambert optical model.
+It is recommended to duplicate the existing .csv files to define your own device and use a programme like Excel or Open Office to edit them. Ensure that the material name given in the 'stack' column matches with one of the materials in the Index of Refraction library if you wish to use the Beer-Lambert optical model.
 
 7.	Obtain equilibrium solutions for your device by typing:
  
