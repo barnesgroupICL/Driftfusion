@@ -12,11 +12,21 @@ soleq.pcbm = equilibrate(par.pcbm);
 JV.tio2.JV50mVs = doJV(soleq.tio2.i_sr, 50e-3, 100, 1, 1, 0, 1.2, 3);
 JV.pcbm.JV50mVs = doJV(soleq.pcbm.i_sr, 50e-3, 100, 1, 1, 0, 1.2, 3);
 
-% plot the outputs
+% plot the current voltage curve
 dfplot.JV(JV.tio2.JV50mVs,3)
+
 figure(4)
 hold on
+
 dfplot.JV(JV.pcbm.JV50mVs,3)
 legend('tio2-dk-f', 'tio2-dk-r', 'tio2-1sun-f', 'tio2-1sun-r',...
         'pcbm-dk-f', 'pcbm-dk-r', 'pcbm-1sun-f', 'pcbm-1sun-r')
 hold off
+
+% plot the energy level diagram and charge densities for the tio2 device at 
+% 1 V (t= 20s) during the illuminated forward scan
+dfplot.ELx(JV.tio2.JV50mVs.ill.f, 20)
+
+% plot the currents as a function of position in the PCBM device at 0.5 V
+% (t = 10 s) during the illuminated forward scan
+dfplot.Jx(JV.pcbm.JV50mVs.ill.f, 10)
