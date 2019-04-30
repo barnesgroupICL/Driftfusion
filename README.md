@@ -39,7 +39,7 @@ It is recommended to duplicate the existing .csv files to define your own device
  
 `soleq = equilibrate(par)`
  
-Inside soleq are 4 solutions. For perovskites you should generally use soleq.i_sr (i = ion and sr = surface recombination).
+Inside soleq are 4 solutions. For perovskites you should generally use `soleq.i_sr` (i = ion and sr = surface recombination).
  
 8.	Try running a JV using:
  
