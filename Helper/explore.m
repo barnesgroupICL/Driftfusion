@@ -29,6 +29,11 @@ classdef explore
                 par = exploreparhelper(par, str1, parval1(i));
                 par.taup(1) = par.taun(1);
                 
+                if strmatch('dcell{1}{1}', parnames(2)) ~= 0
+                        pcontact = round(parval2(i)*1e7);
+                        par.pcell{1}{1} = pcontact*1;
+                end
+
                 Voc_f = zeros(1, length(parval2));
                 Voc_r = zeros(1, length(parval2));
                 Jsc_f = zeros(1, length(parval2));
