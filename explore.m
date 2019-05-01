@@ -126,15 +126,29 @@ classdef explore
             surf(offset, parexsol.parval1, parexsol.stats.Voc_f)
             s1 = gca;
             %ylabel('Ion density [cm-3]')
-            ylabel(parexsol)
-            xlabel('\Phi_A')%/p-type VB-Fermi level offset [eV]')
+            ylabel(parexsol.parnames{1,1})
+            xlabel(parexsol.parnames{1,2})
             zlabel('Voc F scan [V]')
             xlim([offset(1), offset(end)]);
             ylim([parexsol.parval1(1), parexsol.parval1(end)])
-            set(s1,'YScale','log');
-            shading interp
-            colorbar
+            
             %caxis([0.75, 0.95])
+                if xlogon
+                    set(s1,'XScale','log');
+                end
+                if ylogon
+                    set(s1,'YScale','log');
+                end
+                zlabel('taurise [s]')
+                shading interp
+                colorbar
+                cb = colorbar();
+                if zlogon
+                    cb.Ruler.Scale = 'log';
+                    cb.Ruler.MinorTick = 'on';
+                end
+            
+            
             
             figure(3002)
             surf(offset, parexsol.parval1, parexsol.stats.Voc_r)
