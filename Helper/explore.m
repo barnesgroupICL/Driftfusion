@@ -20,19 +20,19 @@ classdef explore
             str1 = char(parnames(1));
             str2 = char(parnames(2));
             
-            j = 1;        
-            for i = 1:length(parval1)
+            j = 1;
+            parfor i = 1:length(parval1)
                 
                 par = par_base;
                 par.Ana = 0;
                 par = explore.helper(par, str1, parval1(i));
-%                par.taup(1) = par.taun(1);
+                %                par.taup(1) = par.taun(1);
                 
-                if strmatch('dcell(1,5)', parnames(1)) ~= 0
-                        pcontact = round(parval1(i)*1e7);
-                        par.pcell(1,5) = pcontact*1;
+                if strmatch('dcell(1,4)', parnames(1)) ~= 0
+                    pcontact = round(parval1(i)*1e7);
+                    par.pcell(1,4) = pcontact*1;
                 end
-
+                
                 Voc_f = zeros(1, length(parval2));
                 Voc_r = zeros(1, length(parval2));
                 Jsc_f = zeros(1, length(parval2));
@@ -53,35 +53,37 @@ classdef explore
                 par.dev = pc.builddev(par);
                 
                 soleq = equilibrate(par);
-                    
+                
                 for j = 1:length(parval2)
                     
                     runN = (i-1)*length(parval2) + j;
-                    disp(['Run no. ', num2str(runN), ', taun = ', num2str(parval1(i)), ', E0 = ', num2str(parval2(j))]);
+                    disp(['Run no. ', num2str(runN), ', d_active = ', num2str(1e7*(parval1(i)+60e-7)), ' nm, Intensity = ', num2str(parval2(j))]);
                     
                     %par = explore.helper(par, str2, parval2(j));
                     
                     % Variable 2 will be light intensity
                     JV = doJV(soleq.ion, 50e-3, JVpnts, parval2(j), 1, 0, 1.3, 2);
+                    stats = dfana.JVstats(JV);
                     
                     Vapp_f(j,:) = JV.ill.f.Vapp;
                     J_f(j,:) =  JV.ill.f.J.tot(:,end);
                     Vapp_r(j,:) = JV.ill.r.Vapp;
-                    J_r(j,:) = JV.ill.r.J.tot(:,end);                  
-                    Voc_f(j) = dfana.JVstats.Voc_f;
-                    Voc_r(j) = dfana.JVstats.Voc_r;
-                    Jsc_f(j) = dfana.JVstats.Jsc_f;
-                    Jsc_r(j) = dfana.JVstats.Jsc_r;
-                    mpp_f(j) = dfana.JVstats.mpp_f;
-                    mpp_r(j) = dfana.JVstats.mpp_r;
-                    FF_f(j) = dfana.JVstats.FF_f;
-                    FF_r(j) = dfana.JVstats.FF_r;
+                    J_r(j,:) = JV.ill.r.J.tot(:,end);
+                    Voc_f(j) = stats.Voc_f;
+                    Voc_r(j) = stats.Voc_r;
+                    Jsc_f(j) = stats.Jsc_f;
+                    Jsc_r(j) = stats.Jsc_r;
+                    mpp_f(j) = stats.mpp_f;
+                    mpp_r(j) = stats.mpp_r;
+                    FF_f(j) = stats.FF_f;
+                    FF_r(j) = stats.FF_r;
                     
                     % For PL
                     %                     [sol_Voc, Voc] = findVoc(soleq.i_sr, 1e-6, Voc_f(j), (Voc_f(j)+0.1))
                     %                     Voc_stable(j) = Voc;
                     %                     PLint(j) = sol_Voc.PLint(end);
-                    
+                    figure(4)
+                    hold on
                 end
                 
                 A(i,:) = Voc_f;
@@ -97,7 +99,7 @@ classdef explore
                 AA(:,:,i) = Vapp_f;
                 BB(:,:,i) = J_f;
                 CC(:,:,i) = Vapp_r;
-                DD(:,:,i) = J_r;               
+                DD(:,:,i) = J_r;
                 
             end
             
@@ -122,6 +124,9 @@ classdef explore
             parexsol.par_base = par_base;
             
             toc
+            
+            figure(4)
+            hold on
         end
         
         function par = helper(par, parname, parvalue)
