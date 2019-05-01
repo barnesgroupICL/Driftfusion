@@ -98,7 +98,7 @@ par.Rs = par_origin.Rs;
 par.tmax = 1e-6;
 par.t0 = 1e-12;
 
-soleq.eq = df(sol, par);
+soleq_nosrh = df(sol, par);
 disp('Complete')
 
 disp('Switching on interfacial recombination')
@@ -107,7 +107,7 @@ par.SRHset = 1;
 par.tmax = 1e-6;
 par.t0 = par.tmax/1e3;
 
-soleq.eq_sr = df(soleq.eq, par);
+soleq.no_ion = df(soleq_nosrh, par);
 disp('Complete')
 
 %% Equilibrium solutions with ion mobility switched on
@@ -122,7 +122,7 @@ par.mobseti = 1e4;           % Ions are accelerated to reach equilibrium
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e3; 
 
-sol = df(soleq.eq, par);
+sol = df(soleq_nosrh, par);
 
 % Longer second solution
 par.calcJ = 0;
@@ -157,8 +157,8 @@ par.t0 = 1e-12;
 sol = df(sol, par);
 
 % write solution and reset ion mobility
-soleq.i = sol;
-soleq.i.par.mobseti = 1;
+soleq_i_nosrh = sol;
+soleq_i_nosrh.par.mobseti = 1;
 
 disp('Ion equilibrium solution complete')
 
@@ -170,11 +170,11 @@ par.calcJ = 0;
 par.tmax = 1e-6;
 par.t0 = par.tmax/1e3;
 
-soleq.i_sr = df(soleq.i, par);
+soleq.ion = df(soleq_i_nosrh, par);
 disp('Complete')
 
-dfplot.ELx(soleq.i_sr);
-dfplot.Jx(soleq.i_sr)
+dfplot.ELx(soleq.ion);
+dfplot.Jx(soleq.ion)
 
 disp('EQUILIBRATION COMPLETE')
 toc
