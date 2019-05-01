@@ -118,51 +118,69 @@ classdef explore
             
         end
         
-        function plotVoc(parexsol, logxon, logyon, logzon)
-            
-            offset = parexsol.parval2-parexsol.par_base.IP(1);
+        function plotVoc(parexsol, xlogon, ylogon, zlogon)
             
             figure(3001)
-            surf(offset, parexsol.parval1, parexsol.stats.Voc_f)
+            surf(parexsol.parval2, parexsol.parval1+60e-7, parexsol.stats.Voc_f)
             s1 = gca;
             %ylabel('Ion density [cm-3]')
             ylabel(parexsol.parnames{1,1})
             xlabel(parexsol.parnames{1,2})
             zlabel('Voc F scan [V]')
-            xlim([offset(1), offset(end)]);
-            ylim([parexsol.parval1(1), parexsol.parval1(end)])
+            xlim([parexsol.parval2(1), parexsol.parval2(end)]);
+            ylim([parexsol.parval1(1)+60e-7, parexsol.parval1(end)+60e-7])
             
             %caxis([0.75, 0.95])
-                if xlogon
-                    set(s1,'XScale','log');
-                end
-                if ylogon
-                    set(s1,'YScale','log');
-                end
-                zlabel('taurise [s]')
-                shading interp
-                colorbar
-                cb = colorbar();
-                if zlogon
-                    cb.Ruler.Scale = 'log';
-                    cb.Ruler.MinorTick = 'on';
-                end
-            
-            
+            if xlogon
+                set(s1,'XScale','log');
+            else
+                set(s1,'XScale','linear');
+            end
+            if ylogon
+                set(s1,'YScale','log');
+            else
+                set(s1,'YScale','linear');
+            end
+            zlabel('taurise [s]')
+            shading interp
+            colorbar
+            cb = colorbar();
+            if zlogon
+                cb.Ruler.Scale = 'log';
+                cb.Ruler.MinorTick = 'on';
+            end
             
             figure(3002)
-            surf(offset, parexsol.parval1, parexsol.stats.Voc_r)
+            surf(parexsol.parval2, parexsol.parval1+60e-7, parexsol.stats.Voc_r)
             s1 = gca;
             %ylabel('Ion density [cm-3]')
             ylabel(parexsol.parnames{1,1})
             xlabel(parexsol.parnames{1,2})
             zlabel('Voc R scan [V]')
-            xlim([offset(1), offset(end)]);
-            ylim([parexsol.parval1(1), parexsol.parval1(end)])
+            xlim([parexsol.parval2(1), parexsol.parval2(end)]);
+            ylim([parexsol.parval1(1)+60e-7, parexsol.parval1(end)+60e-7])
             set(s1,'YScale','log');
             shading interp
             colorbar
             %caxis([0.75, 0.95])
+            if xlogon
+                set(s1,'XScale','log');
+            else
+                set(s1,'XScale','linear');
+            end
+            if ylogon
+                set(s1,'YScale','log');
+            else
+                set(s1,'YScale','linear');
+            end
+            zlabel('taurise [s]')
+            shading interp
+            colorbar
+            cb = colorbar();
+            if zlogon
+                cb.Ruler.Scale = 'log';
+                cb.Ruler.MinorTick = 'on';
+            end
             
         end
         
@@ -185,8 +203,6 @@ classdef explore
             caxis([0.75, 0.95])
             %caxis([1.05, 1.15])
         end
-        
-        
         
         function plotJscF(parexsol)
             
