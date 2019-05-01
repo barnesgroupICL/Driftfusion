@@ -118,7 +118,7 @@ classdef explore
             
         end
         
-        function plotVoc(parexsol)
+        function plotVoc(parexsol, logxon, logyon, logzon)
             
             offset = parexsol.parval2-parexsol.par_base.IP(1);
             
@@ -126,7 +126,7 @@ classdef explore
             surf(offset, parexsol.parval1, parexsol.stats.Voc_f)
             s1 = gca;
             %ylabel('Ion density [cm-3]')
-            ylabel('p-type SRH time constant [s]')
+            ylabel(parexsol)
             xlabel('\Phi_A')%/p-type VB-Fermi level offset [eV]')
             zlabel('Voc F scan [V]')
             xlim([offset(1), offset(end)]);
@@ -171,6 +171,7 @@ classdef explore
             caxis([0.75, 0.95])
             %caxis([1.05, 1.15])
         end
+        
         
         
         function plotJscF(parexsol)
