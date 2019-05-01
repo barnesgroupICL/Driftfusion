@@ -13,18 +13,10 @@ tic;    % Start stopwatch
 % analytical solutions
 sol.u = 0;    
 
-p_original = par;
+% Store the original parameter set
+par_origin = par;
 
-% Store initial mobility of intrinsic layer- note all mobilities will be
-% set to this value during the equilibration procedure.
-sn_l = par.sn_l;
-sn_r = par.sn_r;
-sp_l = par.sp_l;
-sp_r = par.sp_r;
-
-BC = par.BC;
-
-%% Start with low interfacial recombination coefficients
+% Start with zero SRH recombination
 par.SRHset = 0;
 
 % Raditative recombination could also be set to low values initially if required. 
@@ -41,7 +33,6 @@ par.Vapp = 0;
 par.Int = 0;
 par.pulseon = 0; 
 par.OC = 0;
-par.BC = BC;
 par.tmesh_type = 2;
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e4;
@@ -66,23 +57,16 @@ disp('Complete')
 % Switch on mobilities
 par.mobset = 1;
 
-par.sn_l = p_original.sn_l;
-par.sn_r = p_original.sn_r;
-par.sp_l = p_original.sp_l;
-par.sp_r = p_original.sp_r;
+par.sn_l = par_origin.sn_l;
+par.sn_r = par_origin.sn_r;
+par.sp_l = par_origin.sp_l;
+par.sp_r = par_origin.sp_r;
 
-par.figson = 1;
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e3;
 
 %% Soluition with mobility switched on
 disp('Solution with mobility switched on')
-sol = df(sol, par);
-
-% switch to desired mobilities
-par.mue = p_original.mue;          % electron mobility
-par.muh = p_original.muh;      % hole mobility
-
 sol = df(sol, par);
 
 par.tmax = 1e-3;
@@ -110,23 +94,16 @@ end
 
 disp('Switching on series resistance')
 
-par.Rs = p_original.Rs;  
+par.Rs = par_origin.Rs;  
 par.tmax = 1e-6;
 par.t0 = 1e-12;
 
-sol = df(sol, par);
-
-soleq.eq = sol;
-
+soleq.eq = df(sol, par);
 disp('Complete')
 
 disp('Switching on interfacial recombination')
-par.taun = p_original.taun;
-par.taup = p_original.taup;
 par.SRHset = 1;
-par.dev = pc.builddev(par);
 
-par.calcJ = 0;
 par.tmax = 1e-6;
 par.t0 = par.tmax/1e3;
 
@@ -135,20 +112,19 @@ disp('Complete')
 
 %% Equilibrium solutions with ion mobility switched on
 
-% Start with low recombination coefficients
+% Start without SRH or series resistance
 par.SRHset = 0;
 par.Rs = 0;
 
 disp('Closed circuit equilibrium with ions')
 
 par.mobseti = 1e4;           % Ions are accelerated to reach equilibrium
-par.OC = 0;
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e3; 
 
 sol = df(soleq.eq, par);
 
-% Much longer second step to ensure that ions have migrated
+% Longer second solution
 par.calcJ = 0;
 par.tmax = 1e-2;
 par.t0 = par.tmax/1e3;
@@ -174,7 +150,7 @@ end
 
 disp('Switching on series resistance')
 
-par.Rs = p_original.Rs;  
+par.Rs = par_origin.Rs;  
 par.tmax = 1e-6;
 par.t0 = 1e-12;
 
@@ -187,11 +163,8 @@ soleq.i.par.mobseti = 1;
 disp('Ion equilibrium solution complete')
 
 %% Ion equilibrium with surface recombination
-disp('Switching on surface recombination')
-par.taun = p_original.taun;
-par.taup = p_original.taup;
+disp('Switching on SRH recombination')
 par.SRHset = 1;
-par.dev = pc.builddev(par);
 
 par.calcJ = 0;
 par.tmax = 1e-6;
