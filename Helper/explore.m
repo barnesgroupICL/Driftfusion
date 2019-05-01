@@ -51,14 +51,14 @@ classdef explore
                     % JV = doJV(soleq.i_sr, 50e-3, 100, 1, 1e-10, 0, 1.5, 2);
                     JV = doJV(soleq.eq_sr, 50e-3, 100, 1, 0, 0, 1.3, 2);
                     
-                    Voc_f(j) = JV.stats.Voc_f;
-                    Voc_r(j) = JV.stats.Voc_r;
-                    Jsc_f(j) = JV.stats.Jsc_f;
-                    Jsc_r(j) = JV.stats.Jsc_r;
-                    mpp_f(j) = JV.stats.mpp_f;
-                    mpp_r(j) = JV.stats.mpp_r;
-                    FF_f(j) = JV.stats.FF_f;
-                    FF_r(j) = JV.stats.FF_r;
+                    Voc_f(j) = dfana.JVstats.Voc_f;
+                    Voc_r(j) = dfana.JVstats.Voc_r;
+                    Jsc_f(j) = dfana.JVstats.Jsc_f;
+                    Jsc_r(j) = dfana.JVstats.Jsc_r;
+                    mpp_f(j) = dfana.JVstats.mpp_f;
+                    mpp_r(j) = dfana.JVstats.mpp_r;
+                    FF_f(j) = dfana.JVstats.FF_f;
+                    FF_r(j) = dfana.JVstats.FF_r;
                     
                     % For PL
                     %                     [sol_Voc, Voc] = findVoc(soleq.i_sr, 1e-6, Voc_f(j), (Voc_f(j)+0.1))
