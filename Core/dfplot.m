@@ -235,6 +235,22 @@ classdef dfplot
             hold off
         end
         
+        function Voct(sol)
+            Voc = dfana.Voct(sol);
+            figure(6)
+            plot(sol.t, Voc)
+            xlabel('Time [s]')
+            ylabel('Voc [V]')   
+        end
+        
+        function PLt(sol)
+            PL = dfana.PLt(sol);
+            figure(7)
+            plot(sol.t, PL)
+            xlabel('Time [s]')
+            ylabel('PL [cm-5]')   
+        end
+        
         % multiplot 1
         function mp1(varargin)
             
