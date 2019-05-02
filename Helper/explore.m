@@ -106,19 +106,19 @@ classdef explore
                 F(i,:) = mpp_r;
                 G(i,:) = FF_f;
                 H(i,:) = FF_r;
-                J(:,:,i) = Voc_stable;
-                K(:,:,i) = PLint;
-                AA(:,:,i) = Vapp_f;
-                BB(:,:,i) = J_f;
-                CC(:,:,i) = Vapp_r;
-                DD(:,:,i) = J_r;
+                J(i,:,:) = Voc_stable;
+                K(i,:,:) = PLint;
+                AA(i,:,:) = Vapp_f;
+                BB(i,:,:) = J_f;
+                CC(i,:,:) = Vapp_r;
+                DD(i,:,:) = J_r;
                 EE(i,:) = n_av;
                 FF(i,:) = p_av;
-                GG(:,:,i) = n_f;
-                HH(:,:,i) = p_f;
-                II(:,:,i) = a_f;
-                JJ(:,:,i) = V_f;
-                KK(:,:,i) = x;
+                GG(i,:,:) = n_f;
+                HH(i,:,:) = p_f;
+                II(i,:,:) = a_f;
+                JJ(i,:,:) = V_f;
+                KK(i,:,:) = x;
             end
             
             % Store solutions in output struct
@@ -300,7 +300,46 @@ classdef explore
             hold off
         end
         
+        function plotEL(parexsol)
+            % plots final energy level diagrams
+            figure(3011)
+            for i=1:length(parval1)
+                for j = 1:length(parval2)
+                    % Rebuild solutions
+                    sol.u(1,:,1) = parexsol.nf(i, j, :);
+                    sol.u(1,:,2) = parexsol.pf(i, j, :);
+                    sol.u(1,:,3) = parexsol.af(i, j, :);
+                    sol.u(1,:,4) = parexsol.Vf(i, j, :);
+                    sol.t = 0;
+                    sol.x = parexsol.x(i,j,:);
+                    sol.par = parexsol.par_base;
+                                    
+                end
+            end
+        end
         
+         function plotprof_2D(parexsol, yproperty, logy)
+            eval(['y = parexsol.', yproperty,';']);
+            % plots final charge densities
+            figure(3012)
+            for i=1:length(parexsol.parval1)
+                for j = 1:length(parexsol.parval2)
+                    % Rebuild solutions
+                    if logy
+                    semilogy(parexsol.x(j, :, i).*1e7, y(j, :, i));
+                    else
+                    plot(parexsol.x(j, :, i).*1e7, y(j, :, i));
+                    end
+                    hold on                             
+                end
+            end
+            hold off
+            xlabel('Position')
+            ylabel(yproperty)
+     
+        end       
+        
+                    
         function plotVocstable(parexsol)
             
             offset = parexsol.parval2-parexsol.par_base.IP(1);
