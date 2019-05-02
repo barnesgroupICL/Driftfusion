@@ -148,39 +148,110 @@ classdef explore
             
         end
         
-        function plotVoc(parexsol)
-            
-            offset = parexsol.parval2-parexsol.par_base.IP(1);
+        function plotVoc(parexsol, xlogon, ylogon, zlogon)
             
             figure(3001)
-            surf(offset, parexsol.parval1, parexsol.stats.Voc_f)
+            surf(parexsol.parval2, parexsol.parval1+60e-7, parexsol.stats.Voc_f)
             s1 = gca;
             %ylabel('Ion density [cm-3]')
-            ylabel('p-type SRH time constant [s]')
-            xlabel('\Phi_A')%/p-type VB-Fermi level offset [eV]')
+            ylabel(parexsol.parnames{1,1})
+            xlabel(parexsol.parnames{1,2})
             zlabel('Voc F scan [V]')
-            xlim([offset(1), offset(end)]);
-            ylim([parexsol.parval1(1), parexsol.parval1(end)])
-            set(s1,'YScale','log');
+            xlim([parexsol.parval2(1), parexsol.parval2(end)]);
+            ylim([parexsol.parval1(1)+60e-7, parexsol.parval1(end)+60e-7])
+            
+            %caxis([0.75, 0.95])
+            if xlogon
+                set(s1,'XScale','log');
+            else
+                set(s1,'XScale','linear');
+            end
+            if ylogon
+                set(s1,'YScale','log');
+            else
+                set(s1,'YScale','linear');
+            end
+            zlabel('taurise [s]')
             shading interp
             colorbar
-            %caxis([0.75, 0.95])
+            cb = colorbar();
+            if zlogon
+                cb.Ruler.Scale = 'log';
+                cb.Ruler.MinorTick = 'on';
+            end
             
             figure(3002)
-            surf(offset, parexsol.parval1, parexsol.stats.Voc_r)
+            surf(parexsol.parval2, parexsol.parval1+60e-7, parexsol.stats.Voc_r)
             s1 = gca;
             %ylabel('Ion density [cm-3]')
-            ylabel('p-type SRH time constant [s]')
-            xlabel('p-type VB-Fermi level offset [eV]')
+            ylabel(parexsol.parnames{1,1})
+            xlabel(parexsol.parnames{1,2})
             zlabel('Voc R scan [V]')
-            xlim([offset(1), offset(end)]);
-            ylim([parexsol.parval1(1), parexsol.parval1(end)])
+            xlim([parexsol.parval2(1), parexsol.parval2(end)]);
+            ylim([parexsol.parval1(1)+60e-7, parexsol.parval1(end)+60e-7])
             set(s1,'YScale','log');
             shading interp
             colorbar
             %caxis([0.75, 0.95])
+            if xlogon
+                set(s1,'XScale','log');
+            else
+                set(s1,'XScale','linear');
+            end
+            if ylogon
+                set(s1,'YScale','log');
+            else
+                set(s1,'YScale','linear');
+            end
+            zlabel('taurise [s]')
+            shading interp
+            colorbar
+            cb = colorbar();
+            if zlogon
+                cb.Ruler.Scale = 'log';
+                cb.Ruler.MinorTick = 'on';
+            end
             
         end
+        
+        function plotstat_2D_parval1(parexsol, yproperty)
+            % YPROPERTY is string with the property name. Properties must
+            % be one of those contained in the PAREXSOL.STATS structure      
+            eval(['y = parexsol.stats.', yproperty])  
+            for i=1:length(parexsol.parval1)
+                figure(3010)
+                semilogx(parexsol.parval2, y(i,:))
+                hold on
+            end
+           xlabel(parexsol.parnames{1,2})
+           ylabel(yproperty)
+           legstr = (num2str((parexsol.parval1'+60e-7)*1e7));
+           legend(legstr)
+           %xlim([min(parexsol.parval2), max(parexsol.parval2)])
+           xlim([1e-3, 10])
+           hold off
+        end
+                
+        function plotstat_2D_parval2(parexsol, yproperty)
+            % YPROPERTY is string with the property name. Properties must
+            % be one of those contained in the PAREXSOL.STATS structure      
+            eval(['y = parexsol.stats.', yproperty])
+            x = (parexsol.parval1'+ 60e-7)*1e7;
+            for i=1:length(parexsol.parval2)
+                figure(3010)
+                plot(x, y(:,i))
+                hold on
+            end
+           %xlabel(parexsol.parnames{1,1})
+           xlabel('Active layer thickness [nm]')
+           ylabel(yproperty)
+           legstr = (num2str(parexsol.parval2'));
+           legend(legstr)
+           xlim([min(x), max(x)])
+           
+           hold off
+        end
+        
         
         function plotVocstable(parexsol)
             
