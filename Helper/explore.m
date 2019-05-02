@@ -26,12 +26,15 @@ classdef explore
                 par = par_base;
                 par.Ana = 0;
                 par = explore.helper(par, str1, parval1(i));
-                %                par.taup(1) = par.taun(1);
                 
                 if strmatch('dcell(1,4)', parnames(1)) ~= 0
                     pcontact = round(parval1(i)*1e7);
                     par.pcell(1,4) = pcontact*1;
                 end
+                
+                % Rebuild device
+                par.xx = pc.xmeshini(par);
+                par.dev = pc.builddev(par);
                 
                 Voc_f = zeros(1, length(parval2));
                 Voc_r = zeros(1, length(parval2));
@@ -41,17 +44,20 @@ classdef explore
                 mpp_r = zeros(1, length(parval2));
                 FF_f = zeros(1, length(parval2));
                 FF_r = zeros(1, length(parval2));
-                Voc_stable = zeros(1, length(parval2));
-                PLint = zeros(1, length(parval2));
+                n_av = zeros(1, length(parval2));
+                p_av = zeros(1, length(parval2));
+                n_f = zeros(length(parval2), 2000);   % final electron profile of stabilised sol
+                p_f = zeros(length(parval2), 2000);
+                a_f = zeros(length(parval2), 2000);
+                V_f = zeros(length(parval2), 2000);
+                x = zeros(length(parval2), 2000);
+                Voc_stable = zeros(length(parval2), JVpnts);
+                PLint = zeros(length(parval2), JVpnts);
                 Vapp_f = zeros(1, JVpnts);
                 J_f = zeros(length(parval2), JVpnts);
                 Vapp_r = zeros(1, JVpnts);
                 J_r = zeros(length(parval2), JVpnts);
-                
-                % Rebuild device
-                par.xx = pc.xmeshini(par);
-                par.dev = pc.builddev(par);
-                
+
                 soleq = equilibrate(par);
                 
                 for j = 1:length(parval2)
@@ -78,12 +84,18 @@ classdef explore
                     FF_f(j) = stats.FF_f;
                     FF_r(j) = stats.FF_r;
                     
+                    sol_ill = lighton(soleq.ion, parval2(j), 10, 1, 1e6, JVpnts)
+                    
                     % For PL
-                    %                     [sol_Voc, Voc] = findVoc(soleq.i_sr, 1e-6, Voc_f(j), (Voc_f(j)+0.1))
-                    %                     Voc_stable(j) = Voc;
-                    %                     PLint(j) = sol_Voc.PLint(end);
-                    figure(4)
-                    hold on
+                    Voc_stable(j,:) = dfana.Voct(sol_ill);
+                    PLint(j,:) = dfana.PLt(sol_ill);
+                    n_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),1));
+                    p_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),2));
+                    n_f = explore.writevar(n_f, j, par.xx, sol_ill.u(end,:,1));
+                    p_f = explore.writevar(p_f, j, par.xx, sol_ill.u(end,:,2));
+                    a_f = explore.writevar(a_f, j, par.xx, sol_ill.u(end,:,3));
+                    V_f = explore.writevar(V_f, j, par.xx, sol_ill.u(end,:,4));
+                    x = explore.writevar(x, j, par.xx, sol_ill.x);
                 end
                 
                 A(i,:) = Voc_f;
@@ -94,15 +106,22 @@ classdef explore
                 F(i,:) = mpp_r;
                 G(i,:) = FF_f;
                 H(i,:) = FF_r;
-                %                 J(i,:) = Voc_stable;
-                %                 K(i,:) = PLint;
+                J(:,:,i) = Voc_stable;
+                K(:,:,i) = PLint;
                 AA(:,:,i) = Vapp_f;
                 BB(:,:,i) = J_f;
                 CC(:,:,i) = Vapp_r;
                 DD(:,:,i) = J_r;
-                
+                EE(i,:) = n_av;
+                FF(i,:) = p_av;
+                GG(:,:,i) = n_f;
+                HH(:,:,i) = p_f;
+                II(:,:,i) = a_f;
+                JJ(:,:,i) = V_f;
+                KK(:,:,i) = x;
             end
             
+            % Store solutions in output struct
             parexsol.stats.Voc_f = A;
             parexsol.stats.Voc_r = B;
             parexsol.stats.Jsc_f = C;
@@ -115,18 +134,31 @@ classdef explore
             parexsol.J_f = BB;
             parexsol.Vapp_f = CC;
             parexsol.J_f = DD;
-            %             parexsol.stats.Voc_stable = J;
-            %             parexsol.stats.PLint = K;
+            parexsol.stats.Voc_stable = J;
+            parexsol.stats.PLint = K;
             parexsol.parnames = parnames;
             parexsol.parvalues = parvalues;
             parexsol.parval1 = parval1;
             parexsol.parval2 = parval2;
             parexsol.par_base = par_base;
+            parexsol.stats.n_av = EE;
+            parexsol.stats.p_av = FF;
+            parexsol.n_f = GG;
+            parexsol.p_f = HH;
+            parexsol.a_f = II;
+            parexsol.V_f = JJ;
+            parexsol.x = KK;
             
+            save('ws_explore.mat')  % Save workspace
             toc
             
-            figure(4)
-            hold on
+        end
+        
+        function var = writevar(var, j, xx, arr)
+        % EXPLORE.WRITEVAR writes array ARR to variable VAR using variable length
+        % assignment, which is not usually allowed in PARFOR loops. This
+        % allows the solution with different length vectors to be stored.
+            var(j,1:length(xx)) = arr;
         end
         
         function par = helper(par, parname, parvalue)
@@ -214,42 +246,58 @@ classdef explore
             
         end
         
-        function plotstat_2D_parval1(parexsol, yproperty)
+        function plotstat_2D_parval1(parexsol, yproperty, logx, logy)
             % YPROPERTY is string with the property name. Properties must
-            % be one of those contained in the PAREXSOL.STATS structure      
-            eval(['y = parexsol.stats.', yproperty])  
+            % be one of those contained in the PAREXSOL.STATS structure
+            eval(['y = parexsol.stats.', yproperty])
             for i=1:length(parexsol.parval1)
                 figure(3010)
-                semilogx(parexsol.parval2, y(i,:))
+                if logx == 0 && logy == 0
+                    plot(parexsol.parval2, y(i,:))
+                elseif logx == 1 && logy == 0
+                    semilogx(parexsol.parval2, y(i,:))
+                elseif logx == 0 && logy == 1
+                    semilogy(parexsol.parval2, y(i,:))
+                elseif logx == 1 && logy == 1
+                    loglog(parexsol.parval2, y(i,:))
+                end
                 hold on
             end
-           xlabel(parexsol.parnames{1,2})
-           ylabel(yproperty)
-           legstr = (num2str((parexsol.parval1'+60e-7)*1e7));
-           legend(legstr)
-           %xlim([min(parexsol.parval2), max(parexsol.parval2)])
-           xlim([1e-3, 10])
-           hold off
+            xlabel(parexsol.parnames{1,2})
+            ylabel(yproperty)
+            legstr = (num2str((parexsol.parval1'+60e-7)*1e7));
+            legend(legstr)
+            %xlim([min(parexsol.parval2), max(parexsol.parval2)])
+            xlim([1e-3, 10])
+            hold off
         end
-                
-        function plotstat_2D_parval2(parexsol, yproperty)
+        
+        function plotstat_2D_parval2(parexsol, yproperty, logx, logy)
             % YPROPERTY is string with the property name. Properties must
-            % be one of those contained in the PAREXSOL.STATS structure      
+            % be one of those contained in the PAREXSOL.STATS structure
             eval(['y = parexsol.stats.', yproperty])
             x = (parexsol.parval1'+ 60e-7)*1e7;
             for i=1:length(parexsol.parval2)
                 figure(3010)
-                plot(x, y(:,i))
+                if logx == 0 && logy == 0
+                    plot(x, y(:,i))
+                elseif logx == 1 && logy == 0
+                    semilogx(x, y(:,i))
+                elseif logx == 0 && logy == 1
+                    semilogy(x, y(:,i))
+                elseif logx == 1 && logy == 1
+                    loglog(x, y(:,i))
+                end
                 hold on
             end
-           %xlabel(parexsol.parnames{1,1})
-           xlabel('Active layer thickness [nm]')
-           ylabel(yproperty)
-           legstr = (num2str(parexsol.parval2'));
-           legend(legstr)
-           xlim([min(x), max(x)])
-           
-           hold off
+            %xlabel(parexsol.parnames{1,1})
+            xlabel('Active layer thickness [nm]')
+            ylabel(yproperty)
+            legstr = (num2str(parexsol.parval2'));
+            legend(legstr)
+            xlim([min(x), max(x)])
+            
+            hold off
         end
         
         
