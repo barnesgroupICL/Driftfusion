@@ -231,147 +231,158 @@ classdef dfana
                 end
             end
             
-                if par.stats == 'Boltz'
-                    Dn_mat = mue_mat*par.kB*par.T;
-                    Dp_mat = muh_mat*par.kB*par.T;
-                end
-                
-                    % Particle currents
-                    Jdd.ndiff = -Dn_mat.*(dnlocdx-((nloc./Nc_mat).*gradNc_mat)).*-par.e;
-                    Jdd.ndrift = mue_mat.*nloc.*(-dVdx+gradEA_mat)*par.e;
-                    
-                    Jdd.pdiff = -Dp_mat.*(dplocdx-((ploc./Nv_mat).*gradNv_mat)).*par.e;
-                    Jdd.pdrift = muh_mat.*ploc.*(-dVdx+gradIP_mat)*par.e;
-                    
-                    Jdd.adiff = -dev.muion*par.kB*par.T.*dalocdx*par.e;
-                    Jdd.adrift = -dev.muion.*aloc.*dVdx*par.e;
-                    
+            if par.stats == 'Boltz'
+                Dn_mat = mue_mat*par.kB*par.T;
+                Dp_mat = muh_mat*par.kB*par.T;
             end
             
-            function [FV, Frho] = calcF(sol)
-                % Electric field caculation
-                % FV = Field calculated from the gradient of the potential
-                % Frho = Field calculated from integrated space charge density
-                [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
-                rho = dfana.calcrho(sol);
-                eppmat = repmat(dev.epp, length(t), 1);
-                
-                for i=1:length(t)
-                    FV(i,:) = -gradient(V(i, :), x);                      % Electric field calculated from V
-                end
-                
-                Frho = cumtrapz(x, rho./(eppmat.*par.epp0), 2) + FV(:,1);
-                
-            end
+            % Particle currents
+            Jdd.ndiff = -Dn_mat.*(dnlocdx-((nloc./Nc_mat).*gradNc_mat)).*-par.e;
+            Jdd.ndrift = mue_mat.*nloc.*(-dVdx+gradEA_mat)*par.e;
             
-            function rho = calcrho(sol)
-                % Calculates the space charge density
-                [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
-                
-                NAmat = repmat(dev.NA, length(t), 1);
-                NDmat = repmat(dev.ND, length(t), 1);
-                Nionmat = repmat(dev.Nion, length(t), 1);
-                
-                % charge density
-                rho = -n + p + a -NAmat + NDmat - Nionmat;
-            end
+            Jdd.pdiff = -Dp_mat.*(dplocdx-((ploc./Nv_mat).*gradNv_mat)).*par.e;
+            Jdd.pdrift = muh_mat.*ploc.*(-dVdx+gradIP_mat)*par.e;
             
-            
-            function Vapp = calcVapp(sol, option)
-                par = sol.par;
-                t = sol.t;
-                % This is temporary, Vapp should be stored with the solution in
-                % future updates
-                
-                if option == 1
-                    Vapp = par.Vstart + ((par.Vend-par.Vstart)*t*(1/par.tmax));
-                elseif option == 2
-                    Vapp = par.Vapp_func(par.Vapp_params, t);
-                else
-                    [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
-                    Vapp = Efn(:, end) - Efp(:, 1);
-                end
-                
-            end
-            
-            function stats = JVstats(JV)
-                % A function to pull statistics from a JV sweep using DOJV
-                % JV - a solution from DOJV
-                
-                if isfield(JV, 'ill')
-                    if isfield(JV.ill, 'f')
-                        try
-                            p1 = find(JV.ill.f.Vapp >= 0);
-                            p1 = p1(1);
-                            stats.Jsc_f = JV.ill.f.J.tot(p1, end);
-                        catch
-                            warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
-                            stats.Jsc_f = 0;
-                        end
-                        
-                        try
-                            p2 = find(JV.ill.f.J.tot(:, end) >= 0);
-                            p2 = p2(1);
-                            stats.Voc_f = JV.ill.f.Vapp(p2);
-                        catch
-                            warning('No Voc available- try increasing applied voltage range')
-                            stats.Voc_f = 0;
-                        end
-                        
-                        if stats.Jsc_f ~= 0 && stats.Voc_f ~= 0
-                            pow_f = JV.ill.f.J.tot(:,end).*JV.ill.f.Vapp';
-                            stats.mpp_f = min(pow_f);
-                            stats.FF_f = stats.mpp_f/(stats.Jsc_f*stats.Voc_f);
-                        end
-                        
-                    else
-                        stats.Jsc_f = nan;
-                        stats.Voc_f = nan;
-                        stats.mpp_f = nan;
-                        stats.FF_f = nan;
-                    end
-                    
-                    if isfield(JV.ill, 'r')
-                        try
-                            p1 = find(JV.ill.r.Vapp <= 0);
-                            p1 = p1(1);
-                            stats.Jsc_r = JV.ill.r.J.tot(p1, end);
-                        catch
-                            warning('No Jsc available- Vapp must pass through 0')
-                            stats.Jsc_r = 0;
-                        end
-                        
-                        try
-                            p2 = find(JV.ill.r.J.tot(:, end) <= 0);
-                            p2 = p2(1);
-                            stats.Voc_r = JV.ill.r.Vapp(p2);
-                            
-                        catch
-                            warning('No Voc available- try increasing applied voltage range')
-                            stats.Voc_r = 0;
-                            
-                        end
-                        
-                        if stats.Jsc_r ~= 0 && stats.Voc_r ~= 0
-                            pow_r = JV.ill.r.J.tot(:,end).*JV.ill.r.Vapp';
-                            stats.mpp_r = min(pow_r);
-                            stats.FF_r = stats.mpp_r/(stats.Jsc_r*stats.Voc_r);
-                        end
-                        
-                    else
-                        stats.Jsc_r = nan;
-                        stats.Voc_r = nan;
-                        stats.mpp_r = nan;
-                        stats.FF_r = nan;
-                    end
-                else
-                    
-                    
-                end
-                
-            end
-            
+            Jdd.adiff = -dev.muion*par.kB*par.T.*dalocdx*par.e;
+            Jdd.adrift = -dev.muion.*aloc.*dVdx*par.e;
             
         end
         
+        function [FV, Frho] = calcF(sol)
+            % Electric field caculation
+            % FV = Field calculated from the gradient of the potential
+            % Frho = Field calculated from integrated space charge density
+            [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
+            rho = dfana.calcrho(sol);
+            eppmat = repmat(dev.epp, length(t), 1);
+            
+            for i=1:length(t)
+                FV(i,:) = -gradient(V(i, :), x);                      % Electric field calculated from V
+            end
+            
+            Frho = cumtrapz(x, rho./(eppmat.*par.epp0), 2) + FV(:,1);
+            
+        end
+        
+        function rho = calcrho(sol)
+            % Calculates the space charge density
+            [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
+            
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            Nionmat = repmat(dev.Nion, length(t), 1);
+            
+            % charge density
+            rho = -n + p + a -NAmat + NDmat - Nionmat;
+        end
+        
+        
+        function Vapp = calcVapp(sol, option)
+            par = sol.par;
+            t = sol.t;
+            % This is temporary, Vapp should be stored with the solution in
+            % future updates
+            
+            if option == 1
+                Vapp = par.Vstart + ((par.Vend-par.Vstart)*t*(1/par.tmax));
+            elseif option == 2
+                Vapp = par.Vapp_func(par.Vapp_params, t);
+            else
+                [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+                Vapp = Efn(:, end) - Efp(:, 1);
+            end
+            
+        end
+        
+        function stats = JVstats(JV)
+            % A function to pull statistics from a JV sweep using DOJV
+            % JV - a solution from DOJV
+            
+            if isfield(JV, 'ill')
+                if isfield(JV.ill, 'f')
+                    try
+                        p1 = find(JV.ill.f.Vapp >= 0);
+                        p1 = p1(1);
+                        stats.Jsc_f = JV.ill.f.J.tot(p1, end);
+                    catch
+                        warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
+                        stats.Jsc_f = 0;
+                    end
+                    
+                    try
+                        p2 = find(JV.ill.f.J.tot(:, end) >= 0);
+                        p2 = p2(1);
+                        stats.Voc_f = JV.ill.f.Vapp(p2);
+                    catch
+                        warning('No Voc available- try increasing applied voltage range')
+                        stats.Voc_f = 0;
+                    end
+                    
+                    if stats.Jsc_f ~= 0 && stats.Voc_f ~= 0
+                        pow_f = JV.ill.f.J.tot(:,end).*JV.ill.f.Vapp';
+                        stats.mpp_f = min(pow_f);
+                        stats.FF_f = stats.mpp_f/(stats.Jsc_f*stats.Voc_f);
+                    end
+                    
+                else
+                    stats.Jsc_f = nan;
+                    stats.Voc_f = nan;
+                    stats.mpp_f = nan;
+                    stats.FF_f = nan;
+                end
+                
+                if isfield(JV.ill, 'r')
+                    try
+                        p1 = find(JV.ill.r.Vapp <= 0);
+                        p1 = p1(1);
+                        stats.Jsc_r = JV.ill.r.J.tot(p1, end);
+                    catch
+                        warning('No Jsc available- Vapp must pass through 0')
+                        stats.Jsc_r = 0;
+                    end
+                    
+                    try
+                        p2 = find(JV.ill.r.J.tot(:, end) <= 0);
+                        p2 = p2(1);
+                        stats.Voc_r = JV.ill.r.Vapp(p2);
+                        
+                    catch
+                        warning('No Voc available- try increasing applied voltage range')
+                        stats.Voc_r = 0;
+                        
+                    end
+                    
+                    if stats.Jsc_r ~= 0 && stats.Voc_r ~= 0
+                        pow_r = JV.ill.r.J.tot(:,end).*JV.ill.r.Vapp';
+                        stats.mpp_r = min(pow_r);
+                        stats.FF_r = stats.mpp_r/(stats.Jsc_r*stats.Voc_r);
+                    end
+                    
+                else
+                    stats.Jsc_r = nan;
+                    stats.Voc_r = nan;
+                    stats.mpp_r = nan;
+                    stats.FF_r = nan;
+                end
+            else
+                
+                
+            end
+            
+        end
+        
+        function value = PLt(sol)
+            [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
+            value = trapz(x,(n.*p),2);
+        end
+        
+        function value = Voct(sol)
+            %Get QFLs
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            value = Efn(:, end) - Efp(:, 1);
+        end
+        
+        
     end
+    
+end
