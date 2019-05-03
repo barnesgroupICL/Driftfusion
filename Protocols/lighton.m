@@ -1,5 +1,6 @@
 function sol_ill = lighton(sol_ini, Int, stab_time, mobseti, Rs, pnts)
 
+disp(['Starting LIGHTON, Intensity = ', num2str(Int), ' Rs = ', num2str(Rs)])
 par = sol_ini.par;
 par_origin = par;
 
@@ -11,8 +12,10 @@ par.JV = 0;
 par.mobseti = 0;
 par.Rs = Rs;
 
+disp('Switching on series resistance')
 sol_Rs = df(sol_ini, par);
 
+disp('Switching on illumination')
 par.Int = Int;
 
 par.mobseti = mobseti;
@@ -44,5 +47,7 @@ sol_ill = sol;
 sol_ill.par.mobseti = par_origin.mobseti;
 
 dfplot.ELx(sol_ill);
+
+disp('LIGHTON complete')
 
 end

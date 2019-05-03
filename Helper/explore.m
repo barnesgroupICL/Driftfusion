@@ -57,7 +57,7 @@ classdef explore
                 J_f = zeros(length(parval2), JVpnts);
                 Vapp_r = zeros(1, JVpnts);
                 J_r = zeros(length(parval2), JVpnts);
-
+                
                 soleq = equilibrate(par);
                 
                 for j = 1:length(parval2)
@@ -84,7 +84,7 @@ classdef explore
                     FF_f(j) = stats.FF_f;
                     FF_r(j) = stats.FF_r;
                     
-                    sol_ill = lighton(soleq.ion, parval2(j), 10, 1, 1e6, JVpnts)
+                    sol_ill = lighton(soleq.ion, parval2(j), 1, 10, 1e6, JVpnts)
                     
                     % For PL
                     Voc_stable(j,:) = dfana.Voct(sol_ill);
@@ -149,15 +149,14 @@ classdef explore
             parexsol.V_f = JJ;
             parexsol.x = KK;
             
-            save('ws_explore.mat')  % Save workspace
             toc
             
         end
         
         function var = writevar(var, j, xx, arr)
-        % EXPLORE.WRITEVAR writes array ARR to variable VAR using variable length
-        % assignment, which is not usually allowed in PARFOR loops. This
-        % allows the solution with different length vectors to be stored.
+            % EXPLORE.WRITEVAR writes array ARR to variable VAR using variable length
+            % assignment, which is not usually allowed in PARFOR loops. This
+            % allows the solution with different length vectors to be stored.
             var(j,1:length(xx)) = arr;
         end
         
@@ -313,33 +312,41 @@ classdef explore
                     sol.t = 0;
                     sol.x = parexsol.x(i,j,:);
                     sol.par = parexsol.par_base;
-                                    
+                    
                 end
             end
         end
         
-         function plotprof_2D(parexsol, yproperty, logy)
+        function plotprof_2D(parexsol, yproperty, par1logical, par2logical,logx,logy)
             eval(['y = parexsol.', yproperty,';']);
             % plots final charge densities
             figure(3012)
             for i=1:length(parexsol.parval1)
-                for j = 1:length(parexsol.parval2)
-                    % Rebuild solutions
-                    if logy
-                    semilogy(parexsol.x(j, :, i).*1e7, y(j, :, i));
-                    else
-                    plot(parexsol.x(j, :, i).*1e7, y(j, :, i));
+                if par1logical(i) == 1
+                    for j = 1:length(parexsol.parval2)
+                        if par2logical(i) == 1
+                            % Rebuild solutions
+                            if logx
+                                semilogx(squeeze(parexsol.x(i, j, :).*1e7), squeeze(y(i, j, :)));
+                            elseif logy
+                                semilogy(squeeze(parexsol.x(i, j, :).*1e7), squeeze(y(i, j, :)));
+                            elseif logx ==1 && logy ==1
+                                loglog(squeeze(parexsol.x(i, j, :).*1e7), squeeze(y(i, j, :)));
+                            else
+                                plot(squeeze(parexsol.x(i, j, :).*1e7), squeeze(y(i, j, :)));
+                            end
+                            hold on
+                        end
                     end
-                    hold on                             
                 end
             end
             hold off
             xlabel('Position')
             ylabel(yproperty)
-     
-        end       
+            
+        end
         
-                    
+        
         function plotVocstable(parexsol)
             
             offset = parexsol.parval2-parexsol.par_base.IP(1);
