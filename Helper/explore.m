@@ -320,11 +320,23 @@ classdef explore
         function plotprof_2D(parexsol, yproperty, par1logical, par2logical,logx,logy)
             eval(['y = parexsol.', yproperty,';']);
             % plots final charge densities
+            if length(par1logical) > length(parexsol.parval1)
+                par1logical = par1logical(1:length(parexsol.parval1));
+            end
+            
+            if length(par2logical) > length(parexsol.parval2)
+                par2logical = par2logical(1:length(parexsol.parval2));
+            end
+            
+            % Replace zeros with NaNs
+            y(y==0) = NaN;
+            parexsol.x(parexsol.x==0) = NaN;
+            
             figure(3012)
             for i=1:length(parexsol.parval1)
                 if par1logical(i) == 1
                     for j = 1:length(parexsol.parval2)
-                        if par2logical(i) == 1
+                        if par2logical(j) == 1
                             % Rebuild solutions
                             if logx
                                 semilogx(squeeze(parexsol.x(i, j, :).*1e7), squeeze(y(i, j, :)));
@@ -341,7 +353,7 @@ classdef explore
                 end
             end
             hold off
-            xlabel('Position')
+            xlabel('Position [nm]')
             ylabel(yproperty)
             
         end
