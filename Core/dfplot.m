@@ -39,9 +39,6 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
             
-            % calc static background ion matrix
-            Nionmat = repmat(par.dev.Nion, length(t), 1);
-            
             xnm = x*1e7;    % x in nm for plotting
             
             for i = 1:length(tarr)
@@ -62,9 +59,8 @@ classdef dfplot
                 
                 % Ionic space charge density
                 PH3 = subplot(3,1,3);
-                plot(xnm, a(p1,:)-Nionmat, 'black');
-                hold on
-                
+                plot(xnm, a(p1,:)-par.dev.Nion, 'black');
+                hold on 
             end
             
             figure(1)
@@ -79,7 +75,7 @@ classdef dfplot
             hold off
             
             subplot(3,1,2);
-            ylabel('{\itn, p} [cm^{-3}]')
+            ylabel('Carrier density [cm-3]')
             legend('\itn', '\itp')
             xlabel('Position [nm]')
             xlim([xrange(1), xrange(2)]);
@@ -89,7 +85,7 @@ classdef dfplot
             hold off
             
             subplot(3,1,3);
-            ylabel('{\it\rho a} [cm^{-3}]');
+            ylabel('Mobile ionic charge density [cm-3]');
             xlabel('Position [nm]');
             xlim([xrange(1), xrange(2)]);
             set(legend,'FontSize',12);
