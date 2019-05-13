@@ -24,7 +24,7 @@ par.tpoints = 200;
 
 sol = df(jump1.dk.f, par);
 
-all_stable = verifyStabilization(sol.sol, sol.t, 0.7);
+all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 % loop to check ions have reached stable config- if not accelerate ions by
 % order of mag
