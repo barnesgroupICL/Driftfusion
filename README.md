@@ -43,7 +43,7 @@ Inside soleq are 4 solutions. For perovskites you should generally use `soleq.i_
  
 8.	Try running a JV using:
  
-`JV = doJV(soleq.i_sr, 1e-2, 100, 1, 1, 0, 1.4, 3)`
+`JVsol = doJV(soleq.ion, 1e-2, 100, 1, 1, 0, 1.4, 3)`
  
 The various input arguments are discussed in the comments of each code. At any time you can plot the JV using `dfplot.JV(JVsol,3)`.
 Try using doJV as a model for writing functions of your own.
