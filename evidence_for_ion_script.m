@@ -16,7 +16,7 @@ soleq.bc = equilibrate(par.bc);
 % JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 JV.bc_0V_to_m1V = doJV(soleq.bc.ion, 1e-6, 40, 1, 0, 0, -1, 1);
 % Scan from -1.0 V to 1.4 V dark and light
-JV.bc_m1V_to_1p2V = doJV(soleq.bc.ion, 40e-3, 200, 1, 1, -1, 1.2, 3);
+JV.bc_m1V_to_1p2V = doJV(JV.bc_0V_to_m1V.dk.f, 40e-3, 200, 1, 1, -1, 1.2, 3);
 
 
 %% Top cathode device
@@ -24,6 +24,6 @@ JV.bc_m1V_to_1p2V = doJV(soleq.bc.ion, 40e-3, 200, 1, 1, -1, 1.2, 3);
 soleq.tc = equilibrate(par.tc);
 % Scan to -1.0 V with ion mobility off- dark only to get starting condition
 % for the JV
-%JV.tc_0V_to_m1V = doJV(soleq.tc.ion, 1e-6, 100, 1, 40, 0, -1, 1);
+JV.tc_0V_to_m1V = doJV(soleq.tc.ion, 1e-6, 40, 1, 0, 0, -1, 1);
 % Scan from -1.0 V to 1.4 V dark and light
-JV.tc_m1V_to_1p2V = doJV(soleq.tc.ion, 40e-3, 200, 1, 1, 0, 1.2, 3);
+JV.tc_m1V_to_1p2V = doJV(JV.tc_0V_to_m1V.dk.f, 40e-3, 200, 1, 1, -1, 1.2, 3);
