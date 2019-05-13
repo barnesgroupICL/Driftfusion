@@ -69,22 +69,23 @@ classdef explore
                     
                     % Variable 2 will be light intensity
                     JV = doJV(soleq.ion, 50e-3, JVpnts, parval2(j), 1, 0, 1.3, 2);
-                    stats = dfana.JVstats(JV);
+                    %stats = dfana.JVstats(JV);
                     
                     Vapp_f(j,:) = JV.ill.f.Vapp;
                     J_f(j,:) =  JV.ill.f.J.tot(:,end);
                     Vapp_r(j,:) = JV.ill.r.Vapp;
                     J_r(j,:) = JV.ill.r.J.tot(:,end);
-                    Voc_f(j) = stats.Voc_f;
-                    Voc_r(j) = stats.Voc_r;
-                    Jsc_f(j) = stats.Jsc_f;
-                    Jsc_r(j) = stats.Jsc_r;
-                    mpp_f(j) = stats.mpp_f;
-                    mpp_r(j) = stats.mpp_r;
-                    FF_f(j) = stats.FF_f;
-                    FF_r(j) = stats.FF_r;
+%                     Voc_f(j) = stats.Voc_f;
+%                     Voc_r(j) = stats.Voc_r;
+%                     Jsc_f(j) = stats.Jsc_f;
+%                     Jsc_r(j) = stats.Jsc_r;
+%                     mpp_f(j) = stats.mpp_f;
+%                     mpp_r(j) = stats.mpp_r;
+%                     FF_f(j) = stats.FF_f;
+%                     FF_r(j) = stats.FF_r;
                     
-                    sol_ill = lighton(soleq.ion, parval2(j), 1, 10, 1e6, JVpnts)
+                    %sol_ill = lighton(soleq.ion, parval2(j), 1, 10, 1e6, JVpnts);
+                    sol_ill = lighton(soleq.ion, parval2(j), 1, 1e-6, 0, JVpnts);
                     
                     % For PL
                     Voc_stable(j,:) = dfana.Voct(sol_ill);
@@ -132,8 +133,8 @@ classdef explore
             parexsol.stats.FF_r = H;
             parexsol.Vapp_f = AA;
             parexsol.J_f = BB;
-            parexsol.Vapp_f = CC;
-            parexsol.J_f = DD;
+            parexsol.Vapp_r = CC;
+            parexsol.J_r = DD;
             parexsol.stats.Voc_stable = J;
             parexsol.stats.PLint = K;
             parexsol.parnames = parnames;
@@ -274,20 +275,34 @@ classdef explore
         function plotstat_2D_parval2(parexsol, yproperty, logx, logy)
             % YPROPERTY is string with the property name. Properties must
             % be one of those contained in the PAREXSOL.STATS structure
-            eval(['y = parexsol.stats.', yproperty])
+            
+            figure(3010)
+            
+            eval(['y = parexsol.stats.', yproperty,';'])
+            
+            if strmatch('Voc_stable', yproperty) ==1
+               y = y(:,:,end); 
+            end
+            
+            if strmatch('Jsc_r', yproperty) ==1
+               y = -y;
+            end
+            
             x = (parexsol.parval1'+ 60e-7)*1e7;
+            
             for i=1:length(parexsol.parval2)
-                figure(3010)
-                if logx == 0 && logy == 0
-                    plot(x, y(:,i))
-                elseif logx == 1 && logy == 0
-                    semilogx(x, y(:,i))
-                elseif logx == 0 && logy == 1
-                    semilogy(x, y(:,i))
-                elseif logx == 1 && logy == 1
-                    loglog(x, y(:,i))
-                end
-                hold on
+                            % Rebuild solutions
+                            if logx == 0 && logy == 0
+                                plot(x, y(:,i))
+                            elseif logx == 1 && logy == 0
+                                semilogx(x, y(:,i))
+                            elseif logx == 0 && logy == 1
+                                semilogy(x, y(:,i))
+                            elseif logx == 1 && logy == 1
+                                loglog(x, y(:,i))
+                            end
+                            hold on
+                
             end
             %xlabel(parexsol.parnames{1,1})
             xlabel('Active layer thickness [nm]')
@@ -319,7 +334,6 @@ classdef explore
         
         function plotprof_2D(parexsol, yproperty, par1logical, par2logical,logx,logy)
             eval(['y = parexsol.', yproperty,';']);
-            % plots final charge densities
             if length(par1logical) > length(parexsol.parval1)
                 par1logical = par1logical(1:length(parexsol.parval1));
             end
@@ -331,6 +345,10 @@ classdef explore
             % Replace zeros with NaNs
             y(y==0) = NaN;
             parexsol.x(parexsol.x==0) = NaN;
+            
+            if strmatch(yproperty,'a_f')
+                y = y-parexsol.par_base.Nion(1);
+            end
             
             figure(3012)
             for i=1:length(parexsol.parval1)
@@ -358,6 +376,198 @@ classdef explore
             
         end
         
+        function plotU(parexsol, par1logical, par2logical,logx,logy)
+            
+            if length(par1logical) > length(parexsol.parval1)
+                par1logical = par1logical(1:length(parexsol.parval1));
+            end
+            
+            if length(par2logical) > length(parexsol.parval2)
+                par2logical = par2logical(1:length(parexsol.parval2));
+            end
+            
+            UHTL = zeros(length(par1logical),length(par2logical));
+            UHTLint = zeros(length(par1logical),length(par2logical));
+            Ubulk = zeros(length(par1logical),length(par2logical));
+            UETLint = zeros(length(par1logical),length(par2logical));
+            UETL = zeros(length(par1logical),length(par2logical));
+            Utotal = zeros(length(par1logical),length(par2logical));
+            
+            figure(3013)
+            par = parexsol.par_base;
+            
+            for i=1:length(parexsol.parval1)
+                if par1logical(i) == 1
+                    for j = 1:length(parexsol.parval2)
+                        if par2logical(j) == 1
+                            % Rebuild solutions
+                            par = explore.helper(par, parexsol.parnames{1,1}, parexsol.parval1(i));
+                            
+                            if strmatch('dcell(1,4)', parexsol.parnames(1)) ~= 0
+                                pcontact = round(parexsol.parval1(i)*1e7);
+                                par.pcell(1,4) = pcontact*1;
+                            end
+                            
+                            % Rebuild device
+                            par.xx = pc.xmeshini(par);
+                            par.dev = pc.builddev(par);
+                            
+                            dev = par.dev;
+                            
+                            n = squeeze(parexsol.n_f(i,j,:));
+                            p = squeeze(parexsol.p_f(i,j,:));
+                            n=n';
+                            p=p';
+                            n = n(1:length(dev.krad));
+                            p = p(1:length(dev.krad));
+                            
+                            % Recombination
+                            Ubtb = dev.krad.*(n.*p - dev.ni.^2);
+                            
+                            Usrh = ((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
+                            
+                            U = Ubtb + Usrh;
+                            
+                            xplot = squeeze(parexsol.x(i, j, :).*1e7);
+                            xplot = xplot(1:length(dev.krad));
+                            
+                            UHTL(i,j) = trapz(xplot(par.pcum0(1):par.pcum0(2)), U(par.pcum0(1):par.pcum0(2))); 
+                            UHTLint(i,j) = trapz(xplot(par.pcum(1):par.pcum(2)), U(par.pcum(1):par.pcum(2)));                            UHTLint(i,j) = trapz(xplot(par.pcum(1):par.pcum(2)), U(par.pcum(1):par.pcum(2)));
+                            Ubulk(i,j) = trapz(xplot(par.pcum(2):par.pcum(5)), U(par.pcum(2):par.pcum(5)));
+                            UETLint(i,j) = trapz(xplot(par.pcum(5):par.pcum(6)), U(par.pcum(5):par.pcum(6)));
+                            UETL(i,j) = trapz(xplot(par.pcum(6):par.pcum(7)), U(par.pcum(6):par.pcum(7)));
+                            Utotal(i,j) = trapz(xplot, U);
+                            
+                            if logx
+                                semilogx(xplot, U);
+                            elseif logy
+                                semilogy(xplot, U);
+                            elseif logx ==1 && logy ==1
+                                loglog(xplot, U);
+                            else
+                                plot(xplot, U);
+                            end
+                            hold on
+                        end
+                    end
+                end
+                
+            end
+            
+            figure(3013)
+            xlabel('Position [nm]')
+            ylabel('U [cm-3s-1]')
+            hold off
+            
+            for j=1:length(parexsol.parval2)
+                if par2logical(j) == 1
+                    figure(3014)
+                    plot(parexsol.parval1*1e7, UHTL(:,j),...
+                        parexsol.parval1*1e7, UHTLint(:,j),...
+                        parexsol.parval1*1e7, Ubulk(:,j),...
+                        parexsol.parval1*1e7, UETLint(:,j),...
+                        parexsol.parval1*1e7, UETL(:,j),...
+                        parexsol.parval1*1e7, Utotal(:,j));
+                    %hold on
+                end
+            end
+            xlabel('Active layer thickness [nm]')
+            ylabel('Recombination rate [cm-3s-1]')
+            legend('HTL', 'HTL interface', 'Bulk perovskite', 'ETL interface', 'ETL','Total device')
+            hold off
+            
+        end
+        
+        
+        function plotCE(solex_Voc, solex_eq,logx,logy)
+            % plotting function for plotting carrier densities as a
+            % function of Voc
+            
+            % SOLEX_VOC = EXPLORE open circuit solutions
+            % SOLEX_EQ = EXPLORE equilibrium solutions
+            % The carrier densities at equilibrium are subtracted from
+            % those at Voc to obtain the 'extracted' electronic carrier
+            % densities
+            % This version requires that the equilibrium solutions are
+            % found using a separate run of EXPLORE.EXPLORE2PAR with only a
+            % single J element
+                
+            par = solex_Voc.par_base;
+            
+            for i=1:length(solex_Voc.parval1)   % d_active
+                    for j = 1:length(solex_Voc.parval2) % Light intensity
+                            % Rebuild solutions
+                            par = explore.helper(par, solex_Voc.parnames{1,1}, solex_Voc.parval1(i));
+                            
+                            if strmatch('dcell(1,4)', solex_Voc.parnames(1)) ~= 0
+                                pcontact = round(solex_Voc.parval1(i)*1e7);
+                                par.pcell(1,4) = pcontact*1;
+                            end
+                            
+                            % Rebuild device
+                            par.xx = pc.xmeshini(par);
+                            par.dev = pc.builddev(par);
+                            
+                            dev = par.dev;
+                            
+                            n_Voc = squeeze(solex_Voc.n_f(i,j,:))';
+                            p_Voc = squeeze(solex_Voc.p_f(i,j,:))';
+                            n_eq = squeeze(solex_eq.n_f(i,:));
+                            p_eq = squeeze(solex_eq.n_f(i,:));
+                            
+                            n_CEx(i,:) = n_Voc - n_eq;
+                            p_CEx(i,:) = p_Voc - n_eq;
+
+                            n_CE(i,j) = trapz(par.xx(1:length(dev.krad), n_CEx(1:length(dev.krad))));
+                            p_CE(i,j) = trapz(par.xx(1:length(dev.krad), p_CEx(1:length(dev.krad))));
+                            
+                    end
+            end
+            
+            figure(3014)
+            hold on
+            for i = 1:length(solex_Voc.parval1)
+                semilogy(solex_Voc.parval2, n_CE(i,:)) 
+            end
+            hold off
+            xlabel('Light intensity [Suns]')
+            ylabel('integrated electron density [cm-2]')
+            hold off
+            
+            
+            
+        end
+        
+        
+        
+        function plotJV(parexsol, par1logical, par2logical)
+            
+            figure(3015)
+            
+            if length(par1logical) > length(parexsol.parval1)
+                par1logical = par1logical(1:length(parexsol.parval1));
+            end
+            
+            if length(par2logical) > length(parexsol.parval2)
+                par2logical = par2logical(1:length(parexsol.parval2));
+            end
+            
+            for i=1:length(parexsol.parval1)
+                if par1logical(i) == 1
+                    for j = 1:length(parexsol.parval2)
+                        if par2logical(j) == 1
+                            plot(squeeze(parexsol.Vapp_f(i,j,:)), -squeeze(parexsol.J_f(i,j,:)))
+                            hold on
+                        end
+                    end
+                end
+            end
+            xlabel('Applied Voltage [V]')
+            ylabel('Current density [Acm-2]')
+            ylim([-10e-3, 30e-3])
+            xlim([0,1.1])
+            hold off
+        end
         
         function plotVocstable(parexsol)
             
