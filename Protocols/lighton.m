@@ -1,4 +1,6 @@
 function sol_ill = lighton(sol_ini, Int, stab_time, mobseti, Rs, pnts)
+% A function to switch the light on and record the transient state with a
+% series resistance Rs
 
 disp(['Starting LIGHTON, Intensity = ', num2str(Int), ' Rs = ', num2str(Rs)])
 par = sol_ini.par;
