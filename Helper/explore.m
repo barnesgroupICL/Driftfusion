@@ -18,7 +18,8 @@ classdef explore
             parval2 = cell2mat(parvalues(2));
             str1 = char(parnames(1));
             str2 = char(parnames(2));
-
+           
+            
             j = 1;
             parfor i = 1:length(parval1)
                 
@@ -50,7 +51,8 @@ classdef explore
                 FF_r = zeros(1, length(parval2));
                 n_av = zeros(1, length(parval2));
                 p_av = zeros(1, length(parval2));
-                n_f = zeros(length(parval2), 2000);   % final electron profile of stabilised sol
+                % Stabilised profiles
+                n_f = zeros(length(parval2), 2000);
                 p_f = zeros(length(parval2), 2000);
                 a_f = zeros(length(parval2), 2000);
                 V_f = zeros(length(parval2), 2000);
@@ -61,7 +63,8 @@ classdef explore
                 J_f = zeros(length(parval2), JVpnts);
                 Vapp_r = zeros(1, JVpnts);
                 J_r = zeros(length(parval2), JVpnts);
-
+                error_temp = 
+                
                 soleq = equilibrate(par);
 
                 for j = 1:length(parval2)
@@ -135,9 +138,10 @@ classdef explore
                 JJ(i,:,:) = V_f;
                 KK(i,:,:) = x;
                 
+                errorlog(i, j) = 0;
                 catch
                    warning(['Run no. ', num2str(runN), ', ', str1 ,' = ', num2str(parval1(i)), ' , ',str2,' = ', num2str(parval2(j)), ' failed']);
-                    
+                   errorlog(i, j) = 1; 
                 end
             end
 
@@ -168,7 +172,8 @@ classdef explore
             parexsol.a_f = II;
             parexsol.V_f = JJ;
             parexsol.x = KK;
-
+            parexsol.errorlog = errorlog;
+            
             toc
 
         end
