@@ -3,14 +3,13 @@ classdef explore
     methods (Static)
 
         function parexsol = explore2par(par_base, parnames, parvalues, JVpnts)
-            % EXPLOREPAR is used to explore 2 different parameters using a parallel pool.
+            % EXPLORE2PAR is used to explore 2 different parameters using the parallel computing toolbox.
             % The code is likely to require modification for individual parameters
             % owing to possible dependencies.
             % PAR_BASE is the base parameter set
             % PARNAMES is a cell array with the parameter names in - check these
             % carefully to avoid heartache later
             % PARVALUES is matrix with the parameter value ranges e.g.
-
             tic
             disp('Starting parameter exploration');
             disp(['Parameter 1: ', parnames(1)]);
@@ -22,14 +21,19 @@ classdef explore
 
             j = 1;
             parfor i = 1:length(parval1)
-
+                
+                try
                 par = par_base;
                 par.Ana = 0;
                 par = explore.helper(par, str1, parval1(i));
-
-                if strmatch('dcell(1,4)', parnames(1)) ~= 0
-                    pcontact = round(parval1(i)*1e7);
-                    par.pcell(1,4) = pcontact*1;
+                
+                % If the parameter is 
+                if strmatch('dcell', parnames(1)) ~= 0
+                    % sets PCELL at the required position to provide a point
+                    % density of one point per nanometer
+                    layerpoints = round(parval1(i)*1e7);
+                    par = explore.helper(par, ['p', str1(2:end)], layerpoints);
+                    par.pcell(1,4) = layerpoints*1;
                 end
 
                 % Rebuild device
@@ -63,31 +67,41 @@ classdef explore
                 for j = 1:length(parval2)
 
                     runN = (i-1)*length(parval2) + j;
-                    disp(['Run no. ', num2str(runN), ', d_active = ', num2str(1e7*(parval1(i)+60e-7)), ' nm, Intensity = ', num2str(parval2(j))]);
+                    disp(['Run no. ', num2str(runN), ', ', str1 ,' = ', num2str(parval1(i)), ' , ',str2,' = ', num2str(parval2(j))]);
+                    
+                    % If the second parameter name is intensity then set
+                    % INT using PARVAL2 else set the appropriate
+                    % parameter to the required value in par and Int is
+                    % assumed to be 1
+                    if strmatch('Int', parnames(2)) == 1
+                        Int = parval2(j);
+                    else
+                        par = explore.helper(par, str2, parval2(j));
+                        Int = 1;
+                        % Rebuild device
+                        par.xx = pc.xmeshini(par);
+                        par.dev = pc.builddev(par);
+                    end
 
-                    %par = explore.helper(par, str2, parval2(j));
-
-                    % Variable 2 will be light intensity
-                    JV = doJV(soleq.ion, 50e-3, JVpnts, parval2(j), 1, 0, 1.3, 2);
-                    %stats = dfana.JVstats(JV);
+                    JV = doJV(soleq.ion, 50e-3, JVpnts, Int, 1, 0, 1.3, 2);
+                    stats = dfana.JVstats(JV);
 
                     Vapp_f(j,:) = JV.ill.f.Vapp;
                     J_f(j,:) =  JV.ill.f.J.tot(:,end);
                     Vapp_r(j,:) = JV.ill.r.Vapp;
                     J_r(j,:) = JV.ill.r.J.tot(:,end);
-%                     Voc_f(j) = stats.Voc_f;
-%                     Voc_r(j) = stats.Voc_r;
-%                     Jsc_f(j) = stats.Jsc_f;
-%                     Jsc_r(j) = stats.Jsc_r;
-%                     mpp_f(j) = stats.mpp_f;
-%                     mpp_r(j) = stats.mpp_r;
-%                     FF_f(j) = stats.FF_f;
-%                     FF_r(j) = stats.FF_r;
+                    Voc_f(j) = stats.Voc_f;
+                    Voc_r(j) = stats.Voc_r;
+                    Jsc_f(j) = stats.Jsc_f;
+                    Jsc_r(j) = stats.Jsc_r;
+                    mpp_f(j) = stats.mpp_f;
+                    mpp_r(j) = stats.mpp_r;
+                    FF_f(j) = stats.FF_f;
+                    FF_r(j) = stats.FF_r;
+                    
+                    % For steady-state solution
+                    sol_ill = lighton_Rs(soleq.ion, Int, 1, 1e-6, 0, JVpnts);
 
-                    %sol_ill = lighton(soleq.ion, parval2(j), 1, 10, 1e6, JVpnts);
-                    sol_ill = lighton(soleq.ion, parval2(j), 1, 1e-6, 0, JVpnts);
-
-                    % For PL
                     Voc_stable(j,:) = dfana.Voct(sol_ill);
                     PLint(j,:) = dfana.PLt(sol_ill);
                     n_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),1));
@@ -120,6 +134,11 @@ classdef explore
                 II(i,:,:) = a_f;
                 JJ(i,:,:) = V_f;
                 KK(i,:,:) = x;
+                
+                catch
+                   warning(['Run no. ', num2str(runN), ', ', str1 ,' = ', num2str(parval1(i)), ' , ',str2,' = ', num2str(parval2(j)), ' failed']);
+                    
+                end
             end
 
             % Store solutions in output struct
