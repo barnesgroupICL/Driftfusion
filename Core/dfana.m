@@ -1,8 +1,8 @@
 classdef dfana
     % Analysis class
-    
+
     methods (Static)
-        
+
         function [u,t,x,par,dev,n,p,a,V] = splitsol(sol)
             % splits solution into useful outputs
             u = sol.u;
@@ -10,19 +10,19 @@ classdef dfana
             x = sol.x;
             par = sol.par;
             dev = par.dev;
-            
+
             % split the solution into its component parts (e.g. electrons, holes and efield)
             n = u(:,:,1);
             p = u(:,:,2);
             a = u(:,:,3);
             V = u(:,:,4);
         end
-        
+
         function [Ecb, Evb, Efn, Efp] = QFLs(sol)
             % u is the solution structure
             % Simple structure names
             [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
-            
+
             % Create 2D matrices for multiplication with solutions
             EAmat = repmat(dev.EA, length(t), 1);
             IPmat = repmat(dev.IP, length(t), 1);
@@ -33,15 +33,15 @@ classdef dfana
             Nionmat = repmat(dev.Nion, length(t), 1);
             eppmat = repmat(dev.epp, length(t), 1);
             nimat = repmat(dev.ni, length(t), 1);
-            
+
             Ecb = EAmat-V;                                 % Conduction band potential
             Evb = IPmat-V;                                 % Valence band potential
-            
+
             Efn = zeros(size(n,1), size(n,2));
             Efp = zeros(size(n,1), size(n,2));
-            
+
             if par.stats == 'Fermi'
-                
+
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
                         Efn(i,j) = F.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
@@ -50,25 +50,25 @@ classdef dfana
                 end
                 Efn = Efn-V;
                 Efp = Efp-V;
-                
+
             elseif par.stats == 'Boltz'
                 Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./Ncmat));        % Electron quasi-Fermi level
                 Efp = real(Evb-(par.kB*par.T/par.q)*log(p./Nvmat));        % Hole quasi-Fermi level
             end
-            
+
         end
-        
+
         function [j, J] = calcJ(sol)
             % Current, J and flux, j calculation from continuity equations
-            
+
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
-            
+
             % Read in generation profil
             if par.OM == 1
                 gx = sol.gx;
             end
-            
+
             % Property matrices
             eppmat = repmat(dev.epp, length(t), 1);
             nimat = repmat(dev.ni, length(t), 1);
@@ -77,69 +77,69 @@ classdef dfana
             taupmat = repmat(dev.taup, length(t), 1);
             ntmat = repmat(dev.nt, length(t), 1);
             ptmat = repmat(dev.pt, length(t), 1);
-            
+
             for i = 1:size(n, 2)
                 dndt(:,i) = gradient(n(:,i), t);
                 dpdt(:,i) = gradient(p(:,i), t);
                 dadt(:,i) = gradient(a(:,i), t);
             end
-            
+
             dndtInt = trapz(x, dndt, 2);
             dpdtInt = trapz(x, dpdt, 2);
             dadtInt = trapz(x, dadt, 2);
             % Recombination
             Ubtb = kradmat.*(n.*p - nimat.^2);
-            
+
             Usrh = ((n.*p - nimat.^2)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
-            
+
             U = Ubtb + Usrh;
-            
+
             Usrhnogen = ((n.*p)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
-            
+
             % Uniform Generation
             switch par.OM
-                
+
                 % Uniform generation
                 case 0
-                    
+
                     g = par.Int*dev.G0;
-                    
+
                 case 1
-                    
+
                     gxAM15 = par.Int*repmat(gx.AM15', length(t), 1);
-                    
+
                     if par.pulseon == 1
-                        
+
                         las = repmat(gx.las', length(t), 1);
                         pulset = ones(length(x), length(t))*diag(t >= par.pulsestart & t < par.pulselen + par.pulsestart);
                         pulset = pulset';
                         gxlas = las.*pulset;
-                        
+
                     else
                         gxlas = 0;
-                        
+
                     end
-                    
+
                     g = gxAM15 + gxlas;
-                    
+
                 case 2
                     % Transfer Matrix
                     if par.Int == 0
-                        
+
                         g = 0;
-                        
+
                     else
-                        
+
                         g = par.Int*interp1(par.genspace, solstruct.Gx1S, (x-par.dcum(1)));
-                        
+
                     end
-                    
+
             end
-            
+
             djndx = -(dndt - g + U);    % Not certain about the sign here
             djpdx = -(dpdt - g + U);
             djadx = -dadt;
-            
+
             % Integrate across the device to get delta fluxes at all positions
             deltajn = cumtrapz(x, djndx, 2);
             deltajp = cumtrapz(x, djpdx, 2);
@@ -156,54 +156,54 @@ classdef dfana
                     % Setting jp_l = djpdx(end) ensures that jp_r = 0;
                     jn_l = 0;
                     jp_l = -deltajp(:, end);
-                    
+
                     jn_r = deltajn(:, end);
                     jp_r = 0;
-                    
+
                 case 2
-                    
+
                     jn_l = -par.sn_l*(n(:, 1) - par.nleft);
                     jp_l = -deltajp(:, end) + par.sp_r*(p(:, end) - par.pright);
-                    
+
                     jn_r = deltajn(:, end) - par.sn_l*(n(:, 1) - par.nleft);
                     jp_r = par.sp_r*(p(:, end) - par.pright);
-                    
+
                 case 3
-                    
+
                     jn_l = -par.sn_l*(n(:, 1) - par.nleft);
                     jp_l = -par.sp_l*(p(:, 1) - par.pleft);
-                    
+
                     jn_r = par.sn_r*(n(:, end) - par.nright);
                     jp_r = par.sp_r*(p(:, end) - par.pright);
-                    
+
             end
-            
+
             % Calculate total electron and hole currents from fluxes
             j.n = jn_l + deltajn;
             j.p = jp_l + deltajp;
             j.a = 0 + deltaja;
-            
+
             % displacement flux
             j.disp = zeros(length(t), length(x));
             [FV, Frho] = dfana.calcF(sol);
-            
+
             for i = 1:length(x)
                 j.disp(:,i) = par.epp0.*eppmat(:,i).*(gradient(Frho(:,i), t));
             end
-            
+
             J.n = -j.n*par.e;
             J.p = j.p*par.e;
             J.a = j.a*par.e;
             J.disp = j.disp*abs(par.e);
-            
+
             % Total current
             J.tot = J.n + J.p + J.a + J.disp;
         end
-        
+
         function Jdd = Jddxt(sol)
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
-            
+
             mue_mat = repmat(dev.mue, length(t), 1);
             muh_mat = repmat(dev.muh, length(t), 1);
             muion_mat = repmat(dev.muion, length(t), 1);
@@ -221,7 +221,7 @@ classdef dfana
                 [ploc(i,:),dplocdx(i,:)] = pdeval(0,x,p(i,:),x);
                 [aloc(i,:),dalocdx(i,:)] = pdeval(0,x,a(i,:),x);
                 [Vloc(i,:), dVdx(i,:)] = pdeval(0,x,V(i,:),x);
-                
+
                 % Diffusion coefficients
                 if par.stats == 'Fermi'
                     for jj = 1:length(x)
@@ -230,24 +230,24 @@ classdef dfana
                     end
                 end
             end
-            
+
             if par.stats == 'Boltz'
                 Dn_mat = mue_mat*par.kB*par.T;
                 Dp_mat = muh_mat*par.kB*par.T;
             end
-            
+
             % Particle currents
             Jdd.ndiff = -Dn_mat.*(dnlocdx-((nloc./Nc_mat).*gradNc_mat)).*-par.e;
             Jdd.ndrift = mue_mat.*nloc.*(-dVdx+gradEA_mat)*par.e;
-            
+
             Jdd.pdiff = -Dp_mat.*(dplocdx-((ploc./Nv_mat).*gradNv_mat)).*par.e;
             Jdd.pdrift = muh_mat.*ploc.*(-dVdx+gradIP_mat)*par.e;
-            
+
             Jdd.adiff = -dev.muion*par.kB*par.T.*dalocdx*par.e;
             Jdd.adrift = -dev.muion.*aloc.*dVdx*par.e;
-            
+
         end
-        
+
         function [FV, Frho] = calcF(sol)
             % Electric field caculation
             % FV = Field calculated from the gradient of the potential
@@ -255,34 +255,34 @@ classdef dfana
             [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
             rho = dfana.calcrho(sol);
             eppmat = repmat(dev.epp, length(t), 1);
-            
+
             for i=1:length(t)
                 FV(i,:) = -gradient(V(i, :), x);                      % Electric field calculated from V
             end
-            
+
             Frho = cumtrapz(x, rho./(eppmat.*par.epp0), 2) + FV(:,1);
-            
+
         end
-        
+
         function rho = calcrho(sol)
             % Calculates the space charge density
             [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
-            
+
             NAmat = repmat(dev.NA, length(t), 1);
             NDmat = repmat(dev.ND, length(t), 1);
             Nionmat = repmat(dev.Nion, length(t), 1);
-            
+
             % charge density
             rho = -n + p + a -NAmat + NDmat - Nionmat;
         end
-        
-        
+
+
         function Vapp = calcVapp(sol, option)
             par = sol.par;
             t = sol.t;
             % This is temporary, Vapp should be stored with the solution in
             % future updates
-            
+
             if option == 1
                 Vapp = par.Vstart + ((par.Vend-par.Vstart)*t*(1/par.tmax));
             elseif option == 2
@@ -291,13 +291,13 @@ classdef dfana
                 [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
                 Vapp = Efn(:, end) - Efp(:, 1);
             end
-            
+
         end
-        
+
         function stats = JVstats(JV)
             % A function to pull statistics from a JV sweep using DOJV
             % JV - a solution from DOJV
-            
+
             if isfield(JV, 'ill')
                 if isfield(JV.ill, 'f')
                     try
@@ -308,7 +308,7 @@ classdef dfana
                         warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
                         stats.Jsc_f = 0;
                     end
-                    
+
                     try
                         p2 = find(JV.ill.f.J.tot(:, end) >= 0);
                         p2 = p2(1);
@@ -317,20 +317,20 @@ classdef dfana
                         warning('No Voc available- try increasing applied voltage range')
                         stats.Voc_f = 0;
                     end
-                    
+
                     if stats.Jsc_f ~= 0 && stats.Voc_f ~= 0
                         pow_f = JV.ill.f.J.tot(:,end).*JV.ill.f.Vapp';
                         stats.mpp_f = min(pow_f);
                         stats.FF_f = stats.mpp_f/(stats.Jsc_f*stats.Voc_f);
                     end
-                    
+
                 else
                     stats.Jsc_f = nan;
                     stats.Voc_f = nan;
                     stats.mpp_f = nan;
                     stats.FF_f = nan;
                 end
-                
+
                 if isfield(JV.ill, 'r')
                     try
                         p1 = find(JV.ill.r.Vapp <= 0);
@@ -340,24 +340,24 @@ classdef dfana
                         warning('No Jsc available- Vapp must pass through 0')
                         stats.Jsc_r = 0;
                     end
-                    
+
                     try
                         p2 = find(JV.ill.r.J.tot(:, end) <= 0);
                         p2 = p2(1);
                         stats.Voc_r = JV.ill.r.Vapp(p2);
-                        
+
                     catch
                         warning('No Voc available- try increasing applied voltage range')
                         stats.Voc_r = 0;
-                        
+
                     end
-                    
+
                     if stats.Jsc_r ~= 0 && stats.Voc_r ~= 0
                         pow_r = JV.ill.r.J.tot(:,end).*JV.ill.r.Vapp';
                         stats.mpp_r = min(pow_r);
                         stats.FF_r = stats.mpp_r/(stats.Jsc_r*stats.Voc_r);
                     end
-                    
+
                 else
                     stats.Jsc_r = nan;
                     stats.Voc_r = nan;
@@ -365,20 +365,24 @@ classdef dfana
                     stats.FF_r = nan;
                 end
             else
-                
+
+
             end
-            
+
         end
-        
+
         function value = PLt(sol)
             [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
             value = trapz(x,(n.*p),2);
         end
-        
+
         function value = Voct(sol)
             %Get QFLs
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
             value = Efn(:, end) - Efp(:, 1);
         end
-    end   
+
+
+    end
+
 end
