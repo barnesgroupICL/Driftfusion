@@ -46,4 +46,6 @@ figure(4)
 hold off
 
 %% Open circuit voltage tranisents
-
+% lighton_Rs(sol_ini, Int, stab_time, mobseti, Rs, pnts)
+Voc_transient.bc = lighton_Rs(soleq.bc.ion, 1, 1, 1, 1e6, 400);
+Voc_transient.tc = lighton_Rs(soleq.tc.ion, 1, 1, 1, 1e6, 400);
