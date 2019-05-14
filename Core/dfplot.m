@@ -62,7 +62,7 @@ classdef dfplot
                 
                 % Ionic space charge density
                 PH3 = subplot(3,1,3);
-                plot(xnm, a(p1,:)-Nionmat(p1,:), 'black');
+                plot(xnm, a(p1,:)-Nionmat(p1,:));
                 hold on
                 
             end
