@@ -2,7 +2,7 @@
 % The results obtained here will be approximately the same as those
 % presented in Calado 2016. Note that there may be some differences in the
 % exact solutions owing to the difference in the methods used. Previously
-% the Current-Voltage scan was reproduced using a discretised step wise
+% the Current-Voltage scan was reproduced using a discretised step-wise
 % method (one solution per point) whereas here a single solution is used.
 % Similarly the open circuit voltage transients were obtained using a
 % symmetric model method previously while here a series resistance is
