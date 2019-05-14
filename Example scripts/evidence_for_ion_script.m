@@ -31,14 +31,14 @@ soleq.tc = equilibrate(par.tc);
 % for the JV: doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 % Slow scan with ion mobility set to 1 cm2V-1s-1 (by setting mobseti =
 % 1e10)- this ensure ions are in in equilibrium throughout scan
-JV.bc_0V_to_m1V = doJV(soleq.bc.ion, 1e-6, 40, 1, 1e10, 0, -1, 1);
+JV.bc_0V_to_m1V = doJV(soleq.bc.ion, 1e-6, 40, 0, 1e10, 0, -1, 1);
 % Scan from -1.0 V to 1.2 V dark and light
 JV.bc_m1V_to_1p2V = doJV(JV.bc_0V_to_m1V.dk.f, 40e-1, 200, 1, 1, -1, 1.2, 3);
 
 %% Top cathode device
 % Scan to -1.0 V with ion mobility off- dark only to get starting condition
 % for the JV
-JV.tc_0V_to_m1V = doJV(soleq.tc.ion, 1e-6, 40, 1, 1e10, 0, -1, 1);
+JV.tc_0V_to_m1V = doJV(soleq.tc.ion, 1e-6, 40, 0, 1e10, 0, -1, 1);
 % Scan from -1.0 V to 1.4 V dark and light
 JV.tc_m1V_to_1p2V = doJV(JV.tc_0V_to_m1V.dk.f, 40e-1, 200, 1, 1, -1, 1.2, 3);
 
