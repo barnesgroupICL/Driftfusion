@@ -297,7 +297,6 @@ classdef dfana
         function stats = JVstats(JV)
             % A function to pull statistics from a JV sweep using DOJV
             % JV - a solution from DOJV
-
             if isfield(JV, 'ill')
                 if isfield(JV.ill, 'f')
                     try
