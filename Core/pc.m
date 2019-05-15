@@ -3,8 +3,8 @@ classdef pc
     % PC (Parameters Class) defines all the required properties for your
     % device. PC.BUILDDEV builds a structure PO.DEV (where PO is a Parameters Object)
     % that defines the properties of the device at every spatial mesh point, including
-    % interfaces. Whenever PROPERTIES are overwritten, the device should
-    % be rebuilt using PC.BUILDDEV. The spatial mesh is a linear piece-wise mesh
+    % interfaces. Whenever PROPERTIES are overwritten in a protocol, the device should
+    % be rebuilt manually using PC.BUILDDEV. The spatial mesh is a linear piece-wise mesh
     % and is built by the MESHGEN_X function. Details of how to define the mesh
     % are given below in the SPATIAL MESH SUBSECTION.
     
