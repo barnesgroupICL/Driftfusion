@@ -89,6 +89,12 @@ For simulating a different set of parameters, specify the relative pinParams fil
 >> [~, ~, sol_i_eq_SR, ~, ssol_i_eq_SR, sol_i_1S_SR, ssol_i_1S_SR] = equilibrate_minimal(pinParams_10kxSRH_001xmajority)
 ```
 
+For plotting the free charges and ionic defect density profile and the energy levels you can use the `pinana` routine:
+
+``` matlab
+>> pinana(ssol_i_1S_SR)
+```
+
 Simulate impedance spectroscopy with oscillating voltage on a single solution with [ISwave_EA_single_exec](https://github.com/barnesgroupICL/Driftfusion/blob/2018-EIS/ISwave_EA_single_exec.m):
 
 ``` matlab
@@ -125,6 +131,36 @@ Simulate the impedance spectroscopy with oscillating voltage on a cell containin
 
 ``` matlab
 >> ISwave_oc = ISwave_full_exec(structs_oc, 1e9, 1e-2, 56, 2e-3, false, true, true)
+```
+
+For plotting the Bode plots of capacitance and impedance versus frequency of a previous EIS simulation:
+
+``` matlab
+>> IS_full_analysis_impedance(ISwave_oc)
+```
+
+For plotting the Bode plot of phase versus frequency of a previous EIS simulation:
+
+``` matlab
+>> ISwave_full_analysis_phase(ISwave_oc)
+```
+
+For plotting the Nyquist plot of a previous EIS simulation:
+
+``` matlab
+>> ISwave_full_analysis_nyquist(ISwave_oc)
+```
+
+To save the workspace to a file:
+
+``` matlab
+>> save('EIS_20190515')
+```
+
+To load the workspace from a file:
+
+``` matlab
+>> load('EIS_20190515')
 ```
 
 Complete documentation for each function is in the header of the relative file, which can be found [here](https://github.com/barnesgroupICL/Driftfusion/tree/2018-EIS).
