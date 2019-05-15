@@ -102,8 +102,8 @@ classdef dfplot
             [j, J] = dfana.calcJ(sol);
 
             figure(2);
-            plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.tot(:, pos));
-            legend('Jn', 'Jp', 'Ja', 'Jtotal')
+            plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.disp(:,pos), t, J.tot(:, pos));
+            legend('Jn', 'Jp', 'Ja', 'Jdisp', 'Jtotal')
             xlabel('time [s]');
             ylabel('J [A cm^{-2}]');
             set(legend,'FontSize',16);
