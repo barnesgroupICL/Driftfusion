@@ -59,7 +59,7 @@ classdef dfplot
 
                 % Ionic space charge density
                 PH3 = subplot(3,1,3);
-                plot(xnm, a(p1,:)-par.dev.Nion, 'black');
+                plot(xnm, a(p1,:)-par.dev.Nion);
                 hold on
             end
 
@@ -256,7 +256,20 @@ classdef dfplot
             xlabel('Time [s]')
             ylabel('Vapp [V]')
         end
-
+        
+        function JVapp(sol, pos)
+            [j, J] = dfana.calcJ(sol);
+            Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
+            figure(9)
+            plot(Vapp, J.n(:, pos),Vapp, J.p(:, pos),Vapp, J.a(:, pos),Vapp, J.disp(:,pos), Vapp, J.tot(:, pos));
+            legend('Jn', 'Jp', 'Ja', 'Jdisp', 'Jtotal')
+            xlabel('Vapp [V]');
+            ylabel('J [A cm^{-2}]');
+            set(legend,'FontSize',16);
+            set(legend,'EdgeColor',[1 1 1]);
+        end
+            
+            
         % multiplot 1
         function mp1(varargin)
 
