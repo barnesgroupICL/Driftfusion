@@ -3,13 +3,16 @@ classdef explore
     methods (Static)
         
         function exsol = explore2par(par_base, parnames, parvalues, JVpnts)
-            % EXPLORE2PAR is used to explore 2 different parameters using the 
-            % parallel computing toolbox. The code is likely to require 
+            % EXPLORE2PAR is used to explore 2 different parameters using the
+            % parallel computing toolbox. The code is likely to require
             % modification for individual parameters owing to variable dependencies.
             % PAR_BASE is the base parameter set
             % PARNAMES is a cell array with the parameter names in - check these
             % carefully to avoid heartache later
             % PARVALUES is matrix with the parameter value ranges e.g.
+            % Note: Changes in device dimensions, DCELL must be the FIRST
+            % of the two parameters in PARNAMES and associated values in
+            % PARVALUES
             tic
             disp('Starting parameter exploration');
             disp(['Parameter 1: ', parnames(1)]);
@@ -27,13 +30,12 @@ classdef explore
                 par.Ana = 0;
                 par = explore.helper(par, str1, parval1(i));
                 
-                % If the parameter is
                 if strmatch('dcell', parnames(1)) ~= 0
                     % sets PCELL at the required position to provide a point
-                    % density of one point per nanometer
+                    % density of one point per nanometer for changes in
+                    % thickness
                     layerpoints = round(parval1(i)*1e7);
                     par = explore.helper(par, ['p', str1(2:end)], layerpoints);
-                    par.pcell(1,4) = layerpoints*1;
                 end
                 
                 % Rebuild device
@@ -63,7 +65,7 @@ classdef explore
                 Vapp_r = zeros(1, JVpnts);
                 J_r = zeros(length(parval2), JVpnts);
                 errortemp = zeros(1,length(parval2));
-                                
+                
                 for j = 1:length(parval2)
                     try
                         runN = (i-1)*length(parval2) + j;
@@ -208,11 +210,11 @@ classdef explore
             set(s1,'YScale','log');
             zlabel('PL intensity [cm-2s-1]')
             shading interp
-            colorbar      
+            colorbar
         end
         
         function plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
-            % Plots a surface with a 
+            % Plots a surface with a
             try
                 eval(['y = exsol.stats.', yproperty, ';'])
             catch
@@ -244,7 +246,7 @@ classdef explore
             if zlogon
                 cb.Ruler.Scale = 'log';
                 cb.Ruler.MinorTick = 'on';
-            end   
+            end
         end
         
         function plotstat_2D_parval1(exsol, yproperty, logx, logy)
@@ -313,7 +315,7 @@ classdef explore
             hold off
         end
         
-        function plotEL(exsol)
+        function plotfinalELx(exsol)
             % plots final energy level diagrams
             figure(105)
             for i=1:length(parval1)
@@ -338,6 +340,7 @@ classdef explore
             % In this case YPROPERTY must be a three dimensional vector with
             % dimensions [length(parval1), length(parval2), length(x)]
             % contained within EXSOL
+            par = exsol.par_base;
             
             eval(['y = exsol.', yproperty,';']);
             if length(par1logical) > length(exsol.parval1)
@@ -356,9 +359,27 @@ classdef explore
                 y = y-exsol.par_base.Nion(1);
             end
             
+            parval1 = cell2mat(exsol.parvalues(1));
+            parval2 = cell2mat(exsol.parvalues(2));
+            str1 = char(exsol.parnames(1));
+            str2 = char(exsol.parnames(2));
+            
             figure(106)
             for i=1:length(exsol.parval1)
                 if par1logical(i) == 1
+                    
+                    if strmatch('dcell', str1) ~= 0
+                        % sets PCELL at the required position to provide a point
+                        % density of one point per nanometer for changes in
+                        % thickness
+                        layerpoints = round(parval1(i)*1e7);
+                        par = explore.helper(par, ['p', str1(2:end)], layerpoints);
+                    end
+                    
+                    % Rebuild device
+                    par.xx = pc.xmeshini(par);
+                    par.dev = pc.builddev(par);
+                    
                     for j = 1:length(exsol.parval2)
                         if par2logical(j) == 1
                             % Rebuild solutions
@@ -567,7 +588,7 @@ classdef explore
             ylim([-30e-3, 10e-3])
             hold off
         end
-
+        
     end
     
 end
