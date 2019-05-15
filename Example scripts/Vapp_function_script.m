@@ -1,4 +1,5 @@
-% Creates a single carrier device and then applies a 50 mV periodic potential
+% Creates a single carrier device and then applies a 20 mV periodic
+% potential for 2 cycles
 
 par.singlecar = pc('input_files/1 layer single carrier.csv');
 
@@ -7,7 +8,7 @@ soleq = equilibrate(par.singlecar);
 % tmax is the period (seconds)
 tmax = 10;
 Nperiods = 2;   % Number of periods
-coeff = [50e-3, Nperiods*(2*pi)/tmax,0];
+coeff = [20e-3, Nperiods*(2*pi)/tmax,0];
 Vapp_func = @(coeff, t) coeff(1)*sin(coeff(2)*t + coeff(3));
 
 % Vapp_function(sol_ini, Vapp_func, tmax, tpoints, logtime)
