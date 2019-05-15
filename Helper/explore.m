@@ -199,7 +199,7 @@ classdef explore
         function par = helper(par, parname, parvalue)
             % takes parameter set and sets parname to parvalue- workaround for parallel
             % computing loops
-            eval(['par.',parname,'=parvalue']);
+            eval(['par.',parname,'= parvalue;']);
         end
         
         function plotPL(exsol)
@@ -286,7 +286,7 @@ classdef explore
             end
             
             if strmatch('Jsc_r', yproperty) ==1
-                y = -y;
+                y = y;
             end
             
             x = (exsol.parval1'+ 60e-7)*1e7;
