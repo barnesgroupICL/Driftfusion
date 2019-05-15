@@ -94,13 +94,15 @@ classdef dfplot
 
         end
 
-        function Jt(sol)
+        function Jt(sol, pos)
             % Currents as a function of time
+            % POS = the readout position
+            
             t = sol.t;
             [j, J] = dfana.calcJ(sol);
 
             figure(2);
-            plot(t, J.n(:, end),t, J.p(:, end),t, J.a(:, end),t, J.tot(:, end));
+            plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.tot(:, pos));
             legend('Jn', 'Jp', 'Ja', 'Jtotal')
             xlabel('time [s]');
             ylabel('J [A cm^{-2}]');
@@ -245,6 +247,14 @@ classdef dfplot
             plot(sol.t, PL)
             xlabel('Time [s]')
             ylabel('PL [cm-5]')
+        end
+        
+        function Vappt(sol)
+            % Difference in potential between the left and right boundary
+            figure(8)
+            plot(sol.t, -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi));
+            xlabel('Time [s]')
+            ylabel('Vapp [V]')
         end
 
         % multiplot 1
