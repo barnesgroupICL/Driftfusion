@@ -68,8 +68,7 @@ classdef explore
                 
                 for j = 1:length(parval2)
                     try
-                        runN = (i-1)*length(parval2) + j;
-                        disp(['Run no. ', num2str(runN), ', ', str1 ,' = ', num2str(parval1(i)), ' , ',str2,' = ', num2str(parval2(j))]);
+                        disp(['Run no. ', num2str((i-1)*length(parval2) + j), ', ', str1 ,' = ', num2str(parval1(i)), ' , ',str2,' = ', num2str(parval2(j))]);
                         
                         % If the second parameter name is intensity then set
                         % INT using PARVAL2 else set the appropriate
@@ -126,7 +125,7 @@ classdef explore
                         x = explore.writevar(x, j, par.xx, sol_ill.x);
                         errortemp(j) = 0;
                     catch
-                        warning(['DRIFTFUSION FAILURE: Run no. ', num2str(runN), ', ', str1, '= ',num2str(parval1(i)), ', ', str2, '= ', num2str(parval2(j))]);
+                        warning(['DRIFTFUSION FAILURE: Run no. ', num2str((i-1)*length(parval2) + j), ', ', str1, '= ',num2str(parval1(i)), ', ', str2, '= ', num2str(parval2(j))]);
                         errortemp(j) = 1;
                     end
                 end
@@ -342,7 +341,7 @@ classdef explore
             % contained within EXSOL
             par = exsol.par_base;
             
-            eval(['y = exsol.', yproperty,';']);
+            eval(['y = exsol_Voc', yproperty,';']);
             if length(par1logical) > length(exsol.parval1)
                 par1logical = par1logical(1:length(exsol.parval1));
             end
@@ -506,12 +505,12 @@ classdef explore
         end
         
         
-        function plotCE(solex_Voc, solex_eq,logx,logy)
+        function plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
             % plotting function for plotting carrier densities as a
             % function of Voc
             
-            % SOLEX_VOC = EXPLORE open circuit solutions
-            % SOLEX_EQ = EXPLORE equilibrium solutions
+            % exsol_Voc = EXPLORE open circuit solutions
+            % exsol_eq = EXPLORE equilibrium solutions
             % The carrier densities at equilibrium are subtracted from
             % those at Voc to obtain the 'extracted' electronic carrier
             % densities
@@ -519,51 +518,126 @@ classdef explore
             % found using a separate run of EXPLORE.EXPLORE2PAR with only a
             % single J element
             
-            par = solex_Voc.par_base;
+            par = exsol_Voc.par_base;
+            parval1 = cell2mat(exsol_Voc.parvalues(1));
+            parval2 = cell2mat(exsol_Voc.parvalues(2));
+            str1 = char(exsol_Voc.parnames(1));
+            str2 = char(exsol_Voc.parnames(2));
             
-            for i=1:length(solex_Voc.parval1)   % d_active
-                for j = 1:length(solex_Voc.parval2) % Light intensity
-                    % Rebuild solutions
-                    par = explore.helper(par, solex_Voc.parnames{1,1}, solex_Voc.parval1(i));
+            n_CE = zeros(length(exsol_Voc.parval1), length(exsol_Voc.parval2));
+            p_CE = zeros(length(exsol_Voc.parval1), length(exsol_Voc.parval2));
+            
+            for i=1:length(exsol_Voc.parval1)   % d_active
+                % Rebuild solutions
+                par = explore.helper(par, exsol_Voc.parnames{1,1}, exsol_Voc.parval1(i));
+                
+                if strmatch('dcell', str1) ~= 0
+                    % sets PCELL at the required position to provide a point
+                    % density of one point per nanometer for changes in
+                    % thickness
+                    layerpoints = round(parval1(i)*1e7);
+                    par = explore.helper(par, ['p', str1(2:end)], layerpoints);
+                end
+                
+                % Rebuild device
+                par.xx = pc.xmeshini(par);
+                par.dev = pc.builddev(par);
+                x = par.xx;
+                dev = par.dev;
+                
+                n_CEx = zeros(1,length(par.xx));
+                p_CEx = zeros(1,length(par.xx));
+                
+                for j = 1:length(exsol_Voc.parval2) % Light intensity
+                        
+                    n_Voc = squeeze(exsol_Voc.n_f(i,j,1:length(par.xx)))';
+                    p_Voc = squeeze(exsol_Voc.p_f(i,j,1:length(par.xx)))';
+                    n_eq = squeeze(exsol_eq.n_f(i,1:length(par.xx)));
+                    p_eq = squeeze(exsol_eq.p_f(i,1:length(par.xx)));
                     
-                    if strmatch('dcell(1,4)', solex_Voc.parnames(1)) ~= 0
-                        pcontact = round(solex_Voc.parval1(i)*1e7);
-                        par.pcell(1,4) = pcontact*1;
-                    end
+                    n_CEx = n_Voc - n_eq;
+                    p_CEx = p_Voc - p_eq;
                     
-                    % Rebuild device
-                    par.xx = pc.xmeshini(par);
-                    par.dev = pc.builddev(par);
+                    n_CE(i,j) = trapz(par.xx, n_CEx);
+                    p_CE(i,j) = trapz(par.xx, p_CEx);
                     
-                    dev = par.dev;
-                    
-                    n_Voc = squeeze(solex_Voc.n_f(i,j,:))';
-                    p_Voc = squeeze(solex_Voc.p_f(i,j,:))';
-                    n_eq = squeeze(solex_eq.n_f(i,:));
-                    p_eq = squeeze(solex_eq.n_f(i,:));
-                    
-                    n_CEx(i,:) = n_Voc - n_eq;
-                    p_CEx(i,:) = p_Voc - n_eq;
-                    
-                    n_CE(i,j) = trapz(par.xx(1:length(dev.krad), n_CEx(1:length(dev.krad))));
-                    p_CE(i,j) = trapz(par.xx(1:length(dev.krad), p_CEx(1:length(dev.krad))));
-                    
+                    if normali
                 end
             end
             
             figure(109)
             hold on
-            for i = 1:length(solex_Voc.parval1)
-                semilogy(solex_Voc.parval2, n_CE(i,:))
+            for i = 1:length(exsol_Voc.parval1)
+                loglog(exsol_Voc.parval2, n_CE(i,:))
             end
             hold off
             xlabel('Light intensity [Suns]')
             ylabel('integrated electron density [cm-2]')
             hold off
+            
+            figure(110)
+            d_active = round(exsol_Voc.parval1*1e7)+60;
+            surf(exsol_Voc.parval2, d_active , n_CE)
+            s1 = gca;
+%             ylabel(exsol_Voc.parnames{1,1})
+%             xlabel(exsol_Voc.parnames{1,2})
+            xlabel('Light intensity [Sun]')
+            ylabel('Active layer thickness [nm]')
+            zlabel('integrated electron density [cm-2]')
+            xlim([exsol_Voc.parval2(1), exsol_Voc.parval2(end)])
+            ylim([d_active(1),d_active(end)])
+            
+            if xlogon
+                set(s1,'XScale','log');
+            else
+                set(s1,'XScale','linear');
+            end
+            if ylogon
+                set(s1,'YScale','log');
+            else
+                set(s1,'YScale','linear');
+            end
+            shading interp
+            colorbar
+            cb = colorbar();
+            if zlogon
+                cb.Ruler.Scale = 'log';
+                cb.Ruler.MinorTick = 'on';
+            end
+            
+            figure(111)
+            d_active = round(exsol_Voc.parval1*1e7)+60;
+            surf(exsol_Voc.parval2, d_active, p_CE)
+            s1 = gca;
+%             ylabel(exsol_Voc.parnames{1,1})
+%             xlabel(exsol_Voc.parnames{1,2})
+            xlabel('Light intensity [Sun]')
+            ylabel('Active layer thickness [nm]')
+            zlabel('integrated hole density [cm-2]')
+            xlim([exsol_Voc.parval2(1), exsol_Voc.parval2(end)])
+            ylim([d_active(1),d_active(end)])
+            
+            if xlogon
+                set(s1,'XScale','log');
+            else
+                set(s1,'XScale','linear');
+            end
+            if ylogon
+                set(s1,'YScale','log');
+            else
+                set(s1,'YScale','linear');
+            end
+            shading interp
+            colorbar
+            cb = colorbar();
+            if zlogon
+                cb.Ruler.Scale = 'log';
+                cb.Ruler.MinorTick = 'on';
+            end
         end
         
         function plotJV(exsol, par1logical, par2logical)
-            figure(110)
+            figure(112)
             
             if length(par1logical) > length(exsol.parval1)
                 par1logical = par1logical(1:length(exsol.parval1));
