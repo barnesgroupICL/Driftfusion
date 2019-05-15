@@ -2,7 +2,7 @@
 
 par.singlecar = pc('input_files/1 layer single carrier.csv');
 
-%soleq = equilibrate(par.singlecar);
+soleq = equilibrate(par.singlecar);
 
 % tmax is the period (seconds)
 tmax = 10;
@@ -17,3 +17,5 @@ sol_Vapp_func = Vapp_function(soleq.ion, Vapp_func, coeff, tmax, 200, 0);
 dfplot.Vappt(sol_Vapp_func)
 % Current at mid-point
 dfplot.Jt(sol_Vapp_func, round(par.singlecar.pcum(end)/2))
+% Energy level diagrams at t=0 and max amplitude
+dfplot.ELx(sol_Vapp_func, [0, tmax/(4*Nperiods)]);
