@@ -281,32 +281,36 @@ classdef dfana
             Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
         end
 
-        function stats = JVstats(JV)
+        function stats = JVstats(JVsol)
             % A function to pull statistics from a JV sweep using DOJV
-            % JV - a solution from DOJV
-            if isfield(JV, 'ill')
-                if isfield(JV.ill, 'f')
+            % JVsol - a solution from DOJV
+            if isfield(JVsol, 'ill')
+                if isfield(JVsol.ill, 'f')
+                    Vapp = dfana.Vappt(JVsol.ill.f);
+                    [j,J] = dfana.calcJ(JVsol.ill.f);
                     try
-                        p1 = find(JV.ill.f.Vapp >= 0);
+                        p1 = find(Vapp >= 0);
                         p1 = p1(1);
-                        stats.Jsc_f = JV.ill.f.J.tot(p1, end);
+                        stats.Jsc_f = J.tot(p1, end);
                     catch
                         warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
                         stats.Jsc_f = 0;
                     end
 
                     try
-                        p2 = find(JV.ill.f.J.tot(:, end) >= 0);
-                        p2 = p2(1);
-                        stats.Voc_f = JV.ill.f.Vapp(p2);
+                        p2 = find(J.tot(:, end) >= 0);
+                        p2 = p2(end);
+                        stats.Voc_f = Vapp(p2);
                     catch
                         warning('No Voc available- try increasing applied voltage range')
                         stats.Voc_f = 0;
                     end
 
                     if stats.Jsc_f ~= 0 && stats.Voc_f ~= 0
-                        pow_f = JV.ill.f.J.tot(:,end).*JV.ill.f.Vapp';
+                        pow_f = J.tot(:,end).*Vapp;
                         stats.mpp_f = min(pow_f);
+                        p3 = find(pow_f == stats.mpp_f);
+                        stats.mppV_f = Vapp(p3);
                         stats.FF_f = stats.mpp_f/(stats.Jsc_f*stats.Voc_f);
                     end
 
@@ -317,30 +321,32 @@ classdef dfana
                     stats.FF_f = nan;
                 end
 
-                if isfield(JV.ill, 'r')
+                if isfield(JVsol.ill, 'r')
+                    Vapp = dfana.Vappt(JVsol.ill.r);
+                    [j,J] = dfana.calcJ(JVsol.ill.r);
                     try
-                        p1 = find(JV.ill.r.Vapp <= 0);
-                        p1 = p1(1);
-                        stats.Jsc_r = JV.ill.r.J.tot(p1, end);
+                        p1 = find(Vapp <= 0);
+                        p1 = p1(end);
+                        stats.Jsc_r = J.tot(p1, end);
                     catch
-                        warning('No Jsc available- Vapp must pass through 0')
+                        warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
                         stats.Jsc_r = 0;
                     end
 
                     try
-                        p2 = find(JV.ill.r.J.tot(:, end) <= 0);
-                        p2 = p2(1);
-                        stats.Voc_r = JV.ill.r.Vapp(p2);
-
+                        p2 = find(J.tot(:, end) <= 0);
+                        p2 = p2(end);
+                        stats.Voc_r = Vapp(p2);
                     catch
                         warning('No Voc available- try increasing applied voltage range')
                         stats.Voc_r = 0;
-
                     end
 
                     if stats.Jsc_r ~= 0 && stats.Voc_r ~= 0
-                        pow_r = JV.ill.r.J.tot(:,end).*JV.ill.r.Vapp';
+                        pow_r = J.tot(:,end).*Vapp;
                         stats.mpp_r = min(pow_r);
+                        p3 = find(pow_r == stats.mpp_r);
+                        stats.mppV_r = Vapp(p3);
                         stats.FF_r = stats.mpp_r/(stats.Jsc_r*stats.Voc_r);
                     end
 
@@ -351,10 +357,7 @@ classdef dfana
                     stats.FF_r = nan;
                 end
             else
-
-
             end
-
         end
 
         function value = PLt(sol)
