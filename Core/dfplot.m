@@ -174,9 +174,9 @@ classdef dfplot
             if option == 2 || option == 3
 
                 [j, J.ill.f] = dfana.calcJ(JV.ill.f);
-                Vapp.ill.f = dfana.calcVapp(JV.ill.f, 1);
+                Vapp.ill.f = dfana.calcVapp(JV.ill.f);
                 [j, J.ill.r] = dfana.calcJ(JV.ill.r);
-                Vapp.ill.r = dfana.calcVapp(JV.ill.r, 1);
+                Vapp.ill.r = dfana.calcVapp(JV.ill.r);
 
                 figure(4)
                 plot(Vapp.ill.f, J.ill.f.tot(:,end),'--')%, 'Color', [0, 0.4470, 0.7410]);
@@ -185,7 +185,7 @@ classdef dfplot
             end
 
             figure(4)
-            ylim([-30e-3, 10e-3]);
+            %ylim([-30e-3, 10e-3]);
             xlabel('Applied voltage [V]')
             ylabel('Current density [Acm-2]');
             hold off

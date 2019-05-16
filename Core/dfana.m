@@ -277,21 +277,8 @@ classdef dfana
         end
 
 
-        function Vapp = calcVapp(sol, option)
-            par = sol.par;
-            t = sol.t;
-            % This is temporary, Vapp should be stored with the solution in
-            % future updates
-
-            if option == 1
-                Vapp = par.Vstart + ((par.Vend-par.Vstart)*t*(1/par.tmax));
-            elseif option == 2
-                Vapp = par.Vapp_func(par.Vapp_params, t);
-            else
-                [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
-                Vapp = Efn(:, end) - Efp(:, 1);
-            end
-
+        function Vapp = calcVapp(sol)
+            Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
         end
 
         function stats = JVstats(JV)

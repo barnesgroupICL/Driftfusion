@@ -433,9 +433,4 @@ if par.OM == 2 && par.Int ~= 0
     solstruct.g = par.Int*interp1(par.genspace, Gx1S, (x-dcum(1)));
 end
 
-if par.Ana == 1
-    solstruct.Vapp = dfana.calcVapp(solstruct, par.JV);    
-    [j,solstruct.J] = dfana.calcJ(solstruct);
-end
-
 end
