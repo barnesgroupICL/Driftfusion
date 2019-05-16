@@ -822,6 +822,11 @@ classdef pc
             par.PhiA = T{1, 'PhiA'};
             par.PhiC = T{1, 'PhiC'};
             par.Rs = T{1, 'Rs'};
+            try
+                par.OM = T{1, 'OM'};
+            catch
+                warning('no optical model specified in csv')
+            end
         end
     end
     
