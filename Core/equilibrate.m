@@ -169,6 +169,7 @@ par.SRHset = 1;
 par.calcJ = 0;
 par.tmax = 1e-6;
 par.t0 = par.tmax/1e3;
+par.mobseti = 1;
 
 soleq.ion = df(soleq_i_nosrh, par);
 disp('Complete')
