@@ -23,24 +23,11 @@ classdef pc
         %% Spatial mesh
         % Device Dimensions [cm]
         % The spatial mesh is a linear piece-wise mesh and is built by the
-        % MESHGEN_X function using 2 cell arrays DCELL and PCELL,
+        % MESHGEN_X function using 2 arrays DCELL and PCELL,
         % which define the thickness and number of points of each layer
-        % respectively. Each layer is separated by a semi-colon but can be
-        % sub-divided into different regions (with the same material
-        % properties) to allow for variable point spacing. For example,the
-        % following cell arrays:
-        % dcell = {{180e-7, 20e-7}; {500e-7}}
-        % pcell = {{180, 40}; {250}};
-        % Would define a device with 2 layers of 200 nm and 500 nm
-        % respectively. In the first layer the first 180 nm would have 180
-        % points, whilst the final 20 nm of the layer would contain 40
-        % points. The second layer would contain 250 points. This allows
-        % for high density point spacing close to interfaces. Interfaces
-        % are inserted automatically between each layer with a width
-        % defined by the property DINT and number of points defined by
-        % PINT.
-        dcell = 200e-7;         % Layer and subsection thickness array
-        pcell = 200;                          % Number of points in layers and subsections array
+        % respectively.
+        dcell = 400e-7;         % Layer and subsection thickness array
+        pcell = 400;            % Number of points in layers and subsections array
         dint = 2e-7;        % Interfacial region thickness (x_mesh_type = 3)
         pint = 40;          % Interfacial points (x_mesh_type = 3)
         
