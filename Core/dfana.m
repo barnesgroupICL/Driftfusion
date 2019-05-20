@@ -286,7 +286,7 @@ classdef dfana
             % JVsol - a solution from DOJV
             if isfield(JVsol, 'ill')
                 if isfield(JVsol.ill, 'f')
-                    Vapp = dfana.Vappt(JVsol.ill.f);
+                    Vapp = dfana.calcVapp(JVsol.ill.f);
                     [j,J] = dfana.calcJ(JVsol.ill.f);
                     try
                         p1 = find(Vapp >= 0);
@@ -322,7 +322,7 @@ classdef dfana
                 end
 
                 if isfield(JVsol.ill, 'r')
-                    Vapp = dfana.Vappt(JVsol.ill.r);
+                    Vapp = dfana.calcVapp(JVsol.ill.r);
                     [j,J] = dfana.calcJ(JVsol.ill.r);
                     try
                         p1 = find(Vapp <= 0);
