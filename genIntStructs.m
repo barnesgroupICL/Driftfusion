@@ -1,23 +1,23 @@
 function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
-%GENINTSTRUCTS - Generates a cell containing structures of solutions at various light intensities, starting from the one in dark
+%GENINTSTRUCTS - Generates a cell containing structures of solutions at logarithmically spaced light intensities, starting from the one at lower illumination
 %
 % Syntax:  [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
 %
 % Inputs:
 %   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions, or a logic false for not having the dark.
-%   STARTINT - higher requested illumination.
-%   ENDINT - lower requested illumination.
+%   STARTINT - highest requested illumination.
+%   ENDINT - lowest requested illumination.
 %   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
-%   INCLUDE_DARK - logical, if to include the dark solution in the output
+%   INCLUDE_DARK - logical, whether to include the dark solution in the output
 %     structure
 %
 % Outputs:
 %   STRUCTCELL - a cell containing structs of solutions at various light
 %     intensities
 %   V_ARRAY - an array with the voltages present in the solution, which is
-%     an aproximation of the VOCs, getting populated just if the input
+%     an approximation of the VOCs, getting populated just if the input
 %     structures were at open circuit
-%   J_ARRAY - an array with the currents present in the solutionJs
+%   J_ARRAY - an array with the currents present in the solutions
 %
 % Example:
 %   [structs_oc, VOCs, ~] = genIntStructs(ssol_i_eq_SR, 10, 0.01, 4, true)

@@ -1,5 +1,5 @@
 function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startInt, endInt, points, include_dark)
-%GENINTSTRUCTSREALVOC - Generates a cell containing structures of solutions at various light intensities at an accurate VOC
+%GENINTSTRUCTSREALVOC - Generates a cell containing structures of asymmetric solutions at various light intensities at an accurate VOC
 % This script just uses other three scripts: genIntStructs, findOptimVoc
 % and asymmetricize. Both symmetric and asymmetric solutions are supported
 % in input, but the usage of symmetric solutions is strongly encouraged as
@@ -10,16 +10,16 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startIn
 % Inputs:
 %   STRUCT_EQ - a solution struct as created by PINDRIFT in dark
 %     conditions, preferably a symmetric (open circuit) solution
-%   STARTINT - higher requested illumination.
-%   ENDINT - lower requested illumination.
-%   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
-%   INCLUDE_DARK - logical, if to include the dark solution in the output
+%   STARTINT - highest requested illumination.
+%   ENDINT - lowest requested illumination.
+%   POINTS - number of requested illumination points between STARTINT and ENDINT, including extrema, except dark.
+%   INCLUDE_DARK - logical, whether to include the dark solution in the output
 %     structure
 %
 % Outputs:
 %   GOODVOCASYMSTRUCTCELL - a cell containing structs of asymmetric solutions at various light
 %     intensities with an applied voltage equal to the VOC
-%   VOCS - an array with the VOC, getting populated just if the input structures were at open circuit
+%   VOCS - an array with the VOC values
 %
 % Example:
 %   [structs_voc, VOCs] = genIntStructsRealVoc(ssol_i_eq_SR, 1, 1e-3, 7, true)

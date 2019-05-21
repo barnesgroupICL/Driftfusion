@@ -1,6 +1,12 @@
 function plot_charges_single(struct, images_prefix)
 %PLOT_CHARGES_SINGLE - Plot free charges and ions densities, and energy levels over device thickness and over time.
-% This is inspired by Phil Calado's pinExtract2.m but rewritten
+% This is inspired by Dr. Phil Calado's pinExtract2.m but rewritten.
+% The created graphics include: profiles of net charge density and 
+% comparison with the final profile; conduction and valence bands and 
+% quasi-Fermi levels profiles; profiles of total concentration of 
+% particles densities and comparison with the final profile, divided 
+% per particle type; time evolution of voltage, current and specific 
+% particles types in specific positions.
 %
 % Syntax:  plot_charges_single(struct, save_name)
 %
@@ -270,7 +276,7 @@ jet_no_yellow = jet_matrix(~jet_yellow_logical, :);
 jet_no_yellow_flip = flipud(jet_no_yellow);
 t_colors = colormap(jet_no_yellow_flip);
 
-figure('Name', 'Net Charge Density at specific times [s]', 'NumberTitle', 'off')
+figure('Name', 'Net Charge Density and Conduction Band at specific times [s]', 'NumberTitle', 'off')
     hold on
     yyaxis right
     ylabel('V [V]') % right y-axis

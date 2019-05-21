@@ -1,7 +1,7 @@
 function [sol_eq, sol_i_eq, sol_i_eq_SR, ssol_i_eq, ssol_i_eq_SR, sol_i_1S_SR, ssol_i_1S_SR] = equilibrate_minimal(params)
 %EQUILIBRATE_MINIMAL Uses analytical initial conditions and runs to equilibrium and steady state, obtaining just the most important solutions
 % Takes the parameters from pinParams.m file and tries
-% to obtain an equilibrium solution (as if the device has been left for
+% to obtain a steady state solution (as if the device has been left for
 % a long period of time). This solution can then be used as accurate
 % initial conditions for other simulations, e.g. a JV scan.
 % Note that tmax is consistently adjusted to appropriate values for to

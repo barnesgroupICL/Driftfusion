@@ -11,7 +11,7 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 % Inputs:
 %   ASYMSTRUCT - an asymmetric struct as created by PINDRIFT, ideally
 %     breaking a symmetric solution using asymmetricize function so that
-%     the starting Vapp is aready close to the real VOC.
+%     the starting Vapp is already close to the real VOC.
 %
 % Outputs:
 %   ASYMSTRUCT_VOC - an asymmetric struct as created by PINDRIFT using the OC
