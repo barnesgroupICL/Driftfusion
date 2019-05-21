@@ -1,7 +1,25 @@
-% test pindrift and photophysics examples
-% USAGE: runtests('examples_unit_test')
-% for profiling the usage run 'profile on' before running the tests and
-% 'profile viewer' after
+%EXAMPLES_UNIT_TEST - Runs various simulations in order to test the functioning of pindrift and many other implemented functions
+% For profiling the time spent running each function run 'profile on' before running the tests and
+% 'profile viewer' after.
+% Using Matlab's Coverage Reports, the unused code can be easily spotted.
+%
+% Syntax:  runtests('examples_unit_test')
+%
+% Other m-files required: pindrift
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also pindrift.
+
+% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
+% Institute of Chemical Research of Catalonia (ICIQ)
+% Research Group Prof. Emilio Palomares
+% email address: iochesonome@gmail.com
+% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+% Imperial College London
+% October 2017; Last revision: May 2018
+
+%------------- BEGIN CODE --------------
 
 % prepare solutions and indirectly test equilibrate and genIntStructs
 % functions
@@ -119,3 +137,6 @@ ideality_from_Voc(structs_oc)
 
 %% Ideality Factor from stabilized JV points in dark
 ideality_from_dark_jVpoints(sol_i_eq_SR, 1, 0.1)
+
+%------------- END OF CODE --------------
+
