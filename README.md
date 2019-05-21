@@ -2,7 +2,7 @@
 
 An open source drift diffusion code based in MATLAB for simulating solar cells
 
-Please see the link:https://github.com/barnesgroupICL/Driftfusion/wiki[wiki] and the headers of the .m files for complete documentation.
+Please see the [wiki](https://github.com/barnesgroupICL/Driftfusion/wiki) and the headers of the .m files for complete documentation.
 
 ## Info
 Authors: Phil Calado, Piers RF Barnes, Ilario Gelmetti, Mohammed Azzouzi, Ben Hilman
