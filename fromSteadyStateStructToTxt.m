@@ -1,8 +1,36 @@
 function fromSteadyStateStructToTxt(struct, prefix)
 % save the main data from a stabilized solution created by pindrift to
-% txt files, ideally easy to import with Origin (from OriginLab)
-% example:
+% text files, using a format easy to import with Origin (from OriginLab)
+%
+% Syntax:  fromSteadyStateStructToTxt(struct, prefix)
+%
+% Inputs:
+%   STRUCT - a struct as created by PINDRIFT
+%   PREFIX - a char array to be used as prefix for the saved files names
+%
+% Outputs:
+%
+% Example:
 %   fromSteadyStateStructToTxt(ssol_i_1S_SR, 'pinParams_ssol_i_1S_SR')
+%     exports the ionic density profile near to the interfaces and the 
+%     band diagram of ssol_i_1S_SR solution to text files
+%
+% Other m-files required: none
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also pindrift.
+
+% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
+% Institute of Chemical Research of Catalonia (ICIQ)
+% Research Group Prof. Emilio Palomares
+% email address: iochesonome@gmail.com
+% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+% Imperial College London
+% October 2017; Last revision: May 2018
+
+%------------- BEGIN CODE --------------
+
 
 p = struct.p;
 
@@ -83,3 +111,5 @@ end
 fclose(fid_ionic_acc);
 fclose(fid_ionic_depl);
 fclose(fid_band);
+
+%------------- END OF CODE --------------
