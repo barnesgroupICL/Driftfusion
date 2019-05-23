@@ -1,18 +1,29 @@
 function ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFreq, Freq_points, deltaV, sequential, frozen_ions, demodulation, do_graphics, save_solutions)
-%ISWAVE_FULL_EXEC_NONPARALLEL - Do Impedance Spectroscopy approximated applying an oscillating voltage (ISwave) in a range of background light intensities.
-% Getting rid of annoying parfor
+%ISWAVE_FULL_EXEC_NONPARALLEL - Simulates impedance spectroscopy at various frequencies on many provided solutions
+% Alternatively, a cell containing various structures can be provided.
+% For example, if a cell generated using genIntStructs is provided, the
+% impedance at various light intensities can be compared.
+% Or, if the provided cell has been generated using genVappStructs,
+% solutions with different background voltage bias can be compared.
+% The fundamental difference from ISwave_full_exec is the lack of parfor
+% for parallel computation. This allows more flexibility at the cost of a
+% more time demanding simulation.
 %
 % Syntax:  ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFreq, Freq_points, deltaV, sequential, frozen_ions, demodulation, do_graphics, save_solutions)
 %
 % Inputs:
-%   STRUCTS - can be a cell structure containing structs at various background
-%     light intensities. This can be generated using genIntStructs.
+%   STRUCTS - can be a cell structure containing either symmetrical or
+%   asymmetrical structures. Various background light intensities can be
+%   provided using genIntStructs and various applied voltages
+%   using genVappStructs.
 %     Otherwise it can be a single struct as created by PINDRIFT.
-%   STARTFREQ - higher frequency limit
-%   ENDFREQ - lower frequency limit
+%   STARTFREQ - highest frequency limit
+%   ENDFREQ - lowest frequency limit
 %   FREQ_POINTS - number of points to simulate between STARTFREQ and
 %     ENDFREQ
-%   DELTAV - voltage oscillation amplitude in volts, one mV should be enough
+%   DELTAV - voltage oscillation amplitude in volts, one mV should be
+%     enough but larger values can be employed for reducing the noise or
+%     having a large perturbation simulation
 %   SEQUENTIAL - logical, if true do not check that the oscillating solution reached a
 %     (oscillating) stabilization, instead take always the first solution
 %     and use its final timepoint as the starting point of the next
@@ -20,15 +31,17 @@ function ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFr
 %     starting solution is not stabilized and a realistic simulation of the
 %     solution evolving during the measurement is wanted.
 %   FROZEN_IONS - logical, after stabilization sets the mobility of
-%     ionic defects to zero
-%   DEMODULATION - which method to use for extracting phase and amplitude of the current
-%     if false, always uses fitting, if true uses demodulation multiplying the current
-%     by sin waves. Anyway if the obtained phase is werid, fit will be used
-%     automatically for confirming the result
+%     ionic defects to zero to simulate the impedance with effectively
+%     frozen ions
+%   DEMODULATION - logical, determines which method to use for extracting
+%     phase and amplitude of the current. If false, always uses fitting via
+%     ISwave_EA_single_fit, if true uses demodulation via
+%     ISwave_EA_single_demodulation. Anyway if the obtained phase is weird,
+%     fit will be used automatically for confirming the result
 %   DO_GRAPHICS - logical, whether to graph the individual solutions and
 %     the overall graphics
-%   SAVE_SOLUTIONS - is a logic defining if to assing in volatile base
-%     workspace the calulated solutions of single ISstep perturbations
+%   SAVE_SOLUTIONS - logic, defines whether to save in volatile base
+%     workspace each of the calculated solutions
 %
 % Outputs:
 %   ISWAVE_RESULTS - a struct containing the most important results of the simulation
@@ -36,7 +49,7 @@ function ISwave_results = ISwave_full_exec_nonparallel(structs, startFreq, endFr
 % Example:
 %   ISwave_oc = ISwave_full_exec_nonparallel(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, false, true, true, true)
 %     calculate on 8 different illumination intensities including dark,
-%     on 23 points from frequencies of 1 GHz to 0.01 Hz,
+%     on 56 points from frequencies of 1 GHz to 0.01 Hz,
 %     use a half peak to peak voltage oscillation amplitude of 2 mV,
 %     start each simulation from a stabilized solution,
 %     do not freeze ions,

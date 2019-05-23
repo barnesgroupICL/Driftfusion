@@ -1,7 +1,34 @@
 function fromISwaveResultsToTxt(ISwave_results, prefix)
-% save the main data from an ISwave_results struct created by ISwave_full_exec* to txt files, ideally easy to import with Origin (from OriginLab)
-% example:
-%   fromISwaveResultsToTxt(ISwave_oc, 'pinParams_ISwave_oc')
+% FROMISWAVERESULTSTOTXT - Exports data of a set of impedance simulations to text files
+% save the main data from an ISwave_results struct created by
+% ISwave_full_exec* to text files, for easing the import with Origin (from OriginLab).
+% 
+%
+% Syntax:  fromISwaveResultsToTxt(ISwave_results, prefix)
+%
+% Inputs:
+%   ISWAVE_RESULTS - a struct containing the most important results of the ISwave simulation
+%   PREFIX - char array, prefix to be used for the text files names
+%
+% Example:
+%   fromISwaveResultsToTxt(ISwave_oc, 'ISwave_oc')
+%     save data from a set of simulations to text files
+%
+% Other m-files required: none
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also ISwave_full_exec.
+
+% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
+% Institute of Chemical Research of Catalonia (ICIQ)
+% Research Group Prof. Emilio Palomares
+% email address: iochesonome@gmail.com
+% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+% Imperial College London
+% October 2017; Last revision: January 2018
+
+%------------- BEGIN CODE --------------
 
 %% create header
 
@@ -205,3 +232,6 @@ fclose(fid_phaseIonic);
 fclose(fid_JionicAmpAbs);
 fclose(fid_JampOutOfPhaseAbs);
 fclose(fid_JrecAmpOutOfPhaseAbs);
+
+%------------- END OF CODE --------------
+

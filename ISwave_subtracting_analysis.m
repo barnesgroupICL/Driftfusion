@@ -1,12 +1,13 @@
 function [subtracting_n_t, subtracting_n_intr_t] = ISwave_subtracting_analysis(asymstruct_ISwave)
-%ISWAVE_SUBTRACTING_ANALYSIS - Calculate the charge excess in a device compared with the previous time point and express this as a current
+%ISWAVE_SUBTRACTING_ANALYSIS - Calculates the time derivative of the total charge in the device
+% Calculate the charge excess in a device compared with the previous time point and express this as a current
 % for Impedance Spectroscopy with oscillating voltage (ISwave)
 % This is used as a reference for IS and for separating the ionic contribution
 %
 % Syntax:  [subtracting_n_t, subtracting_n_intr_t] = ISwave_subtracting_analysis(asymstruct_ISwave)
 %
 % Inputs:
-%   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbated by an
+%   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbed by an
 %     oscillating voltage, as generated from ISwave_EA_single_exec
 %
 % Outputs:

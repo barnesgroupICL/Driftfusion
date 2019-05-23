@@ -1,8 +1,34 @@
 function fromISwaveEAStructToTxt(struct, prefix)
-% save the main data from a oscilalting solution created by ISwave_EA_single_exec to
-% txt files, ideally easy to import with Origin (from OriginLab)
-% example:
-%   fromISwaveEAStructToTxt(ssol_i_1S_SR_is_100mHz_2mV, 'pinParams_ssol_i_1S_SR_is_100mHz_2mV')
+%FROMISWAVEEASTRUCTTOTXT - Exports single impedance simulation data to text file
+% Saves the main data from a oscillating solution created by ISwave_EA_single_exec to text files
+% for easing the import with Origin (from OriginLab).
+%
+% Syntax:  fromISwaveEAStructToTxt(struct, prefix)
+%
+% Inputs:
+%   STRUCT - a struct with a solution being perturbed by an
+%     oscillating voltage, as generated from ISwave_EA_single_exec
+%   PREFIX - char array, prefix to be used for the text files names
+%
+% Example:
+%   fromISwaveEAStructToTxt(asymssol_i_1S_SR_is_100mHz_2mV, 'asymssol_i_1S_SR_is_100mHz_2mV')
+%     save single simulation data to text files
+%
+% Other m-files required: none
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also ISwave_full_exec.
+
+% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
+% Institute of Chemical Research of Catalonia (ICIQ)
+% Research Group Prof. Emilio Palomares
+% email address: iochesonome@gmail.com
+% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+% Imperial College London
+% October 2017; Last revision: January 2018
+
+%------------- BEGIN CODE --------------
 
 p = struct.p;
 
@@ -133,3 +159,5 @@ end
 
 fclose(fid_band);
 fclose(fid_current);
+
+%------------- END OF CODE --------------

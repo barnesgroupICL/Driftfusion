@@ -4,7 +4,7 @@ function [n_coeff, i_coeff, U_coeff, dQ_coeff, n_noionic_coeff] = ISwave_single_
 % Syntax:  ISwave_single_analysis(asymstruct_ISwave, minimal_mode, demodulation)
 %
 % Inputs:
-%   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbated by an
+%   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbed by an
 %     oscillating voltage, as generated from ISwave_EA_single_exec
 %   MINIMAL_MODE - logical, when true graphics does not get created and
 %     ISwave_subtracting_analysis does not get launched, useful when
@@ -12,23 +12,23 @@ function [n_coeff, i_coeff, U_coeff, dQ_coeff, n_noionic_coeff] = ISwave_single_
 %   DEMODULATION - logical, get phase via demodulation instead of using a fitting
 %
 % Outputs:
-%   n_coeff - background current, half peak to peak amplitude of
+%   n_coeff - array of background current, half peak to peak amplitude of
 %     oscillation and phase of total electronic current
-%   i_coeff - background current, half peak to peak amplitude of
+%   i_coeff - array of background current, half peak to peak amplitude of
 %     oscillation and phase of ionic displacement current
-%   U_coeff - background current, half peak to peak amplitude of
+%   U_coeff - array of background current, half peak to peak amplitude of
 %     oscillation and phase of recombinating charge per unit time
-%   dQ_coeff - background current, half peak to peak amplitude of
+%   dQ_coeff - array of background current, half peak to peak amplitude of
 %     oscillation and phase of accumulating current, this is the real
 %     capacitive current, obtained comparing the free charges profiles at
 %     different times
-%   n_noionic_coeff - background current, half peak to peak amplitude of
+%   n_noionic_coeff - array of background current, half peak to peak amplitude of
 %     oscillation and phase of non ionic current as obtained via
 %     subtraction of ionic current from total electronic current
 %  
 % Example:
 %   ISwave_single_analysis(ssol_i_1S_SR_is_100mHz_2mV, false, true)
-%     do plot
+%     plot current profile, reference profiles and calculate the phase using demodulation approach
 %
 % Other m-files required: ISwave_subtracting_analysis,
 %   ISwave_EA_single_fit, ISwave_EA_single_demodulation, pinana

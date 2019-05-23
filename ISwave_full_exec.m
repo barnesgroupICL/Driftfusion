@@ -1,23 +1,34 @@
 function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, demodulation, do_graphics)
-%ISWAVE_FULL_EXEC - Do Impedance Spectroscopy approximated applying an oscillating voltage (ISwave) in a range of background light intensities
+%ISWAVE_FULL_EXEC - Simulates impedance spectroscopy at various frequencies on many provided solutions
+% Alternatively, a cell containing various structures can be provided.
+% For example, if a cell generated using genIntStructs is provided, the
+% impedance at various light intensities can be compared.
+% Or, if the provided cell has been generated using genVappStructs,
+% solutions with different background voltage bias can be compared.
 %
 % Syntax:  ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, demodulation, do_graphics)
 %
 % Inputs:
-%   STRUCTS - can be a cell structure containing structs at various background
-%     light intensities. This can be generated using genIntStructs.
+%   STRUCTS - can be a cell structure containing either symmetrical or
+%   asymmetrical structures. Various background light intensities can be
+%   provided using genIntStructs and various applied voltages
+%   using genVappStructs.
 %     Otherwise it can be a single struct as created by PINDRIFT.
-%   STARTFREQ - higher frequency limit
-%   ENDFREQ - lower frequency limit
+%   STARTFREQ - highest frequency limit
+%   ENDFREQ - lowest frequency limit
 %   FREQ_POINTS - number of points to simulate between STARTFREQ and
 %     ENDFREQ
-%   DELTAV - voltage oscillation amplitude in volts, one mV should be enough
+%   DELTAV - voltage oscillation amplitude in volts, one mV should be
+%     enough but larger values can be employed for reducing the noise or
+%     having a large perturbation simulation
 %   FROZEN_IONS - logical, after stabilization sets the mobility of
-%     ionic defects to zero
-%   DEMODULATION - which method to use for extracting phase and amplitude of the current
-%     if false, always uses fitting, if true uses demodulation multiplying the current
-%     by sin waves. Anyway if the obtained phase is werid, fit will be used
-%     automatically for confirming the result
+%     ionic defects to zero to simulate the impedance with effectively
+%     frozen ions
+%   DEMODULATION - logical, determines which method to use for extracting
+%     phase and amplitude of the current. If false, always uses fitting via
+%     ISwave_EA_single_fit, if true uses demodulation via
+%     ISwave_EA_single_demodulation. Anyway if the obtained phase is weird,
+%     fit will be used automatically for confirming the result
 %   DO_GRAPHICS - logical, whether to graph the individual solutions and
 %     the overall graphics
 %
@@ -27,8 +38,8 @@ function ISwave_results = ISwave_full_exec(structs, startFreq, endFreq, Freq_poi
 % Example:
 %   ISwave_oc = ISwave_full_exec(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, true, true)
 %     calculate on 8 different illumination intensities including dark, do not freeze ions, use a half peak to peak
-%     voltage oscillation amplitude of 2 mV, on 23 points from frequencies of 1 GHz to
-%     0.01 Hz
+%     voltage oscillation amplitude of 2 mV, on 56 points from frequencies of 1 GHz to
+%     0.01 Hz and plot all graphics, including the ones for each solution
 %   ISwave_oc_frozenions = ISwave_full_exec(genIntStructs(ssol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, true, true, true)
 %     as above but freezing ions during voltage oscillation
 %   ISwave_sc = ISwave_full_exec(genIntStructs(sol_i_eq_SR, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, true, true)

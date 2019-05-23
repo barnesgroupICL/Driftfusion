@@ -21,7 +21,7 @@ function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq,
 %     value of 1e-8 sets for a very precise simulation
 %
 % Outputs:
-%   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbated by an
+%   ASYMSTRUCT_ISWAVE - a struct with a solution being perturbed by an
 %     oscillating voltage
 %
 % Example:

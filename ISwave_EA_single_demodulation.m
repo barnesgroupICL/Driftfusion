@@ -1,8 +1,8 @@
 function coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
 %ISWAVE_EA_SINGLE_DEMODULATION - Calculate phase and amplitude demodulating oscillating current data from impedance spectroscopy with oscillating voltage.
 % The current profile gets multiplied by the voltage profile and,
-% separately, by the voltage profile with an additional 90 degrees phase,
-% the integrals of the resulting profiles are related to the phase.
+% separately, by the voltage profile with an additional 90 degrees phase.
+% The integrals of the resulting profiles are related to the phase.
 % This simulates the working principle of a dual-phase demodulator often
 % used by lock-in amplifiers.
 % https://en.wikipedia.org/wiki/Lock-in_amplifier
@@ -11,7 +11,7 @@ function coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
 % a phase close to 90 degrees results in very small values of
 % inphase_integral which can have a wrong sign and result in a wrong phase of
 % -90 degrees, in that case the simulation should be repeated with smaller
-% RelTol
+% pdepe relative tolerance RelTol
 %
 % Syntax:  coeff = ISwave_EA_single_demodulation(t, y, Vapp_func, Vapp_params)
 %

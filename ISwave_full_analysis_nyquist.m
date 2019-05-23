@@ -1,6 +1,9 @@
 function ISwave_full_analysis_nyquist(ISwave_results)
 %ISSTEP_FULL_ANALYSIS_NYQUIST - Plot Nyquist graph for Impedance Spectroscopy (ISwave)
 % in a range of background light intensities or applied DC voltages, imaginary part of impedance versus real part of impedance
+% Nyquist plot refers the imaginary component of the impedance to its real component.
+% A normalized spectra is also plotted and the rescaling factors are
+% indicated in the legend.
 %
 % Syntax:  ISwave_full_analysis_nyquist(ISwave_results)
 %

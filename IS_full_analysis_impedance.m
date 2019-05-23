@@ -1,7 +1,13 @@
 function IS_full_analysis_impedance(IS_results)
-%IS_FULL_ANALYSIS_IMPEDANCE - Plot impedance and capacitance from Impedance Spectroscopy (IS)
-% in a range of background light intensities or applied DC voltages and in a range
-% of voltage oscillation frequencies
+%IS_FULL_ANALYSIS_IMPEDANCE - Represents Bode plots of impedance and capacitance from impedance spectroscopy
+% Plot the value of absolute impedance magnitude |Z|, resistance Z'
+% (real component), reactance Z'' (imaginary component), and apparent
+% capacitance defined as \omega^-1 \Im{Z^-1} at various frequencies and
+% various illumination or background voltage bias conditions.
+% As a reference, the following currents are also used for plotting the
+% mentioned quantities: ionic displacement current, recombination current,
+% and total charge time derivative as obtained from
+% ISwave_subtracting_analysis
 %
 % Syntax:  IS_full_analysis_impedance(IS_results)
 %

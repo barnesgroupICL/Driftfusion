@@ -1,5 +1,6 @@
 function fit_coeff = ISwave_EA_single_fit(t, y, J_E_func)
 %ISWAVE_EA_SINGLE_FIT - Calculate phase and amplitude fitting oscillating current data from impedance spectroscopy with oscillating voltage
+% This is an alternative to ISwave_EA_single_demodulation.m which can be used to confirm the demodulation results.
 %
 % Syntax:  fit_coeff = ISwave_EA_single_fit(t, y, func)
 %

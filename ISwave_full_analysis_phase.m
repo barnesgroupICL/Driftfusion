@@ -1,6 +1,8 @@
 function ISwave_full_analysis_phase(ISwave_results)
-%ISWAVE_FULL_ANALYSIS_PHASE - Plot phase Bode plots from Impedance Spectroscopy (IS)
-% in a range of background light intensities or applied DC voltages
+%ISWAVE_FULL_ANALYSIS_PHASE - Represents Bode plots of phase from impedance spectroscopy
+% The phase of the current oscillation with regards to the applied voltage
+% is plotted as obtained from simulations made with
+% ISwave_full_exec or ISwave_full_exec_nonparallel
 %
 % Syntax:  ISwave_full_analysis_phase(ISwave_results)
 %
