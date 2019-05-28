@@ -18,20 +18,25 @@ function Gentot = beerlambert(par, x, source_type, laserlambda, figson)
 h = 6.626e-34;
 c = 2.998e8;
 
-lambda = 300:767;          % wavelength range - currently limited by database MUST BE IN nm
+lambda = 300:767;  % wavelength range - currently limited by database MUST BE IN nm
 
-layers = par.stack;
+switch par.side
+    case 1
+        layers = par.stack;
+        layer_type = par.layer_type;
+    case 2
+        layers = fliplr(par.stack);
+        layer_type = fliplr(par.layer_type);
+        x = x(end)-fliplr(par.xx);
+end
 
 switch source_type
-    
-    case 'AM15'
-        
+    case 'AM15'      
         I0 = lightsource('AM15', lambda);
-        
     case 'laser'
         % Throw up error if LASERLAMBDA is not within the acceptable range
         if laserlambda < lambda(1) || laserlambda > lambda(end)
-            msg = ['Error in BEERLAMBERT - laser wavelength must be in the range ', num2str(lambda(1)), ' - ', num2str(lambda(end)), ' nm']
+            msg = ['Error in BEERLAMBERT - laser wavelength must be in the range ', num2str(lambda(1)), ' - ', num2str(lambda(end)), ' nm'];
             error(msg);
         end
         
@@ -49,7 +54,7 @@ n = zeros(size(layers,2),size(lambda,2));
 k = zeros(size(layers,2),size(lambda,2));
 try
     for index = 1:size(layers,2)
-        if strcmp(par.layer_type{1,index}, 'layer') 
+        if strcmp(layer_type{1,index}, 'layer') 
             [n(index,:), k(index,:)] = LoadRefrIndex(layers{index},lambda);
         else
         % Currently holds the optical properties from previous layer across
@@ -64,8 +69,13 @@ end
 % For the time being, the optical properties are changed abruptly mid-way
 % through the interface. Grading of the optical properties is desirable
 % in future versions.
-xarr = [0, par.d];
-xarr(end) = xarr(end); % Adjustment required as no interface at end of device
+switch par.side
+    case 1
+        xarr = [0, par.d];
+    case 2
+        xarr = [0, fliplr(par.d)];
+end
+
 xcum = par.pcum;
 
 % calculate absorption coefficient from k
@@ -77,12 +87,9 @@ I = zeros(length(x), length(lambda));
 
 % Iterate across layers
 for i =1:length(xarr)-1
-  
     % Iterate across wavelengths
     for j = 1:length(lambda)
-    
         x1 = sum(xarr(1:i));
-        
         if i==length(xarr)-1
             x2 = x(end);    %avoid rounding issues
         else
@@ -91,14 +98,10 @@ for i =1:length(xarr)-1
         % Set p1 to 1 on first loop to avoid problems with mesh not
         % starting at 0
         if i == 1
-            
-            p1 = 1;
-            
+            p1 = 1;       
         else
-            
             p1 = find(x <= x1);
             p1 = p1(end);
-        
         end
         
         p2 = find(x <= x2);
@@ -113,26 +116,31 @@ end
 
 Gentot = trapz(lambda, Gen, 2);
 
+if par.side == 2
+    I = flipud(I);
+    Gen = flipud(Gen);
+    Gentot = flipud(Gentot);
+end
+
 if figson == 1
 
 figure(31)
-surf(lambda, x, I)
+surf(lambda, par.xx, I)
 xlabel('Wavelength [nm]')
 ylabel('Position [nm]')
 zlabel('Intensity [Wcm-3]')
 
 figure(32)
-surf(lambda, x, Gen)
+surf(lambda, par.xx, Gen)
 xlabel('Wavelength [nm]')
 ylabel('Position [nm]')
 zlabel('Gen rate [cm-3s-1]')
 
 figure(33)
-plot(x, Gentot)
+plot(par.xx, Gentot)
 xlabel('Position [nm]')
 ylabel('Gen rate [cm-2s-1]')
 
 end
 
 end
-
