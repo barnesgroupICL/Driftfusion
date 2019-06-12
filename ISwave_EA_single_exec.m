@@ -1,5 +1,9 @@
 function asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
-%ISWAVE_EA_SINGLE_EXEC - Do a single Impedance Spectroscopy (ISwave) experiment
+%ISWAVE_EA_SINGLE_EXEC - Do a single Impedance Spectroscopy (ISwave) simulation
+% Starting from the last time point of the provided solution it applies a
+% time-varying voltage.
+% This voltage profile is the background voltage bias from the provided
+% solution summed to a sinusoidally oscillating voltage.
 %
 % Syntax:  asymstruct_ISwave = ISwave_EA_single_exec(asymstruct_Int, deltaV, freq, periods, tpoints_per_period, reach_stability, EA, RelTol)
 %

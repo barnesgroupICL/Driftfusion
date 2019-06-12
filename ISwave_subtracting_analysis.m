@@ -41,7 +41,7 @@ s = asymstruct_ISwave;
 % Intrinsic points logical array
 itype_points= (s.x >= s.p.tp & s.x <= s.p.tp + s.p.ti);
 
-% make a new matrix subtracting from each profile at a time point the
+% if I made a new matrix subtracting from each profile at a time point the
 % profile at the previous time point, the resulting rows will be one row
 % less than the original solution matrix
 

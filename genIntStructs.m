@@ -4,7 +4,7 @@ function [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, end
 % Syntax:  [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
 %
 % Inputs:
-%   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions, or a logic false for not having the dark.
+%   STRUCT_EQ - a solution struct as created by PINDRIFT in dark conditions
 %   STARTINT - highest requested illumination.
 %   ENDINT - lowest requested illumination.
 %   POINTS - number of illumination requested between STARTINT and ENDINT, including extrema, except dark.
