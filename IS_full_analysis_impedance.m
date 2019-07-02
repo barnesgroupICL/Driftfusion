@@ -56,7 +56,7 @@ jet_matrix = jet(length(legend_text) + 1);
 % colors list
 jet_yellow_logical = ismember(jet_matrix, [1, 1, 0], 'rows');
 jet_no_yellow = jet_matrix(~jet_yellow_logical, :);
-jet_no_yellow_flip = flipud(jet_no_yellow);
+jet_no_yellow_flip = jet_no_yellow;%flipud(jet_no_yellow);
 Int_colors = colormap(jet_no_yellow_flip);
 
 % round to two significant digits
