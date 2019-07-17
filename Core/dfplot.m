@@ -36,7 +36,7 @@ classdef dfplot
             end
 
             % Call dfana to obtain band energies and QFLs
-            [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
 
             xnm = x*1e7;    % x in nm for plotting
@@ -59,7 +59,7 @@ classdef dfplot
 
                 % Ionic space charge density
                 PH3 = subplot(3,1,3);
-                plot(xnm, a(p1,:)-par.dev.Nion);
+                plot(xnm, a(p1,:), xnm, c(p1,:));
                 hold on
             end
 
@@ -85,8 +85,9 @@ classdef dfplot
             hold off
 
             subplot(3,1,3);
-            ylabel('Mobile ionic charge density [cm-3]');
+            ylabel('Mobile ion density [cm-3]');
             xlabel('Position [nm]');
+            legend('anion', 'cation')
             xlim([xrange(1), xrange(2)]);
             set(legend,'FontSize',12);
             set(legend,'EdgeColor',[1 1 1]);
@@ -102,8 +103,8 @@ classdef dfplot
             [j, J] = dfana.calcJ(sol);
 
             figure(2);
-            plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.disp(:,pos), t, J.tot(:, pos));
-            legend('Jn', 'Jp', 'Ja', 'Jdisp', 'Jtotal')
+            plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.c(:, pos), t, J.disp(:,pos), t, J.tot(:, pos));
+            legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal')
             xlabel('time [s]');
             ylabel('J [A cm^{-2}]');
             set(legend,'FontSize',16);
@@ -143,13 +144,13 @@ classdef dfplot
 
                 % electron and hole currents as function of position from continuity
                 figure(3)
-                plot(xnm, J.n(p1, :), xnm, J.p(p1, :), xnm, J.a(p1, :), xnm, J.disp(p1, :), xnm, J.tot(p1, :))
+                plot(xnm, J.n(p1, :), xnm, J.p(p1, :), xnm, J.a(p1, :), xnm, J.c(p1, :), xnm, J.disp(p1, :), xnm, J.tot(p1, :))
                 hold on
             end
 
             xlabel('Position [nm]')
             ylabel('J [A]')
-            legend('Jn', 'Jp', 'Ja', 'Jdisp', 'Jtot')
+            legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtot')
             xlim([xrange(1), xrange(2)])
             hold off
         end
@@ -214,7 +215,7 @@ classdef dfplot
             end
 
             % get drift and diffusion currents
-            Jdd = dfana.calcJddxt(sol);
+            Jdd = dfana.Jddxt(sol);
             xnm = sol.x*1e7;
 
             figure(5)
@@ -224,12 +225,13 @@ classdef dfplot
                 p1 = p1(end);
 
                 plot(xnm, Jdd.ndiff(p1,:), xnm, Jdd.ndrift(p1,:), xnm, Jdd.pdiff(p1,:),...
-                    xnm, Jdd.pdrift(p1,:), xnm, Jdd.adiff(p1,:), xnm, Jdd.adrift(p1,:));
+                    xnm, Jdd.pdrift(p1,:), xnm, Jdd.adiff(p1,:), xnm, Jdd.adrift(p1,:),...
+                    Jdd.cdiff(p1,:), xnm, Jdd.cdrift(p1,:));
                 hold on
             end
             xlabel('Position [nm]')
             ylabel('Current density [Acm-2]')
-            legend('n,diff', 'n,drift', 'p,diff', 'p,drift', 'a,diff', 'a,drift')
+            legend('n,diff', 'n,drift', 'p,diff', 'p,drift', 'a,diff', 'a,drift', 'c,diff', 'c,drift')
             hold off
         end
 

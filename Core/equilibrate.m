@@ -26,7 +26,7 @@ par.SRHset = 0;
 
 %% General initial parameters
 par.tmesh_type = 2;
-par.tpoints = 40;
+par.tpoints = 10;
 
 par.JV = 0;
 par.Vapp = 0;
@@ -65,7 +65,7 @@ par.sp_r = par_origin.sp_r;
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e3;
 
-%% Soluition with mobility switched on
+%% Solution with mobility switched on
 disp('Solution with mobility switched on')
 sol = df(sol, par);
 
@@ -89,17 +89,20 @@ while any(all_stable) == 0
     sol = df(sol, par);
     
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-
 end
 
-disp('Switching on series resistance')
+if par_origin.Rs ~= 0
+    disp('Switching on series resistance')
+    
+    par.Rs = par_origin.Rs;
+    par.tmax = 1e-6;
+    par.t0 = 1e-12;
+    
+    soleq_nosrh = df(sol, par);
+    disp('Complete')
+end
 
-par.Rs = par_origin.Rs;  
-par.tmax = 1e-6;
-par.t0 = 1e-12;
-
-soleq_nosrh = df(sol, par);
-disp('Complete')
+soleq_nosrh = sol;
 
 disp('Switching on interfacial recombination')
 par.SRHset = 1;
@@ -118,15 +121,31 @@ par.Rs = 0;
 
 disp('Closed circuit equilibrium with ions')
 
-par.mobseti = 1e4;           % Ions are accelerated to reach equilibrium
-par.tmax = 1e-9;
+% Take ratio of electron and ion mobilities in the active layer
+rat_anion = par.mue(par.active_layer)/par.muion(par.active_layer);
+rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+
+% If the ratio is infinity (ion mobility set to zero) then set the ratio to
+% zero instead
+if isnan(rat_anion) || isinf(rat_anion)
+    rat_anion = 0;
+end
+
+if isnan(rat_cation) || isinf(rat_cation)
+    rat_cation = 0;
+end
+
+par.mobseti = 1;           % Ions are accelerated to reach equilibrium
+par.K_anion = rat_anion;
+par.K_cation = rat_cation;
+par.tmax = 1e-12;
 par.t0 = par.tmax/1e3; 
 
 sol = df(soleq_nosrh, par);
 
 % Longer second solution
 par.calcJ = 0;
-par.tmax = 1e-2;
+par.tmax = 1e-3;
 par.t0 = par.tmax/1e3;
 
 sol = df(sol, par);
@@ -159,6 +178,8 @@ sol = df(sol, par);
 % write solution and reset ion mobility
 soleq_i_nosrh = sol;
 soleq_i_nosrh.par.mobseti = 1;
+soleq_i_nosrh.par.K_anion = 1;
+soleq_i_nosrh.par.K_cation = 1;
 
 disp('Ion equilibrium solution complete')
 
@@ -170,6 +191,8 @@ par.calcJ = 0;
 par.tmax = 1e-6;
 par.t0 = par.tmax/1e3;
 par.mobseti = 1;
+par.K_anion = 1;
+par.K_cation = 1;
 
 soleq.ion = df(soleq_i_nosrh, par);
 disp('Complete')
