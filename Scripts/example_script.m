@@ -30,3 +30,9 @@ dfplot.ELx(JV.tio2.JV50mVs.ill.f, 20)
 % plot the currents as a function of position in the PCBM device at 0.5 V
 % (t = 10 s) during the illuminated forward scan
 dfplot.Jx(JV.pcbm.JV50mVs.ill.f, 10)
+
+% Save the workspace- this is commented out as the filepath should lead to
+% a folder on your computer. It is not recommended to store large files in
+% the Github repository as they will be cached even when deleted leading to
+% a large folder size regardless of whether it contains data or not.
+% save('/Users/Username/Data/temp.mat')

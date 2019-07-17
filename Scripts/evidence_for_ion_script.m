@@ -67,3 +67,9 @@ hold off
 dfplot.ELx(Voc_transient.bc, [1e-3, 1])
 % Uncomment to plot EL and carrier density diagrams for Top Cathode device
 %dfplot.ELx(Voc_transient.tc, [1e-3, 1])
+
+% Save the workspace- this is commented out as the filepath should lead to
+% a folder on your computer. It is not recommended to store large files in
+% the Github repository as they will be cached even when deleted leading to
+% a large folder size regardless of whether it contains data or not.
+% save('/Users/Username/Data/temp.mat')
