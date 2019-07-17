@@ -21,4 +21,8 @@ explore.plotsurf(ptpd_parex_dactive_light_33, 'Voc_r', 1, 0, 0)
 % thickness at 1 sun
 explore.plotprof_2D(ptpd_parex_dactive_light_33, 'a_f', [1,1,1], [0,1,0], 0,0)
 
-save('explore_ws.mat')  % Save workspace
+% Save the workspace- this is commented out as the filepath should lead to
+% a folder on your computer. It is not recommended to store large files in
+% the Github repository as they will be cached even when deleted leading to
+% a large folder size regardless of whether it contains data or not.
+% save('/Users/Username/Data/temp.mat')
