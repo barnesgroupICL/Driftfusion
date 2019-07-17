@@ -200,7 +200,7 @@ classdef dfana
             J.tot = J.n + J.p + J.a + J.disp;
         end
 
-        function Jdd = Jddxt(sol)
+        function calcJdd = Jddxt(sol)
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,V] = dfana.splitsol(sol);
 
@@ -371,6 +371,19 @@ classdef dfana
             value = Efn(:, end) - Efp(:, 1);
         end
 
+        function deltaV = deltaVt(sol, p1, p2)
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            % Calculates the electorstatic potential difference as a function of time 
+            % between two points P1 and P2
+            deltaV = V(:,p1) - V(:,p2);
+        end
+        
+        function sigma = calcsigma(sol)
+            % calculates the integrated space charge density
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            rho = dfana.calcrho(sol);
+            sigma = trapz(x, rho, 2);
+        end
 
     end
 
