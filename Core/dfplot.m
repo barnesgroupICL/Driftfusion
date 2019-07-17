@@ -214,7 +214,7 @@ classdef dfplot
             end
 
             % get drift and diffusion currents
-            Jdd = dfana.Jddxt(sol);
+            Jdd = dfana.calcJddxt(sol);
             xnm = sol.x*1e7;
 
             figure(5)
