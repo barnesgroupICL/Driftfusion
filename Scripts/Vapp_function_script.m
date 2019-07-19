@@ -1,7 +1,7 @@
 % Creates a single carrier device and then applies a 20 mV periodic
 % potential for 2 cycles
 
-par.singlecar = pc('input_files/1 layer single carrier.csv');
+par.singlecar = pc('input_files/1_layer_single_carrier.csv');
 
 soleq = equilibrate(par.singlecar);
 
