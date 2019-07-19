@@ -38,7 +38,7 @@ classdef pc
         % exactly as given in the column headings with the '_n', '_k' omitted
         layer_type = {'layer'}
         stack = {'MAPICl'}
-        active_layer = 3;       % State the index of a layer that has the active layer properties
+        active_layer = 1;       % State the index of a layer that has the active layer properties
 
         % Define spatial cordinate system- typically this will be kept at
         % 0 for most applications
