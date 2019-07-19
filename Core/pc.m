@@ -32,11 +32,19 @@ classdef pc
         pint = 40;          % Interfacial points (x_mesh_type = 3)
 
         %% Layer description
+        % Define the layer type for each of the layers in the device. The
+        % options are:
+        % LAYER = standard layer
+        % ACTIVE = standard layer but the properties of this layer are
+        % flagged such that they can easily be accessed
+        % JUNCTION = a region with graded properties between two materials
+        % (either LAYER or ACTIVE type)
+        % with different properties
+        layer_type = {'active'}
         % Currently STACK is used for reading the optical properties
         % library. The names here do not influence the electrical properties of the
         % device. See INDEX OF REFRACTION LIBRARY for choices- names must be enetered
         % exactly as given in the column headings with the '_n', '_k' omitted
-        layer_type = {'layer'}
         stack = {'MAPICl'}
 
         % Define spatial cordinate system- typically this will be kept at
@@ -208,8 +216,10 @@ classdef pc
 
     %%  Properties whose values depend on other properties (see 'get' methods).
     properties (Dependent)
+        active_layer
         d
         parr
+        d_active
         dcum
         dcum0           % includes first entry as zero
         dEAdx
@@ -239,7 +249,6 @@ classdef pc
         wp
         wscr            % Space charge region width
         x0              % Initial spatial mesh value
-
     end
 
     methods
@@ -417,12 +426,20 @@ classdef pc
             end
         end
 
+        %% Get active layer indexes from layer_type
+        function value = get.active_layer(par)
+            value = find(strncmp('active', par.layer_type,6));
+        end
+        
+        %% Active layer thickness
+        function value = get.d_active(par)
+           value = sum(par.dcell(par.active_layer(1):par.active_layer(end)));
+        end
         %% Layer thicknesses [cm]
         function value = get.d(par)
             % For backwards comptibility. pcell and parr arre the now the
             % same thing
             value = par.dcell;
-
         end
 
         %% Layer points
@@ -430,7 +447,6 @@ classdef pc
             % For backwards comptibility. pcell and parr arre the now the
             % same thing
             value = par.pcell;
-
         end
 
         %% Band gap energies    [eV]
