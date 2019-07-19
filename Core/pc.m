@@ -255,7 +255,7 @@ classdef pc
                 par = pc.importproperties(par, filepath);
             elseif length(varargin) > 1
                 filepath = varargin{1, 1};
-                warning('pc should have 0 or 1 input arguments- only first argument will be used for filepath')
+                warning('pc should have 0 or 1 input arguments- only the first argument will be used for the filepath')
             end
 
             % Warn if tmesh_type is not correct
