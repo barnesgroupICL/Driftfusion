@@ -42,9 +42,9 @@ function all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
 %------------- BEGIN CODE --------------
 
 % name of the variables
-names = ["electrons", "holes", "ions", "potential"];
+names = ["electrons", "holes", "anions", "cations", "potential"];
 % which values have to be considered in a linear or in a log10 scale
-compare_log = [true, true, false, false];
+compare_log = [true, true, false, false, false];
 all_stable = true;
 
 % no need to calculate end_time for each of the 4 solutions: if they
@@ -69,11 +69,8 @@ for i = 1:length(sol_matrix(1, 1, :))
     stable = difference <= threshold;
 
     if stable
-        
-        display(['variable ', num2str(i), ' stabilisation verified']);
-        
+        %display(['variable ', num2str(i), ' stabilisation verified']);        
     else
-        
         warning('Driftfusion:verifyStabilization',...
             'Comparing final solutions at %s s and %s s showed that the %s distribution did not reach stability. Consider trying with a greater tmax.',...
             num2str(t_array(time_index)), num2str(t_array(end)), names(i));
