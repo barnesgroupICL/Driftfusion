@@ -1,7 +1,6 @@
 function JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 tic
 disp('Current voltage scan')
-
 % A procedure for running JV scans using DF
 %% Input arguments
 % sol_ini   	= an initial solution - must be at the same Vapp as the
@@ -38,76 +37,79 @@ par.tmesh_type = 1;
 par.tpoints = par.JVscan_pnts;
 
 if option ==1 || option ==3
-        
-        %% Dark forward scan
-        
-        disp('Dark forward scan...')
-        JV.dk.f = df(sol_ini, par);
-        JV.dk.f.par.JV = 0;
-        disp('Complete.')
-        
-        %% Dark reverse scan
-        
-        disp('Dark reverse scan...')
-        par.Vstart = Vend;
-        par.Vend = Vstart;
-        par.JV = 1;
-        
-        JV.dk.r = df(JV.dk.f, par);
-        JV.dk.r.par.JV = 0;
-        disp('Complete.')
-        
+    
+    %% Dark forward scan
+    
+    disp('Dark forward scan...')
+    JV.dk.f = df(sol_ini, par);
+    JV.dk.f.par.JV = 0;
+    disp('Complete.')
+    
+    %% Dark reverse scan
+    
+    disp('Dark reverse scan...')
+    par.Vstart = Vend;
+    par.Vend = Vstart;
+    par.JV = 1;
+    
+    JV.dk.r = df(JV.dk.f, par);
+    JV.dk.r.par.JV = 0;
+    disp('Complete.')
+    
 end
 
 if option ==2 || option ==3
-        
-        %% 1 Sun quasi equilibrium solution
-        
-        disp('Illuminated quasi-equilibrium solution')
-        par.JV = 0;
-        par.mobseti = 0;          % Switch ion mobility off for illumination step
-        par.Int = Intensity;
-        
-        % Log time mesh
-        par.tmesh_type = 2;
-        par.tmax = 1e-3;
-        par.t0 = par.tmax*1e-6;
-        
-        sol_i_1S = df(sol_ini, par);
-        disp('Complete.')
-        
-        %% Light forward
-        
-        disp('Illuminated forward scan...')
-        par.mobseti = mobseti;
-        
-        %% JV settings
-        par.JV = 1;
-        par.Vstart = Vstart;
-        par.Vend = Vend;
-        par.calcJ = 0;
-        par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
-        par.t0 = 0;
-        par.tmesh_type = 1;
-        par.tpoints = par.JVscan_pnts;
-        
-        JV.ill.f = df(sol_i_1S, par);
-        JV.ill.f.par.JV = 0;
-        disp('Complete.')
-        
-        %% Light reverse   
-        disp('Illuminated reverse scan...')
-        par.Vstart = Vend;
-        par.Vend = Vstart;
-        
-        JV.ill.r = df(JV.ill.f, par);
-        JV.ill.r.par.JV = 0;
-        disp('Complete.')
-        
-        disp('JV scan complete.')
-        
-        dfplot.JV(JV,option)
-        JV.stats = dfana.JVstats(JV);
+    
+    if Intensity == 0
+        error('Intensity cannot be zero- use option 1 for dark scan instead')
+    end
+    
+    %% 1 Sun quasi equilibrium solution
+    disp('Illuminated quasi-equilibrium solution')
+    par.JV = 0;
+    par.mobseti = 0;          % Switch ion mobility off for illumination step
+    par.Int = Intensity;
+    
+    % Log time mesh
+    par.tmesh_type = 2;
+    par.tmax = 1e-3;
+    par.t0 = par.tmax*1e-6;
+    
+    sol_i_1S = df(sol_ini, par);
+    disp('Complete.')
+    
+    %% Light forward
+    
+    disp('Illuminated forward scan...')
+    par.mobseti = mobseti;
+    
+    %% JV settings
+    par.JV = 1;
+    par.Vstart = Vstart;
+    par.Vend = Vend;
+    par.calcJ = 0;
+    par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
+    par.t0 = 0;
+    par.tmesh_type = 1;
+    par.tpoints = par.JVscan_pnts;
+    
+    JV.ill.f = df(sol_i_1S, par);
+    JV.ill.f.par.JV = 0;
+    disp('Complete.')
+    
+    %% Light reverse
+    disp('Illuminated reverse scan...')
+    par.Vstart = Vend;
+    par.Vend = Vstart;
+    
+    JV.ill.r = df(JV.ill.f, par);
+    JV.ill.r.par.JV = 0;
+    disp('Complete.')
+    
+    disp('JV scan complete.')
+    
+    dfplot.JV(JV,option)
+    JV.stats = dfana.JVstats(JV);
 end
 toc
 end
