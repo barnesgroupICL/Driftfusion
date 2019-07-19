@@ -38,7 +38,6 @@ classdef pc
         % exactly as given in the column headings with the '_n', '_k' omitted
         layer_type = {'layer'}
         stack = {'MAPICl'}
-        active_layer = 1;       % State the index of a layer that has the active layer properties
 
         % Define spatial cordinate system- typically this will be kept at
         % 0 for most applications
@@ -863,11 +862,6 @@ classdef pc
                 warning('No of ionic species (N_ionic_species) undefined in .csv. Using default in PC')
             end
             
-            try
-                par.active_layer = T{1, 'active_layer'};
-            catch
-                warning('active_layer undefined in .csv. Using default value in PC')
-            end
         end
     end
 
