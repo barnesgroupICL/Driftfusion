@@ -429,6 +429,10 @@ classdef pc
         %% Get active layer indexes from layer_type
         function value = get.active_layer(par)
             value = find(strncmp('active', par.layer_type,6));
+            if length(value) == 0
+                % If no flag is give assume active layer is middle
+                value = round(length(par.layer_type)/2);
+            end
         end
         
         %% Active layer thickness
