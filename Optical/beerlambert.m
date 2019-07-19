@@ -11,8 +11,8 @@ function Gentot = beerlambert(par, x, source_type, laserlambda, figson)
 % GENTOT - Generation rate integrated across the spectrum
 
 % Author: Philip Calado, Imperial College London, 2018
-% n & k loader taken from Stanford Transfer Matrix Code
-% NOTE: In this version n & k change abruptly in the centre of interfaces
+% n & k loader taken from McGeehee group Stanford Transfer Matrix Code
+% NOTE: In this version n & k change abruptly at interfaces
 
 % Constants
 h = 6.626e-34;
