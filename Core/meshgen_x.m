@@ -165,7 +165,7 @@ switch par.xmesh_type
 
         for i = 2:length(dcum0)
             
-            if strcmp(par.layer_type{1,i-1}, 'layer') == 1
+            if any(strcmp(par.layer_type{1,i-1}, {'layer', 'active'})) == 1
             
             alpha = 0.7;
             parr = 1:1:pcell(i-1)+1;

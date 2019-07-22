@@ -583,7 +583,7 @@ classdef pc
             if par.stats == 'Fermi'
                 % Build diffusion coefficient structure
                 for i =1:length(par.dcum)
-                    if strcmp(par.layer_type{1,i}, 'layer') == 1
+                    if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
                         startlim = par.EA(i)-0.4;
                         endlim = par.EA(i)+par.Fermi_limit;
                         interval = (endlim-startlim)/par.Fermi_Dn_points;
@@ -606,7 +606,7 @@ classdef pc
             % j is the xmesh index
             for i=1:length(par.dcum)
                 for j = 1:length(xx)
-                    if strcmp(par.layer_type{1,i}, 'layer') == 1
+                    if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
                         if xx(j) >= par.dcum0(i) %&& xx(j) <= darrcumint(k+1)
                             % Upper limits currently causing errors for final points-
                             % seems to be due to rounding. For now ignore
@@ -653,7 +653,7 @@ classdef pc
                             end
                         end
 
-                    elseif strcmp(par.layer_type{1,i}, 'junction') == 1
+                    elseif any(strcmp(par.layer_type{1,i}, {'junction'})) == 1
                         % Interfaces
                         if xx(j) > par.dcum0(i) && xx(j) < par.dcum0(i+1)
 
