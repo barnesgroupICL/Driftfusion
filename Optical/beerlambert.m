@@ -54,7 +54,7 @@ n = zeros(size(layers,2),size(lambda,2));
 k = zeros(size(layers,2),size(lambda,2));
 try
     for index = 1:size(layers,2)
-        if strcmp(layer_type{1,index}, 'layer') 
+        if any(strcmp(par.layer_type{1,index}, {'layer', 'active'}))
             [n(index,:), k(index,:)] = LoadRefrIndex(layers{index},lambda);
         else
         % Currently holds the optical properties from previous layer across
