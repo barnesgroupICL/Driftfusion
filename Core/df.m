@@ -125,6 +125,11 @@ if par.OM == 2 && par.Int ~= 0
     
 end
 
+%% Initial conditions
+if par.DP3layerIC
+    u0x = initial_conditions_3layer(par, 0);
+end
+
 %% Solver options
 % MaxStep = limit maximum time step size during integration
 options = odeset('MaxStep', 0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
@@ -255,10 +260,8 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                     g - dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-dev.ni(i)^2)/((dev.taun(i)*(u(2)+dev.pt(i))) + (dev.taup(i)*(u(1)+dev.nt(i)))));
                     0;
                     (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-dev.NA(i)+dev.ND(i)-u(5)+u(3));
-                    0;];
-                
+                    0;];        
         end
-        
     end
 
 % --------------------------------------------------------------------------
@@ -272,20 +275,36 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
             
             switch par.N_ionic_species
                 case 1
-                    u0 = [dev.n0(i);
-                        dev.p0(i);
-                        dev.Ncat(i);
-                        dev.E0(i);];
+                    if par.DP3layerIC
+                        u0 = [u0x(i, 1);
+                            u0x(i, 2);
+                            u0x(i, 3);
+                            u0x(i, 4);];
+                    else
+                        u0 = [dev.n0(i);
+                            dev.p0(i);
+                            dev.Ncat(i);
+                            dev.E0(i);];
+                    end
                 case 2
-                    u0 = [dev.n0(i);
-                        dev.p0(i);
-                        dev.Ncat(i);
-                        dev.E0(i);
-                        dev.Nion(i);];
+                    if par.DP3layerIC
+                        u0 = [u0x(i,1);
+                            u0x(i,2);
+                            u0x(i,3);
+                            u0x(i,4);
+                            u0x(i,5);];
+                    else
+                        u0 = [dev.n0(i);
+                            dev.p0(i);
+                            dev.Ncat(i);
+                            dev.E0(i);
+                            dev.Nion(i);];
+                    end
             end
         elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
             switch par.N_ionic_species
                 case 1
+                    
                     u0 = [interp1(icx,icsol(end,:,1),x);
                         interp1(icx,icsol(end,:,2),x);
                         interp1(icx,icsol(end,:,3),x);
@@ -321,7 +340,6 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
             case 1
                 % Open circuit condition- symmetric model
                 if par.OC == 1
-                    
                     
                     pl = [0;
                         0;
@@ -452,10 +470,8 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                             1;
                             1;
                             0;];
-                        
                     end
                 end
-                
                 
             case 2
                 % Open circuit condition- symmetric model
