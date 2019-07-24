@@ -83,6 +83,7 @@ classdef pc
         mobset = 1;             % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
         mobseti = 1;
         SRHset = 1;
+        radset = 1;
         JV = 0;                 % Toggle run JV scan on/off
         Ana = 1;                % Toggle on/off analysis
         stats = 'Boltz';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
@@ -92,7 +93,7 @@ classdef pc
         
         % Depletion approximation initial conditions
         % only works for 1 ionic species, 3 layers
-        DP3layerIC = 0;
+        DP3layerIC = 1;
         
         %% OM = Optical Model
         % Uniform generation uses
