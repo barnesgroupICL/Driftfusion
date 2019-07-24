@@ -263,31 +263,16 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
             
             switch par.N_ionic_species
                 case 1
-                    if par.DP3layerIC
-                        u0 = [u0x(i,1);
-                            u0x(i,2);
-                            u0x(i,3);
-                            u0x(i,4);];
-                    else
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
                             dev.E0(i);];
-                    end
                 case 2
-                    if par.DP3layerIC
-                        u0 = [u0x(i,1);
-                            u0x(i,2);
-                            u0x(i,3);
-                            u0x(i,4);
-                            u0x(i,5);];
-                    else
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
                             dev.E0(i);
                             dev.Nion(i);];
-                    end
             end
         elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
             switch par.N_ionic_species
