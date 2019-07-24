@@ -1,5 +1,5 @@
 function soleq = equilibrate(varargin)
-% Uses initial conditions defined in PINDRIFT and runs to equilibrium
+% Uses initial conditions defined in DF and runs to equilibrium
 if length(varargin) == 1
     par = varargin{1,1};
 else
@@ -18,16 +18,12 @@ par_origin = par;
 
 % Start with zero SRH recombination
 par.SRHset = 0;
-
-% Raditative recombination could also be set to low values initially if required. 
-% par.krad = 1e-20;
-% par.kradetl = 1e-20;
-% par.kradhtl = 1e-20;
+% Radiative rec could initially be set to zero in addition if required
+par.radset = 1;
 
 %% General initial parameters
 par.tmesh_type = 2;
 par.tpoints = 10;
-
 par.JV = 0;
 par.Vapp = 0;
 par.Int = 0;
@@ -74,6 +70,7 @@ par.sn_l = par_origin.sn_l;
 par.sn_r = par_origin.sn_r;
 par.sp_l = par_origin.sp_l;
 par.sp_r = par_origin.sp_r;
+par.radset = 1;
 par.mobset = 1;
 par.mobseti = 1;           % Ions are accelerated to reach equilibrium
 par.K_anion = rat_anion;
@@ -140,7 +137,7 @@ disp('Complete')
 
 % Switch on mobilities
 par.mobset = 1;
-
+par.radset = 1;
 par.sn_l = par_origin.sn_l;
 par.sn_r = par_origin.sn_r;
 par.sp_l = par_origin.sp_l;
