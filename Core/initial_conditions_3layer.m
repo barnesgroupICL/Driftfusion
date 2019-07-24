@@ -7,7 +7,7 @@ pcum1 = par.pcum0+1;
 
 % obtain electrostatic potential from depletion approximation based on
 % doping densites and ionic densities
-[rhomat, Fmat, Phimat] = depletion_approx_model9_numeric(par, 1, 0, 0.1, 2, [0],0);
+[rhomat, Fmat, Phimat] = depletion_approx_modelX_numeric(par, 1, 0, 0.1, 2, [0],0);
 
 V0 = Phimat(1,:);
 
@@ -49,8 +49,6 @@ a(p_active_l:p_active_r) = dev.Nion(p_active_l:p_active_r).*exp((V0_active(p_act
 c = dev.Ncat.*exp((V0_active(p_midact) - V0_active)/(par.kB*par.T));
 a = dev.Nion.*exp((V0_active - V0_active(p_midact))/(par.kB*par.T));
 
-
-
 % Normalise to uniform integrated density in the active layer
 Ncat_int = trapz(par.xx(p_active_l:p_active_r), dev.Ncat(p_active_l:p_active_r));
 Nion_int = trapz(par.xx(p_active_l:p_active_r), dev.Nion(p_active_l:p_active_r));
@@ -84,6 +82,7 @@ if figson
     semilogy(xnm, n, xnm, p)
     xlabel('Position [nm]')
     ylabel('Electronic carrier density [cm-3]')
+    legend('n','p')
     
     figure(502)
     plot(xnm, rho, xnm, rhoc, xnm, rhoel)
@@ -91,13 +90,13 @@ if figson
     ylabel('Space charge density [cm-3]')
     
     figure(503)
-    plot(xnm, c, xnm, a);%, c_norm, xnm, a_norm)
+    plot(xnm, a, xnm, c);%, c_norm, xnm, a_norm)
     xlabel('Position [nm]')
     ylabel('Ionic carrier density [cm-3]')
-    legend('c','a','c_{norm}','a_{norm}')
+    legend('a','c');%,'c_{norm}','a_{norm}')
     
     figure(504)
-    plot(xnm, V0)
+    plot(xnm, -V0)
     xlabel('Position [nm]')
     ylabel('Potential [V]')
 end
