@@ -8,42 +8,30 @@ function solstruct = df(varargin)
 % Authors: Phil Calado, Piers Barnes, Ilario Gelmetti, Ben Hillman,
 % Imperial College London, 2019
 
-% Variable input arguments
-
-% With no input argument, parameters
+% Deal with varargin arguments
 if length(varargin) == 0
-    
+    % If no input parameter set then call pc directly
     par = pc;
-    
 elseif length(varargin) == 1
-    
-    % Call input parameters function
+    % If one input argument then assume it is the Initial Conditions (IC) solution
     icsol = varargin{1, 1}.u;
     icx = varargin{1, 1}.x;
     par = pc;
-    
-elseif length(varargin) == 2
-    
-    if max(max(max(varargin{1, 1}.u))) == 0
-        
-        par = varargin{2};
-        
+elseif length(varargin) == 2  
+    if max(max(max(varargin{1, 1}.u))) == 0   
+        par = varargin{2};   
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
         
         input_solstruct = varargin{1, 1};
         par = input_solstruct.par;
         icsol = input_solstruct.u;
-        icx = input_solstruct.x;
-        
+        icx = input_solstruct.x;   
     else
-        
         input_solstruct = varargin{1, 1};
         icsol = input_solstruct.u;
         icx = input_solstruct.x;
-        par = varargin{2};
-        
-    end
-    
+        par = varargin{2};    
+    end  
 end
 
 %% Unpack dependent properties
@@ -276,10 +264,10 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
             switch par.N_ionic_species
                 case 1
                     if par.DP3layerIC
-                        u0 = [u0x(i, 1);
-                            u0x(i, 2);
-                            u0x(i, 3);
-                            u0x(i, 4);];
+                        u0 = [u0x(i,1);
+                            u0x(i,2);
+                            u0x(i,3);
+                            u0x(i,4);];
                     else
                         u0 = [dev.n0(i);
                             dev.p0(i);
@@ -322,7 +310,7 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 
 % --------------------------------------------------------------------------
 
-% Define boundary condtions, refer pdepe help for the precise meaning of p
+% Define boundary condtions, refer PDEPE help for the precise meaning of p
 % and you l and r refer to left and right.
 % in this example I am controlling the flux through the boundaries using
 % the difference in concentration from equilibrium and the extraction
@@ -338,7 +326,8 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
         
         switch par.N_ionic_species
             case 1
-                % Open circuit condition- symmetric model
+                %% Open circuit condition
+                % Not currently working
                 if par.OC == 1
                     
                     pl = [0;
@@ -391,7 +380,6 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                         % Fixed majority charge densities at the boundaries- contact in equilibrium with etl and htl
                         % Blocking electrode- zero flux for minority carriers
                     elseif par.BC == 1
-                        
                         
                         pl = [0;
                             (ul(2)-pleft);
@@ -619,10 +607,8 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                             1;
                             1;
                             0;
-                            1;];
-                        
+                            1;]; 
                     end
-                    
                 end
         end
     end
