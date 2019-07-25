@@ -261,12 +261,12 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
-                            (x/par.xx(end))*Vbi;];
+                            0;];%(x/par.xx(end))*Vbi;];
                 case 2
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
-                            (x/par.xx(end))*Vbi;
+                            0;%(x/par.xx(end))*Vbi;
                             dev.Nion(i);];
             end
         elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
