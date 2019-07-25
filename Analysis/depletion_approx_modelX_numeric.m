@@ -118,7 +118,7 @@ V = Vbi - Vapp;
 
 %% Call solver - default settings currently work well
 [tout, Q] = ode15s(@odefun,t,Q0);
-Q = Q';
+Q = real(Q');
 
 rhomat = zeros(length(t), length(x));
 Fmat = zeros(length(t), length(x));
