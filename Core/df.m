@@ -113,11 +113,6 @@ if par.OM == 2 && par.Int ~= 0
     
 end
 
-%% Initial conditions
-if par.DP3layerIC
-    u0x = initial_conditions_3layer(par, 0);
-end
-
 %% Solver options
 % MaxStep = limit maximum time step size during integration
 options = odeset('MaxStep', 0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
@@ -266,12 +261,12 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
-                            dev.E0(i);];
+                            (x/par.xx(end))*Vbi;];
                 case 2
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
-                            dev.E0(i);
+                            (x/par.xx(end))*Vbi;
                             dev.Nion(i);];
             end
         elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
