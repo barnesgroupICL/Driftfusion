@@ -58,16 +58,12 @@ if length(varargin) == 0 || max(max(max(varargin{1, 1}.u))) == 0
     x = meshgen_x(par);
     
 else
-    
     x = icx;
-    
 end
 
 % Define the x points to give the initial
-if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.u))) == 0
-    
-    icx = x;
-    
+if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.u))) == 0  
+    icx = x;   
 end
 
 par.xpoints = length(x);
@@ -141,9 +137,7 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                 % Add pulse
                 if par.pulseon == 1
                     if  t >= par.pulsestart && t < par.pulselen + par.pulsestart
-                        
                         g = g+(par.pulseint.*dev.G0);
-                        
                     end
                 end
                 
@@ -168,14 +162,12 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
             case 2
                 
                 if par.Int ~= 0
-                    
                     if x > dcum(1) && x <= dcum(2)
                         g = par.Int*interp1(par.genspace, Gx1S, (x-dcum(1)));
                     end
                 else
                     g = 0;
                 end
-                
                 % Add pulse
                 if par.pulseon == 1
                     if  t >= 10e-6 && t < par.pulselen + 10e-6
@@ -184,10 +176,8 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                             g = g + lasg;
                         end
                     end
-                end
-                
+                end  
         end
-        
         
         switch par.N_ionic_species
             case 1
@@ -261,12 +251,12 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
-                            0;];%(x/par.xx(end))*Vbi;];
+                            dev.E0(i);];%(x/par.xx(end))*Vbi;];
                 case 2
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
-                            0;%(x/par.xx(end))*Vbi;
+                            dev.E0(i);%(x/par.xx(end))*Vbi;
                             dev.Nion(i);];
             end
         elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
