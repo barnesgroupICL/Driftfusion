@@ -50,6 +50,7 @@ disp('Initial solution, zero mobility')
 sol = df(sol, par);
 disp('Complete')
 
+toc
 % Switch on mobilities
 par.mobset = 1;
 par.radset = 1;
