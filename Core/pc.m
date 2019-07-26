@@ -90,11 +90,7 @@ classdef pc
         Fermi_limit = 0.2;      % Max allowable limit for Fermi levels beyond the bands [eV]
         Fermi_Dn_points = 400;  % No. of points in the Fermi-Dirac look-up table
         intgradfun = 'linear'      % Interface gradient function 'linear' = linear, 'erf' = 'error function'
-        
-        % Depletion approximation initial conditions
-        % only works for 1 ionic species, 3 layers
-        DP3layerIC = 1;
-        
+                
         %% OM = Optical Model
         % Uniform generation uses
         % 0 = Uniform Generation
