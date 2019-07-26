@@ -23,11 +23,12 @@ par.radset = 1;
 
 %% General initial parameters
 par.tmesh_type = 2;
-par.tpoints = 10;
+par.tpoints = 3;
+
 par.JV = 0;
 par.Vapp = 0;
 par.Int = 0;
-par.pulseon = 0;
+par.pulseon = 0; 
 par.OC = 0;
 par.tmesh_type = 2;
 par.tmax = 1e-9;
@@ -50,7 +51,6 @@ disp('Initial solution, zero mobility')
 sol = df(sol, par);
 disp('Complete')
 
-toc
 % Switch on mobilities
 par.mobset = 1;
 par.radset = 1;
@@ -60,7 +60,7 @@ par.sp_l = par_origin.sp_l;
 par.sp_r = par_origin.sp_r;
 
 par.tmax = 1e-9;
-par.t0 = par.tmax/1e3;
+par.t0 = par.tmax/1e6;
 
 %% Solution with mobility switched on
 disp('Solution with mobility switched on')
