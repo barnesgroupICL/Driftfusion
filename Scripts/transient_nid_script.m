@@ -6,7 +6,7 @@ par = pc('input_files/3_layer_test.csv');
 %% Get equilibrium
 soleq = equilibrate(par);
 
-%% Preconditioning at 1.2 V until stable
+%% Preconditioning at Vbi+0.2 V until stable- change the second argument for a different precondition
 sol_relax = jumptoV(soleq.ion, par.Vbi+0.2, 1e-3, 0, 1);
 
 %% Get open circuit solutions
