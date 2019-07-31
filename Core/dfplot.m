@@ -356,6 +356,78 @@ classdef dfplot
             hold off
         end
         
+        function npx(varargin)
+            % Carrier densities as a function of position
+            if length(varargin) == 1
+                sol = varargin{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                tarr = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                tarr = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            xnm = sol.x*1e7;
+            figure(12)
+            for i = 1:length(tarr)
+                % find the time
+                p1 = find(sol.t >= tarr(i));
+                p1 = p1(1);
+
+                semilogy(xnm, (n(p1, :)), xnm, (p(p1, :)))
+                hold on
+            end
+            xlabel('Position [nm]')
+            ylabel('Carrier density [V]')
+            %legend('n', 'p')
+            hold off
+        end
+        
+        function Ux(varargin)
+            % Carrier densities as a function of position
+            if length(varargin) == 1
+                sol = varargin{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                tarr = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                tarr = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            U = dfana.calcU(sol);
+            
+            xnm = sol.x*1e7;
+            figure(12)
+            for i = 1:length(tarr)
+                % find the time
+                p1 = find(sol.t >= tarr(i));
+                p1 = p1(1);
+
+                semilogy(xnm, (U.btb(p1, :)), xnm, (U.srh(p1, :)), xnm, (U.tot(p1, :)))
+                hold on
+            end
+            xlabel('Position [nm]')
+            ylabel('Carrier density [V]')
+            legend('Ubtb', 'Usrh', 'Utot')
+            hold off
+        end
         
         function JVrec(JV, option)
             % Plots recombination currents for JV
