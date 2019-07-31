@@ -1,4 +1,4 @@
-function sol_relax = jumptoV(sol_ini, Vjump, tdwell, Int, K_cation, stabilise)
+function sol_relax = jumptoV(sol_ini, Vjump, tdwell, Int, stabilise)
 % A function to simulate a jump-to-Voltage measurement as used for SDP
 %% Input arugments
 % SOL_INI - input solution- could be cell at equilibrium or stablised at an
@@ -21,7 +21,7 @@ sol_ini.par.mobseti = 0;
 % Vapp_function(sol_ini, Vapp_func, tmax, tpoints, logtime)
 jump1 = Vapp_function(sol_ini, Vapp_func, coeff, tjump, 20, 1);
 
-par.K_cation = K_cation;
+par.K_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
 par.Vapp = V1;
 par.mobseti = 1;
 par.tmax = tdwell;
