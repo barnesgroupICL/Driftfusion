@@ -17,21 +17,21 @@ elseif length(varargin) == 1
     icsol = varargin{1, 1}.u;
     icx = varargin{1, 1}.x;
     par = pc;
-elseif length(varargin) == 2  
-    if max(max(max(varargin{1, 1}.u))) == 0   
-        par = varargin{2};   
+elseif length(varargin) == 2
+    if max(max(max(varargin{1, 1}.u))) == 0
+        par = varargin{2};
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
         
         input_solstruct = varargin{1, 1};
         par = input_solstruct.par;
         icsol = input_solstruct.u;
-        icx = input_solstruct.x;   
+        icx = input_solstruct.x;
     else
         input_solstruct = varargin{1, 1};
         icsol = input_solstruct.u;
         icx = input_solstruct.x;
-        par = varargin{2};    
-    end  
+        par = varargin{2};
+    end
 end
 
 %% Unpack dependent properties
@@ -62,8 +62,8 @@ else
 end
 
 % Define the x points to give the initial
-if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.u))) == 0  
-    icx = x;   
+if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.u))) == 0
+    icx = x;
 end
 
 par.xpoints = length(x);
@@ -176,7 +176,7 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                             g = g + lasg;
                         end
                     end
-                end  
+                end
         end
         
         switch par.N_ionic_species
@@ -233,7 +233,7 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                     g - par.radset*dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-dev.ni(i)^2)/((dev.taun(i)*(u(2)+dev.pt(i))) + (dev.taup(i)*(u(1)+dev.nt(i)))));
                     0;
                     (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-dev.NA(i)+dev.ND(i)-u(5)+u(3));
-                    0;];        
+                    0;];
         end
     end
 
@@ -248,16 +248,16 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
             
             switch par.N_ionic_species
                 case 1
-                        u0 = [dev.n0(i);
-                            dev.p0(i);
-                            dev.Ncat(i);
-                            (x/par.xx(end))*Vbi;];
+                    u0 = [dev.n0(i);
+                        dev.p0(i);
+                        dev.Ncat(i);
+                        (x/par.xx(end))*Vbi;];
                 case 2
-                        u0 = [dev.n0(i);
-                            dev.p0(i);
-                            dev.Ncat(i);
-                            (x/par.xx(end))*Vbi;
-                            dev.Nion(i);];
+                    u0 = [dev.n0(i);
+                        dev.p0(i);
+                        dev.Ncat(i);
+                        (x/par.xx(end))*Vbi;
+                        dev.Nion(i);];
             end
         elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
             switch par.N_ionic_species
@@ -295,289 +295,241 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
         
         switch par.N_ionic_species
             case 1
-                %% Open circuit condition
-                % Not currently working
-                if par.OC == 1
+                % Zero current - rarely used but can be useful to switch off currents before switching
+                % to OC in procedures.
+                if par.BC == 0
                     
                     pl = [0;
                         0;
                         0;
-                        ul(4)+ur(4)];
+                        -ul(4);];
                     
                     ql = [1;
                         1;
                         1;
-                        0];
+                        0;];
                     
                     pr = [0;
                         0;
                         0;
-                        ul(4)+ur(4)];
+                        -ur(4) + Vbi - par.Vapp;];
                     
                     qr = [1;
                         1;
                         1;
-                        0];
+                        0;];
                     
-                else
-                    %% Closed circuit condition
+                    % Fixed majority charge densities at the boundaries- contact in equilibrium with etl and htl
+                    % Blocking electrode- zero flux for minority carriers
+                elseif par.BC == 1
                     
-                    % Zero current - rarely used but can be useful to switch off currents before switching
-                    % to OC in procedures.
-                    if par.BC == 0
-                        
-                        pl = [0;
-                            0;
-                            0;
-                            -ul(4);];
-                        
-                        ql = [1;
-                            1;
-                            1;
-                            0;];
-                        
-                        pr = [0;
-                            0;
-                            0;
-                            -ur(4) + Vbi - par.Vapp;];
-                        
-                        qr = [1;
-                            1;
-                            1;
-                            0;];
-                        
-                        % Fixed majority charge densities at the boundaries- contact in equilibrium with etl and htl
-                        % Blocking electrode- zero flux for minority carriers
-                    elseif par.BC == 1
-                        
-                        pl = [0;
-                            (ul(2)-pleft);
-                            0;
-                            -ul(4);];
-                        
-                        ql = [1;
-                            0;
-                            1;
-                            0;];
-                        
-                        pr = [(ur(1)-nright);
-                            0;
-                            0;
-                            -ur(4)+Vbi-par.Vapp;];
-                        
-                        qr = [0;
-                            1;
-                            1;
-                            0;];
-                        
-                        % Non- selective contacts - fixed charge densities for majority carrier
-                        % and flux for minority carriers- use recombination coefficients sn_rec
-                        % & sp_rec to set the surface recombination velocity. pdepe
-                    elseif par.BC == 2
-                        
-                        pl = [-par.sn_l*(ul(1) - nleft);
-                            ul(2) - pleft;
-                            0;
-                            -ul(4);];
-                        
-                        ql = [1;
-                            0;
-                            1;
-                            0;];
-                        
-                        pr = [ur(1) - nright;
-                            par.sp_r*(ur(2) - pright);
-                            0;
-                            -ur(4)+Vbi-par.Vapp;];
-                        
-                        qr = [0;
-                            1;
-                            1;
-                            0;];
-                        
-                        % Flux boundary conditions for both carrier types. Leads to
-                        % inaccurate calculation at low currents due to the small
-                        % fractional change in majority carrier density at interface. May
-                        % be more reliable at high currents than BC2 since does not rely on
-                        % integrating continuity equations across the device.
-                    elseif par.BC == 3
-                        
-                        Jn_r = -par.e*par.sn_r*(ur(1) - nright);
-                        Jp_r = par.e*par.sp_r*(ur(2) - pright);
-                        
-                        Jr = Jn_r+Jp_r;
+                    pl = [0;
+                        (ul(2)-pleft);
+                        0;
+                        -ul(4);];
+                    
+                    ql = [1;
+                        0;
+                        1;
+                        0;];
+                    
+                    pr = [(ur(1)-nright);
+                        0;
+                        0;
+                        -ur(4)+Vbi-par.Vapp;];
+                    
+                    qr = [0;
+                        1;
+                        1;
+                        0;];
+                    
+                    % Non- selective contacts - fixed charge densities for majority carrier
+                    % and flux for minority carriers- use recombination coefficients sn_rec
+                    % & sp_rec to set the surface recombination velocity. pdepe
+                elseif par.BC == 2
+                    
+                    pl = [-par.sn_l*(ul(1) - nleft);
+                        ul(2) - pleft;
+                        0;
+                        -ul(4);];
+                    
+                    ql = [1;
+                        0;
+                        1;
+                        0;];
+                    
+                    pr = [ur(1) - nright;
+                        par.sp_r*(ur(2) - pright);
+                        0;
+                        -ur(4)+Vbi-par.Vapp;];
+                    
+                    qr = [0;
+                        1;
+                        1;
+                        0;];
+                    
+                    % Flux boundary conditions for both carrier types. Leads to
+                    % inaccurate calculation at low currents due to the small
+                    % fractional change in majority carrier density at interface. May
+                    % be more reliable at high currents than BC2 since does not rely on
+                    % integrating continuity equations across the device.
+                elseif par.BC == 3
+                    
+                    Jn_r = -par.e*par.sn_r*(ur(1) - nright);
+                    Jp_r = par.e*par.sp_r*(ur(2) - pright);
+                    
+                    Jr = Jn_r+Jp_r;
+                    
+                    if par.Rs_initial
+                        % Initial linear sweep
+                        Vres = Jr*par.Rs*t/par.tmax;
+                    else
                         Vres = Jr*par.Rs;
-                        
-                        pl = [-par.sn_l*(ul(1) - nleft);
-                            -par.sp_l*(ul(2) - pleft);
-                            0;
-                            -ul(4);];
-                        
-                        ql = [1;
-                            1;
-                            1;
-                            0;];
-                        
-                        pr = [par.sn_r*(ur(1) - nright);
-                            par.sp_r*(ur(2) - pright);
-                            0;
-                            -ur(4)+Vbi-par.Vapp+Vres;];
-                        
-                        qr = [1;
-                            1;
-                            1;
-                            0;];
                     end
+                    
+                    pl = [-par.sn_l*(ul(1) - nleft);
+                        -par.sp_l*(ul(2) - pleft);
+                        0;
+                        -ul(4);];
+                    
+                    ql = [1;
+                        1;
+                        1;
+                        0;];
+                    
+                    pr = [par.sn_r*(ur(1) - nright);
+                        par.sp_r*(ur(2) - pright);
+                        0;
+                        -ur(4)+Vbi-par.Vapp+Vres;];
+                    
+                    qr = [1;
+                        1;
+                        1;
+                        0;];
                 end
                 
             case 2
-                % Open circuit condition- symmetric model
-                if par.OC == 1
+                % Zero current - rarely used but can be useful to switch off currents before switching
+                % to OC in procedures.
+                if par.BC == 0
+                    
                     pl = [0;
                         0;
                         0;
-                        -ul(4)];
+                        -ul(4);
+                        0;];
                     
                     ql = [1;
                         1;
                         1;
-                        0];
+                        0;
+                        1;];
                     
                     pr = [0;
                         0;
                         0;
-                        -ur(4)];
+                        -ur(4) + Vbi - par.Vapp;
+                        0;];
                     
                     qr = [1;
                         1;
                         1;
-                        0];
+                        0;
+                        1;];
                     
-                else
-                    %% Closed circuit condition
+                    % Fixed majority charge densities at the boundaries- contact in equilibrium with etl and htl
+                    % Blocking electrode- zero flux for minority carriers
+                elseif par.BC == 1
                     
-                    % Zero current - rarely used but can be useful to switch off currents before switching
-                    % to OC in procedures.
-                    if par.BC == 0
-                        
-                        pl = [0;
-                            0;
-                            0;
-                            -ul(4);
-                            0;];
-                        
-                        ql = [1;
-                            1;
-                            1;
-                            0;
-                            1;];
-                        
-                        pr = [0;
-                            0;
-                            0;
-                            -ur(4) + Vbi - par.Vapp;
-                            0;];
-                        
-                        qr = [1;
-                            1;
-                            1;
-                            0;
-                            1;];
-                        
-                        % Fixed majority charge densities at the boundaries- contact in equilibrium with etl and htl
-                        % Blocking electrode- zero flux for minority carriers
-                    elseif par.BC == 1
-                        
-                        
-                        pl = [0;
-                            (ul(2)-pleft);
-                            0;
-                            -ul(4);
-                            0;];
-                        
-                        ql = [1;
-                            0;
-                            1;
-                            0;
-                            1;];
-                        
-                        pr = [(ur(1)-nright);
-                            0;
-                            0;
-                            -ur(4)+Vbi-par.Vapp;
-                            0;];
-                        
-                        qr = [0;
-                            1;
-                            1;
-                            0;
-                            1;];
-                        
-                        % Non- selective contacts - fixed charge densities for majority carrier
-                        % and flux for minority carriers- use recombination coefficients sn_rec
-                        % & sp_rec to set the surface recombination velocity. pdepe
-                    elseif par.BC == 2
-                        
-                        pl = [-par.sn_l*(ul(1) - nleft);
-                            ul(2) - pleft;
-                            0;
-                            -ul(4);
-                            0;];
-                        
-                        ql = [1;
-                            0;
-                            1;
-                            0;
-                            1;];
-                        
-                        pr = [ur(1) - nright;
-                            par.sp_r*(ur(2) - pright);
-                            0;
-                            -ur(4)+Vbi-par.Vapp;
-                            0;];
-                        
-                        qr = [0;
-                            1;
-                            1;
-                            0;
-                            1;];
-                        
-                        % Flux boundary conditions for both carrier types. Leads to
-                        % inaccurate calculation at low currents due to the small
-                        % fractional change in majority carrier density at interface. May
-                        % be more reliable at high currents than BC2 since does not rely on
-                        % integrating continuity equations across the device.
-                    elseif par.BC == 3
-                        Jn_r = -par.e*par.sn_r*(ur(1) - nright);
-                        Jp_r = par.e*par.sp_r*(ur(2) - pright);
-                        
-                        Jr = Jn_r+Jp_r;
-                        Vres = Jr*par.Rs;
-                        
-                        pl = [-par.sn_l*(ul(1) - nleft);
-                            -par.sp_l*(ul(2) - pleft);
-                            0;
-                            -ul(4);
-                            0;];
-                        
-                        ql = [1;
-                            1;
-                            1;
-                            0;
-                            1;];
-                        
-                        pr = [par.sn_r*(ur(1) - nright);
-                            par.sp_r*(ur(2) - pright);
-                            0;
-                            -ur(4)+Vbi-par.Vapp+Vres;
-                            0;];
-                        
-                        qr = [1;
-                            1;
-                            1;
-                            0;
-                            1;]; 
-                    end
+                    
+                    pl = [0;
+                        (ul(2)-pleft);
+                        0;
+                        -ul(4);
+                        0;];
+                    
+                    ql = [1;
+                        0;
+                        1;
+                        0;
+                        1;];
+                    
+                    pr = [(ur(1)-nright);
+                        0;
+                        0;
+                        -ur(4)+Vbi-par.Vapp;
+                        0;];
+                    
+                    qr = [0;
+                        1;
+                        1;
+                        0;
+                        1;];
+                    
+                    % Non- selective contacts - fixed charge densities for majority carrier
+                    % and flux for minority carriers- use recombination coefficients sn_rec
+                    % & sp_rec to set the surface recombination velocity. pdepe
+                elseif par.BC == 2
+                    
+                    pl = [-par.sn_l*(ul(1) - nleft);
+                        ul(2) - pleft;
+                        0;
+                        -ul(4);
+                        0;];
+                    
+                    ql = [1;
+                        0;
+                        1;
+                        0;
+                        1;];
+                    
+                    pr = [ur(1) - nright;
+                        par.sp_r*(ur(2) - pright);
+                        0;
+                        -ur(4)+Vbi-par.Vapp;
+                        0;];
+                    
+                    qr = [0;
+                        1;
+                        1;
+                        0;
+                        1;];
+                    
+                    % Flux boundary conditions for both carrier types. Leads to
+                    % inaccurate calculation at low currents due to the small
+                    % fractional change in majority carrier density at interface. May
+                    % be more reliable at high currents than BC2 since does not rely on
+                    % integrating continuity equations across the device.
+                elseif par.BC == 3
+                    Jn_r = -par.e*par.sn_r*(ur(1) - nright);
+                    Jp_r = par.e*par.sp_r*(ur(2) - pright);
+                    
+                    Jr = Jn_r+Jp_r;
+                    Vres = Jr*par.Rs;
+                    
+                    pl = [-par.sn_l*(ul(1) - nleft);
+                        -par.sp_l*(ul(2) - pleft);
+                        0;
+                        -ul(4);
+                        0;];
+                    
+                    ql = [1;
+                        1;
+                        1;
+                        0;
+                        1;];
+                    
+                    pr = [par.sn_r*(ur(1) - nright);
+                        par.sp_r*(ur(2) - pright);
+                        0;
+                        -ur(4)+Vbi-par.Vapp+Vres;
+                        0;];
+                    
+                    qr = [1;
+                        1;
+                        1;
+                        0;
+                        1;];
                 end
         end
     end
