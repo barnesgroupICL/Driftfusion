@@ -14,3 +14,4 @@ sol_OC = transient_nid(sol_relax, logspace(-4,2,7), 10, 1, 1e6, 200);
 
 %% Analyse the solution
 nidt_mean = transient_nid_ana(sol_OC);
+
