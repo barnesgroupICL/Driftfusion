@@ -176,7 +176,8 @@ classdef pc
 
         %% Series resistance
         Rs = 0;
-
+        Rs_initial = 0;         % Switch to allow linear ramp of Rs on first application
+        
         %% Defect recombination rate coefficient
         % Currently not used
         k_defect_p = 0;
