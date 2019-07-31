@@ -65,6 +65,7 @@ end
 sol_relax = sol;
 
 sol_relax.par.K_cation = 1;
+sol_relax.par.K_anion = 1;
 % Read out currents from LH side
 dfplot.Jt(sol_relax, 1);
 
