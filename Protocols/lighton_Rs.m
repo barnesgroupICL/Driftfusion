@@ -22,11 +22,13 @@ par.tpoints = 10;
 par.JV = 0;
 par.mobseti = 0;
 par.Rs = Rs;
+par.Rs_initial = 1;
 
-disp('Switching on series resistance')
+disp('Switching on series resistance- initial fast linear sweep')
 sol_Rs = df(sol_ini, par);
 
 disp('Switching on illumination')
+par.Rs_initial = 0;
 par.Int = Int;
 
 par.mobseti = mobseti;
