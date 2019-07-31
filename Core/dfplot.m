@@ -92,7 +92,6 @@ classdef dfplot
             set(legend,'FontSize',12);
             set(legend,'EdgeColor',[1 1 1]);
             hold off
-
         end
 
         function Jt(sol, pos)
@@ -226,7 +225,7 @@ classdef dfplot
 
                 plot(xnm, Jdd.ndiff(p1,:), xnm, Jdd.ndrift(p1,:), xnm, Jdd.pdiff(p1,:),...
                     xnm, Jdd.pdrift(p1,:), xnm, Jdd.adiff(p1,:), xnm, Jdd.adrift(p1,:),...
-                    Jdd.cdiff(p1,:), xnm, Jdd.cdrift(p1,:));
+                    xnm, Jdd.cdiff(p1,:), xnm, Jdd.cdrift(p1,:));
                 hold on
             end
             xlabel('Position [nm]')
@@ -357,6 +356,43 @@ classdef dfplot
         end
         
         function npx(varargin)
+            % Carrier densities as a function of position
+            if length(varargin) == 1
+                sol = varargin{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                tarr = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                tarr = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            xnm = sol.x*1e7;
+            figure(12)
+            for i = 1:length(tarr)
+                % find the time
+                p1 = find(sol.t >= tarr(i));
+                p1 = p1(1);
+
+                semilogy(xnm, (n(p1, :)), xnm, (p(p1, :)))
+                hold on
+            end
+            xlabel('Position [nm]')
+            ylabel('Carrier density [V]')
+            xlim([xrange(1), xrange(2)])
+            %legend('n', 'p')
+            hold off
+        end
+        
+        function cax(varargin)
             % Carrier densities as a function of position
             if length(varargin) == 1
                 sol = varargin{1};
@@ -696,6 +732,169 @@ classdef dfplot
             ylabel('Electrostatic potential [V]')
             xlim([xnm(1), xnm(end)])
             hold off 
+        end
+        
+        
+        function ELx_single(varargin)
+            % Energy Level diagram, and charge densities plotter
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+
+            % tarr is a time time array for the time you wish to plot
+            if length(varargin) == 1
+                sol = varargin{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                tarr = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                tarr = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+
+            % Call dfana to obtain band energies and QFLs
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+
+            xnm = x*1e7;    % x in nm for plotting
+            FH1 = figure(22);
+            for i = 1:length(tarr)
+                % find the tarr
+                p1 = find(sol.t <= tarr(i));
+                p1 = p1(end);
+                
+                plot (xnm, Efn(p1,:), '--', xnm, Efp(p1,:), '--', xnm, Ecb(p1, :), xnm, Evb(p1 ,:));
+                hold on
+            end
+
+            figure(22)
+            legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
+            set(legend,'FontSize',12);
+            xlabel('Position [nm]');
+            ylabel('Energy [eV]');
+            xlim([xrange(1), xrange(2)]);
+            set(legend,'FontSize',12);
+            set(legend,'EdgeColor',[1 1 1]);
+            hold off
+        end
+        
+        
+        function ELnpx(varargin)
+            % Energy Level diagram, and charge densities plotter
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+
+            % tarr is a time time array for the time you wish to plot
+            if length(varargin) == 1
+                sol = varargin{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                tarr = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                tarr = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+
+            % Call dfana to obtain band energies and QFLs
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+
+            xnm = x*1e7;    % x in nm for plotting
+
+            for i = 1:length(tarr)
+                % find the tarr
+                p1 = find(sol.t <= tarr(i));
+                p1 = p1(end);
+
+                % Band Diagram
+                FH1 = figure(23);
+                PH1 = subplot(2,1,1);
+                plot (xnm, Efn(p1,:), '--', xnm, Efp(p1,:), '--', xnm, Ecb(p1, :), xnm, Evb(p1 ,:));
+                hold on
+
+                % Final Charge Densities
+                PH2 = subplot(2,1,2);
+                semilogy(xnm, n(p1, :), xnm, p(p1, :));
+                hold on
+            end
+
+            figure(23)
+            subplot(2,1,1);
+            legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
+            set(legend,'FontSize',12);
+            xlabel('Position [nm]');
+            ylabel('Energy [eV]');
+            xlim([xrange(1), xrange(2)]);
+            set(legend,'FontSize',12);
+            set(legend,'EdgeColor',[1 1 1]);
+            hold off
+
+            subplot(2,1,2);
+            ylabel('Carrier density [cm-3]')
+            legend('\itn', '\itp')
+            xlabel('Position [nm]')
+            xlim([xrange(1), xrange(2)]);
+            ylim([1e0, 1e20]);
+            set(legend,'FontSize',12);
+            set(legend,'EdgeColor',[1 1 1]);
+            hold off
+
+        end
+        
+        function Jnpddx(varargin)
+            % figure(5)
+            % drift and diffusion currents as a function of position
+
+            if length(varargin) == 1
+                sol = varargin{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                tarr = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                tarr = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+
+            % get drift and diffusion currents
+            Jdd = dfana.Jddxt(sol);
+            xnm = sol.x*1e7;
+
+            figure(5)
+            for i = 1:length(tarr)
+                % find the time
+                p1 = find(sol.t <= tarr(i));
+                p1 = p1(end);
+
+                plot(xnm, Jdd.ndiff(p1,:), xnm, Jdd.ndrift(p1,:), xnm, Jdd.pdiff(p1,:),...
+                    xnm, Jdd.pdrift(p1,:));
+                hold on
+            end
+            xlabel('Position [nm]')
+            ylabel('Current density [Acm-2]')
+            legend('n,diff', 'n,drift', 'p,diff', 'p,drift')
+            hold off
         end
     end
 end
