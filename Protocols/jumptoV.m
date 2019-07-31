@@ -21,7 +21,22 @@ sol_ini.par.mobseti = 0;
 % Vapp_function(sol_ini, Vapp_func, tmax, tpoints, logtime)
 jump1 = Vapp_function(sol_ini, Vapp_func, coeff, tjump, 20, 1);
 
-par.K_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+% Take ratio of electron and ion mobilities in the active layer
+rat_anion = par.mue(par.active_layer)/par.muion(par.active_layer);
+rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+
+% If the ratio is infinity (ion mobility set to zero) then set the ratio to
+% zero instead
+if isnan(rat_anion) || isinf(rat_anion)
+    rat_anion = 0;
+end
+
+if isnan(rat_cation) || isinf(rat_cation)
+    rat_cation = 0;
+end
+par.K_anion = rat_anion;
+par.K_cation = rat_cation;
+
 par.Vapp = V1;
 par.mobseti = 1;
 par.tmax = tdwell;
