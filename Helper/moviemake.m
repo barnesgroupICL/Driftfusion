@@ -15,12 +15,18 @@ capfigon = 0;
 for i = 1:length(sol.t)
     %figure(600)
     clf
+    
     plotfun(sol, sol.t(i))
     fig1 = gca;
 %     subplot(2,1,1);
-%     ylim([-2,0.1])
-%     
+%     ylim([-2,0.2])
+    
 %     subplot(2,1,2);
+%     ylim([1e10, 1.5e18])
+
+%     subplot(3,1,3);
+%     ylim([0,2e18])
+    
     if xrange ~= 0
         xlim([xrange(1)*1e7, xrange(2)*1e7])
     end
@@ -28,7 +34,8 @@ for i = 1:length(sol.t)
     if yrange ~= 0
         ylim([yrange(1), yrange(2)])
     end
-    Framefile(i) = getframe(fig1);
+    
+    Framefile(i) = getframe(gcf);
     
 end
 
