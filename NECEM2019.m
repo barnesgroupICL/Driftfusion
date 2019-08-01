@@ -8,10 +8,10 @@
 % %  dfplot.ELx_single(JV.tio2_no_ion.ill.f, 0);
 % %  dfplot.npx(JV.tio2_no_ion.ill.f, 0);
 % 
- par.pn = pc('input_files/pn_junction.csv');
- soleq.pn = equilibrate(par.pn);
-%  JV.pn = doJV(soleq.pn.ion, 100e-3, 201, 1, 1, 0, 1.2, 2);
-JV.pn_no_ion = doJV(soleq.pn.no_ion, 100e-3, 100, 1, 1, 0, 0.6, 1);
+%  par.pn = pc('input_files/pn_junction.csv');
+%  soleq.pn = equilibrate(par.pn);
+% %  JV.pn = doJV(soleq.pn.ion, 100e-3, 201, 1, 1, 0, 1.2, 2);
+% JV.pn_no_ion = doJV(soleq.pn.no_ion, 100e-3, 100, 1, 1, 0, 0.6, 1);
 % 
 % pn_dk_f = moviemake(JV.pn_no_ion.dk.f, @dfplot.ELnpx, 0, [1e4, 1e17], 'pn_dk_f_mov');
 
@@ -28,6 +28,14 @@ JV.pn_no_ion = doJV(soleq.pn.no_ion, 100e-3, 100, 1, 1, 0, 0.6, 1);
 
 % par.pn_ion = pc('input_files/pn_junction_ion.csv');
 % soleq.pn_ion = equilibrate(par.pn_ion);
-% %  JV.pn_ion = doJV(soleq.pn_ion.ion, 100e-3, 201, 1, 1, 0, 1.2, 2);
-% JV.pn_ion = doJV(soleq.pn_ion.ion, 100e-3, 100, 1, 1, 0, 0.6, 1);
-% pn_ion_dk_f = moviemake(JV.pn_ion.dk.f, @dfplot.ELnpx, 0, [1e4, 1e17], 'pn_ion_dk_f_mov');
+%% jumptoV(sol_ini, Vjump, tdwell, mobseti, Int, stabilise)
+% sol_0V_to_m0p4V = jumptoV(soleq.pn_ion.ion, -0.4, 1, 1, 0, 1);
+% sol_m0p4V_to_0V = jumptoV(sol_0V_to_m0p4V, 0, 1, 0, 0, 1);
+JV.pn_ion_m0p4V = doJV(sol_m0p4V_to_0V, 100e-3, 100, 1, 0, 0, 0.6, 1);
+
+sol_0V_to_0p6V = jumptoV(soleq.pn_ion.ion, 0.6, 1, 1, 0, 1);
+sol_0p6V_to_0V = jumptoV(sol_0V_to_0p6V, 0, 1, 0, 0, 1);
+JV.pn_ion_0p6V = doJV(sol_0p6V_to_0V , 100e-3, 100, 1, 0, 0, 0.6, 1);
+% JV.pn_ion = doJV(soleq.pn_ion.ion, 100e-3, 201, 1, 1, 0, 1.2, 2);
+JV.pn_ion_0V = doJV(soleq.pn_ion.ion, 100e-3, 100, 1, 1, 0, 0.6, 1);
+pn_ion_0V_dk_f_V= moviemake(JV.pn_ion_0V.dk.f, @dfplot.Vacx, 0, 0, 'pn_ion_0V_dk_f_V_mov', 1 , 0);
