@@ -1,4 +1,4 @@
-function Framefile = moviemake2(sol, plotfun, xrange, yrange, movie_name)
+function Framefile = moviemake2(sol, plotfun, xrange, yrange, movie_name, Vcounter, tcounter)
 % Makes a frame file F from a solution
 % Currently configured to output the band diagram
 % @PLOTFUN is the name of the plotting function that you wish to use
@@ -10,7 +10,7 @@ function Framefile = moviemake2(sol, plotfun, xrange, yrange, movie_name)
 ionfigon = 0;
 capfigon = 0;
 
-%fig1 = figure(600);
+Vapp = dfana.calcVapp(sol);
 
 for i = 1:length(sol.t)
     %figure(600)
@@ -18,11 +18,11 @@ for i = 1:length(sol.t)
     
     plotfun(sol, sol.t(i))
     fig1 = gca;
-%     subplot(2,1,1);
-%     ylim([-2,0.2])
+    subplot(2,1,1);
+    ylim([[-0.7, 0.1]])
     
-%     subplot(2,1,2);
-%     ylim([1e10, 1.5e18])
+    subplot(2,1,2);
+    ylim([0e18, 2e18])
 
 %     subplot(3,1,3);
 %     ylim([0,2e18])
@@ -36,6 +36,26 @@ for i = 1:length(sol.t)
     end
     
     Framefile(i) = getframe(gcf);
+    
+    % Voltage counter
+    if Vcounter
+        dim = [.2 0 .3 .3];
+        Vnow = round(Vapp(i), 2, 'decimal');
+        anno = ['V = ', num2str(Vnow), ' V'];
+        T = annotation('textbox', dim, 'String', anno, 'FitBoxToText','on');
+        T.FontSize = 16;
+        drawnow
+    end
+    
+    % Time counter
+    if tcounter
+        dim = [.2 0 .3 .3];
+        tnow = round(sol.t(i), 2, 'decimal');
+        anno = ['t = ', num2str(tnow), ' s'];
+        T = annotation('textbox', dim, 'String', anno, 'FitBoxToText','on');
+        T.FontSize = 16;
+        drawnow
+    end
     
 end
 
