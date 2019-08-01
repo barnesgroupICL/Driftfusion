@@ -8,14 +8,12 @@ if par.tmesh_type == 1
 
 elseif par.tmesh_type == 2
    
-    t = logspace(log10(par.t0),log10(par.tmax),par.tpoints) - par.t0;
-
+    t = logspace(log10(par.t0),log10(par.tmax),par.tpoints);
+    t = [0,t];
     % For use with TPV only! Start with 100 points up to the decay then
     % switches to log
 elseif par.tmesh_type == 3
-    
     t = [linspace(0, par.pulsestart+par.pulselen, 0.2*par.tpoints), par.pulsestart + par.pulselen + par.logspace(log10(par.deltat), log10(par.tmax- par.pulsestart- par.pulselen), 0.8*par.tpoints)];
-    
 end
 
 
