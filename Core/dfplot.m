@@ -928,12 +928,14 @@ classdef dfplot
                 p1 = p1(1);
                 
                 subplot(2,1,1)
-                plot(xnm, -V(p1, :))
+                plot(xnm, -V(p1, :), 'black')
                 hold on
                 
                 subplot(2,1,2)
-                plot(xnm, c(p1,:), xnm, a(p1,:))
+                plot(xnm, c(p1,:), 'black')
                 hold on
+                %plot(xnm, a(p1,:))
+                
             end
             subplot(2,1,1)
             xlabel('Position [nm]')
@@ -945,8 +947,61 @@ classdef dfplot
             xlabel('Position [nm]')
             ylabel('Ionic carrier density [cm-3]')
             xlim([xrange(1), xrange(2)])
-            legend('c','a')
+            %legend('c','a')
             hold off
-        end 
+        end
+        
+        function rhoVx(varargin)
+            % Volumetric charge density (rho) as a funciton of position
+            % A time array can be used as a second input argument
+
+            if length(varargin) == 1
+                sol = varargin{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                tarr = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                tarr = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+            
+            rho = dfana.calcrho(sol);
+            V = sol.u(:,:,4)-sol.u(:,1,4);
+            
+            xnm = sol.x*1e7;
+            figure(19)
+            for i = 1:length(tarr)
+                % find the time
+                p1 = find(sol.t <= tarr(i));
+                p1 = p1(end);
+                
+                subplot(2,1,1)
+                plot(xnm, rho(p1, :))
+                hold on
+                
+                subplot(2,1,2)
+                plot(xnm, -V(p1, :))
+                hold on  
+            end
+            subplot(2,1,1)
+            xlabel('Position [nm]')
+            ylabel('Charge density [cm-3]')
+            hold off
+            xlim([xrange(1), xrange(2)])
+            
+            subplot(2,1,2)
+            xlabel('Position [nm]')
+            ylabel('-Electrostatic potential [V]')
+            hold off
+            xlim([xrange(1), xrange(2)])
+            
+        end
     end
 end
