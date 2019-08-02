@@ -48,6 +48,7 @@ pright = par.pright;
 dmax = par.dcum(end);
 xx = par.xx;
 dev = par.dev;
+devihalf = getdevihalf(par);
 
 %%%% Spatial mesh %%%%
 if length(varargin) == 0 || max(max(max(varargin{1, 1}.u))) == 0
@@ -130,14 +131,14 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
             
             case 0
                 if par.Int ~= 0
-                    g = par.Int*dev.G0(i);
+                    g = par.Int*devihalf.G0(i);
                 else
                     g = 0;
                 end
                 % Add pulse
                 if par.pulseon == 1
                     if  t >= par.pulsestart && t < par.pulselen + par.pulsestart
-                        g = g+(par.pulseint.*dev.G0);
+                        g = g+(par.pulseint.*devihalf.G0);
                     end
                 end
                 
@@ -189,22 +190,22 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                     0;];
                 
                 if par.stats == 'Fermi'
-                    Dn = F.D(u(1), dev.Dnfun(i,:), dev.n_fd(i,:));
-                    Dp = F.D(u(2), dev.Dpfun(i,:), dev.p_fd(i,:));
+                    Dn = F.D(u(1), devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
+                    Dp = F.D(u(2), devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
                 elseif par.stats == 'Boltz'
-                    Dn = dev.mue(i)*par.kB*par.T;
-                    Dp = dev.muh(i)*par.kB*par.T;
+                    Dn = devihalf.mue(i)*par.kB*par.T;
+                    Dp = devihalf.muh(i)*par.kB*par.T;
                 end
                 
-                f = [par.mobset*(dev.mue(i)*u(1)*(-DuDx(4)+dev.gradEA(i))+(Dn*(DuDx(1)-((u(1)/dev.Nc(i))*dev.gradNc(i)))));
-                    par.mobset*(dev.muh(i)*u(2)*(DuDx(4)-dev.gradIP(i))+(Dp*(DuDx(2)-((u(2)/dev.Nv(i))*dev.gradNv(i)))));
-                    par.K_cation*par.mobseti*(dev.mucat(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(dev.DOScat(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
-                    (dev.epp(i)/max(par.epp))*DuDx(4);];
+                f = [par.mobset*(devihalf.mue(i)*u(1)*(-DuDx(4)+devihalf.gradEA(i))+(Dn*(DuDx(1)-((u(1)/devihalf.Nc(i))*devihalf.gradNc(i)))));
+                    par.mobset*(devihalf.muh(i)*u(2)*(DuDx(4)-devihalf.gradIP(i))+(Dp*(DuDx(2)-((u(2)/devihalf.Nv(i))*devihalf.gradNv(i)))));
+                    par.K_cation*par.mobseti*(devihalf.mucat(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(devihalf.DOScat(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
+                    (devihalf.epp(i)/max(par.epp))*DuDx(4);];
                 
-                s = [g - par.radset*dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-dev.ni(i)^2)/((dev.taun(i)*(u(2)+dev.pt(i))) + (dev.taup(i)*(u(1)+dev.nt(i)))));
-                    g - par.radset*dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-dev.ni(i)^2)/((dev.taun(i)*(u(2)+dev.pt(i))) + (dev.taup(i)*(u(1)+dev.nt(i)))));
+                s = [g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
+                    g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     0;
-                    (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-dev.NA(i)+dev.ND(i)-dev.Nion(i)+u(3))];
+                    (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-devihalf.NA(i)+devihalf.ND(i)-devihalf.Nion(i)+u(3))];
                 
             case 2
                 % Prefactors set to 1 for time dependent components - can add other
@@ -216,23 +217,23 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
                     1;];
                 
                 if par.stats == 'Fermi'
-                    Dn = F.D(u(1), dev.Dnfun(i,:), dev.n_fd(i,:));
-                    Dp = F.D(u(2), dev.Dpfun(i,:), dev.p_fd(i,:));
+                    Dn = F.D(u(1), devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
+                    Dp = F.D(u(2), devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
                 elseif par.stats == 'Boltz'
-                    Dn = dev.mue(i)*par.kB*par.T;
-                    Dp = dev.muh(i)*par.kB*par.T;
+                    Dn = devihalf.mue(i)*par.kB*par.T;
+                    Dp = devihalf.muh(i)*par.kB*par.T;
                 end
                 
-                f = [par.mobset*(dev.mue(i)*u(1)*(-DuDx(4)+dev.gradEA(i))+(Dn*(DuDx(1)-((u(1)/dev.Nc(i))*dev.gradNc(i)))));
-                    par.mobset*(dev.muh(i)*u(2)*(DuDx(4)-dev.gradIP(i))+(Dp*(DuDx(2)-((u(2)/dev.Nv(i))*dev.gradNv(i)))));
-                    par.K_cation*par.mobseti*(dev.mucat(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(dev.DOScat(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
-                    (dev.epp(i)/max(par.epp))*DuDx(4);
-                    par.K_anion*par.mobseti*(dev.muion(i)*(u(5)*-DuDx(4)+par.kB*par.T*(DuDx(5)+(u(5)*(DuDx(5)/(dev.DOSion(i)-u(5)))))));];
+                f = [par.mobset*(devihalf.mue(i)*u(1)*(-DuDx(4)+devihalf.gradEA(i))+(Dn*(DuDx(1)-((u(1)/devihalf.Nc(i))*devihalf.gradNc(i)))));
+                    par.mobset*(devihalf.muh(i)*u(2)*(DuDx(4)-devihalf.gradIP(i))+(Dp*(DuDx(2)-((u(2)/devihalf.Nv(i))*devihalf.gradNv(i)))));
+                    par.K_cation*par.mobseti*(devihalf.mucat(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(devihalf.DOScat(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
+                    (devihalf.epp(i)/max(par.epp))*DuDx(4);
+                    par.K_anion*par.mobseti*(devihalf.muion(i)*(u(5)*-DuDx(4)+par.kB*par.T*(DuDx(5)+(u(5)*(DuDx(5)/(devihalf.DOSion(i)-u(5)))))));];
                 
-                s = [g - par.radset*dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-dev.ni(i)^2)/((dev.taun(i)*(u(2)+dev.pt(i))) + (dev.taup(i)*(u(1)+dev.nt(i)))));
-                    g - par.radset*dev.krad(i)*((u(1)*u(2))-(dev.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-dev.ni(i)^2)/((dev.taun(i)*(u(2)+dev.pt(i))) + (dev.taup(i)*(u(1)+dev.nt(i)))));
+                s = [g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
+                    g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     0;
-                    (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-dev.NA(i)+dev.ND(i)-u(5)+u(3));
+                    (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-devihalf.NA(i)+devihalf.ND(i)-u(5)+u(3));
                     0;];
         end
     end
