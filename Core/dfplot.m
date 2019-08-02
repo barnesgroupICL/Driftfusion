@@ -195,7 +195,7 @@ classdef dfplot
         function Jddx(varargin)
             % figure(5)
             % drift and diffusion currents as a function of position
-
+            
             if length(varargin) == 1
                 sol = varargin{1};
                 tarr = sol.t(end);
@@ -212,17 +212,18 @@ classdef dfplot
                 xrange = varargin{3};
                 pointtype = 't';
             end
-
+            
             % get drift and diffusion currents
             Jdd = dfana.Jddxt(sol);
-            xnm = sol.x*1e7;
-
+            xhalfmesh = getxihalf(sol);
+            xnm = xhalfmesh*1e7;
+            
             figure(5)
             for i = 1:length(tarr)
                 % find the time
                 p1 = find(sol.t <= tarr(i));
                 p1 = p1(end);
-
+                
                 plot(xnm, Jdd.ndiff(p1,:), xnm, Jdd.ndrift(p1,:), xnm, Jdd.pdiff(p1,:),...
                     xnm, Jdd.pdrift(p1,:), xnm, Jdd.adiff(p1,:), xnm, Jdd.adrift(p1,:),...
                     xnm, Jdd.cdiff(p1,:), xnm, Jdd.cdrift(p1,:));
@@ -230,7 +231,22 @@ classdef dfplot
             end
             xlabel('Position [nm]')
             ylabel('Current density [Acm-2]')
-            legend('n,diff', 'n,drift', 'p,diff', 'p,drift', 'a,diff', 'a,drift', 'c,diff', 'c,drift')
+            legend('Jn,diff', 'Jn,drift', 'Jp,diff', 'Jp,drift', 'Ja,diff', 'Ja,drift', 'Jc,diff', 'Jc,drift')
+            hold off
+            
+            figure(51)
+            for i = 1:length(tarr)
+                % find the time
+                p1 = find(sol.t <= tarr(i));
+                p1 = p1(end);
+                
+                plot(xnm, Jdd.n(p1,:), xnm, Jdd.p(p1,:), xnm, Jdd.a(p1,:), xnm, Jdd.c(p1,:), xnm, Jdd.disp(p1,:), xnm, Jdd.tot(p1,:));
+                hold on
+            end
+            
+            xlabel('Position [nm]')
+            ylabel('Current density [Acm-2]')
+            legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal');
             hold off
         end
 

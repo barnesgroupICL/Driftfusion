@@ -143,10 +143,10 @@ classdef dfana
                     
             end
             
-            djndx = -(dndt - g + U);    % Not certain about the sign here
-            djpdx = -(dpdt - g + U);
-            djadx = -dadt;
-            djcdx = -dcdt;
+            djndx = (dndt + g - U);    % Not certain about the sign here
+            djpdx = (dpdt + g - U);
+            djadx = dadt;
+            djcdx = dcdt;
             
             % Integrate across the device to get delta fluxes at all positions
             deltajn = cumtrapz(x, djndx, 2);
@@ -189,7 +189,8 @@ classdef dfana
             
             % Calculate total electron and hole currents from fluxes
             j.n = jn_l + deltajn;
-            j.p = jp_l + deltajp;
+            j.p = jp_r + (deltajp-deltajp(end));
+      
             j.a = 0 + deltaja;
             j.c = 0 + deltajc;
             % displacement flux
@@ -245,37 +246,42 @@ classdef dfana
             U.srh = ((n.*p - nimat.^2)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
             
             U.tot = U.btb + U.srh;
-            
         end
-        
         
         function Jdd = Jddxt(sol)
             % obtain SOL components for easy referencing
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            xhalfmesh = getxihalf(sol);
+            devihalf = getdevihalf(par);
             
-            mue_mat = repmat(dev.mue, length(t), 1);
-            muh_mat = repmat(dev.muh, length(t), 1);
-            gradEA_mat = repmat(dev.gradEA, length(t), 1);
-            gradIP_mat = repmat(dev.gradIP, length(t), 1);
-            gradNc_mat = repmat(dev.gradNc, length(t), 1);
-            gradNv_mat = repmat(dev.gradNv, length(t), 1);
-            Nc_mat = repmat(dev.Nc, length(t), 1);
-            Nv_mat = repmat(dev.Nv, length(t), 1);
+            % Property matrices
+            eppmat = devihalf.epp;
+            mue_mat = devihalf.mue;
+            muh_mat = devihalf.muh;
+            mue_cat = devihalf.mucat;
+            muh_ion = devihalf.muion;
+            gradEA_mat = devihalf.gradEA;
+            gradIP_mat = devihalf.gradIP;
+            gradNc_mat = devihalf.gradNc;
+            gradNv_mat = devihalf.gradNv;
+            Nc_mat = devihalf.Nc;
+            Nv_mat = devihalf.Nv;
             % Calculates drift and diffusion currents at every point and all times -
             % NOTE: UNRELIABLE FOR TOTAL CURRENT as errors in the calculation of the
             % spatial gradients mean that the currents do not cancel properly
             for i = 1:length(t)
-                [nloc(i,:),dnlocdx(i,:)] = pdeval(0,x,n(i,:),x);
-                [ploc(i,:),dplocdx(i,:)] = pdeval(0,x,p(i,:),x);
-                [aloc(i,:),dalocdx(i,:)] = pdeval(0,x,a(i,:),x);
-                [cloc(i,:),dclocdx(i,:)] = pdeval(0,x,c(i,:),x);
-                [Vloc(i,:), dVdx(i,:)] = pdeval(0,x,V(i,:),x);
-                
+                   
+                [nloc(i,:),dndx(i,:)] = pdeval(0,xmesh,n(i,:),xhalfmesh);
+                [ploc(i,:),dpdx(i,:)] = pdeval(0,xmesh,p(i,:),xhalfmesh);
+                [aloc(i,:),dadx(i,:)] = pdeval(0,xmesh,a(i,:),xhalfmesh);
+                [cloc(i,:),dcdx(i,:)] = pdeval(0,xmesh,c(i,:),xhalfmesh);
+                [Vloc(i,:),dVdx(i,:)] = pdeval(0,xmesh,V(i,:),xhalfmesh);
+    
                 % Diffusion coefficients
                 if par.stats == 'Fermi'
                     for jj = 1:length(x)
-                        Dn(i,jj) = F.D(nloc(i,jj), dev.Dnfun(jj,:), dev.n_fd(jj,:));
-                        Dp(i,jj) = F.D(ploc(i,jj), dev.Dpfun(jj,:), dev.p_fd(jj,:));
+                        Dn(i,jj) = F.D(nloc(i,jj), devihalf.Dnfun(jj,:), devihalf.n_fd(jj,:));
+                        Dp(i,jj) = F.D(ploc(i,jj), devihalf.Dpfun(jj,:), devihalf.p_fd(jj,:));
                     end
                 end
             end
@@ -286,17 +292,43 @@ classdef dfana
             end
             
             % Particle currents
-            Jdd.ndiff = -Dn_mat.*(dnlocdx-((nloc./Nc_mat).*gradNc_mat)).*-par.e;
+%             Jdd.ndiff = -Dn_mat.*(dndx-((nloc./Nc_mat).*gradNc_mat)).*-par.e;
+%             Jdd.ndrift = mue_mat.*nloc.*(dVdx-gradEA_mat)*-par.e;
+%             
+%             Jdd.pdiff = -Dp_mat.*(dpdx-((ploc./Nv_mat).*gradNv_mat)).*par.e;
+%             Jdd.pdrift = muh_mat.*ploc.*(-dVdx+gradIP_mat)*par.e;
+
+            Jdd.ndiff = -Dn_mat.*(dndx-((nloc./Nc_mat).*gradNc_mat)).*-par.e;
             Jdd.ndrift = mue_mat.*nloc.*(dVdx-gradEA_mat)*-par.e;
             
-            Jdd.pdiff = -Dp_mat.*(dplocdx-((ploc./Nv_mat).*gradNv_mat)).*par.e;
+            Jdd.pdiff = -Dp_mat.*(dpdx-((ploc./Nv_mat).*gradNv_mat)).*par.e;
             Jdd.pdrift = muh_mat.*ploc.*(-dVdx+gradIP_mat)*par.e;
+
+            Jdd.cdiff = -devihalf.mucat.*par.kB*par.T.*dcdx*par.e;
+            Jdd.cdrift = devihalf.mucat.*cloc.*-dVdx*par.e;
             
-            Jdd.adiff = -dev.muion*par.kB*par.T.*dalocdx*-par.e;
-            Jdd.adrift = dev.muion.*aloc.*dVdx*-par.e;
+            if par.N_ionic_species == 1
+                Jdd.adiff = zeros(length(t), length(xhalfmesh));
+                Jdd.adrift = zeros(length(t), length(xhalfmesh));
+            elseif par.No_ionic_species == 2
+                Jdd.adiff = -devihalf.muion.*par.kB*par.T.*dadx.*-par.e;
+                Jdd.adrift = devihalf.muion.*aloc.*dVdx.*-par.e;
+            end
             
-            Jdd.cdiff = -dev.mucat*par.kB*par.T.*dalocdx*par.e;
-            Jdd.cdrift = dev.mucat.*cloc.*-dVdx*par.e;
+            Jdd.n = Jdd.ndrift + Jdd.ndiff;
+            Jdd.p = Jdd.pdrift + Jdd.pdiff;
+            Jdd.a = Jdd.adrift + Jdd.adiff;
+            Jdd.c = Jdd.cdrift + Jdd.cdiff;
+            
+            % Displacement current
+            %[FV, Frho] = dfana.calcF(sol);
+            for i = 1:length(xhalfmesh)
+                j.disp(:,i) = par.epp0.*eppmat(:,i).*(gradient(dVdx(:,i), t));
+            end
+            
+            Jdd.disp = j.disp*abs(par.e);
+            
+            Jdd.tot = Jdd.n + Jdd.p + Jdd.a + Jdd.c + Jdd.disp;
         end
         
         function [FV, Frho] = calcF(sol)
