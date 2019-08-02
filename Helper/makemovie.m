@@ -1,4 +1,4 @@
-function Framefile = moviemake2(sol, plotfun, xrange, yrange, movie_name, Vcounter, tcounter)
+function Framefile = makemovie(sol, plotfun, xrange, yrange, movie_name, Vcounter, tcounter)
 % Makes a frame file F from a solution
 % Currently configured to output the band diagram
 % @PLOTFUN is the name of the plotting function that you wish to use
@@ -18,12 +18,13 @@ for i = 1:length(sol.t)
     
     plotfun(sol, sol.t(i))
     fig1 = gca;
-    subplot(2,1,1);
-    ylim([[-0.7, 0.1]])
-    
-    subplot(2,1,2);
-    ylim([0e18, 2e18])
-
+%     subplot(2,1,1);
+%     ylim([-4, 4]*1e16)
+%     
+%     subplot(2,1,2);
+%     %ylim([0e19, 1.1e19])
+%     ylim([-0.72, 0.02])
+    %xlim([580, 610])
 %     subplot(3,1,3);
 %     ylim([0,2e18])
     
