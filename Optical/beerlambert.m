@@ -125,22 +125,22 @@ end
 if figson == 1
 
 figure(31)
-surf(lambda, par.xx, I)
+surf(lambda, par.xx*1e7, I)
 xlabel('Wavelength [nm]')
 ylabel('Position [nm]')
 zlabel('Intensity [Wcm-3]')
 
 figure(32)
-surf(lambda, par.xx, Gen)
+surf(lambda, par.xx*1e7, Gen)
 xlabel('Wavelength [nm]')
 ylabel('Position [nm]')
 zlabel('Gen rate [cm-3s-1]')
 
 figure(33)
-plot(par.xx, Gentot)
+plot(par.xx*1e7, Gentot)
 xlabel('Position [nm]')
 ylabel('Gen rate [cm-2s-1]')
-
+xlim([0, par.xx(end)*1e7])
 end
 
 end
