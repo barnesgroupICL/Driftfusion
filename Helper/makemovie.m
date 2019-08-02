@@ -2,31 +2,23 @@ function Framefile = makemovie(sol, plotfun, xrange, yrange, movie_name, Vcounte
 % Makes a frame file F from a solution
 % Currently configured to output the band diagram
 % @PLOTFUN is the name of the plotting function that you wish to use
-% XRANGE is a two element array with XL and XR in cm
-% yRANGE is a two element array with YLOW and YHIGH
+% XRANGE is a two element array with XL and XR in cm - enter 0 for auto
+% yRANGE is a two element array with YLOW and YHIGH - enter 0 for auto
 % MOVIE_NAME is the desired out name
-
-
-ionfigon = 0;
-capfigon = 0;
-
 Vapp = dfana.calcVapp(sol);
 
 for i = 1:length(sol.t)
     %figure(600)
     clf
-    
     plotfun(sol, sol.t(i))
     fig1 = gca;
+    
+%% You can include limits for subplots here
 %     subplot(2,1,1);
 %     ylim([-4, 4]*1e16)
 %     
 %     subplot(2,1,2);
-%     %ylim([0e19, 1.1e19])
-%     ylim([-0.72, 0.02])
-    %xlim([580, 610])
-%     subplot(3,1,3);
-%     ylim([0,2e18])
+%     ylim([0e19, 1.1e19])
     
     if xrange ~= 0
         xlim([xrange(1)*1e7, xrange(2)*1e7])
