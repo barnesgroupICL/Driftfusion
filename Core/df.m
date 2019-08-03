@@ -117,11 +117,11 @@ options = odeset('MaxStep', 0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'A
 %% Call solver
 % inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
-u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
+u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
 %% Subfunctions
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
-    function [c,f,s,iterations] = pdex4pde(x,t,u,DuDx)
+    function [c,f,s,iterations] = dfpde(x,t,u,DuDx)
         
         i = find(par.xx <= x);
         i = i(end);
@@ -240,7 +240,7 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 
 % --------------------------------------------------------------------------
 % Define initial conditions.
-    function u0 = pdex4ic(x)
+    function u0 = dfic(x)
         
         if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) == 0
             
@@ -285,7 +285,7 @@ u = pdepe(par.m,@pdex4pde,@pdex4ic,@pdex4bc,x,t,options);
 % in this example I am controlling the flux through the boundaries using
 % the difference in concentration from equilibrium and the extraction
 % coefficient.
-    function [pl,ql,pr,qr] = pdex4bc(xl,ul,xr,ur,t)
+    function [pl,ql,pr,qr] = dfbc(xl,ul,xr,ur,t)
         
         switch par.JV
             case 1
