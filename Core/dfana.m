@@ -89,62 +89,42 @@ classdef dfana
                 dadt(:,i) = gradient(a(:,i), t);
                 dcdt(:,i) = gradient(c(:,i), t);
             end
-            
+           
             dndtInt = trapz(x, dndt, 2);
             dpdtInt = trapz(x, dpdt, 2);
             dadtInt = trapz(x, dadt, 2);
             dcdtInt = trapz(x, dcdt, 2);
             % Recombination
-            Ubtb = kradmat.*(n.*p - nimat.^2);
-            
-            Usrh = ((n.*p - nimat.^2)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
-            
-            U = Ubtb + Usrh;
-            
-            Usrhnogen = ((n.*p)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
+            U = dfana.calcU(sol);
             
             % Uniform Generation
             switch par.OM
-                
                 % Uniform generation
                 case 0
-                    
                     g = par.Int*dev.G0;
-                    
                 case 1
-                    
                     gxAM15 = par.Int*repmat(gx.AM15', length(t), 1);
-                    
-                    if par.pulseon == 1
-                        
+                    if par.pulseon == 1 
                         las = repmat(gx.las', length(t), 1);
                         pulset = ones(length(x), length(t))*diag(t >= par.pulsestart & t < par.pulselen + par.pulsestart);
                         pulset = pulset';
                         gxlas = las.*pulset;
-                        
                     else
                         gxlas = 0;
-                        
                     end
-                    
                     g = gxAM15 + gxlas;
                     
                 case 2
                     % Transfer Matrix
                     if par.Int == 0
-                        
                         g = 0;
-                        
                     else
-                        
                         g = par.Int*interp1(par.genspace, solstruct.Gx1S, (x-par.dcum(1)));
-                        
                     end
-                    
             end
             
-            djndx = (dndt + g - U);    % Not certain about the sign here
-            djpdx = (dpdt + g - U);
+            djndx = dndt + g - U.tot;    % Not certain about the sign here
+            djpdx = dpdt + g - U.tot;
             djadx = dadt;
             djcdx = dcdt;
             
@@ -155,42 +135,37 @@ classdef dfana
             deltajc = cumtrapz(x, djcdx, 2);
             %% Currents from the boundaries
             switch par.BC
-                case 0
-                    jn_l = 0;
-                    jp_l = 0;
-                    jn_r = 0;
-                    jp_r = 0;
-                    % Blocking contacts
-                case 1
-                    % Setting jp_l = djpdx(end) ensures that jp_r = 0;
-                    jn_l = 0;
-                    jp_l = -deltajp(:, end);
-                    
-                    jn_r = deltajn(:, end);
-                    jp_r = 0;
-                    
                 case 2
-                    
                     jn_l = -par.sn_l*(n(:, 1) - par.nleft);
                     jp_l = -deltajp(:, end) + par.sp_r*(p(:, end) - par.pright);
                     
                     jn_r = deltajn(:, end) - par.sn_l*(n(:, 1) - par.nleft);
                     jp_r = par.sp_r*(p(:, end) - par.pright);
-                    
-                case 3
-                    
+                case 3  
                     jn_l = -par.sn_l*(n(:, 1) - par.nleft);
                     jp_l = -par.sp_l*(p(:, 1) - par.pleft);
                     
                     jn_r = par.sn_r*(n(:, end) - par.nright);
-                    jp_r = par.sp_r*(p(:, end) - par.pright);
-                    
+                    jp_r = par.sp_r*(p(:, end) - par.pright);     
             end
             
             % Calculate total electron and hole currents from fluxes
-            j.n = jn_l + deltajn;
-            j.p = jp_r + (deltajp-deltajp(end));
-      
+            % Use the minority carrier flux as the boundary condition
+            if par.EA(1)-par.E0(1) <= par.E0(1)-par.IP(1) && par.EA(end)-par.E0(end) >= par.E0(end)-par.IP(1)
+                % p-type left boundary, n-type right boundary
+                j.n = jn_r + (deltajn-deltajn(:,end));
+                j.p = jp_l + deltajp;
+            elseif par.EA(1)-par.E0(1) >= par.E0(1)-par.IP(1) && par.EA(end)-par.E0(end) <= par.E0(end)-par.IP(end)
+                % n-type left boundary, p-type right boundary
+                j.n = jn_l + deltajn;
+                j.p = jp_r + (deltajp - deltajp(:,end));
+            elseif par.EA(1)-par.E0(1) >= par.E0(1)-par.IP(1) && par.EA(end)-par.E0(end) >= par.E0(end)-par.IP(end)...
+                    || par.EA(1)-par.E0(1) <= par.E0(1)-par.IP(1) && par.EA(end)-par.E0(end) <= par.E0(end)-par.IP(end)
+                % p-type both boundaries or n-type both boundaries
+                j.n = jp_l + deltajn;
+                j.p = jp_l + deltajp;
+            end
+            
             j.a = 0 + deltaja;
             j.c = 0 + deltajc;
             % displacement flux
@@ -310,7 +285,7 @@ classdef dfana
             if par.N_ionic_species == 1
                 Jdd.adiff = zeros(length(t), length(xhalfmesh));
                 Jdd.adrift = zeros(length(t), length(xhalfmesh));
-            elseif par.No_ionic_species == 2
+            elseif par.N_ionic_species == 2
                 Jdd.adiff = -devihalf.muion.*par.kB*par.T.*dadx.*-par.e;
                 Jdd.adrift = devihalf.muion.*aloc.*dVdx.*-par.e;
             end
