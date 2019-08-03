@@ -153,6 +153,51 @@ classdef dfplot
             xlim([xrange(1), xrange(2)])
             hold off
         end
+        
+        function jx(varargin)
+            % Plots the currents
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+
+            if length(varargin) == 1
+                sol = varargin{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                tarr = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                tarr = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+
+            xnm = sol.x*1e7;
+            [j, J] = dfana.calcJ(sol);
+
+            for i = 1:length(tarr)
+                % find the time
+                p1 = find(sol.t <= tarr(i));
+                p1 = p1(end);
+
+                % electron and hole currents as function of position from continuity
+                figure(3)
+                plot(xnm, j.n(p1, :), xnm, j.p(p1, :), xnm, j.a(p1, :), xnm, j.c(p1, :), xnm, j.disp(p1, :))
+                hold on
+            end
+
+            xlabel('Position [nm]')
+            ylabel('j [cm-2s-1]')
+            legend('jn', 'jp', 'ja', 'jc', 'jdisp', 'jtot')
+            xlim([xrange(1), xrange(2)])
+            hold off
+        end
+        
 
         function JV(JV, option)
             % JV - a solution from doJV
