@@ -83,16 +83,7 @@ classdef dfana
             if par.OM == 1
                 gx = sol.gx;
             end
-            
-            % Property matrices
-            eppmat = repmat(dev.epp, length(t), 1);
-            nimat = repmat(dev.ni, length(t), 1);
-            kradmat = repmat(dev.krad, length(t), 1);
-            taunmat = repmat(dev.taun, length(t), 1);
-            taupmat = repmat(dev.taup, length(t), 1);
-            ntmat = repmat(dev.nt, length(t), 1);
-            ptmat = repmat(dev.pt, length(t), 1);
-            
+                        
             for i = 1:length(x)
                 if option == 2
                     dndt(:,i) = gradient(n_ihalf(:,i), t);
@@ -148,6 +139,7 @@ classdef dfana
             djpdx = dpdt + g - U.tot;
             djadx = dadt;
             djcdx = dcdt;
+            
             switch option
                 case 0
                     % Integrate across the device to get delta fluxes at all positions
@@ -173,8 +165,7 @@ classdef dfana
                     deltajn = cumtrapz(x, djndx, 2);
                     deltajp = cumtrapz(x, djpdx, 2);
                     deltaja = cumtrapz(x, djadx, 2);
-                    deltajc = cumtrapz(x, djcdx, 2);
-                    
+                    deltajc = cumtrapz(x, djcdx, 2);       
             end
             %% Currents from the boundaries
             switch par.BC
@@ -213,7 +204,11 @@ classdef dfana
             j.c = 0 + deltajc;
             % displacement flux
             j.disp = zeros(length(t), length(x));
-            [FV, Frho] = dfana.calcF(sol);
+            [FV, Frho] = dfana.calcF_ihalf(sol);
+            
+            % Property matrices
+            dev_ihalf = getdevihalf(par);
+            eppmat = repmat(dev_ihalf.epp, length(t), 1);
             
             for i = 1:length(x)
                 j.disp(:,i) = par.epp0.*eppmat(:,i).*(gradient(Frho(:,i), t));
@@ -401,6 +396,27 @@ classdef dfana
             
         end
         
+        function [FV, Frho] = calcF_ihalf(sol)
+            % Electric field caculation
+            % FV = Field calculated from the gradient of the potential
+            % Frho = Field calculated from integrated space charge density
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            devi_ihalf = getdevihalf(par);
+            
+            x = getvarihalf(x);
+            
+            rho = dfana.calcrho_ihalf(sol);
+            
+            eppmat = repmat(devi_ihalf.epp, length(t), 1);
+            
+            for i=1:length(t)
+                V_ihalf(i,:) = getvarihalf(V(i,:));
+                FV(i,:) = -gradient(V_ihalf(i, :), x);                      % Electric field calculated from V
+            end
+            Frho = cumtrapz(x, rho./(eppmat.*par.epp0), 2) + FV(:,1);
+        end
+        
         function rho = calcrho(sol)
             % Calculates the space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
@@ -412,6 +428,26 @@ classdef dfana
             rho = -n + p - a + c - NAmat + NDmat;
         end
         
+        function rho = calcrho_ihalf(sol)
+            % Calculates the space charge density
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+                for ii = 1:length(t)
+                    n_ihalf(ii,:) = getvarihalf(n(ii,:));
+                    p_ihalf(ii,:) = getvarihalf(p(ii,:));
+                    a_ihalf(ii,:) = getvarihalf(a(ii,:));
+                    c_ihalf(ii,:) = getvarihalf(c(ii,:));
+                end
+                x = getvarihalf(x);
+                
+            dev_ihalf = getdevihalf(par);
+            
+            NAmat = repmat(dev_ihalf.NA, length(t), 1);
+            NDmat = repmat(dev_ihalf.ND, length(t), 1);
+            
+            % charge density
+            rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - NAmat + NDmat;
+        end
         
         function Vapp = calcVapp(sol)
             par = sol.par;

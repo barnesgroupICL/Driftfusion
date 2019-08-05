@@ -193,7 +193,7 @@ classdef dfplot
 
             xlabel('Position [nm]')
             ylabel('j [cm-2s-1]')
-            legend('jn', 'jp', 'ja', 'jc', 'jdisp', 'jtot')
+            legend('jn', 'jp', 'ja', 'jc', 'jdisp')
             xlim([xrange(1), xrange(2)])
             hold off
         end
