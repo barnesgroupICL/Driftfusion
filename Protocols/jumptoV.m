@@ -51,6 +51,8 @@ par.t0 = par.tmax/1e8;
 par.tmesh_type = 2;
 par.tpoints = 100;
 par.Int = Int;
+par.K_anion = 1;
+par.K_cation = 1;
 
 sol = df(jump1, par);
 
@@ -73,7 +75,7 @@ sol_relax = sol;
 sol_relax.par.K_cation = 1;
 sol_relax.par.K_anion = 1;
 % Read out currents from LH side
-dfplot.Jt(sol_relax, 1);
+dfplot.Jt(sol_relax, sol_relax.x(end));
 
 disp('Jump to V complete')
 end
