@@ -35,6 +35,7 @@ par.tmax = 1e-9;
 par.t0 = par.tmax/1e4;
 par.Rs = 0;
 par.Ana = 0;
+par.BC = 3;     % To enable boundary fluxes to be switched off
 
 %% Switch off mobilities
 par.mobset = 0;
@@ -52,6 +53,7 @@ sol = df(sol, par);
 disp('Complete')
 
 % Switch on mobilities
+par.BC = par_origin.BC;
 par.mobset = 1;
 par.radset = 1;
 par.sn_l = par_origin.sn_l;
