@@ -74,7 +74,7 @@ classdef pc
         Int = 0;                % Bias Light intensity (Suns Eq.)
         pulseon = 0;            % Switch pulse on TPC or TPV
         Vapp = 0;               % Applied bias
-        BC = 3;                 % Boundary Conditions. Must be set to one for first solution
+        BC = 2;                 % Boundary Conditions. Must be set to one for first solution
         figson = 1;             % Toggle figures on/off
         meshx_figon = 0;        % Toggles x-mesh figures on/off
         mesht_figon = 0;        % Toggles t-mesh figures on/off
