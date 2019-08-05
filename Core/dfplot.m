@@ -94,13 +94,15 @@ classdef dfplot
             hold off
         end
 
-        function Jt(sol, pos)
+        function Jt(sol, xpos)
             % Currents as a function of time
             % POS = the readout position
-            
             t = sol.t;
-            [j, J] = dfana.calcJ(sol);
-
+            [j, J, x] = dfana.calcJ(sol);
+            
+            pos = find(x <= xpos);
+            pos = pos(end);
+            
             figure(2);
             plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.c(:, pos), t, J.disp(:,pos), t, J.tot(:, pos));
             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal')
@@ -259,9 +261,8 @@ classdef dfplot
             end
             
             % get drift and diffusion currents
-            Jdd = dfana.Jddxt(sol);
-            xhalfmesh = getxihalf(sol);
-            xnm = xhalfmesh*1e7;
+            [Jdd, x] = dfana.Jddxt(sol);
+            xnm = x*1e7;
             
             figure(5)
             for i = 1:length(tarr)
