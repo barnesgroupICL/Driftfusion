@@ -2,7 +2,7 @@
 % the parallel computing toolbox
 % Users will likely need to modify explore.explore2par
 % Obtain the base parameters
-par.ptpd = pc('input_files/ptpd.csv');
+par.ptpd = pc('Input_files/ptpd.csv');
 
 % For the first example we will run JV and steady-state Voc for 3 different
 % active layer thicknesses and light intensities 

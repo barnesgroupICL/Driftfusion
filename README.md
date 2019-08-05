@@ -30,9 +30,9 @@ Alternatively, you can download Driftfusion standalone as a folder but you wonâ€
 
 The  names of properties and their units are given in the commented code in the `pc` class.
 	
-6. 	A better way of defining your device is to use the .csv files contained in the `/input_files` folder. For example, to create a parameters object with default parameters to simulate an inverted PEDOT/perovskite/PCBM stack type:
+6. 	A better way of defining your device is to use the .csv files contained in the `/Input_files` folder. For example, to create a parameters object with default parameters to simulate an inverted PEDOT/perovskite/PCBM stack type:
 
-`par = pc('input_files/pcbm.csv');`
+`par = pc('Input_files/pcbm.csv');`
 
 It is recommended to duplicate the existing .csv files to define your own device and use a programme like Excel or Open Office to edit them. Ensure that the material name given in the 'stack' column matches with one of the materials in the Index of Refraction library if you wish to use the Beer-Lambert optical model.
 

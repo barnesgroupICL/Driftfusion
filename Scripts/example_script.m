@@ -3,8 +3,8 @@
 initialise_df
 
 % Create parameters objects for Spiro/MAPI/TiO2 and PEDOT/MAPI/PCBM devices
-par.tio2 = pc('input_files/spiro_mapi_tio2.csv');
-par.pcbm = pc('input_files/ptpd_mapi_pcbm.csv');
+par.tio2 = pc('Input_files/spiro_mapi_tio2.csv');
+par.pcbm = pc('Input_files/ptpd_mapi_pcbm.csv');
 
 % Find equilibrium solutions
 soleq.tio2 = equilibrate(par.tio2);

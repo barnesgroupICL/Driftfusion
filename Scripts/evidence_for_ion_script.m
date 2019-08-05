@@ -17,8 +17,8 @@
 % BC = Bottom Cathode i.e. the device with SRH recombination in the
 % contacts (interfacial recombination)
 % TC = Top Cathode i.e. device without SRH recombination
-par.tc = pc('input_files/Evidence_for_ion_migration_noSRH.csv');
-par.bc = pc('input_files/Evidence_for_ion_migration_SRH.csv');
+par.tc = pc('Input_files/Evidence_for_ion_migration_noSRH.csv');
+par.bc = pc('Input_files/Evidence_for_ion_migration_SRH.csv');
 
 % Get equilibrium solutions
 soleq.bc = equilibrate(par.bc);
