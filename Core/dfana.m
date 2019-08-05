@@ -63,6 +63,69 @@ classdef dfana
             
         end
         
+        function [Ecb, Evb, Efn, Efp] = QFL_J(sol)
+            % u is the solution structure
+            % Simple structure names
+            [u,t,xmesh,par,dev,n0,p0,a0,c0,V0] = dfana.splitsol(sol);
+               for ii = 1:length(t)
+                    n(ii,:) = getvarihalf(n0(ii,:));
+                    p(ii,:) = getvarihalf(p0(ii,:));
+                    a(ii,:) = getvarihalf(a0(ii,:));
+                    c(ii,:) = getvarihalf(c0(ii,:));
+                    V(ii,:) = getvarihalf(V0(ii,:));
+                end
+            dev_ihalf = getdevihalf(par);  
+            % Create 2D matrices for multiplication with solutions
+            EAmat = repmat(dev.EA, length(t), 1);
+            IPmat = repmat(dev.IP, length(t), 1);
+            NAmat = repmat(dev_ihalf.NA, length(t), 1);
+            NDmat = repmat(dev_ihalf.ND, length(t), 1);
+            Ncmat = repmat(dev_ihalf.Nc, length(t), 1);
+            Nvmat = repmat(dev_ihalf.Nv, length(t), 1);
+            Nionmat = repmat(dev_ihalf.Nion, length(t), 1);
+            Ncatmat = repmat(dev_ihalf.Ncat, length(t), 1);
+            eppmat = repmat(dev_ihalf.epp, length(t), 1);
+            nimat = repmat(dev_ihalf.ni, length(t), 1);
+            mue_mat = repmat(dev_ihalf.mue, length(t), 1);
+            muh_mat = repmat(dev_ihalf.muh, length(t), 1); 
+            
+            [j, J, x] = dfana.calcJ(sol);
+            for i = 1:length(t)
+                deltaEfn(i,:) = cumtrapz(x, J.n(i,:)./(n(i,:).*mue_mat(i,:)), 2);
+                deltaEfp(i,:) = cumtrapz(x, J.p(i,:)./(p(i,:).*muh_mat(i,:)), 2);
+            end
+            % Boundary values - electrostatic potential is assumed to be
+            % zero at left-hand boundary
+%             Efn = zeros(size(n,1), size(n,2));
+%             Efp = zeros(size(n,1), size(n,2));
+            
+            if par.stats == 'Fermi'
+                
+                for i = 1:size(n,1)           % time
+                    for j = 1:size(n,2)       % position
+                        Efn_l(i) = F.Efn_fd_fun(n(i,1), dev_ihalf.Efn(j,1),  dev_ihalf.n_fd(j,1));
+                        Efp_l(i) = F.Efp_fd_fun(p(i,1), dev_ihalf.Efp(j,1),  dev_ihalf.p_fd(j,1));
+                    end
+                end
+                
+            elseif par.stats == 'Boltz'
+                Efn_l = real(par.EA(1)+(par.kB*par.T/par.q)*log(n(:,1)./Ncmat(:,1)));        % Electron quasi-Fermi level
+                Efp_l = real(par.IP(1)-(par.kB*par.T/par.q)*log(p(:,1)./Nvmat(:,1)));        % Hole quasi-Fermi level
+            end
+            
+            Efn_ihalf = Efn_l + deltaEfn;
+            Efp_ihalf = Efp_l + deltaEfp;
+            
+            for ii = 1:length(t)
+                Efn(ii,:) = interp1(x, Efn_ihalf(ii,:), xmesh);
+                Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
+            end
+            
+            Ecb = EAmat-V0;                                 % Conduction band potential
+            Evb = IPmat-V0;                                 % Valence band potential
+        end
+        
+        
         function [j, J, x] = calcJ(sol)
             % Current, J and flux, j calculation from continuity equations
             option = 2;
