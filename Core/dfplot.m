@@ -133,9 +133,9 @@ classdef dfplot
                 pointtype = 't';
             end
 
-            xnm = sol.x*1e7;
-            [j, J] = dfana.calcJ(sol);
-
+            [j, J, x] = dfana.calcJ(sol);
+            xnm = x*1e7;
+            
             for i = 1:length(tarr)
                 % find the time
                 p1 = find(sol.t <= tarr(i));
@@ -177,8 +177,8 @@ classdef dfplot
                 pointtype = 't';
             end
 
-            xnm = sol.x*1e7;
-            [j, J] = dfana.calcJ(sol);
+            [j, J, x] = dfana.calcJ(sol);
+            xnm = x*1e7;
 
             for i = 1:length(tarr)
                 % find the time
