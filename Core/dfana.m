@@ -83,7 +83,7 @@ classdef dfana
             if par.OM == 1
                 gx = sol.gx;
             end
-                        
+            
             for i = 1:length(x)
                 if option == 2
                     dndt(:,i) = gradient(n_ihalf(:,i), t);
@@ -97,7 +97,7 @@ classdef dfana
                     dcdt(:,i) = gradient(c(:,i), t);
                 end
             end
-           
+            
             % Recombination
             U = dfana.calcU(sol);
             
@@ -112,7 +112,7 @@ classdef dfana
                     g = par.Int*dev.G0;
                 case 1
                     gxAM15 = par.Int*repmat(gx.AM15', length(t), 1);
-                    if par.pulseon == 1 
+                    if par.pulseon == 1
                         las = repmat(gx.las', length(t), 1);
                         pulset = ones(length(x), length(t))*diag(t >= par.pulsestart & t < par.pulselen + par.pulsestart);
                         pulset = pulset';
@@ -132,7 +132,7 @@ classdef dfana
             end
             
             if option == 2
-                    g = getvarihalf(g);
+                g = getvarihalf(g);
             end
             
             djndx = dndt + g - U.tot;    % Not certain about the sign here
@@ -149,7 +149,7 @@ classdef dfana
                     deltajc = cumtrapz(x, djcdx, 2);
                 case 1
                     for ii = 1:length(t)
-                    % Fluxes on half grid
+                        % Fluxes on half grid
                         djndx_ihalf(ii,:) = getvarihalf(djndx(ii,:));
                         djpdx_ihalf(ii,:) = getvarihalf(djpdx(ii,:));
                         djadx_ihalf(ii,:) = getvarihalf(djadx(ii,:));
@@ -165,7 +165,7 @@ classdef dfana
                     deltajn = cumtrapz(x, djndx, 2);
                     deltajp = cumtrapz(x, djpdx, 2);
                     deltaja = cumtrapz(x, djadx, 2);
-                    deltajc = cumtrapz(x, djcdx, 2);       
+                    deltajc = cumtrapz(x, djcdx, 2);
             end
             %% Currents from the boundaries
             switch par.BC
@@ -175,12 +175,12 @@ classdef dfana
                     
                     jn_r = deltajn(:, end) - par.sn_l*(n(:, 1) - par.nleft);
                     jp_r = par.sp_r*(p(:, end) - par.pright);
-                case 3  
+                case 3
                     jn_l = -par.sn_l*(n(:, 1) - par.nleft);
                     jp_l = -par.sp_l*(p(:, 1) - par.pleft);
                     
                     jn_r = par.sn_r*(n(:, end) - par.nright);
-                    jp_r = par.sp_r*(p(:, end) - par.pright);     
+                    jp_r = par.sp_r*(p(:, end) - par.pright);
             end
             
             % Calculate total electron and hole currents from fluxes
@@ -211,7 +211,7 @@ classdef dfana
             eppmat = repmat(dev_ihalf.epp, length(t), 1);
             
             for i = 1:length(x)
-                j.disp(:,i) = par.epp0.*eppmat(:,i).*(gradient(Frho(:,i), t));
+                j.disp(:,i) = -par.epp0.*eppmat(:,i).*(gradient(Frho(:,i), t));
             end
             
             J.n = j.n*-par.e;
@@ -254,13 +254,13 @@ classdef dfana
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-               for ii = 1:length(t)
-                    n_ihalf(ii,:) = getvarihalf(n(ii,:));
-                    p_ihalf(ii,:) = getvarihalf(p(ii,:));
-                    a_ihalf(ii,:) = getvarihalf(a(ii,:));
-                    c_ihalf(ii,:) = getvarihalf(c(ii,:));
-                end
-                x = getvarihalf(x);
+            for ii = 1:length(t)
+                n_ihalf(ii,:) = getvarihalf(n(ii,:));
+                p_ihalf(ii,:) = getvarihalf(p(ii,:));
+                a_ihalf(ii,:) = getvarihalf(a(ii,:));
+                c_ihalf(ii,:) = getvarihalf(c(ii,:));
+            end
+            x = getvarihalf(x);
             
             % Read in generation profil
             if par.OM == 1
@@ -285,47 +285,88 @@ classdef dfana
             U.tot = U.btb + U.srh;
         end
         
-        function Jdd = Jddxt(sol)
+        function [Jdd, xout] = Jddxt(sol)
+            
+            option = 1;
             % obtain SOL components for easy referencing
             [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             xhalfmesh = getxihalf(sol);
             devihalf = getdevihalf(par);
             
-            % Property matrices
-            eppmat = devihalf.epp;
-            mue_mat = devihalf.mue;
-            muh_mat = devihalf.muh;
-            mue_cat = devihalf.mucat;
-            muh_ion = devihalf.muion;
-            gradEA_mat = devihalf.gradEA;
-            gradIP_mat = devihalf.gradIP;
-            gradNc_mat = devihalf.gradNc;
-            gradNv_mat = devihalf.gradNv;
-            Nc_mat = devihalf.Nc;
-            Nv_mat = devihalf.Nv;
+            switch option
+                case 1
+                    % Property matrices
+                    eppmat = devihalf.epp;
+                    mue_mat = devihalf.mue;
+                    muh_mat = devihalf.muh;
+                    mu_cat = devihalf.mucat;
+                    mu_ion = devihalf.muion;
+                    gradEA_mat = devihalf.gradEA;
+                    gradIP_mat = devihalf.gradIP;
+                    gradNc_mat = devihalf.gradNc;
+                    gradNv_mat = devihalf.gradNv;
+                    Nc_mat = devihalf.Nc;
+                    Nv_mat = devihalf.Nv;
+                    xout = xhalfmesh;
+                case {2,3}
+                    % Property matrices
+                    eppmat = dev.epp(2:end-1);
+                    mue_mat = dev.mue(2:end-1);
+                    muh_mat = dev.muh(2:end-1);
+                    mu_cat = dev.mucat(2:end-1);
+                    mu_ion = dev.muion(2:end-1);
+                    gradEA_mat = dev.gradEA(2:end-1);
+                    gradIP_mat = dev.gradIP(2:end-1);
+                    gradNc_mat = dev.gradNc(2:end-1);
+                    gradNv_mat = dev.gradNv(2:end-1);
+                    Nc_mat = dev.Nc(2:end-1);
+                    Nv_mat = dev.Nv(2:end-1);
+                    xout = xmesh(2:end-1);
+            end
+            
             % Calculates drift and diffusion currents at every point and all times -
             % NOTE: UNRELIABLE FOR TOTAL CURRENT as errors in the calculation of the
             % spatial gradients mean that the currents do not cancel properly
             for i = 1:length(t)
                 
-                [nloc(i,:),~] = pdeval(0,xmesh,n(i,:),xhalfmesh);
-                [ploc(i,:),~] = pdeval(0,xmesh,p(i,:),xhalfmesh);
-                [aloc(i,:),~] = pdeval(0,xmesh,a(i,:),xhalfmesh);
-                [cloc(i,:),~] = pdeval(0,xmesh,c(i,:),xhalfmesh);
-                [Vloc(i,:),~] = pdeval(0,xmesh,V(i,:),xhalfmesh);
+                switch option
+                    case 1
+                        [nloc(i,:),~] = pdeval(0,xmesh,n(i,:),xhalfmesh);
+                        [ploc(i,:),~] = pdeval(0,xmesh,p(i,:),xhalfmesh);
+                        [aloc(i,:),~] = pdeval(0,xmesh,a(i,:),xhalfmesh);
+                        [cloc(i,:),~] = pdeval(0,xmesh,c(i,:),xhalfmesh);
+                        [Vloc(i,:),~] = pdeval(0,xmesh,V(i,:),xhalfmesh);
                 
-                [~,dndx0(i,:)] = pdeval(0,xmesh,n(i,:),xmesh);
-                [~,dpdx0(i,:)] = pdeval(0,xmesh,p(i,:),xmesh);
-                [~,dadx0(i,:)] = pdeval(0,xmesh,a(i,:),xmesh);
-                [~,dcdx0(i,:)] = pdeval(0,xmesh,c(i,:),xmesh);
-                [~,dVdx0(i,:)] = pdeval(0,xmesh,V(i,:),xmesh);
+                        [~,dndx(i,:)] = pdeval(0,xmesh,n(i,:),xhalfmesh);
+                        [~,dpdx(i,:)] = pdeval(0,xmesh,p(i,:),xhalfmesh);
+                        [~,dadx(i,:)] = pdeval(0,xmesh,a(i,:),xhalfmesh);
+                        [~,dcdx(i,:)] = pdeval(0,xmesh,c(i,:),xhalfmesh);
+                        [~,dVdx(i,:)] = pdeval(0,xmesh,V(i,:),xhalfmesh);
+                    case 2
+                        [nloc(i,:),~] = pdeval(0,xmesh,n(i,:),xhalfmesh);
+                        [ploc(i,:),~] = pdeval(0,xmesh,p(i,:),xhalfmesh);
+                        [aloc(i,:),~] = pdeval(0,xmesh,a(i,:),xhalfmesh);
+                        [cloc(i,:),~] = pdeval(0,xmesh,c(i,:),xhalfmesh);
+                        [Vloc(i,:),~] = pdeval(0,xmesh,V(i,:),xhalfmesh);
                 
-                dndx(i,:) = getvarihalf(dndx0(i,:));
-                dpdx(i,:) = getvarihalf(dpdx0(i,:));
-                dadx(i,:) = getvarihalf(dadx0(i,:));
-                dcdx(i,:) = getvarihalf(dcdx0(i,:));
-                dVdx(i,:) = getvarihalf(dVdx0(i,:));
+                        dndx(i,:) = (nloc(i,2:end) - nloc(i,1:end-1))./(xhalfmesh(2:end) - xhalfmesh(1:end-1));
+                        dpdx(i,:) = (ploc(i,2:end) - ploc(i,1:end-1))./(xhalfmesh(2:end) - xhalfmesh(1:end-1));
+                        dadx(i,:) = (aloc(i,2:end) - aloc(i,1:end-1))./(xhalfmesh(2:end) - xhalfmesh(1:end-1));
+                        dcdx(i,:) = (cloc(i,2:end) - cloc(i,1:end-1))./(xhalfmesh(2:end) - xhalfmesh(1:end-1));
+                        dVdx(i,:) = (Vloc(i,2:end) - Vloc(i,1:end-1))./(xhalfmesh(2:end) - xhalfmesh(1:end-1));
+                    case 3
+                        [nloc(i,:),~] = pdeval(0,xmesh,n(i,:),xhalfmesh);
+                        [ploc(i,:),~] = pdeval(0,xmesh,p(i,:),xhalfmesh);
+                        [aloc(i,:),~] = pdeval(0,xmesh,a(i,:),xhalfmesh);
+                        [cloc(i,:),~] = pdeval(0,xmesh,c(i,:),xhalfmesh);
+                        [Vloc(i,:),~] = pdeval(0,xmesh,V(i,:),xhalfmesh);
                 
+                        [~,dndx(i,:)] = pdeval(0,xhalfmesh,nloc(i,:),xmesh(2:end-1));
+                        [~,dpdx(i,:)] = pdeval(0,xhalfmesh,ploc(i,:),xmesh(2:end-1));
+                        [~,dadx(i,:)] = pdeval(0,xhalfmesh,aloc(i,:),xmesh(2:end-1));
+                        [~,dcdx(i,:)] = pdeval(0,xhalfmesh,cloc(i,:),xmesh(2:end-1));
+                        [~,dVdx(i,:)] = pdeval(0,xhalfmesh,Vloc(i,:),xmesh(2:end-1));
+                end
                 % Diffusion coefficients
                 if par.stats == 'Fermi'
                     for jj = 1:length(x)
@@ -340,28 +381,30 @@ classdef dfana
                 Dp_mat = muh_mat*par.kB*par.T;
             end
             
-            % Particle currents
-%             Jdd.ndiff = -Dn_mat.*(dndx-((nloc./Nc_mat).*gradNc_mat)).*-par.e;
-%             Jdd.ndrift = mue_mat.*nloc.*(dVdx-gradEA_mat)*-par.e;
-%             
-%             Jdd.pdiff = -Dp_mat.*(dpdx-((ploc./Nv_mat).*gradNv_mat)).*par.e;
-%             Jdd.pdrift = muh_mat.*ploc.*(-dVdx+gradIP_mat)*par.e;
+            if option == 2 || option == 3
+               nloc = n(:,2:end-1);
+               ploc = p(:,2:end-1);
+               aloc = a(:,2:end-1);
+               cloc = c(:,2:end-1);
+               Vloc = V(:,2:end-1);
+            end
 
+            % Particle currents
             Jdd.ndiff = -Dn_mat.*(dndx-((nloc./Nc_mat).*gradNc_mat)).*-par.e;
             Jdd.ndrift = mue_mat.*nloc.*(dVdx-gradEA_mat)*-par.e;
             
             Jdd.pdiff = -Dp_mat.*(dpdx-((ploc./Nv_mat).*gradNv_mat)).*par.e;
             Jdd.pdrift = muh_mat.*ploc.*(-dVdx+gradIP_mat)*par.e;
-
-            Jdd.cdiff = -devihalf.mucat.*par.kB*par.T.*dcdx*par.e;
-            Jdd.cdrift = devihalf.mucat.*cloc.*-dVdx*par.e;
+            
+            Jdd.cdiff = -mu_cat.*par.kB*par.T.*dcdx*par.e;
+            Jdd.cdrift = mu_cat.*cloc.*-dVdx*par.e;
             
             if par.N_ionic_species == 1
-                Jdd.adiff = zeros(length(t), length(xhalfmesh));
-                Jdd.adrift = zeros(length(t), length(xhalfmesh));
+                Jdd.adiff = zeros(length(t), length(xout));
+                Jdd.adrift = zeros(length(t), length(xout));
             elseif par.N_ionic_species == 2
-                Jdd.adiff = -devihalf.muion.*par.kB*par.T.*dadx.*-par.e;
-                Jdd.adrift = devihalf.muion.*aloc.*dVdx.*-par.e;
+                Jdd.adiff = -mu_ion.*par.kB*par.T.*dadx.*-par.e;
+                Jdd.adrift = mu_ion.*aloc.*dVdx.*-par.e;
             end
             
             Jdd.n = Jdd.ndrift + Jdd.ndiff;
@@ -370,13 +413,11 @@ classdef dfana
             Jdd.c = Jdd.cdrift + Jdd.cdiff;
             
             % Displacement current
-            %[FV, Frho] = dfana.calcF(sol);
-            for i = 1:length(xhalfmesh)
-                j.disp(:,i) = par.epp0.*eppmat(:,i).*(gradient(dVdx(:,i), t));
+            for i = 1:length(xout)
+                j.disp(:,i) = par.epp0.*eppmat(:,i).*(gradient(-dVdx(:,i), t));
             end
             
-            Jdd.disp = zeros(length(t), length(xhalfmesh));%j.disp*abs(par.e);
-            
+            Jdd.disp = j.disp*par.e;
             Jdd.tot = Jdd.n + Jdd.p + Jdd.a + Jdd.c + Jdd.disp;
         end
         
@@ -391,9 +432,7 @@ classdef dfana
             for i=1:length(t)
                 FV(i,:) = -gradient(V(i, :), x);                      % Electric field calculated from V
             end
-            
-            Frho = cumtrapz(x, rho./(eppmat.*par.epp0), 2) + FV(:,1);
-            
+            Frho = cumtrapz(x, rho, 2)./(eppmat.*par.epp0) + FV(:,1);         
         end
         
         function [FV, Frho] = calcF_ihalf(sol)
@@ -414,7 +453,7 @@ classdef dfana
                 V_ihalf(i,:) = getvarihalf(V(i,:));
                 FV(i,:) = -gradient(V_ihalf(i, :), x);                      % Electric field calculated from V
             end
-            Frho = cumtrapz(x, rho./(eppmat.*par.epp0), 2) + FV(:,1);
+            Frho = cumtrapz(x, rho, 2)./(eppmat.*par.epp0) + FV(:,1);
         end
         
         function rho = calcrho(sol)
@@ -432,14 +471,14 @@ classdef dfana
             % Calculates the space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-                for ii = 1:length(t)
-                    n_ihalf(ii,:) = getvarihalf(n(ii,:));
-                    p_ihalf(ii,:) = getvarihalf(p(ii,:));
-                    a_ihalf(ii,:) = getvarihalf(a(ii,:));
-                    c_ihalf(ii,:) = getvarihalf(c(ii,:));
-                end
-                x = getvarihalf(x);
-                
+            for ii = 1:length(t)
+                n_ihalf(ii,:) = getvarihalf(n(ii,:));
+                p_ihalf(ii,:) = getvarihalf(p(ii,:));
+                a_ihalf(ii,:) = getvarihalf(a(ii,:));
+                c_ihalf(ii,:) = getvarihalf(c(ii,:));
+            end
+            x = getvarihalf(x);
+            
             dev_ihalf = getdevihalf(par);
             
             NAmat = repmat(dev_ihalf.NA, length(t), 1);
