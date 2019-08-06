@@ -91,8 +91,8 @@ classdef dfana
             
             [j, J, x] = dfana.calcJ(sol);
             for i = 1:length(t)
-                deltaEfn(i,:) = cumtrapz(x, J.n(i,:)./(n(i,:).*mue_mat(i,:)), 2);
-                deltaEfp(i,:) = cumtrapz(x, J.p(i,:)./(p(i,:).*muh_mat(i,:)), 2);
+                deltaEfn(i,:) = cumtrapz(x, J.n(i,:)./(par.e*n(i,:).*mue_mat(i,:)), 2);
+                deltaEfp(i,:) = cumtrapz(x, J.p(i,:)./(par.e*p(i,:).*muh_mat(i,:)), 2);
             end
             % Boundary values - electrostatic potential is assumed to be
             % zero at left-hand boundary
@@ -173,6 +173,10 @@ classdef dfana
                 % Uniform generation
                 case 0
                     g = par.Int*dev.G0;
+                    
+                    if option == 2
+                            g_ihalf(1,:) = getvarihalf(g(1,:));
+                    end
                 case 1
                     gxAM15 = par.Int*repmat(gx.AM15', length(t), 1);
                     if par.pulseon == 1
@@ -185,6 +189,12 @@ classdef dfana
                     end
                     g = gxAM15 + gxlas;
                     
+                    if option == 2
+                        for jj = 1:length(t)
+                            g_ihalf(jj,:) = getvarihalf(g(jj,:));
+                        end
+                    end
+                    
                 case 2
                     % Transfer Matrix
                     if par.Int == 0
@@ -194,12 +204,8 @@ classdef dfana
                     end
             end
             
-            if option == 2
-                g = getvarihalf(g);
-            end
-            
-            djndx = dndt + g - U.tot;    % Not certain about the sign here
-            djpdx = dpdt + g - U.tot;
+            djndx = dndt + g_ihalf - U.tot;    % Not certain about the sign here
+            djpdx = dpdt + g_ihalf - U.tot;
             djadx = dadt;
             djcdx = dcdt;
             
