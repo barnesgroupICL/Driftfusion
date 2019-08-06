@@ -280,20 +280,20 @@ classdef dfplot
             legend('Jn,diff', 'Jn,drift', 'Jp,diff', 'Jp,drift', 'Ja,diff', 'Ja,drift', 'Jc,diff', 'Jc,drift')
             hold off
             
-            figure(51)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-                
-                plot(xnm, Jdd.n(p1,:), xnm, Jdd.p(p1,:), xnm, Jdd.a(p1,:), xnm, Jdd.c(p1,:), xnm, Jdd.disp(p1,:), xnm, Jdd.tot(p1,:));
-                hold on
-            end
-            
-            xlabel('Position [nm]')
-            ylabel('Current density [Acm-2]')
-            legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal');
-            hold off
+%             figure(51)
+%             for i = 1:length(tarr)
+%                 % find the time
+%                 p1 = find(sol.t <= tarr(i));
+%                 p1 = p1(end);
+%                 
+%                 plot(xnm, Jdd.n(p1,:), xnm, Jdd.p(p1,:), xnm, Jdd.a(p1,:), xnm, Jdd.c(p1,:), xnm, Jdd.disp(p1,:), xnm, Jdd.tot(p1,:));
+%                 hold on
+%             end
+%             
+%             xlabel('Position [nm]')
+%             ylabel('Current density [Acm-2]')
+%             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal');
+%             hold off
         end
 
         function Voct(sol)
