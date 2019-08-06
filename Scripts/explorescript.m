@@ -2,6 +2,9 @@
 % the parallel computing toolbox
 % Users will likely need to modify explore.explore2par
 % Obtain the base parameters
+clear all
+close all
+
 par.ptpd = pc('input_files/ptpd.csv');
 
 % For the first example we will run JV and steady-state Voc for 3 different

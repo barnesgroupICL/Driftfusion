@@ -1,5 +1,7 @@
 % Creates a single carrier device and then applies a 20 mV periodic
 % potential for 2 cycles
+clear all
+close all
 
 par.singlecar = pc('Input_files/1_layer_single_carrier.csv');
 

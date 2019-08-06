@@ -1,4 +1,6 @@
 %% A script to obtain the transient ideality factor
+clear all
+close all
 
 %% Insert the appropriate file path here
 par = pc('input_files/3_layer_test.csv');
