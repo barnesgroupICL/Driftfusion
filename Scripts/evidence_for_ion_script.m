@@ -10,6 +10,10 @@
 % Note also that the ions have been accelerated by two orders of magnitude
 % as compared to the original publication mu_ion = 10^-10 cm2V-1s-1 to aid 
 % convergence of the solutions
+initialise_df
+
+clear all
+close all
 
 %% Load parameters
 % set OM =0 in pc before doing this for uniform generation in the active

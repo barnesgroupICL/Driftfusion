@@ -37,7 +37,7 @@ classdef dfplot
 
             % Call dfana to obtain band energies and QFLs
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFL2(sol);
 
             xnm = x*1e7;    % x in nm for plotting
 
@@ -94,13 +94,15 @@ classdef dfplot
             hold off
         end
 
-        function Jt(sol, pos)
+        function Jt(sol, xpos)
             % Currents as a function of time
             % POS = the readout position
-            
             t = sol.t;
-            [j, J] = dfana.calcJ(sol);
-
+            [j, J, x] = dfana.calcJ(sol);
+            
+            pos = find(x <= xpos);
+            pos = pos(end);
+            
             figure(2);
             plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.c(:, pos), t, J.disp(:,pos), t, J.tot(:, pos));
             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal')
@@ -133,9 +135,9 @@ classdef dfplot
                 pointtype = 't';
             end
 
-            xnm = sol.x*1e7;
-            [j, J] = dfana.calcJ(sol);
-
+            [j, J, x] = dfana.calcJ(sol);
+            xnm = x*1e7;
+            
             for i = 1:length(tarr)
                 % find the time
                 p1 = find(sol.t <= tarr(i));
@@ -177,8 +179,8 @@ classdef dfplot
                 pointtype = 't';
             end
 
-            xnm = sol.x*1e7;
-            [j, J] = dfana.calcJ(sol);
+            [j, J, x] = dfana.calcJ(sol);
+            xnm = x*1e7;
 
             for i = 1:length(tarr)
                 % find the time
@@ -193,7 +195,7 @@ classdef dfplot
 
             xlabel('Position [nm]')
             ylabel('j [cm-2s-1]')
-            legend('jn', 'jp', 'ja', 'jc', 'jdisp', 'jtot')
+            legend('jn', 'jp', 'ja', 'jc', 'jdisp')
             xlim([xrange(1), xrange(2)])
             hold off
         end
@@ -259,9 +261,8 @@ classdef dfplot
             end
             
             % get drift and diffusion currents
-            Jdd = dfana.Jddxt(sol);
-            xhalfmesh = getxihalf(sol);
-            xnm = xhalfmesh*1e7;
+            [Jdd, x] = dfana.Jddxt(sol);
+            xnm = x*1e7;
             
             figure(5)
             for i = 1:length(tarr)
@@ -279,20 +280,20 @@ classdef dfplot
             legend('Jn,diff', 'Jn,drift', 'Jp,diff', 'Jp,drift', 'Ja,diff', 'Ja,drift', 'Jc,diff', 'Jc,drift')
             hold off
             
-            figure(51)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-                
-                plot(xnm, Jdd.n(p1,:), xnm, Jdd.p(p1,:), xnm, Jdd.a(p1,:), xnm, Jdd.c(p1,:), xnm, Jdd.disp(p1,:), xnm, Jdd.tot(p1,:));
-                hold on
-            end
-            
-            xlabel('Position [nm]')
-            ylabel('Current density [Acm-2]')
-            legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal');
-            hold off
+%             figure(51)
+%             for i = 1:length(tarr)
+%                 % find the time
+%                 p1 = find(sol.t <= tarr(i));
+%                 p1 = p1(end);
+%                 
+%                 plot(xnm, Jdd.n(p1,:), xnm, Jdd.p(p1,:), xnm, Jdd.a(p1,:), xnm, Jdd.c(p1,:), xnm, Jdd.disp(p1,:), xnm, Jdd.tot(p1,:));
+%                 hold on
+%             end
+%             
+%             xlabel('Position [nm]')
+%             ylabel('Current density [Acm-2]')
+%             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal');
+%             hold off
         end
 
         function Voct(sol)
@@ -823,7 +824,7 @@ classdef dfplot
 
             % Call dfana to obtain band energies and QFLs
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFL2(sol);
 
             xnm = x*1e7;    % x in nm for plotting
             FH1 = figure(22);
@@ -874,7 +875,7 @@ classdef dfplot
 
             % Call dfana to obtain band energies and QFLs
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFL2(sol);
 
             xnm = x*1e7;    % x in nm for plotting
 

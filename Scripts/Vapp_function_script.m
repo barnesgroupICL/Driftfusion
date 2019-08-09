@@ -1,5 +1,7 @@
 % Creates a single carrier device and then applies a 20 mV periodic
 % potential for 2 cycles
+clear all
+close all
 
 par.singlecar = pc('Input_files/1_layer_single_carrier.csv');
 
@@ -19,6 +21,7 @@ sol_Vapp_func = Vapp_function(soleq.ion, Vapp_func, coeff, tmax, 200, 0);
 dfplot.Vappt(sol_Vapp_func)
 % Current at mid-point
 dfplot.Jt(sol_Vapp_func, round(par.singlecar.pcum(end)/2))
+ylim([-2e-4, 2e-4])
 % JV plot
 dfplot.JVapp(sol_Vapp_func, round(par.singlecar.pcum(end)/2))
 % Energy level diagrams at t=0 and max amplitude

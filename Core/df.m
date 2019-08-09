@@ -68,8 +68,6 @@ if length(varargin) == 0 || length(varargin) == 2 && max(max(max(varargin{1, 1}.
 end
 
 par.xpoints = length(x);
-%dmax = x(end);
-xnm = x*1e7;
 
 t = meshgen_t(par);
 

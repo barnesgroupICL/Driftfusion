@@ -39,13 +39,13 @@ if accelerate
     % Take ratio of electron and ion mobilities in the active layer
     rat_anion = par.mue(par.active_layer)/par.muion(par.active_layer);
     rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
-    
+
     % If the ratio is infinity (ion mobility set to zero) then set the ratio to
     % zero instead
     if isnan(rat_anion) || isinf(rat_anion)
         rat_anion = 0;
     end
-    
+
     if isnan(rat_cation) || isinf(rat_cation)
         rat_cation = 0;
     end
@@ -63,6 +63,8 @@ par.t0 = par.tmax/1e8;
 par.tmesh_type = 2;
 par.tpoints = 200;
 par.Int = Int;
+par.K_anion = 1;
+par.K_cation = 1;
 
 sol = df(jump1, par);
 
@@ -71,12 +73,12 @@ if stabilise
     % loop to check ions have reached stable config- if not accelerate ions by
     while any(all_stable) == 0
         disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-        
+
         par.tmax = par.tmax*10;
         par.t0 = par.tmax/1e6;
-        
+
         sol = df(sol, par);
-        
+
         all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     end
 end
@@ -85,7 +87,7 @@ sol_relax = sol;
 sol_relax.par.K_cation = 1;
 sol_relax.par.K_anion = 1;
 % Read out currents from LH side
-dfplot.Jt(sol_relax, par.pcum(end));
+dfplot.Jt(sol_relax, sol_relax.x(end));
 
 disp('Jump to V complete')
 end
