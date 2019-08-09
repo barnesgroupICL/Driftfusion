@@ -32,6 +32,7 @@ par.Rs_initial = 0;
 par.Int = Int;
 
 par.mobseti = mobseti;
+% If stabtime is entered as zero set to default value
 if stab_time >= 0
     par.tmax = stab_time;
 else
@@ -41,6 +42,9 @@ par.t0 = par.tmax/1e6;
 par.tpoints = pnts;
 
 sol = df(sol_Rs, par);
+
+% Swicth off applied voltage during precondition
+par.Vapp = 0;
 
 if stab_time == -1
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);

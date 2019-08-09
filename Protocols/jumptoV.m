@@ -1,10 +1,17 @@
-function sol_relax = jumptoV(sol_ini, Vjump, tdwell, mobseti, Int, stabilise)
+function sol_relax = jumptoV(sol_ini, Vjump, tdwell, mobseti, Int, stabilise, accelerate)
 % A function to simulate a jump-to-Voltage measurement as used for SDP
 %% Input arugments
 % SOL_INI - input solution- could be cell at equilibrium or stablised at an
 % applied voltage
 % VJUMP - the voltage to be jumped to
 % TDWELL - the relaxation time after jumping
+% MOBSETI - determines whether the ion mobility is switched on after the
+% jump
+% INT - Intensity during stabilisation phase
+% STABILISE - Determines whether the time step is increased such that the
+% device is at steady-state at the end of the solution
+% ACCELERATE - Accelerate the ions to be at the same mobility as the
+% electrons (for easy access to steady state solutions)
 
 if tdwell == 0
     error('tdwell cannot be set to zero- please choose a time step > 0 s')
@@ -28,28 +35,33 @@ disp('Initial jump with zero ion mobility')
 % Vapp_function(sol_ini, Vapp_func, tmax, tpoints, logtime)
 jump1 = Vapp_function(sol_ini, Vapp_func, coeff, tjump, 20, 1);
 
-% Take ratio of electron and ion mobilities in the active layer
-rat_anion = par.mue(par.active_layer)/par.muion(par.active_layer);
-rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
-
-% If the ratio is infinity (ion mobility set to zero) then set the ratio to
-% zero instead
-if isnan(rat_anion) || isinf(rat_anion)
-    rat_anion = 0;
+if accelerate
+    % Take ratio of electron and ion mobilities in the active layer
+    rat_anion = par.mue(par.active_layer)/par.muion(par.active_layer);
+    rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+    
+    % If the ratio is infinity (ion mobility set to zero) then set the ratio to
+    % zero instead
+    if isnan(rat_anion) || isinf(rat_anion)
+        rat_anion = 0;
+    end
+    
+    if isnan(rat_cation) || isinf(rat_cation)
+        rat_cation = 0;
+    end
+    par.K_anion = rat_anion;
+    par.K_cation = rat_cation;
+else
+    par.K_anion = 1;
+    par.K_cation = 1;
 end
-
-if isnan(rat_cation) || isinf(rat_cation)
-    rat_cation = 0;
-end
-par.K_anion = rat_anion;
-par.K_cation = rat_cation;
 
 par.Vapp = V1;
 par.mobseti = mobseti;
 par.tmax = tdwell;
 par.t0 = par.tmax/1e8;
 par.tmesh_type = 2;
-par.tpoints = 100;
+par.tpoints = 200;
 par.Int = Int;
 
 sol = df(jump1, par);
@@ -73,7 +85,7 @@ sol_relax = sol;
 sol_relax.par.K_cation = 1;
 sol_relax.par.K_anion = 1;
 % Read out currents from LH side
-dfplot.Jt(sol_relax, 1);
+dfplot.Jt(sol_relax, par.pcum(end));
 
 disp('Jump to V complete')
 end
