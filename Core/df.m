@@ -247,16 +247,35 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             
             switch par.N_ionic_species
                 case 1
-                    u0 = [dev.n0(i);
-                        dev.p0(i);
-                        dev.Ncat(i);
-                        (x/par.xx(end))*Vbi;];
+                    if length(par.dcell) == 1
+                        % Single layer
+                        u0 = [par.nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
+                            par.pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
+                            dev.Ncat(i);
+                            (x/par.xx(end))*Vbi;];
+                        % Multi-layered
+                    else
+                        u0 = [dev.n0(i);
+                            dev.p0(i);
+                            dev.Ncat(i);
+                            (x/par.xx(end))*Vbi;];
+                    end
                 case 2
-                    u0 = [dev.n0(i);
-                        dev.p0(i);
-                        dev.Ncat(i);
-                        (x/par.xx(end))*Vbi;
-                        dev.Nion(i);];
+                    if length(par.dcell) == 1
+                        % Single layer
+                        u0 = [par.nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
+                            par.pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
+                            dev.Ncat(i);
+                            (x/par.xx(end))*Vbi;
+                            dev.Nion(i);];
+                        % Multi-layered
+                    else
+                        u0 = [dev.n0(i);
+                            dev.p0(i);
+                            dev.Ncat(i);
+                            (x/par.xx(end))*Vbi;
+                            dev.Nion(i);];
+                    end
             end
         elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
             switch par.N_ionic_species

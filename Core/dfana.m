@@ -363,16 +363,16 @@ classdef dfana
             
             % Calculate total electron and hole currents from fluxes
             % Use the minority carrier flux as the boundary condition
-            if par.EA(1)-par.E0(1) <= par.E0(1)-par.IP(1) && par.EA(end)-par.E0(end) >= par.E0(end)-par.IP(1)
+            if par.pleft >= par.nleft && par.nright >= par.pright
                 % p-type left boundary, n-type right boundary
                 j.n = jn_r + (deltajn-deltajn(:,end));
                 j.p = jp_l + deltajp;
-            elseif par.EA(1)-par.E0(1) >= par.E0(1)-par.IP(1) && par.EA(end)-par.E0(end) <= par.E0(end)-par.IP(end)
+            elseif par.nleft >= par.nright && par.pright >= par.nright
                 % n-type left boundary, p-type right boundary
                 j.n = jn_l + deltajn;
                 j.p = jp_r + (deltajp - deltajp(:,end));
-            elseif par.EA(1)-par.E0(1) >= par.E0(1)-par.IP(1) && par.EA(end)-par.E0(end) >= par.E0(end)-par.IP(end)...
-                    || par.EA(1)-par.E0(1) <= par.E0(1)-par.IP(1) && par.EA(end)-par.E0(end) <= par.E0(end)-par.IP(end)
+            elseif par.pleft >= par.nleft && par.pright >= par.nright...
+                    || par.nleft >= par.pleft && par.nright >= par.pright
                 % p-type both boundaries or n-type both boundaries
                 j.n = jp_l + deltajn;
                 j.p = jp_l + deltajp;
