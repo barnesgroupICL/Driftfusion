@@ -19,4 +19,4 @@ sol_OC = transient_nid(sol_relax, logspace(-4,2,7), 10, 1, 1e6, 200);
 nidt_mean = transient_nid_ana(sol_OC);
 
 % Plot initial OC EL diagram at 1 Sun
-dfplot.ELx(sol_OC(5),0)
+dfplot.ELx(sol_OC(5),0);
