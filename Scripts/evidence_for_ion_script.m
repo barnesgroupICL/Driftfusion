@@ -8,7 +8,7 @@
 % symmetric model method previously while here a series resistance is
 % applied to the boundary conditions.
 % Note also that the ions have been accelerated by two orders of magnitude
-% as compared to the original publication mu_ion = 10^-10 cm2V-1s-1 to aid 
+% as compared to the original publication mu_ion = 10^-10 cm2V-1s-1 to aid
 % convergence of the solutions
 initialise_df
 

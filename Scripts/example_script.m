@@ -30,7 +30,7 @@ xlim([0, 1.2])
 ylim([-30e-3, 10e-3])
 hold off
 
-% plot the energy level diagram and carrier densities for the tio2 device at 
+% plot the energy level diagram and carrier densities for the tio2 device at
 % 1 V (t= 20s) during the illuminated forward scan
 dfplot.ELx(JV.tio2.kscan50em3.ill.f, 20)
 
