@@ -211,7 +211,7 @@ classdef pc
         RelTol = 1e-3;
         AbsTol = 1e-6;
 
-        %dev;
+        dev;
 
     end
 
@@ -220,7 +220,6 @@ classdef pc
     properties (Dependent)
         active_layer
         d
-        dev
         parr
         d_active
         dcum
@@ -384,7 +383,7 @@ classdef pc
             end
 
             % Build the device- properties are defined at each point
-            % par.dev  = pc.builddev(par);
+            par.dev  = pc.builddev(par);
             % Build initial xmesh
             par.xx = pc.xmeshini(par);
         end
@@ -536,7 +535,16 @@ classdef pc
             value = [0, cumsum(par.dcell)];
         end
 
-        function dev = get.dev(par)
+    end
+
+    methods (Static)
+
+        function xx = xmeshini(par)
+            xx = meshgen_x(par);
+        end
+
+        % EA array
+        function dev = builddev(par)
             % BUILDDEV builds the properties for the device as
             % concatenated arrays such that each property can be called for
             % each point including grading at interfaces. For future
@@ -742,6 +750,7 @@ classdef pc
                                     dlogp0dx = (log(par.p0(i+1))-log(par.p0(i-1)))/(par.d(i));
                                     dev.p0(j) = exp(log(par.p0(i-1)) + xprime*dlogp0dx);
 
+
                                 case 'erf'
 
                                     %% error function
@@ -814,13 +823,6 @@ classdef pc
             dev.gradIP = gradient(dev.IP, xx);
             dev.nt = F.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.stats);
             dev.pt = F.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.stats);
-        end
-    end
-
-    methods (Static)
-
-        function xx = xmeshini(par)
-            xx = meshgen_x(par);
         end
 
         function par = importproperties(par, filepath)
