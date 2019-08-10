@@ -358,8 +358,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                             Vres = Jr*par.Rs;
                         end
                         
-                        pl = [-par.sn_l*(ul(1) - nleft);
-                            -par.sp_l*(ul(2) - pleft);
+                        pl = [par.mobset*(-par.sn_l*(ul(1) - nleft));
+                            par.mobset*(-par.sp_l*(ul(2) - pleft));
                             0;
                             -ul(4);];
                         
@@ -368,8 +368,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                             1;
                             0;];
                         
-                        pr = [par.sn_r*(ur(1) - nright);
-                            par.sp_r*(ur(2) - pright);
+                        pr = [par.mobset*(par.sn_r*(ur(1) - nright));
+                            par.mobset*(par.sp_r*(ur(2) - pright));
                             0;
                             -ur(4)+Vbi-par.Vapp+Vres;];
                         
@@ -422,8 +422,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         Jr = Jn_r+Jp_r;
                         Vres = Jr*par.Rs;
                         
-                        pl = [-par.sn_l*(ul(1) - nleft);
-                            -par.sp_l*(ul(2) - pleft);
+                        pl = [par.mobset*(-par.sn_l*(ul(1) - nleft));
+                            par.mobset*(-par.sp_l*(ul(2) - pleft));
                             0;
                             -ul(4);
                             0;];
@@ -434,8 +434,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                             0;
                             1;];
                         
-                        pr = [par.sn_r*(ur(1) - nright);
-                            par.sp_r*(ur(2) - pright);
+                        pr = [par.mobset*(par.sn_r*(ur(1) - nright));
+                            par.mobset*(par.sp_r*(ur(2) - pright));
                             0;
                             -ur(4)+Vbi-par.Vapp+Vres;
                             0;];
