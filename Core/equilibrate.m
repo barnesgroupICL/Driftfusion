@@ -41,12 +41,6 @@ par.BC = 3;     % To enable boundary fluxes to be switched off
 par.mobset = 0;
 par.mobseti = 0;
 
-% Switch off extraction and recombination
-par.sn_l = 0;
-par.sn_r = 0;
-par.sp_l = 0;
-par.sp_r = 0;
-
 %% Initial solution with zero mobility
 disp('Initial solution, zero mobility')
 sol = df(sol, par);
@@ -56,10 +50,6 @@ disp('Complete')
 par.BC = par_origin.BC;
 par.mobset = 1;
 par.radset = 1;
-par.sn_l = par_origin.sn_l;
-par.sn_r = par_origin.sn_r;
-par.sp_l = par_origin.sp_l;
-par.sp_r = par_origin.sp_r;
 
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e6;
@@ -153,7 +143,6 @@ all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 % loop to check ions have reached stable config- if not accelerate ions by
 % order of mag
-
 while any(all_stable) == 0
     disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
     
@@ -163,7 +152,6 @@ while any(all_stable) == 0
     sol = df(sol, par);
     
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-    
 end
 
 disp('Switching on series resistance')
