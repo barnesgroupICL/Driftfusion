@@ -113,7 +113,7 @@ classdef pc
         % These must exist within the energy gap of the appropriate layers
         % and define the variables PT and NT in the expression:
         % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
-        Et_bulk =[-0.5];
+        Et =[-0.5];
 
         %% Electrode Fermi energies [eV]
         % Fermi energies of the metal electrode. These define the built-in voltage, Vbi
@@ -211,8 +211,6 @@ classdef pc
         RelTol = 1e-3;
         AbsTol = 1e-6;
 
-        dev;
-
     end
 
 
@@ -222,6 +220,7 @@ classdef pc
         d
         parr
         d_active
+        dev
         dcum
         dcum0           % includes first entry as zero
         dEAdx
@@ -254,7 +253,6 @@ classdef pc
     end
 
     methods
-
         function par = pc(varargin)
             % Parameters constructor function- runs numerous checks that
             % the input properties are consistent with the model
@@ -287,8 +285,8 @@ classdef pc
             end
 
             % Warn if trap energies are outside of band gap energies
-            for i = 1:length(par.Et_bulk)
-                if par.Et_bulk(i) >= par.EA(i) || par.Et_bulk(i) <= par.IP(i)
+            for i = 1:length(par.Et)
+                if par.Et(i) >= par.EA(i) || par.Et(i) <= par.IP(i)
                     msg = 'Trap energies must exist within layer band gap.';
                     error(msg);
                 end
@@ -315,11 +313,6 @@ classdef pc
                 error(msg)
             end
             
-%             if par.muion(par.active_layer) == 0 || par.mucat(par.active_layer) == 0
-%                 msg = 'Ion mobilities cannot be set to zero. Use a single ionic species instead.';
-%                 error(msg)    
-%             end
-
             % Warn if property array do not have the correct number of
             % layers. The layer thickness array is used to define the
             % number of layers
@@ -377,13 +370,11 @@ classdef pc
             elseif length(par.taup) ~= length(par.d)
                 msg = 'Bulk SRH hole time constants array (taup_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.Et_bulk) ~= length(par.d)
-                msg = 'Bulk SRH trap energy array (Et_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.Et) ~= length(par.d)
+                msg = 'Bulk SRH trap energy array (Et) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             end
 
-            % Build the device- properties are defined at each point
-            par.dev  = pc.builddev(par);
             % Build initial xmesh
             par.xx = pc.xmeshini(par);
         end
@@ -427,7 +418,7 @@ classdef pc
                 end
             end
         end
-
+   
         %% Get active layer indexes from layer_type
         function value = get.active_layer(par)
             value = find(strncmp('active', par.layer_type,6));
@@ -535,16 +526,7 @@ classdef pc
             value = [0, cumsum(par.dcell)];
         end
 
-    end
-
-    methods (Static)
-
-        function xx = xmeshini(par)
-            xx = meshgen_x(par);
-        end
-
-        % EA array
-        function dev = builddev(par)
+        function dev = get.dev(par)
             % BUILDDEV builds the properties for the device as
             % concatenated arrays such that each property can be called for
             % each point including grading at interfaces. For future
@@ -552,7 +534,6 @@ classdef pc
             % at the interfaces is intended. At present the
             % properties are graded linearly.
             xx = pc.xmeshini(par);
-
             dev.EA = zeros(1, length(xx));
             dev.IP = zeros(1, length(xx));
             dev.mue = zeros(1, length(xx));
@@ -581,7 +562,6 @@ classdef pc
             dev.Et = zeros(1, length(xx));
             dev.nt = zeros(1, length(xx));
             dev.pt = zeros(1, length(xx));
-
             if par.stats == 'Fermi'
                 % Build diffusion coefficient structure
                 for i =1:length(par.dcum)
@@ -603,7 +583,6 @@ classdef pc
                     end
                 end
             end
-
             % i is the stack layer index including interfaces
             % j is the xmesh index
             for i=1:length(par.dcum)
@@ -641,7 +620,7 @@ classdef pc
                             dev.gradNv(j) = 0;
                             dev.taun(j) = par.taun(i);
                             dev.taup(j) = par.taup(i);
-                            dev.Et(j) = par.Et_bulk(i);
+                            dev.Et(j) = par.Et(i);
 
                             if par.stats =='Fermi'
                                 % Electron diffusion coefficient lookup table
@@ -654,16 +633,12 @@ classdef pc
                                 dev.Efp(j,:) = Dfd_struct_p(i).Efp;
                             end
                         end
-
                     elseif any(strcmp(par.layer_type{1,i}, {'junction'})) == 1
                         % Interfaces
                         if xx(j) > par.dcum0(i) && xx(j) < par.dcum0(i+1)
-
                             xprime = xx(j)-par.dcum0(i);
-
                             switch par.intgradfun
                                 case 'linear'
-
                                     % Electron affiniity
                                     dEAdxprime = (par.EA(i+1)-par.EA(i-1))/(par.d(i));
                                     dev.EA(j) = par.EA(i-1) + xprime*dEAdxprime;
@@ -701,8 +676,8 @@ classdef pc
                                     dkraddx = (par.krad(i+1)-par.krad(i-1))/(par.d(i));
                                     dev.krad(j) = par.krad(i-1) + xprime*dkraddx;
                                     % SRH trap elvel
-                                    dEtdx = (par.Et_bulk(i+1)-par.Et_bulk(i-1))/(par.d(i));
-                                    dev.Et(j) = par.Et_bulk(i-1) + xprime*dEtdx;
+                                    dEtdx = (par.Et(i+1)-par.Et(i-1))/(par.d(i));
+                                    dev.Et(j) = par.Et(i-1) + xprime*dEtdx;
                                     % SRH time constants
                                     dev.taun(j) = par.taun(i);
                                     dev.taup(j) = par.taup(i);
@@ -724,7 +699,6 @@ classdef pc
                                     % VB effective density of states
                                     dNvdx = (par.Nv(i+1)-par.Nv(i-1))/(par.d(i));
                                     dev.Nv(j) = par.Nv(i-1) + xprime*dNvdx;
-
                                     %% logarithmically graded variables
                                     % CB effective density of states
                                     dlogNcdx = (log(par.Nc(i+1))-log(par.Nc(i-1)))/(par.d(i));
@@ -749,10 +723,7 @@ classdef pc
                                     % Equilibrium carrier densities
                                     dlogp0dx = (log(par.p0(i+1))-log(par.p0(i-1)))/(par.d(i));
                                     dev.p0(j) = exp(log(par.p0(i-1)) + xprime*dlogp0dx);
-
-
                                 case 'erf'
-
                                     %% error function
                                     dev.erf(j) = ((erf(2*pi*(xprime-par.d(i)/2)/(par.d(i)))+1)/2);
                                     dev.EA(j) = par.EA(i-1) + (par.EA(i+1)-par.EA(i-1))*dev.erf(j);
@@ -766,7 +737,7 @@ classdef pc
                                     dev.E0(j) = par.E0(i-1) + (par.E0(i+1)-par.E0(i-1))*dev.erf(j);
                                     dev.G0(j) = par.G0(i-1) + (par.G0(i+1)-par.G0(i-1))*dev.erf(j);
                                     dev.krad(j) = par.krad(i-1) + (par.krad(i+1)-par.krad(i-1))*dev.erf(j);
-                                    dev.Et(j) = par.Et_bulk(i-1) + (par.Et_bulk(i+1)-par.Et_bulk(i-1))*dev.erf(j);
+                                    dev.Et(j) = par.Et(i-1) + (par.Et(i+1)-par.Et(i-1))*dev.erf(j);
                                     dev.Nion(j) = par.Nion(i-1) + (par.Nion(i+1)-par.Nion(i-1))*dev.erf(j);
                                     dev.Ncat(j) = par.Ncat(i-1) + (par.Ncat(i+1)-par.Ncat(i-1))*dev.erf(j);
                                     dev.DOSion(j) = par.DOSion(i-1) + (par.DOSion(i+1)-par.DOSion(i-1))*dev.erf(j);
@@ -824,6 +795,13 @@ classdef pc
             dev.nt = F.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.stats);
             dev.pt = F.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.stats);
         end
+    end
+
+    methods (Static)
+
+        function xx = xmeshini(par)
+            xx = meshgen_x(par);
+        end
 
         function par = importproperties(par, filepath)
             % A function to overwrite the properties in par with those imported from a
@@ -837,7 +815,7 @@ classdef pc
             par.EA = T{:, 'EA'}';
             par.IP = T{:, 'IP'}';
             par.E0 = T{:, 'E0'}';
-            par.Et_bulk = T{:,'Et_bulk'}';
+
             par.Nc = T{:, 'Nc'}';
             par.Nv = T{:, 'Nv'}';
             par.Nion = T{:, 'Nion'}';
@@ -860,6 +838,15 @@ classdef pc
             par.PhiA = T{1, 'PhiA'};
             par.PhiC = T{1, 'PhiC'};
             par.Rs = T{1, 'Rs'};
+            
+            try
+                par.Et = T{:,'Et'}';
+            end
+            
+            try
+                par.Et = T{:,'Et_bulk'}';   % For backward compatibility
+            end
+            
             try
                 par.OM = T{1, 'OM'};
             catch
