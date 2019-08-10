@@ -119,8 +119,8 @@ classdef pc
         % Fermi energies of the metal electrode. These define the built-in voltage, Vbi
         % and the boundary carrier concentrations nleft, pleft, nright, and
         % pright
-        PhiA = -0.6;
-        PhiC = -0.4;
+        Phi_left = -0.6;
+        Phi_right = -0.4;
 
         %% Effective Density Of States (eDOS) [cm-3]
         Nc = [1e19];
@@ -303,13 +303,13 @@ classdef pc
 
             % Warn if electrode workfunctions are outside of boundary layer
             % bandgap
-            if par.PhiA < par.IP(1) || par.PhiA > par.EA(1)
-                msg = 'Anode workfunction (PhiA) out of range: value must exist within left-hand layer band gap';
+            if par.Phi_left < par.IP(1) || par.Phi_left > par.EA(1)
+                msg = 'Anode workfunction (Phi_left) out of range: value must exist within left-hand layer band gap';
                 error(msg)
             end
 
-            if par.PhiC < par.IP(end) || par.PhiA > par.EA(end)
-                msg = 'Anode workfunction (PhiA) out of range: value must exist within right-hand layer band gap';
+            if par.Phi_right < par.IP(end) || par.Phi_left > par.EA(end)
+                msg = 'Anode workfunction (Phi_left) out of range: value must exist within right-hand layer band gap';
                 error(msg)
             end
             
@@ -453,7 +453,7 @@ classdef pc
 
         %% Built-in voltage Vbi based on difference in boundary workfunctions
         function value = get.Vbi(par)
-            value = par.PhiC - par.PhiA;
+            value = par.Phi_right - par.Phi_left;
         end
 
         %% Intrinsic Fermi Energies
@@ -492,22 +492,22 @@ classdef pc
         % Uses metal Fermi energies to calculate boundary densities
         % Electrons left boundary
         function value = get.nleft(par)
-            value = F.nfun(par.Nc(1), par.EA(1), par.PhiA, par.T, par.stats);
+            value = F.nfun(par.Nc(1), par.EA(1), par.Phi_left, par.T, par.stats);
         end
 
         % Electrons right boundary
         function value = get.nright(par)
-            value = F.nfun(par.Nc(end), par.EA(end), par.PhiC, par.T, par.stats);
+            value = F.nfun(par.Nc(end), par.EA(end), par.Phi_right, par.T, par.stats);
         end
 
         % Holes left boundary
         function value = get.pleft(par)
-            value = F.pfun(par.Nv(1), par.IP(1), par.PhiA, par.T, par.stats);
+            value = F.pfun(par.Nv(1), par.IP(1), par.Phi_left, par.T, par.stats);
         end
 
         % holes right boundary
         function value = get.pright(par)
-            value = F.pfun(par.Nv(end), par.IP(end), par.PhiC, par.T, par.stats);
+            value = F.pfun(par.Nv(end), par.IP(end), par.Phi_right, par.T, par.stats);
         end
 
         function value = get.dcum(par)
@@ -835,8 +835,23 @@ classdef pc
             par.sp_l = T{1, 'sp_l'}';
             par.sn_r = T{1, 'sn_r'}';
             par.sp_r = T{1, 'sp_r'}';
-            par.PhiA = T{1, 'PhiA'};
-            par.PhiC = T{1, 'PhiC'};
+            
+            try
+                par.Phi_left = T{1, 'PhiA'};
+            end
+            
+            try
+                par.Phi_left = T{1, 'Phi_left'};    % For backwards compatibility
+            end
+            
+            try
+                par.Phi_right = T{1, 'PhiC'};       % For backwards compatibility
+            end
+            
+            try
+                par.Phi_right = T{1, 'Phi_right'};
+            end
+            
             par.Rs = T{1, 'Rs'};
             
             try
@@ -844,7 +859,7 @@ classdef pc
             end
             
             try
-                par.Et = T{:,'Et_bulk'}';   % For backward compatibility
+                par.Et = T{:,'Et_bulk'}';   % For backwards compatibility
             end
             
             try
