@@ -261,7 +261,7 @@ classdef dfplot
             end
 
             % get drift and diffusion currents
-            [Jdd, x] = dfana.Jddxt(sol);
+            [~, Jdd, x] = dfana.Jddxt(sol);
             xnm = x*1e7;
 
             figure(5)
@@ -285,11 +285,11 @@ classdef dfplot
 %                 % find the time
 %                 p1 = find(sol.t <= tarr(i));
 %                 p1 = p1(end);
-%
+%                 
 %                 plot(xnm, Jdd.n(p1,:), xnm, Jdd.p(p1,:), xnm, Jdd.a(p1,:), xnm, Jdd.c(p1,:), xnm, Jdd.disp(p1,:), xnm, Jdd.tot(p1,:));
 %                 hold on
 %             end
-%
+%             
 %             xlabel('Position [nm]')
 %             ylabel('Current density [Acm-2]')
 %             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal');
