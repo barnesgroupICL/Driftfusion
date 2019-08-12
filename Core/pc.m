@@ -71,8 +71,6 @@ classdef pc
 
         %% GENERAL CONTROL PARAMETERS
         OC = 0;                 % Closed circuit = 0, Open Circuit = 1
-        Int = 0;                % Bias Light intensity (Suns Eq.)
-        pulseon = 0;            % Switch pulse on TPC or TPV
         Vapp = 0;               % Applied bias
         BC = 3;                 % Boundary Conditions. Must be set to one for first solution
         figson = 1;             % Toggle figures on/off
@@ -90,13 +88,17 @@ classdef pc
         Fermi_limit = 0.2;      % Max allowable limit for Fermi levels beyond the bands [eV]
         Fermi_Dn_points = 400;  % No. of points in the Fermi-Dirac look-up table
         intgradfun = 'linear'      % Interface gradient function 'linear' = linear, 'erf' = 'error function'
-                
-        %% OM = Optical Model
-        % Uniform generation uses
+        
+        %% Generation 
+        % OM = Optical Model
         % 0 = Uniform Generation
         % 1 = Beer Lambert
         OM = 1;
-
+        Int = 0;                % Bias Light intensity (multiples of g0 or 1 sun for Beer-Lambert)
+        G0 = [2.6409e+21];      % Uniform generation rate [cm-3s-1]
+        % default: Approximate Uniform generation rate @ 1 Sun for 510 nm active layer thickness
+        pulseon = 0;            % Switch pulse on TPC or TPV
+        
         %%%%%%%%%%% LAYER MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
         % Numerical values should be given as a row vector with the number of
         % entries equal to the number of layers specified in STACK
@@ -153,9 +155,6 @@ classdef pc
 
         %% Relative dielectric constants
         epp = [10];
-
-        %% Uniform generation rate [cm-3s-1]
-        G0 = [2.6409e+21];        % Approximate Uniform generation rate @ 1 Sun for 510 nm active layer thickness
 
         %% Recombination
         % Radiative recombination, U = k(np - ni^2)
