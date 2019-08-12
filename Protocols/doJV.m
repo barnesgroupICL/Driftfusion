@@ -20,7 +20,7 @@ par = sol_ini.par;
 %%Initial settings
 par.Ana = 1;
 par.figson = 0;
-par.Int = 0;
+par.int1 = 0;
 par.pulseon = 0;
 par.OC = 0;
 par.mobseti = mobseti;
@@ -68,7 +68,7 @@ if option ==2 || option ==3
     disp('Illuminated quasi-equilibrium solution')
     par.JV = 0;
     par.mobseti = 0;          % Switch ion mobility off for illumination step
-    par.Int = Intensity;
+    par.int1 = Intensity;
     
     % Log time mesh
     par.tmesh_type = 2;

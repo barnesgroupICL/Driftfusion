@@ -258,11 +258,7 @@ classdef dfana
                 c_ihalf(ii,:) = getvarihalf(c(ii,:));
             end
             x = getvarihalf(x);
-            
-            % Read in generation profil
-            if par.OM == 1
-                gx = sol.gx;
-            end
+            g = sol.g;
             
             for i = 1:length(x)
                 dndt(:,i) = gradient(n_ihalf(:,i), t);
@@ -273,48 +269,9 @@ classdef dfana
             
             % Recombination
             U = dfana.calcU_ihalf(sol);
-            
-            % Uniform Generation
-            switch par.OM
-                % Uniform generation
-                case 0
-                    g = par.Int*dev.G0;
-                    
-                    if option == 2
-                        g_ihalf(1,:) = getvarihalf(g(1,:));
-                    end
-                case 1
-                    gxAM15 = par.Int*repmat(gx.AM15', length(t), 1);
-                    if par.pulseon == 1
-                        las = repmat(gx.las', length(t), 1);
-                        pulset = ones(length(x), length(t))*diag(t >= par.pulsestart & t < par.pulselen + par.pulsestart);
-                        pulset = pulset';
-                        gxlas = las.*pulset;
-                    else
-                        gxlas = 0;
-                    end
-                    g = gxAM15 + gxlas;
-                    
-                    for jj = 1:length(t)
-                        g_ihalf(jj,:) = getvarihalf(g(jj,:));
-                    end
-                    
-                case 2
-                    % Transfer Matrix
-                    if par.Int == 0
-                        g = 0;
-                    else
-                        g = par.Int*interp1(par.genspace, solstruct.Gx1S, (x-par.dcum(1)));
-                    end
-                    
-                    for jj = 1:length(t)
-                        g_ihalf(jj,:) = getvarihalf(g(jj,:));
-                    end
-                    
-            end
-            
-            djndx = dndt + g_ihalf - U.tot;    % Not certain about the sign here
-            djpdx = dpdt + g_ihalf - U.tot;
+
+            djndx = dndt + g - U.tot;    % Not certain about the sign here
+            djpdx = dpdt + g - U.tot;
             djadx = dadt;
             djcdx = dcdt;
             
@@ -439,11 +396,7 @@ classdef dfana
                 c_ihalf(ii,:) = getvarihalf(c(ii,:));
             end
             x = getvarihalf(x);
-            
-            % Read in generation profil
-            if par.OM == 1
-                gx = sol.gx;
-            end
+           
             devihalf = getdevihalf(par);
             
             % Property matrices

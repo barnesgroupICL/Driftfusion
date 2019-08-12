@@ -27,7 +27,10 @@ par.tpoints = 3;
 
 par.JV = 0;
 par.Vapp = 0;
-par.Int = 0;
+par.int1 = 0;
+par.int2 = 0;
+par.g1_fun_type = 'constant';
+par.g2_fun_type = 'constant';
 par.pulseon = 0; 
 par.OC = 0;
 par.tmesh_type = 2;

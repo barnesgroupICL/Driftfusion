@@ -95,9 +95,26 @@ classdef pc
         % 1 = Beer Lambert
         OM = 1;
         Int = 0;                % Bias Light intensity (multiples of g0 or 1 sun for Beer-Lambert)
-        G0 = [2.6409e+21];      % Uniform generation rate [cm-3s-1]
+        int1 = 0;
+        int2 = 0;
+        g0 = [2.6409e+21];      % Uniform generation rate [cm-3s-1]
+        light_source1 = 'AM15';
+        light_source2 = 'laser';
+        laser_lambda1 = 0;
+        laser_lambda2 = 638;
+        g1_fun_type = 'constant'
+        g2_fun_type = 'constant'
+        gen_arg1 = [];
+        gen_arg2 = [];
         % default: Approximate Uniform generation rate @ 1 Sun for 510 nm active layer thickness
+        
+        %% Pulse settings
         pulseon = 0;            % Switch pulse on TPC or TPV
+        laserlambda = 638;      % Pulse wavelength (Beer-Lambert and Transfer Matrix)
+        pulselen = 1e-6;        % Transient pulse length
+        pulsepow = 10;          % Pulse power [mW cm-2] OM2 (Beer-Lambert and Transfer Matrix only)
+        pulsestart = 1e-7;      % Time recorded prior to pulse
+        pulseint = 0.1;         % Pulse intensity (when using uniform generation)
         
         %%%%%%%%%%% LAYER MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
         % Numerical values should be given as a row vector with the number of
@@ -182,13 +199,6 @@ classdef pc
         k_defect_p = 0;
         k_defect_n = 0;
 
-        %% Pulse settings
-        laserlambda = 638;      % Pulse wavelength (Beer-Lambert and Transfer Matrix)
-        pulselen = 1e-6;        % Transient pulse length
-        pulsepow = 10;          % Pulse power [mW cm-2] OM2 (Beer-Lambert and Transfer Matrix only)
-        pulsestart = 1e-7;      % Time recorded prior to pulse
-        pulseint = 0.1;         % Pulse intensity (when using uniform generation)
-
         %% Current voltage scan parameters
         Vstart = 0;             % Initial scan point
         Vend = 1.2;             % Final scan point
@@ -203,6 +213,8 @@ classdef pc
         xpoints = [];
         Vapp_params = [];
         Vapp_func = @(str) [];
+        gx1 = [];       % Light source 1
+        gx2 = [];       % Light source 2
 
         % Define the default relative tolerance for the pdepe solver
         % 1e-3 is the default, can be decreased if more precision is needed
@@ -211,7 +223,6 @@ classdef pc
         AbsTol = 1e-6;
 
     end
-
 
     %%  Properties whose values depend on other properties (see 'get' methods).
     properties (Dependent)
@@ -360,8 +371,8 @@ classdef pc
             elseif length(par.E0) ~= length(par.d)
                 msg = 'Equilibrium Fermi level array (E0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.G0) ~= length(par.d)
-                msg = 'Uniform generation array (G0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.g0) ~= length(par.d)
+                msg = 'Uniform generation array (g0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.taun) ~= length(par.d)
                 msg = 'Bulk SRH electron time constants array (taun_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
@@ -375,7 +386,13 @@ classdef pc
             end
 
             % Build initial xmesh
-            par.xx = pc.xmeshini(par);
+            par.xx = meshgen_x(par);
+            
+            % Get generation profiles
+            par.gx1 = generation(par, par.light_source1, par.laser_lambda1);
+            par.gx2 = generation(par, par.light_source2, par.laser_lambda2);
+            par.gen_arg1 = par.int1;
+            par.gen_arg2 = par.int2;    % Set defaults
         end
 
         function par = set.xmesh_type(par, value)
@@ -395,10 +412,10 @@ classdef pc
             %   from 1 to 2, and if so, changes PARAMS.tmesh_type to VALUE.
             %   Otherwise, a warning is shown. Runs automatically whenever
             %   tmesh_type is changed.
-            if any(1:1:3 == value)
+            if any(1:1:4 == value)
                 par.tmesh_type = value;
             else
-                error('PARAMS.tmesh_type should be an integer from 1 to 3 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
+                error('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
             end
         end
 
@@ -417,7 +434,7 @@ classdef pc
                 end
             end
         end
-   
+        
         %% Get active layer indexes from layer_type
         function value = get.active_layer(par)
             value = find(strncmp('active', par.layer_type,6));
@@ -532,7 +549,7 @@ classdef pc
             % versions a choice of functions defining how the properties change
             % at the interfaces is intended. At present the
             % properties are graded linearly.
-            xx = pc.xmeshini(par);
+            xx = meshgen_x(par);
             dev.EA = zeros(1, length(xx));
             dev.IP = zeros(1, length(xx));
             dev.mue = zeros(1, length(xx));
@@ -555,7 +572,7 @@ classdef pc
             dev.gradNc = zeros(1, length(xx));
             dev.gradNv = zeros(1, length(xx));
             dev.E0 = zeros(1, length(xx));
-            dev.G0 = zeros(1, length(xx));
+            dev.g0 = zeros(1, length(xx));
             dev.taun = zeros(1, length(xx));
             dev.taup = zeros(1, length(xx));
             dev.Et = zeros(1, length(xx));
@@ -612,7 +629,7 @@ classdef pc
                             dev.n0(j) = par.n0(i);
                             dev.p0(j) = par.p0(i);
                             dev.E0(j) = par.E0(i);
-                            dev.G0(j) = par.G0(i);
+                            dev.g0(j) = par.g0(i);
                             dev.gradEA(j) = 0;
                             dev.gradIP(j) = 0;
                             dev.gradNc(j) = 0;
@@ -669,8 +686,8 @@ classdef pc
                                     dE0dx = (par.E0(i+1)-par.E0(i-1))/(par.d(i));
                                     dev.E0(j) = par.E0(i-1) + xprime*dE0dx;
                                     % Uniform generation rate
-                                    dG0dx = (par.G0(i+1)-par.G0(i-1))/(par.d(i));
-                                    dev.G0(j) = par.G0(i-1) + xprime*dG0dx;
+                                    dg0dx = (par.g0(i+1)-par.g0(i-1))/(par.d(i));
+                                    dev.g0(j) = par.g0(i-1) + xprime*dg0dx;
                                     % Radiative recombination coefficient
                                     dkraddx = (par.krad(i+1)-par.krad(i-1))/(par.d(i));
                                     dev.krad(j) = par.krad(i-1) + xprime*dkraddx;
@@ -734,7 +751,7 @@ classdef pc
                                     dev.mucat(j) = par.mucat(i-1) + (par.mucat(i+1)-par.mucat(i-1))*dev.erf(j);
                                     dev.epp(j) = par.epp(i-1) + (par.epp(i+1)-par.epp(i-1))*dev.erf(j);
                                     dev.E0(j) = par.E0(i-1) + (par.E0(i+1)-par.E0(i-1))*dev.erf(j);
-                                    dev.G0(j) = par.G0(i-1) + (par.G0(i+1)-par.G0(i-1))*dev.erf(j);
+                                    dev.g0(j) = par.g0(i-1) + (par.g0(i+1)-par.g0(i-1))*dev.erf(j);
                                     dev.krad(j) = par.krad(i-1) + (par.krad(i+1)-par.krad(i-1))*dev.erf(j);
                                     dev.Et(j) = par.Et(i-1) + (par.Et(i+1)-par.Et(i-1))*dev.erf(j);
                                     dev.Nion(j) = par.Nion(i-1) + (par.Nion(i+1)-par.Nion(i-1))*dev.erf(j);
@@ -798,10 +815,6 @@ classdef pc
 
     methods (Static)
 
-        function xx = xmeshini(par)
-            xx = meshgen_x(par);
-        end
-
         function par = importproperties(par, filepath)
             % A function to overwrite the properties in par with those imported from a
             % text file located in filepath
@@ -826,7 +839,15 @@ classdef pc
             par.muion = T{:, 'muion'}';
             par.mucat = T{:, 'mucat'}';
             par.epp = T{:, 'epp'}';
-            par.G0 = T{:, 'G0'}';
+            
+            try
+                par.g0 = T{:, 'G0'}';   % For backwards compatibility
+            end
+            
+            try
+                par.g0 = T{:, 'g0'}'; 
+            end
+            
             par.krad = T{:, 'krad'}';
             par.taun = T{:, 'taun_SRH'}';
             par.taup = T{:, 'taup_SRH'}';
