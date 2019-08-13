@@ -2,13 +2,10 @@ function nidt = transient_nid_ana(sol_OC)
 % Takes an input from transient_nid and plots nid(t)
 par = sol_OC(1).par;
 % Incident photon flux density at 1 Sun across device
-switch par.OM
-    case 0
-        G = trapz(sol_OC(1).x, par.dev.G0);
-    case 1
-        G = trapz(sol_OC(1).x, sol_OC(1).gx.AM15);
-end
-    
+% Get x_halfi
+xihalf = getvarihalf(sol_OC(1).x);
+G = trapz(xihalf, par.gx1);
+   
 % Extract desrired values from the solution
 for i = 1:length(sol_OC)
    % Split solution
@@ -16,7 +13,7 @@ for i = 1:length(sol_OC)
    
    Voct(i,:) = dfana.Voct(sol_OC(i));
    t = sol_OC(i).t;     
-   Int(i) = sol_OC(i).par.Int;
+   Int(i) = sol_OC(i).par.int1;
    % Incident photon flux at Int(i)
    phi(i) = G*Int(i);
    
