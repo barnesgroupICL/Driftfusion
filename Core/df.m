@@ -64,14 +64,6 @@ par.xpoints = length(x);
 t = meshgen_t(par);
 tmesh = t;
 
-%% Generation function
-gxt1 = fun_gen(par.gx1, par.int1, par.g1_fun_type, par, par.gen_arg1);
-gxt2 = fun_gen(par.gx2, par.int2, par.g2_fun_type, par, par.gen_arg2);
-g = gxt1 + gxt2;
-
-%% Voltage function
-
-
 %% Solver options
 % MaxStep = limit maximum time step size during integration
 options = odeset('MaxStep', par.MaxStepFactor*0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
@@ -89,10 +81,20 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         i = find(x_ihalf <= x);
         i = i(end);
         
-        % Get time point
-        j = find(tmesh <= t);
-        j = j(end);
-               
+        if par.gx1(i) == 0
+            gxt1_now = 0;
+        else
+            gxt1_now = fun_gen(par.gx1(i), par.int1, par.g1_fun_type, par.gen_arg1, t, par.tmax);
+        end
+        
+        if par.gx1(i) == 0
+            gxt2_now = 0;
+        else
+            gxt2_now = fun_gen(par.gx2(i), par.int2, par.g2_fun_type, par.gen_arg2, t, par.tmax);
+        end
+        
+        g = gxt1_now  + gxt2_now;
+           
         switch par.N_ionic_species
             case 1
                 % Prefactors set to 1 for time dependent components - can add other
@@ -115,8 +117,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     par.K_cation*par.mobseti*(devihalf.mucat(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(devihalf.DOScat(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
                     (devihalf.epp(i)/max(par.epp))*DuDx(4);];
                 
-                source = [g(j,i) - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
-                    g(j,i) - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
+                source = [g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
+                    g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     0;
                     (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-devihalf.NA(i)+devihalf.ND(i)-devihalf.Nion(i)+u(3))];
                 
@@ -143,8 +145,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     (devihalf.epp(i)/max(par.epp))*DuDx(4);
                     par.K_anion*par.mobseti*(devihalf.muion(i)*(u(5)*-DuDx(4)+par.kB*par.T*(DuDx(5)+(u(5)*(DuDx(5)/(devihalf.DOSion(i)-u(5)))))));];
                 
-                source = [g(j,i) - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
-                    g(j,i) - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
+                source = [g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
+                    g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     0;
                     (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-devihalf.NA(i)+devihalf.ND(i)-u(5)+u(3));
                     0;];
@@ -219,12 +221,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % coefficient.
     function [pl,ql,pr,qr] = dfbc(xl,ul,xr,ur,t)
         
-        switch par.JV
-            case 1
-                par.Vapp = par.Vstart + ((par.Vend-par.Vstart)*t*(1/par.tmax));
-            case 2 % for custom profile of voltage
-                par.Vapp = par.Vapp_func(par.Vapp_params, t);
-        end
+        Vapp = fun_gen(1, par.Vapp, par.V_fun_type, par.V_fun_arg, t, par.tmax);
         
         switch par.N_ionic_species
             case 1
@@ -247,7 +244,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         pr = [ur(1) - nright;
                             par.sp_r*(ur(2) - pright);
                             0;
-                            -ur(4)+Vbi-par.Vapp;];
+                            -ur(4)+Vbi-Vapp;];
                         
                         qr = [0;
                             1;
@@ -286,7 +283,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         pr = [par.mobset*(par.sn_r*(ur(1) - nright));
                             par.mobset*(par.sp_r*(ur(2) - pright));
                             0;
-                            -ur(4)+Vbi-par.Vapp+Vres;];
+                            -ur(4)+Vbi-Vapp+Vres;];
                         
                         qr = [1;
                             1;
@@ -315,7 +312,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         pr = [ur(1) - nright;
                             par.sp_r*(ur(2) - pright);
                             0;
-                            -ur(4)+Vbi-par.Vapp;
+                            -ur(4)+Vbi-Vapp;
                             0;];
                         
                         qr = [0;
@@ -352,7 +349,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         pr = [par.mobset*(par.sn_r*(ur(1) - nright));
                             par.mobset*(par.sp_r*(ur(2) - pright));
                             0;
-                            -ur(4)+Vbi-par.Vapp+Vres;
+                            -ur(4)+Vbi-Vapp+Vres;
                             0;];
                         
                         qr = [1;
@@ -364,13 +361,18 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         end
     end
 
-%% Analysis, graphing-  required to obtain J and Voc
+% Save the generation profile
+gxt1_save = fun_gen(par.gx1, par.int1, par.g1_fun_type, par.gen_arg1, tmesh, par.tmax);
+gxt2_save = fun_gen(par.gx2, par.int2, par.g2_fun_type, par.gen_arg2, tmesh, par.tmax);
+g_save = gxt1_save + gxt2_save;
+% Store final voltage in par.Vapp
+par.Vapp = Vapp;
 
 % Readout solutions to structure
 solstruct.u = u;
 solstruct.x = x;
 solstruct.t = t;
-solstruct.g = g;
+solstruct.g = g_save;
 
 % Store parameters structure
 solstruct.par = par;

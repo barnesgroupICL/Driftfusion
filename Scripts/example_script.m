@@ -1,7 +1,7 @@
 % An example script for comparing the current-voltage curves for two different
 % architects of perovskite solar cell
-clear all
-close all
+% clear all
+% close all
 
 initialise_df
 

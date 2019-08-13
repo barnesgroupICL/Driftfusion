@@ -200,11 +200,16 @@ classdef pc
         k_defect_n = 0;
 
         %% Current voltage scan parameters
+        % Soon to be obselete
         Vstart = 0;             % Initial scan point
         Vend = 1.2;             % Final scan point
         JVscan_rate = 1;        % JV scan rate (Vs-1)
         JVscan_pnts = 100;      % JV scan points
-
+        
+        %% Voltage function parameters
+        V_fun_type = 'constant';
+        V_fun_arg = [];
+        
         %% Dynamically created variables
         genspace = [];
         x = [];

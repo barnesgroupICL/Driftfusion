@@ -26,15 +26,13 @@ par.OC = 0;
 par.mobseti = mobseti;
 
 %% JV settings
-par.JV = 1;
-par.Vstart = Vstart;
-par.Vend = Vend;
-par.calcJ = 0;
-par.JVscan_pnts = JVscan_pnts;
+par.V_fun_type = 'sweep';
+par.V_fun_arg(1) = Vstart;
+par.V_fun_arg(2) = Vend;
 par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
 par.t0 = 0;
 par.tmesh_type = 1;
-par.tpoints = par.JVscan_pnts;
+par.tpoints = JVscan_pnts;
 
 if option ==1 || option ==3
     
@@ -48,12 +46,10 @@ if option ==1 || option ==3
     %% Dark reverse scan
     
     disp('Dark reverse scan...')
-    par.Vstart = Vend;
-    par.Vend = Vstart;
-    par.JV = 1;
+    par.V_fun_arg(1) = Vend;
+    par.V_fun_arg(2) = Vstart;
     
     JV.dk.r = df(JV.dk.f, par);
-    JV.dk.r.par.JV = 0;
     disp('Complete.')
     
 end
@@ -68,6 +64,7 @@ if option ==2 || option ==3
     disp('Illuminated quasi-equilibrium solution')
     par.JV = 0;
     par.mobseti = 0;          % Switch ion mobility off for illumination step
+    par.V_fun_type = 'constant';
     par.int1 = Intensity;
     
     % Log time mesh
@@ -84,10 +81,9 @@ if option ==2 || option ==3
     par.mobseti = mobseti;
     
     %% JV settings
-    par.JV = 1;
-    par.Vstart = Vstart;
-    par.Vend = Vend;
-    par.calcJ = 0;
+    par.V_fun_type = 'sweep';
+    par.V_fun_arg(1) = Vstart;
+    par.V_fun_arg(2) = Vend;
     par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
     par.t0 = 0;
     par.tmesh_type = 1;
@@ -99,8 +95,8 @@ if option ==2 || option ==3
     
     %% Light reverse
     disp('Illuminated reverse scan...')
-    par.Vstart = Vend;
-    par.Vend = Vstart;
+    par.V_fun_arg(1) = Vend;
+    par.V_fun_arg(2) = Vstart;
     
     JV.ill.r = df(JV.ill.f, par);
     JV.ill.r.par.JV = 0;
