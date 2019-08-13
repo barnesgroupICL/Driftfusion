@@ -10,6 +10,13 @@ switch par.OM
     case 1
         % beerlambert(par, x, source_type, laserlambda, figson)
         gx = beerlambert(par, par.xx, source_type, laserlambda, 0);
+        % Remove interfaces
+        for i = 1:length(par.layer_type)
+            if strcmp(par.layer_type{1,i}, 'junction') == 1
+                gx(par.pcum0(i):par.pcum0(i+1)) = 0;
+            end
+        end
+        
         % interpolate for i+0.5 mesh
         gx = interp1(par.xx, gx, xsolver);  
 
