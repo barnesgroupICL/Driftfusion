@@ -65,11 +65,12 @@ t = meshgen_t(par);
 tmesh = t;
 
 %% Generation function
-gxt1 = gfun(par.gx1, par.int1, par.g1_fun_type, par, par.gen_arg1);
-gxt2 = gfun(par.gx2, par.int2, par.g2_fun_type, par, par.gen_arg2);
+gxt1 = fun_gen(par.gx1, par.int1, par.g1_fun_type, par, par.gen_arg1);
+gxt2 = fun_gen(par.gx2, par.int2, par.g2_fun_type, par, par.gen_arg2);
 g = gxt1 + gxt2;
 
 %% Voltage function
+
 
 %% Solver options
 % MaxStep = limit maximum time step size during integration
