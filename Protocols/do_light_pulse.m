@@ -1,4 +1,4 @@
-function [sol_pulse] = dolightpulse(sol_ini, pulse_int, tmax, tpoints, duty, mobseti, log_timemesh)
+function [sol_pulse] = do_light_pulse(sol_ini, pulse_int, tmax, tpoints, duty, mobseti, log_timemesh)
 % Uses square wave light generator for light source 2 and peforms a single
 % pulse
 
