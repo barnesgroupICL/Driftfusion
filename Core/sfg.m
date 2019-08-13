@@ -67,7 +67,7 @@ if nargin<3, ff=0; end
 switch type
     case 'sin'
         %sin wave
-        y = sin(2*pi*ff*t);
+        y = 0.5*(sin(2*pi*ff*t)+1);
         if ana==1,plotana(t,y);end
     
     case 'sq'
@@ -224,7 +224,7 @@ end
 
     function y = sqg(t,ff)
             %square wave
-            y = 2*gt(sin(2*pi*ff*t),0)-1;
+            y = gt(sin(2*pi*ff*t),0);
     end
 
     function y = dug(t,ff,f0)
