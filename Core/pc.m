@@ -219,6 +219,7 @@ classdef pc
         % Define the default relative tolerance for the pdepe solver
         % 1e-3 is the default, can be decreased if more precision is needed
         % Solver options
+        MaxStepFactor = 1;      % Multiplier for easy access to maximum time step
         RelTol = 1e-3;
         AbsTol = 1e-6;
 
