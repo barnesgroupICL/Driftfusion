@@ -64,6 +64,26 @@ par.xpoints = length(x);
 t = meshgen_t(par);
 tmesh = t;
 
+Vapp_fun = fun_gen2(par.V_fun_type);
+g1_fun = fun_gen2(par.g1_fun_type);
+g2_fun = fun_gen2(par.g2_fun_type);
+
+if strcmp(par.V_fun_type, 'constant') == 1
+    par.V_fun_arg = par.Vapp;
+end
+    
+%         if par.gx1(i) == 0
+%             gxt1_now = 0;
+%         else
+%             gxt1_now = fun_gen(par.gx1(i), par.int1, par.g1_fun_type, par.gen_arg1, t, par.tmax);
+%         end
+%         
+%         if par.gx1(i) == 0
+%             gxt2_now = 0;
+%         else
+%             gxt2_now = fun_gen(par.gx2(i), par.int2, par.g2_fun_type, par.gen_arg2, t, par.tmax);
+%         end
+
 %% Solver options
 % MaxStep = limit maximum time step size during integration
 options = odeset('MaxStep', par.MaxStepFactor*0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
@@ -81,20 +101,11 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         i = find(x_ihalf <= x);
         i = i(end);
         
-        if par.gx1(i) == 0
-            gxt1_now = 0;
-        else
-            gxt1_now = fun_gen(par.gx1(i), par.int1, par.g1_fun_type, par.gen_arg1, t, par.tmax);
-        end
-        
-        if par.gx1(i) == 0
-            gxt2_now = 0;
-        else
-            gxt2_now = fun_gen(par.gx2(i), par.int2, par.g2_fun_type, par.gen_arg2, t, par.tmax);
-        end
-        
+
+        gxt1_now = par.gx1(i)*g1_fun(par.gen_arg1, t);
+        gxt2_now = par.gx2(i)*g1_fun(par.gen_arg2, t);
         g = gxt1_now  + gxt2_now;
-           
+        
         switch par.N_ionic_species
             case 1
                 % Prefactors set to 1 for time dependent components - can add other
@@ -221,7 +232,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % coefficient.
     function [pl,ql,pr,qr] = dfbc(xl,ul,xr,ur,t)
         
-        Vapp = fun_gen(1, par.Vapp, par.V_fun_type, par.V_fun_arg, t, par.tmax);
+        Vapp = Vapp_fun(par.V_fun_arg, t);
         
         switch par.N_ionic_species
             case 1
