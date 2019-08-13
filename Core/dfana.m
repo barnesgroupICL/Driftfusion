@@ -363,11 +363,6 @@ classdef dfana
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            % Read in generation profil
-            if par.OM == 1
-                gx = sol.gx;
-            end
-            
             % Property matrices
             eppmat = repmat(dev.epp, length(t), 1);
             nimat = repmat(dev.ni, length(t), 1);
