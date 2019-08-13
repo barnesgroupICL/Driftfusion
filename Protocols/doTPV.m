@@ -16,8 +16,8 @@ par = sol_ill.par;
 
 % Setup time mesh
 par.tmesh_type = 1;
-par.tmax = tmax;
 par.t0 = 0;
+par.tmax = tmax;
 
 % Setup square wave function generator
 par.g2_fun_type = 'square';
