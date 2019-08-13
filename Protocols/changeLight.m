@@ -58,8 +58,8 @@ par.tmax = tmax_temp;
 
 % find the initial illumination intensity, if it's zero (dark) just use
 % 1e-4, so that the first stabilization will be from dark to 1e-3
-if par.Int
-    oldInt = par.Int;
+if par.int1
+    oldInt = par.int1;
     steps = 1 + ceil(abs(log10(newInt / oldInt)));
 else
     oldInt = 1e-3;
@@ -76,8 +76,8 @@ Int_array = logspace(log10(oldInt), log10(newInt), steps);
 % skip first value in the array as is the initial Int (and does not get through pindrift again) or, in case the input
 % was in dark, the first value is 1e-3 and gets skipped
 for i = 2:length(Int_array)
-    disp([mfilename ' - Go from light intensity ' num2str(par.Int) ' to ' num2str(Int_array(i)) ' over ' num2str(par.tmax) ' s'])
-    par.Int = Int_array(i); % set new light intensity
+    disp([mfilename ' - Go from light intensity ' num2str(par.int1) ' to ' num2str(Int_array(i)) ' over ' num2str(par.tmax) ' s'])
+    par.int1 = Int_array(i); % set new light intensity
     sol_int = df(sol_int, par);
 end
 

@@ -67,7 +67,7 @@ for i = 1:nsolutions
     
     % in case the solution is symmetric, break it in halves
     if badVocStructCell{1, i}.par.OC
-        disp([mfilename ' - asymmetricize solution at illumination intensity ' num2str(badVocStructCell{1, i}.par.Int)])
+        disp([mfilename ' - asymmetricize solution at illumination intensity ' num2str(badVocStructCell{1, i}.par.int1)])
         asymstruct_Int = asymmetricize(badVocStructCell{1, i});
     else
         asymstruct_Int = badVocStructCell{1, i};
@@ -78,7 +78,7 @@ for i = 1:nsolutions
     
     % use findOptimVoc for finding the applied voltage that minimizes the
     % residual current
-    disp([mfilename ' - finding real Voc for illumination intensity ' num2str(badVocStructCell{1, i}.par.Int)])
+    disp([mfilename ' - finding real Voc for illumination intensity ' num2str(badVocStructCell{1, i}.par.int1)])
     [asymstruct_Int_Voc, VOC] = findOptimVoc(asymstruct_Int);
     
     % restore figson before saving

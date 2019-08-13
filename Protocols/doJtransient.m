@@ -14,9 +14,6 @@ par.gen_arg2(2) = pulseint;
 par.gen_arg2(3) = tperiod;
 par.gen_arg2(4) = 50;           % Duty cycle
 
-par.tpoints = 400;
-par.calcJ = 0;
-
 sol_Jtran = df(sol_ini, par);
 sol_Jtran.par.pulseon = 0;
 

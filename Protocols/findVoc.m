@@ -31,7 +31,7 @@ taup = par.taup_inter;
 disp('1 Sun quasi-equilibrium solution')
 par.mobseti = 0;      % switch off ion mobility for illumination step
 par.JV = 0;
-par.Int = 1;
+par.int1 = 1;
 
 % Log time mesh
 par.tmesh_type = 2;
@@ -53,7 +53,7 @@ par.t0 = 0;
 par.tmesh_type = 1;
 par.tpoints = par.JVscan_pnts;
 par.pulseon = 0;
-par.Int = Int;
+par.int1 = Int;
       
 sol = df(sol, par);         
 
@@ -121,7 +121,7 @@ while abs(fx1) > tol
 %     par.t0 = par.tmax/1e3;
 %     par.Vapp = x1;
 %     par.pulseon = 0;
-%     par.Int = 0;
+%     par.int1 = 0;
 % 
 %     sol = df(sol_eq, par);         
 %     
@@ -140,7 +140,7 @@ while abs(fx1) > tol
 %     
 %     sol = df(sol, par);
 %     
-%     par.Int = Int;
+%     par.int1 = Int;
 %     par.tmax = 1e-3;
 %     par.t0 = par.tmax/1e4;
 % 

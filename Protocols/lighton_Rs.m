@@ -1,9 +1,9 @@
-function sol_ill = lighton_Rs(sol_ini, Int, stab_time, mobseti, Rs, pnts)
+function sol_ill = lighton_Rs(sol_ini, int1, stab_time, mobseti, Rs, pnts)
 % A function to switch the light on and record the transient state with a
 % series resistance Rs
 %% Input arguments
 % SOL_INI = initial conditions
-% INT = Light intensity (Suns)
+% int1 = Bias light intensity (Suns)
 % STAB_TIME = Stabilisation time - length of the transient. Setting to -1
 % to cycle to stable solution from initial time of 0.1
 % MOBSETI = Ion mobility switch
@@ -11,12 +11,13 @@ function sol_ill = lighton_Rs(sol_ini, Int, stab_time, mobseti, Rs, pnts)
 % circuit
 % PNTS = Number of time points in the solution
 
-disp(['Starting LIGHTON, Intensity = ', num2str(Int), ' Rs = ', num2str(Rs)])
+disp(['Starting LIGHTON, Intensity = ', num2str(int1), ' Rs = ', num2str(Rs)])
 par = sol_ini.par;
 par_origin = par;
 
+par.g1_fun_type = 'constant';
 par.tmesh_type = 2;
-par.tmax = 1e-3;
+par.tmax = 1e-6;
 par.t0 = par.tmax/1e6;
 par.tpoints = 10;
 par.JV = 0;
@@ -28,8 +29,13 @@ disp('Switching on series resistance- initial fast linear sweep')
 sol_Rs = df(sol_ini, par);
 
 disp('Switching on illumination')
+par.g1_fun_type = 'constant';
+par.tmax = 1e-3;
+par.t0 = par.tmax/1e6;
 par.Rs_initial = 0;
-par.Int = Int;
+par.int1 = int1;
+
+sol = df(sol_Rs, par);
 
 par.mobseti = mobseti;
 % If stabtime is entered as zero set to default value
@@ -41,7 +47,7 @@ end
 par.t0 = par.tmax/1e6;
 par.tpoints = pnts;
 
-sol = df(sol_Rs, par);
+sol = df(sol, par);
 
 % Swicth off applied voltage during precondition
 par.Vapp = 0;

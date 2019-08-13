@@ -12,7 +12,7 @@ Vapp_arr = [solini.par.Vapp, Vapp_arr];    % include intial potential in array
 par.Ana = 1;
 par.figson = 1;
 par.pulseon = 0;
-par.Int = 0;
+par.int1 = 0;
 
 for i = 1:length(Vapp_arr)-1
     

@@ -24,7 +24,7 @@ par.mobseti = 1;
 Jtr = zeros(length(t), length(tdwell_arr));
 
 % 1 ns stabilisation
-par.Int = 0;
+par.int1 = 0;
 par.Vapp = Vjump;
 par.JV = 0;
 
@@ -34,7 +34,7 @@ for i = 1:length(tdwell_arr)
     msg = ['SDP scan, ', num2str(i), ' tdwell = ', num2str(tdwell_arr(i))];
     disp(msg)
     
-    par.Int = 0;
+    par.int1 = 0;
     par.tmax = tdwell_arr(i)./scalefactor;
     %accelerate ions
     par.mobseti = scalefactor;
@@ -45,7 +45,7 @@ for i = 1:length(tdwell_arr)
     sdpsol.Jdk = sol_dk.Jtotr(end, end);
     
     par.tmax = pulselen;
-    par.Int = pulseint;
+    par.int1 = pulseint;
     % switch off ion during pulse
     par.mobseti = 1;
     

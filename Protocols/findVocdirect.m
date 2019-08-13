@@ -10,7 +10,7 @@ par.tpoints = 40;
 
 sol_Rs = df(sol_ini, par);
 
-par.Int = light_intensity;
+par.int1 = light_intensity;
 par.tmax = 1e-3;
 
 sol_Voc = df(sol_Rs, par);

@@ -62,7 +62,7 @@ par.tmax = tdwell;
 par.t0 = par.tmax/1e8;
 par.tmesh_type = 2;
 par.tpoints = 200;
-par.Int = Int;
+par.int1 = Int;
 
 sol = df(jump1, par);
 j = 1;
