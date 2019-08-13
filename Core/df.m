@@ -73,7 +73,7 @@ g = gxt1 + gxt2;
 
 %% Solver options
 % MaxStep = limit maximum time step size during integration
-options = odeset('MaxStep', 0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
+options = odeset('MaxStep', par.MaxStepFactor*0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
 
 %% Call solver
 % inputs with '@' are function handles to the subfunctions
@@ -369,17 +369,9 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 solstruct.u = u;
 solstruct.x = x;
 solstruct.t = t;
-
-% include generation profile when beer lambert is included
-if par.OM == 1
-    solstruct.g = g;
-end
+solstruct.g = g;
 
 % Store parameters structure
 solstruct.par = par;
-
-if par.OM == 2 && par.Int ~= 0
-    solstruct.g = par.Int*interp1(par.genspace, Gx1S, (x-dcum(1)));
-end
 
 end
