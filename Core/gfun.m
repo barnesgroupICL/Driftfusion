@@ -24,9 +24,11 @@ switch g_fun_type
             gxt(i,:) = gx*(range(1) + ((range(2)-range(1))*t(i)*(1/t(end))));
         end
     case 'square'
-        tarr = sfg('du',t,1/argsin(3),argsin(4),0,0);
-        tarr = tarr';
-        gxt = tarr*gx;
+        % Generate intensity array
+        int_arr = argsin(1) + (argsin(2)-argsin(1))*sfg('du',t,1/argsin(3),argsin(4),0,0);
+        int_arr(end) = argsin(1);
+        int_arr = int_arr';
+        gxt = int_arr*gx;
     case 'sin'
         
 end
