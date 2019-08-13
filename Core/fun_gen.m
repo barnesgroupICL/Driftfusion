@@ -1,18 +1,21 @@
-function gxt = gfun(gx, int, g_fun_type, par, argsin)
+function gxt = fun_gen(gx, A, g_fun_type, par, argsin)
 % Function generator for generation profile
-% GX = The input generation profile as a function of position
-% INT = Intensity
+% GX = The input profile as a function of position for 2 dimensional
+% functions
+% A = Amplitude
 % G_FUN_TYPE = Type of function
+% PAR = the parameters object
 %% 'constant'
-% VARARGIN = INT
+% ARGSIN is ignored and INT is used
 %% 'sweep'
-% VARARGIN = {Initial_intensity, Final_intensity}
+% ARGSIN = {Initial_intensity, Final_intensity}
 % Here INT is ignored - this was the easiest way to maintain backwards
 % compatibility with different protocols and may be updated in future
 % releases
 %% 'square'
-% VARAGIN = {low_int, high_int, time_period, duty_cycle}
-% PAR = the parameters object
+% ARGSIN = {A_low, A_high, time_period, duty_cycle}
+%% 'sin'
+% ARGSIN = {DC_int, Delta_int, frequency}
 
 t = meshgen_t(par);
 switch g_fun_type
@@ -30,5 +33,8 @@ switch g_fun_type
         int_arr = int_arr';
         gxt = int_arr*gx;
     case 'sin'
-        
+        int_arr = argsin(1) + argsin(2)*(2*sin(2*pi*argsin(3)*t));
+        int_arr(1) = argsin(1);     %Ensure starts at int_intial
+        int_arr = int_arr';
+        gxt = int_arr*gx;
 end
