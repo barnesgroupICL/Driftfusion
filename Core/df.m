@@ -97,11 +97,15 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             otherwise
                 gxt1 = g1_fun(par.g1_fun_arg, t)*par.gx1(i);
         end
+        
+        switch par.g2_fun_type
+            case 'constant'
+                gxt2 = par.int2*par.gx2(i);
+            otherwise
+                gxt2 = g2_fun(par.g2_fun_arg, t)*par.gx2(i);
+        end
 
-
-        gxt1_now = par.gx1(i)*g1_fun(par.gen_arg1, t);
-        gxt2_now = par.gx2(i)*g1_fun(par.gen_arg2, t);
-        g = gxt1_now  + gxt2_now;
+        g = gxt1 + gxt2;
 
         switch par.N_ionic_species
             case 1
@@ -372,7 +376,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 %% Generation function
 gxt1 = fun_gen(par.gx1, par.int1, par.g1_fun_type, par, par.g1_fun_arg);
 gxt2 = fun_gen(par.gx2, par.int2, par.g2_fun_type, par, par.g2_fun_arg);
-g = gxt1 + gxt2;
+g_save = gxt1 + gxt2;
 
 % Store final voltage reading
 par.Vapp = Vapp;
