@@ -104,8 +104,8 @@ classdef pc
         laser_lambda2 = 638;
         g1_fun_type = 'constant'
         g2_fun_type = 'constant'
-        gen_arg1 = [];
-        gen_arg2 = [];
+        g1_fun_arg = 0;
+        g2_fun_arg = 0;
         % default: Approximate Uniform generation rate @ 1 Sun for 510 nm active layer thickness
         
         %% Pulse settings
@@ -206,10 +206,6 @@ classdef pc
         JVscan_rate = 1;        % JV scan rate (Vs-1)
         JVscan_pnts = 100;      % JV scan points
         
-        %% Voltage function parameters
-        V_fun_type = 'constant';
-        V_fun_arg = [];
-        
         %% Dynamically created variables
         genspace = [];
         x = [];
@@ -220,7 +216,11 @@ classdef pc
         Vapp_func = @(str) [];
         gx1 = [];       % Light source 1
         gx2 = [];       % Light source 2
-
+        
+        %% Voltage function parameters
+        V_fun_type = 'constant';
+        V_fun_arg = 0;
+        
         % Define the default relative tolerance for the pdepe solver
         % 1e-3 is the default, can be decreased if more precision is needed
         % Solver options
@@ -397,8 +397,8 @@ classdef pc
             % Get generation profiles
             par.gx1 = generation(par, par.light_source1, par.laser_lambda1);
             par.gx2 = generation(par, par.light_source2, par.laser_lambda2);
-            par.gen_arg1 = par.int1;
-            par.gen_arg2 = par.int2;    % Set defaults
+            par.g1_fun_arg = par.int1;
+            par.g2_fun_arg = par.int2;    % Set defaults
         end
 
         function par = set.xmesh_type(par, value)

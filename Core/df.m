@@ -21,7 +21,7 @@ elseif length(varargin) == 2
     if max(max(max(varargin{1, 1}.u))) == 0
         par = varargin{2};
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
-        
+
         input_solstruct = varargin{1, 1};
         par = input_solstruct.par;
         icsol = input_solstruct.u;
@@ -53,7 +53,7 @@ devihalf = getdevihalf(par);
 
 %% Read-in spatial mesh
 if length(varargin) == 0 || max(max(max(varargin{1, 1}.u))) == 0
-    x = xx; 
+    x = xx;
 else
     x = icx;
 end
@@ -65,24 +65,14 @@ t = meshgen_t(par);
 tmesh = t;
 
 Vapp_fun = fun_gen2(par.V_fun_type);
-g1_fun = fun_gen2(par.g1_fun_type);
-g2_fun = fun_gen2(par.g2_fun_type);
+Vapp = 0;
 
-if strcmp(par.V_fun_type, 'constant') == 1
-    par.V_fun_arg = par.Vapp;
-end
-    
-%         if par.gx1(i) == 0
-%             gxt1_now = 0;
-%         else
-%             gxt1_now = fun_gen(par.gx1(i), par.int1, par.g1_fun_type, par.gen_arg1, t, par.tmax);
-%         end
-%         
-%         if par.gx1(i) == 0
-%             gxt2_now = 0;
-%         else
-%             gxt2_now = fun_gen(par.gx2(i), par.int2, par.g2_fun_type, par.gen_arg2, t, par.tmax);
-%         end
+% switch par.V_fun_type
+%     case 'constant'
+%     % This accelerates solutions with constant voltage by removing the
+%     % function from the solver subfunctions
+%     Vapp = par.Vapp;
+% end
 
 %% Solver options
 % MaxStep = limit maximum time step size during integration
@@ -96,16 +86,23 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 %% Subfunctions
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
     function [c,flux,source,iterations] = dfpde(x,t,u,DuDx)
-        
+
         % Get position point
         i = find(x_ihalf <= x);
         i = i(end);
-        
+
+        switch par.g1_fun_type
+            case 'constant'
+                gxt1 = par.int1*par.gx1(i);
+            otherwise
+                gxt1 = g1_fun(par.g1_fun_arg, t)*par.gx1(i);
+        end
+
 
         gxt1_now = par.gx1(i)*g1_fun(par.gen_arg1, t);
         gxt2_now = par.gx2(i)*g1_fun(par.gen_arg2, t);
         g = gxt1_now  + gxt2_now;
-        
+
         switch par.N_ionic_species
             case 1
                 % Prefactors set to 1 for time dependent components - can add other
@@ -114,7 +111,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     1;
                     1;
                     0;];
-                
+
                 if par.stats == 'Fermi'
                     Dn = F.D(u(1), devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
                     Dp = F.D(u(2), devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
@@ -122,17 +119,17 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     Dn = devihalf.mue(i)*par.kB*par.T;
                     Dp = devihalf.muh(i)*par.kB*par.T;
                 end
-                
+
                 flux = [par.mobset*(devihalf.mue(i)*u(1)*(-DuDx(4)+devihalf.gradEA(i))+(Dn*(DuDx(1)-((u(1)/devihalf.Nc(i))*devihalf.gradNc(i)))));
                     par.mobset*(devihalf.muh(i)*u(2)*(DuDx(4)-devihalf.gradIP(i))+(Dp*(DuDx(2)-((u(2)/devihalf.Nv(i))*devihalf.gradNv(i)))));
                     par.K_cation*par.mobseti*(devihalf.mucat(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(devihalf.DOScat(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
                     (devihalf.epp(i)/max(par.epp))*DuDx(4);];
-                
+
                 source = [g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     0;
                     (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-devihalf.NA(i)+devihalf.ND(i)-devihalf.Nion(i)+u(3))];
-                
+
             case 2
                 % Prefactors set to 1 for time dependent components - can add other
                 % functions if you want to include the multiple trapping model
@@ -141,7 +138,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     1;
                     0
                     1;];
-                
+
                 if par.stats == 'Fermi'
                     Dn = F.D(u(1), devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
                     Dp = F.D(u(2), devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
@@ -149,13 +146,13 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     Dn = devihalf.mue(i)*par.kB*par.T;
                     Dp = devihalf.muh(i)*par.kB*par.T;
                 end
-                
+
                 flux = [par.mobset*(devihalf.mue(i)*u(1)*(-DuDx(4)+devihalf.gradEA(i))+(Dn*(DuDx(1)-((u(1)/devihalf.Nc(i))*devihalf.gradNc(i)))));
                     par.mobset*(devihalf.muh(i)*u(2)*(DuDx(4)-devihalf.gradIP(i))+(Dp*(DuDx(2)-((u(2)/devihalf.Nv(i))*devihalf.gradNv(i)))));
                     par.K_cation*par.mobseti*(devihalf.mucat(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(devihalf.DOScat(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
                     (devihalf.epp(i)/max(par.epp))*DuDx(4);
                     par.K_anion*par.mobseti*(devihalf.muion(i)*(u(5)*-DuDx(4)+par.kB*par.T*(DuDx(5)+(u(5)*(DuDx(5)/(devihalf.DOSion(i)-u(5)))))));];
-                
+
                 source = [g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     0;
@@ -167,12 +164,12 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % --------------------------------------------------------------------------
 % Define initial conditions.
     function u0 = dfic(x)
-        
+
         if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) == 0
-            
+
             i = find(par.xx <= x);
             i = i(end);
-            
+
             switch par.N_ionic_species
                 case 1
                     if length(par.dcell) == 1
@@ -231,9 +228,9 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % the difference in concentration from equilibrium and the extraction
 % coefficient.
     function [pl,ql,pr,qr] = dfbc(xl,ul,xr,ur,t)
-        
+
         Vapp = Vapp_fun(par.V_fun_arg, t);
-        
+
         switch par.N_ionic_species
             case 1
                 switch par.BC
@@ -246,62 +243,62 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                             ul(2) - pleft;
                             0;
                             -ul(4);];
-                        
+
                         ql = [1;
                             0;
                             1;
                             0;];
-                        
+
                         pr = [ur(1) - nright;
                             par.sp_r*(ur(2) - pright);
                             0;
                             -ur(4)+Vbi-Vapp;];
-                        
+
                         qr = [0;
                             1;
                             1;
                             0;];
-                        
+
                         % Flux boundary conditions for both carrier types. Leads to
                         % inaccurate calculation at low currents due to the small
                         % fractional change in majority carrier density at interface. May
                         % be more reliable at high currents than BC2 since does not rely on
                         % integrating continuity equations across the device.
                     case 3
-                        
+
                         Jn_r = -par.e*par.sn_r*(ur(1) - nright);
                         Jp_r = par.e*par.sp_r*(ur(2) - pright);
-                        
+
                         Jr = Jn_r+Jp_r;
-                        
+
                         if par.Rs_initial
                             % Initial linear sweep
                             Vres = Jr*par.Rs*t/par.tmax;
                         else
                             Vres = Jr*par.Rs;
                         end
-                        
+
                         pl = [par.mobset*(-par.sn_l*(ul(1) - nleft));
                             par.mobset*(-par.sp_l*(ul(2) - pleft));
                             0;
                             -ul(4);];
-                        
+
                         ql = [1;
                             1;
                             1;
                             0;];
-                        
+
                         pr = [par.mobset*(par.sn_r*(ur(1) - nright));
                             par.mobset*(par.sp_r*(ur(2) - pright));
                             0;
                             -ur(4)+Vbi-Vapp+Vres;];
-                        
+
                         qr = [1;
                             1;
                             1;
                             0;];
                 end
-                
+
             case 2
                 switch par.BC
                     case 2
@@ -313,56 +310,56 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                             0;
                             -ul(4);
                             0;];
-                        
+
                         ql = [1;
                             0;
                             1;
                             0;
                             1;];
-                        
+
                         pr = [ur(1) - nright;
                             par.sp_r*(ur(2) - pright);
                             0;
                             -ur(4)+Vbi-Vapp;
                             0;];
-                        
+
                         qr = [0;
                             1;
                             1;
                             0;
                             1;];
-                        
+
                     case 3
                         % Flux boundary conditions for both carrier types. Leads to
                         % inaccurate calculation at low currents due to the small
                         % fractional change in majority carrier density at interface. May
                         % be more reliable at high currents than BC2 since does not rely on
                         % integrating continuity equations across the device.
-                        
+
                         Jn_r = -par.e*par.sn_r*(ur(1) - nright);
                         Jp_r = par.e*par.sp_r*(ur(2) - pright);
-                        
+
                         Jr = Jn_r+Jp_r;
                         Vres = Jr*par.Rs;
-                        
+
                         pl = [par.mobset*(-par.sn_l*(ul(1) - nleft));
                             par.mobset*(-par.sp_l*(ul(2) - pleft));
                             0;
                             -ul(4);
                             0;];
-                        
+
                         ql = [1;
                             1;
                             1;
                             0;
                             1;];
-                        
+
                         pr = [par.mobset*(par.sn_r*(ur(1) - nright));
                             par.mobset*(par.sp_r*(ur(2) - pright));
                             0;
                             -ur(4)+Vbi-Vapp+Vres;
                             0;];
-                        
+
                         qr = [1;
                             1;
                             1;
@@ -372,11 +369,12 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         end
     end
 
-% Save the generation profile
-gxt1_save = fun_gen(par.gx1, par.int1, par.g1_fun_type, par.gen_arg1, tmesh, par.tmax);
-gxt2_save = fun_gen(par.gx2, par.int2, par.g2_fun_type, par.gen_arg2, tmesh, par.tmax);
-g_save = gxt1_save + gxt2_save;
-% Store final voltage in par.Vapp
+%% Generation function
+gxt1 = fun_gen(par.gx1, par.int1, par.g1_fun_type, par, par.g1_fun_arg);
+gxt2 = fun_gen(par.gx2, par.int2, par.g2_fun_type, par, par.g2_fun_arg);
+g = gxt1 + gxt2;
+
+% Store final voltage reading
 par.Vapp = Vapp;
 
 % Readout solutions to structure

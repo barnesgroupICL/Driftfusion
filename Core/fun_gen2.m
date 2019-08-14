@@ -19,7 +19,7 @@ function fun = fun_gen2(g_fun_type, par)
 
 switch g_fun_type
     case 'constant'
-        fun = @(coeff, t) coeff(1)*t;
+        fun = @(coeff, t) coeff(1);
     case 'sweep'
         fun = @(coeff, t) coeff(1) + (coeff(2)-coeff(1))*t/coeff(3);
     case 'square'
