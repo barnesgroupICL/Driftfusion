@@ -209,7 +209,7 @@ classdef pc
         %% Dynamically created variables
         genspace = [];
         x = [];
-        %xx = [];
+        xx = [];
         t = [];
         xpoints = [];
         Vapp_params = [];
@@ -266,7 +266,7 @@ classdef pc
         wp
         wscr            % Space charge region width
         x0              % Initial spatial mesh value
-        xx
+
     end
 
     methods
@@ -393,7 +393,7 @@ classdef pc
             end
 
             % Build initial xmesh
-            %par.xx = meshgen_x(par);
+            par.xx = meshgen_x(par);
             
             % Get generation profiles
             par.gx1 = generation(par, par.light_source1, par.laser_lambda1);
@@ -549,9 +549,9 @@ classdef pc
             value = [0, cumsum(par.dcell)];
         end
         
-        function value = get.xx(par)
-            value = meshgen_x(par);
-        end
+%         function value = get.xx(par)
+%             value = meshgen_x(par);
+%         end
         
         function dev = get.dev(par)
             % BUILDDEV builds the properties for the device as
