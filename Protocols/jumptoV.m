@@ -20,22 +20,23 @@ end
 disp('Starting jump to V')
 %% OUTPUTS
 % SOL_RELAX - the output relaxation solution
-
-
 par = sol_ini.par;
-V0 = par.Vapp;
-V1 = Vjump;
+
+%% Set up sweep
+tjump = 1e-6;
 par.tmesh_type = 1;
-tjump = 1e-10;   % Jump to V in 1 us
+par.V_fun_type = 'sweep';
+par.V_fun_arg(1) = par.Vapp;
+par.V_fun_arg(2) = Vjump;
+par.V_fun_arg(3) = tjump;
 
-% Calculate linear rate coefficient
-coeff = [V0, ((V1 - V0)/tjump)];
-Vapp_func = @(coeff, t) coeff(1) + coeff(2)*t;
+par.mobseti = 0;
 
-sol_ini.par.mobseti = 0;
 disp('Initial jump with zero ion mobility')
 % Vapp_function(sol_ini, Vapp_func, tmax, tpoints, logtime)
-jump1 = Vapp_function(sol_ini, Vapp_func, coeff, tjump, 20, 1);
+jump1 = df(sol_ini, par);
+
+par = jump1.par;
 
 if accelerate
     % Take ratio of electron and ion mobilities in the active layer
@@ -58,13 +59,18 @@ else
     par.K_cation = 1;
 end
 
-par.Vapp = V1;
+par.V_fun_type = 'constant';
+par.V_fun_arg(1) = par.Vapp;    % For future proof
+
+par.g1_fun_type = 'constant';
+par.g1_fun_arg(1) = Int;        % For future proof
+par.int1 = Int;
+
 par.mobseti = mobseti;
 par.tmax = tdwell;
 par.t0 = par.tmax/1e8;
 par.tmesh_type = 2;
 par.tpoints = 200;
-par.int1 = Int;
 
 sol = df(jump1, par);
 j = 1;
