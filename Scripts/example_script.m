@@ -2,7 +2,6 @@
 % architects of perovskite solar cell
 % clear all
 % close all
-
 initialise_df
 
 % Create parameters objects for Spiro/MAPI/TiO2 and PEDOT/MAPI/PCBM devices
