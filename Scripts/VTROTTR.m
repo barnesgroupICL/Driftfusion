@@ -1,10 +1,9 @@
 %% A script to perform a transients of the transient photovoltage
 % measurement
-close all
-clear all
+% close all
+% clear all
 
 % Read-in params
-%par = pc('input_files/Evidence_for_ion_migration_SRH.csv');
 par = pc('input_files/spiro_mapi_tio2.csv');
 
 % Find equilibrium solution
@@ -32,7 +31,7 @@ for i = 1:Ntr
     pp = pp(end);
     
     % Write solution into final position of temporary solution (this is
-    % what will be readin
+    % what will be read in
     sol_temp.u = sol_OC.u(pp,:,:);
     % Reduce the time step for greater accuracy
     sol_temp.par.MaxStepFactor = 0.1;
