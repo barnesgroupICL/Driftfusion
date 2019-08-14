@@ -271,19 +271,18 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         % fractional change in majority carrier density at interface. May
                         % be more reliable at high currents than BC2 since does not rely on
                         % integrating continuity equations across the device.
-                    case 3
-                        
+                    case 3            
                         % Calculate series resistance voltage Vres
-                        if par.Rs ~= 0
-                            Jr = par.e*par.sp_r*(ur(2) - pright) - par.e*par.sp_r*(ur(2) - pright);
+                        if par.Rs == 0
+                            Vres = 0;
+                        else
+                            Jr = par.e*par.sp_r*(ur(2) - pright) - par.e*par.sn_r*(ur(1) - nright);
                             if par.Rs_initial
                                 % Initial linear sweep
                                 Vres = Jr*par.Rs*t/par.tmax;
                             else
                                 Vres = Jr*par.Rs;
                             end
-                        else
-                            Vres = 0;
                         end
 
                         pl = [par.mobset*(-par.sn_l*(ul(1) - nleft));
@@ -343,12 +342,19 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         % fractional change in majority carrier density at interface. May
                         % be more reliable at high currents than BC2 since does not rely on
                         % integrating continuity equations across the device.
-
-                        Jn_r = -par.e*par.sn_r*(ur(1) - nright);
-                        Jp_r = par.e*par.sp_r*(ur(2) - pright);
-
-                        Jr = Jn_r+Jp_r;
-                        Vres = Jr*par.Rs;
+                        
+                        % Calculate series resistance voltage Vres
+                        if par.Rs == 0
+                            Vres = 0;
+                        else
+                            Jr = par.e*par.sp_r*(ur(2) - pright) - par.e*par.sn_r*(ur(1) - nright);
+                            if par.Rs_initial
+                                % Initial linear sweep
+                                Vres = Jr*par.Rs*t/par.tmax;
+                            else
+                                Vres = Jr*par.Rs;
+                            end
+                        end
 
                         pl = [par.mobset*(-par.sn_l*(ul(1) - nleft));
                             par.mobset*(-par.sp_l*(ul(2) - pleft));
