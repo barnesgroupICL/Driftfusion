@@ -24,7 +24,7 @@ classdef explore
             errorlog = zeros(length(parval1), length(parval2));
             
             j = 1;
-            parfor i = 1:length(parval1)
+            for i = 1:length(parval1)
                 
                 par = par_base;
                 par.Ana = 0;
@@ -38,9 +38,8 @@ classdef explore
                     par = explore.helper(par, ['p', str1(2:end)], layerpoints);
                 end
                 
-                % Rebuild device
-                par.xx = pc.xmeshini(par);
-                par.dev = pc.builddev(par);
+                % Refresh device
+                par = pc.refresh(par);
                 
                 Voc_f = zeros(1, length(parval2));
                 Voc_r = zeros(1, length(parval2));
@@ -79,9 +78,8 @@ classdef explore
                         else
                             par = explore.helper(par, str2, parval2(j));
                             Int = 1;
-                            % Rebuild device
-                            par.xx = pc.xmeshini(par);
-                            par.dev = pc.builddev(par);
+                            % Refresh device
+                            par = pc.refresh(par);
                         end
                         
                         % Obtain equilibrium solution - could be calculated
@@ -375,9 +373,8 @@ classdef explore
                         par = explore.helper(par, ['p', str1(2:end)], layerpoints);
                     end
                     
-                    % Rebuild device
-                    par.xx = pc.xmeshini(par);
-                    par.dev = pc.builddev(par);
+                    % Refresh device
+                    par = pc.refresh(par);
                     
                     for j = 1:length(exsol.parval2)
                         if par2logical(j) == 1
@@ -434,9 +431,8 @@ classdef explore
                                 par.pcell(1,4) = pcontact*1;
                             end
                             
-                            % Rebuild device
-                            par.xx = pc.xmeshini(par);
-                            par.dev = pc.builddev(par);
+                            % Refresh device
+                            par = pc.refresh(par);
                             
                             dev = par.dev;
                             
@@ -539,9 +535,8 @@ classdef explore
                     par = explore.helper(par, ['p', str1(2:end)], layerpoints);
                 end
                 
-                % Rebuild device
-                par.xx = pc.xmeshini(par);
-                par.dev = pc.builddev(par);
+                % Refresh device
+                par = pc.refresh(par);
                 x = par.xx;
                 dev = par.dev;
                 

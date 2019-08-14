@@ -210,6 +210,7 @@ classdef pc
         genspace = [];
         x = [];
         xx = [];
+        dev = [];
         t = [];
         xpoints = [];
         Vapp_params = [];
@@ -236,7 +237,7 @@ classdef pc
         d
         parr
         d_active
-        dev
+        %dev
         dcum
         dcum0           % includes first entry as zero
         dEAdx
@@ -391,15 +392,14 @@ classdef pc
                 msg = 'Bulk SRH trap energy array (Et) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             end
-
-            % Build initial xmesh
-            par.xx = meshgen_x(par);
             
-            % Get generation profiles
-            par.gx1 = generation(par, par.light_source1, par.laser_lambda1);
-            par.gx2 = generation(par, par.light_source2, par.laser_lambda2);
-            par.g1_fun_arg = par.int1;
-            par.g2_fun_arg = par.int2;    % Set defaults
+            %% Device and generation builder
+            % Import variables and structure, xx, gx1, gx2, and dev must be
+            % refreshed when to rebuild the device for example when
+            % changing device thickness on the fly. These are not present
+            % in the dependent variables as it is too costly to have them
+            % continuously called.
+            par = pc.refresh(par);
         end
 
         function par = set.xmesh_type(par, value)
@@ -548,46 +548,58 @@ classdef pc
         function value = get.dcum0(par)
             value = [0, cumsum(par.dcell)];
         end
+    end
+
+    methods (Static)
         
-%         function value = get.xx(par)
-%             value = meshgen_x(par);
-%         end
+        function xx = xmeshini(par) % For backwards compatibility
+            xx = meshgen_x(par);
+        end
         
-        function dev = get.dev(par)
+        function par = refresh(par)
+            par.xx = meshgen_x(par);
+            par.dev = pc.builddev(par);
+            % Get generation profiles
+            par.gx1 = generation(par, par.light_source1, par.laser_lambda1);
+            par.gx2 = generation(par, par.light_source2, par.laser_lambda2);
+        end
+        
+        function dev = builddev(par)
+            xmesh = par.xx;
             % BUILDDEV builds the properties for the device as
             % concatenated arrays such that each property can be called for
             % each point including grading at interfaces. For future
             % versions a choice of functions defining how the properties change
             % at the interfaces is intended. At present the
             % properties are graded linearly.
-            dev.EA = zeros(1, length(par.xx));
-            dev.IP = zeros(1, length(par.xx));
-            dev.mue = zeros(1, length(par.xx));
-            dev.muh = zeros(1, length(par.xx));
-            dev.muion = zeros(1, length(par.xx));
-            dev.NA = zeros(1, length(par.xx));
-            dev.ND = zeros(1, length(par.xx));
-            dev.Nc = zeros(1, length(par.xx));
-            dev.Nv = zeros(1, length(par.xx));
-            dev.Nion = zeros(1, length(par.xx));
-            dev.Ncat = zeros(1, length(par.xx));
-            dev.ni = zeros(1, length(par.xx));
-            dev.n0 = zeros(1, length(par.xx));
-            dev.p0 = zeros(1, length(par.xx));
-            dev.DOSion = zeros(1, length(par.xx));
-            dev.epp = zeros(1, length(par.xx));
-            dev.krad = zeros(1, length(par.xx));
-            dev.gradEA = zeros(1, length(par.xx));
-            dev.gradIP = zeros(1, length(par.xx));
-            dev.gradNc = zeros(1, length(par.xx));
-            dev.gradNv = zeros(1, length(par.xx));
-            dev.E0 = zeros(1, length(par.xx));
-            dev.g0 = zeros(1, length(par.xx));
-            dev.taun = zeros(1, length(par.xx));
-            dev.taup = zeros(1, length(par.xx));
-            dev.Et = zeros(1, length(par.xx));
-            dev.nt = zeros(1, length(par.xx));
-            dev.pt = zeros(1, length(par.xx));
+            dev.EA = zeros(1, length(xmesh));
+            dev.IP = zeros(1, length(xmesh));
+            dev.mue = zeros(1, length(xmesh));
+            dev.muh = zeros(1, length(xmesh));
+            dev.muion = zeros(1, length(xmesh));
+            dev.NA = zeros(1, length(xmesh));
+            dev.ND = zeros(1, length(xmesh));
+            dev.Nc = zeros(1, length(xmesh));
+            dev.Nv = zeros(1, length(xmesh));
+            dev.Nion = zeros(1, length(xmesh));
+            dev.Ncat = zeros(1, length(xmesh));
+            dev.ni = zeros(1, length(xmesh));
+            dev.n0 = zeros(1, length(xmesh));
+            dev.p0 = zeros(1, length(xmesh));
+            dev.DOSion = zeros(1, length(xmesh));
+            dev.epp = zeros(1, length(xmesh));
+            dev.krad = zeros(1, length(xmesh));
+            dev.gradEA = zeros(1, length(xmesh));
+            dev.gradIP = zeros(1, length(xmesh));
+            dev.gradNc = zeros(1, length(xmesh));
+            dev.gradNv = zeros(1, length(xmesh));
+            dev.E0 = zeros(1, length(xmesh));
+            dev.g0 = zeros(1, length(xmesh));
+            dev.taun = zeros(1, length(xmesh));
+            dev.taup = zeros(1, length(xmesh));
+            dev.Et = zeros(1, length(xmesh));
+            dev.nt = zeros(1, length(xmesh));
+            dev.pt = zeros(1, length(xmesh));
             if par.stats == 'Fermi'
                 % Build diffusion coefficient structure
                 for i =1:length(par.dcum)
@@ -612,9 +624,9 @@ classdef pc
             % i is the stack layer index including interfaces
             % j is the xmesh index
             for i=1:length(par.dcum)
-                for j = 1:length(par.xx)
+                for j = 1:length(xmesh)
                     if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
-                        if par.xx(j) >= par.dcum0(i) %&& par.xx(j) <= darrcumint(k+1)
+                        if xmesh(j) >= par.dcum0(i) %&& xmesh(j) <= darrcumint(k+1)
                             % Upper limits currently causing errors for final points-
                             % seems to be due to rounding. For now ignore
                             % upper limit- more expensive but prevents
@@ -661,8 +673,8 @@ classdef pc
                         end
                     elseif any(strcmp(par.layer_type{1,i}, {'junction'})) == 1
                         % Interfaces
-                        if par.xx(j) > par.dcum0(i) && par.xx(j) < par.dcum0(i+1)
-                            xprime = par.xx(j)-par.dcum0(i);
+                        if xmesh(j) > par.dcum0(i) && xmesh(j) < par.dcum0(i+1)
+                            xprime = xmesh(j)-par.dcum0(i);
                             switch par.intgradfun
                                 case 'linear'
                                     % Electron affiniity
@@ -729,11 +741,11 @@ classdef pc
                                     % CB effective density of states
                                     dlogNcdx = (log(par.Nc(i+1))-log(par.Nc(i-1)))/(par.d(i));
                                     dev.Nc(j) = exp(log(par.Nc(i-1)) + xprime*dlogNcdx);
-                                    %gradNc = (dev.Nc(j)-dev.Nc(j-1))/par.xx(j);
+                                    %gradNc = (dev.Nc(j)-dev.Nc(j-1))/xmesh(j);
                                     % VB effective density of states
                                     dlogNvdx = (log(par.Nv(i+1))-log(par.Nv(i-1)))/(par.d(i));
                                     dev.Nv(j) = exp(log(par.Nv(i-1)) + xprime*dlogNvdx);
-                                    %gradNv = (dev.Nv(j)-dev.Nv(j-1))/par.xx(j);
+                                    %gradNv = (dev.Nv(j)-dev.Nv(j-1))/xmesh(j);
                                     % Acceptor density
                                     dlogNAdx = (log(par.NA(i+1))-log(par.NA(i-1)))/(par.d(i));
                                     dev.NA(j) = exp(log(par.NA(i-1)) + xprime*dlogNAdx);
@@ -814,19 +826,12 @@ classdef pc
             end
 
             % Centre difference gradients
-            dev.gradNc = gradient(dev.Nc, par.xx);
-            dev.gradNv = gradient(dev.Nv, par.xx);
-            dev.gradEA = gradient(dev.EA, par.xx);
-            dev.gradIP = gradient(dev.IP, par.xx);
+            dev.gradNc = gradient(dev.Nc, xmesh);
+            dev.gradNv = gradient(dev.Nv, xmesh);
+            dev.gradEA = gradient(dev.EA, xmesh);
+            dev.gradIP = gradient(dev.IP, xmesh);
             dev.nt = F.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.stats);
             dev.pt = F.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.stats);
-        end
-    end
-
-    methods (Static)
-        
-        function xx = xmeshini(par) % For backwards compatibility
-            xx = meshgen_x(par);
         end
         
         function par = importproperties(par, filepath)

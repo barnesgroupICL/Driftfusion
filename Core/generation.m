@@ -10,24 +10,8 @@ switch par.OM
     case 1
         % beerlambert(par, x, source_type, laserlambda, figson)
         gx = beerlambert(par, par.xx, source_type, laserlambda, 0);
-        % Remove interfaces
-        for i = 1:length(par.layer_type)
-            if strcmp(par.layer_type{1,i}, 'junction') == 1
-                gx(par.pcum0(i):par.pcum0(i+1)) = 0;
-            end
-        end
-        
         % interpolate for i+0.5 mesh
-        gx = interp1(par.xx, gx, xsolver);  
-
-%     case 2
-%         par.genspace = x(x > par.dcum(1) & x < par.dcum(2));    % Active layer points for interpolation- this could all be implemented better but ea
-%         
-%         %% TRANSFER MATRIX NOT CURRENTLY AVAILABLE
-%         % Call Transfer Matrix code: [Gx1, Gx2] = TMPC1(layers, thicknesses, activeLayer1, activeLayer2)
-%         [Gx1S, GxLas] = TMPC1({'TiO2' 'MAPICl' 'Spiro'}, [par.d(1)+0.5*par.dint, par.d(2)+0.5*par.dint, par.d(3)+0.5*par.dint], 2, 2, par.laserlambda, par.pulsepow);
-%         Gx1S = Gx1S';
-%         GxLas = GxLas';  
+        gx = interp1(par.xx, gx, xsolver);
 end
 
 end

@@ -53,7 +53,7 @@ Eph = h*c./(lambda*1e-9);    % Photon energy in Joules
 n = zeros(size(layers,2),size(lambda,2));
 k = zeros(size(layers,2),size(lambda,2));
 try
-    for index = 1:size(layers,2)
+    for index = 1:length(layers)    %size(layers,2)
         if any(strcmp(par.layer_type{1,index}, {'layer', 'active'}))
             [n(index,:), k(index,:)] = LoadRefrIndex(layers{index},lambda);
         else
@@ -110,11 +110,27 @@ for i =1:length(xarr)-1
         I(p1:p2, j) = I0(j).*exp(-alpha(i, j).*(x(p1:p2)-x(p1)));
         
         Gen(p1:p2, j) = I(p1:p2, j)*alpha(i, j)/Eph(j);
-end
+    end
         I0 = I(p2, :);  % Set I0 for new layer
 end
 
 Gentot = trapz(lambda, Gen, 2);
+
+%% grade generation linearly at interfaces
+Gentot_copy = Gentot;
+for i = 1:length(layers)
+    if strcmp(par.layer_type{1,i}, 'junction') == 1
+        xprime = x(par.pcum0(i):par.pcum0(i+1)+1) - x(par.pcum0(i));
+        xprime = xprime';
+        switch par.intgradfun
+            case 'linear'
+                Gentot(par.pcum0(i):par.pcum0(i+1)+1) = Gentot_copy(par.pcum0(i)) + ((Gentot_copy(par.pcum0(i+1)+1) - Gentot_copy(par.pcum0(i)))*(xprime/xprime(end)));
+            case 'erf'
+                myerf = ((erf(2*pi*(xprime-par.d(i)/2)/(par.d(i)))+1)/2);
+                Gentot(par.pcum0(i):par.pcum0(i+1)+1) = Gentot_copy(par.pcum0(i)) + (Gentot_copy(par.pcum0(i+1)+1) - Gentot_copy(par.pcum0(i)))*myerf;
+        end
+    end
+end
 
 if par.side == 2
     I = flipud(I);
