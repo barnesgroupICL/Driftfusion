@@ -1,10 +1,8 @@
-function fun = fun_gen2(g_fun_type)
+function fun = fun_gen(g_fun_type)
 % Function generator for generation profile
-% GX = The input profile as a function of position for 2 dimensional
-% functions
-% A = Amplitude
+% Some of the functions in this code are based on SFG.M by Hiroyuki Kato Copyright (c) 2013
+% The license details are contained with sfg_license
 % G_FUN_TYPE = Type of function
-% PAR = the parameters object
 %% 'constant'
 % COEFF = [Amplitude]
 %% 'sweep'
