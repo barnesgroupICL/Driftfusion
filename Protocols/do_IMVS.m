@@ -19,9 +19,10 @@ par.t0 = 0;
 % Setup square wave function generator
 par.g1_fun_type = 'sin';
 par.tpoints = tpoints;
-par.gen_arg1(1) = int_base;
-par.gen_arg1(2) = int_delta;
-par.gen_arg1(3) = frequency;
+par.g1_fun_arg(1) = int_base;
+par.g1_fun_arg(2) = int_delta;
+par.g1_fun_arg(3) = frequency;
+par.g1_fun_arg(4) = 0;          % phase
 
 disp('Applying oscillating optical bias')
 sol_IMVS = df(sol_ill, par);

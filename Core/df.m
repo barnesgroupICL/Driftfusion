@@ -69,13 +69,10 @@ g = 0;
 %% Voltage function
 Vapp_fun = fun_gen2(par.V_fun_type);
 Vapp = 0;
-
-% switch par.V_fun_type
-%     case 'constant'
-%     % This accelerates solutions with constant voltage by removing the
-%     % function from the solver subfunctions
-%     Vapp = par.Vapp;
-% end
+Vres = 0;
+Jn_r = 0;
+Jp_r = 0;
+Jr = 0;
 
 %% Solver options
 % MaxStep = limit maximum time step size during integration
@@ -382,9 +379,20 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
     end
 
 %% Generation function
-gxt1 = fun_gen(par.gx1, par.int1, par.g1_fun_type, par, par.g1_fun_arg);
-gxt2 = fun_gen(par.gx2, par.int2, par.g2_fun_type, par, par.g2_fun_arg);
-g_save = gxt1 + gxt2;
+switch par.g1_fun_type
+    case 'constant'
+        gxt1_save = repmat(par.int1.*par.gx1, length(t), 1);
+    otherwise
+        gxt1_save = g1_fun(par.g1_fun_arg, tmesh')*par.gx1;
+end
+
+switch par.g2_fun_type
+    case 'constant'
+        gxt2_save = repmat(par.int2.*par.gx2, length(t), 1);
+    otherwise
+        gxt2_save = g2_fun(par.g2_fun_arg, tmesh')*par.gx2;
+end
+g_save = gxt1_save + gxt2_save;
 
 % Store final voltage reading
 par.Vapp = Vapp;

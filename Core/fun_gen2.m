@@ -13,9 +13,9 @@ function fun = fun_gen2(g_fun_type)
 % compatibility with different protocols and may be updated in future
 % releases
 %% 'square'
-% COEFF = {A_low, A_high, time_period, duty_cycle}
+% COEFF = [A_low, A_high, time_period, duty_cycle]
 %% 'sin'
-% COEFF = {DC_int, Delta_A, frequency}
+% COEFF = [DC_int, Delta_A, frequency, phase]
 
 switch g_fun_type
     case 'constant'
