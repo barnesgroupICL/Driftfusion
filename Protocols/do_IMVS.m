@@ -8,7 +8,7 @@ disp(['Starting IMVS, base intensity ', num2str(int_base), ', delta intensity ',
 par = sol_ini.par;
 
 %sol_ill = lighton_Rs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
-sol_ill = lighton_Rs(sol_ini, int_base, -1, 0, 1e6, 100);
+sol_ill = lighton_Rs(sol_ini, int_base, -1, 1, 1e6, 100);
 par = sol_ill.par;
 
 % Setup time mesh
@@ -26,6 +26,9 @@ par.g1_fun_arg(4) = 0;          % phase
 
 disp('Applying oscillating optical bias')
 sol_IMVS = df(sol_ill, par);
+
+%% Plot the Voc as a function of t
+dfplot.Voct(sol_IMVS);
 
 disp('IMVS complete')
 
