@@ -60,18 +60,16 @@ t = meshgen_t(par);
 tmesh = t;
 
 %% Generation function
-g1_fun = fun_gen2(par.g1_fun_type);
-g2_fun = fun_gen2(par.g2_fun_type);
+g1_fun = fun_gen(par.g1_fun_type);
+g2_fun = fun_gen(par.g2_fun_type);
 gxt1 = 0;
 gxt2 = 0;
 g = 0;
 
 %% Voltage function
-Vapp_fun = fun_gen2(par.V_fun_type);
+Vapp_fun = fun_gen(par.V_fun_type);
 Vapp = 0;
 Vres = 0;
-Jn_r = 0;
-Jp_r = 0;
 Jr = 0;
 
 %% Solver options
@@ -274,17 +272,18 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         % be more reliable at high currents than BC2 since does not rely on
                         % integrating continuity equations across the device.
                     case 3
-
-                        Jn_r = -par.e*par.sn_r*(ur(1) - nright);
-                        Jp_r = par.e*par.sp_r*(ur(2) - pright);
-
-                        Jr = Jn_r+Jp_r;
-
-                        if par.Rs_initial
-                            % Initial linear sweep
-                            Vres = Jr*par.Rs*t/par.tmax;
+                        
+                        % Calculate series resistance voltage Vres
+                        if par.Rs ~= 0
+                            Jr = par.e*par.sp_r*(ur(2) - pright) - par.e*par.sp_r*(ur(2) - pright);
+                            if par.Rs_initial
+                                % Initial linear sweep
+                                Vres = Jr*par.Rs*t/par.tmax;
+                            else
+                                Vres = Jr*par.Rs;
+                            end
                         else
-                            Vres = Jr*par.Rs;
+                            Vres = 0;
                         end
 
                         pl = [par.mobset*(-par.sn_l*(ul(1) - nleft));
