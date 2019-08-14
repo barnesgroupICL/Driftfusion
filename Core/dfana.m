@@ -249,7 +249,7 @@ classdef dfana
             % Calculated on the i+0.5 grid
             option = 2;
             % obtain SOL components for easy referencing
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
             for ii = 1:length(t)
                 n_ihalf(ii,:) = getvarihalf(n(ii,:));
@@ -257,7 +257,7 @@ classdef dfana
                 a_ihalf(ii,:) = getvarihalf(a(ii,:));
                 c_ihalf(ii,:) = getvarihalf(c(ii,:));
             end
-            x = getvarihalf(x);
+            x = getvarihalf(xmesh);
             g = sol.g;
             
             for i = 1:length(x)
@@ -339,14 +339,16 @@ classdef dfana
             j.c = 0 + deltajc;
             % displacement flux
             j.disp = zeros(length(t), length(x));
-            [FV, ~] = dfana.calcF_ihalf(sol);
-            
+            [FV, ~] = dfana.calcF(sol);
+            for i = 1:length(t)
+                FV_ihalf(i,:) = interp1(xmesh, FV(i,:), x);
+            end
             % Property matrices
             dev_ihalf = getdevihalf(par);
             eppmat = repmat(dev_ihalf.epp, length(t), 1);
             
             for i = 1:length(x)
-                j.disp(:,i) = -par.epp0.*eppmat(:,i).*(gradient(FV(:,i), t));
+                j.disp(:,i) = -par.epp0.*eppmat(:,i).*(gradient(FV_ihalf(:,i), t));
             end
             
             J.n = j.n*-par.e;
