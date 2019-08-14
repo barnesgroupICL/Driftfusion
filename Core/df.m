@@ -51,19 +51,22 @@ x_ihalf = getvarihalf(xx);
 dev = par.dev;
 devihalf = getdevihalf(par);
 
-%% Read-in spatial mesh
-if length(varargin) == 0 || max(max(max(varargin{1, 1}.u))) == 0
-    x = xx;
-else
-    x = icx;
-end
-
+%% Spatial mesh
+x = xx;
 par.xpoints = length(x);
 
 %% Time mesh
 t = meshgen_t(par);
 tmesh = t;
 
+%% Generation function
+g1_fun = fun_gen2(par.g1_fun_type);
+g2_fun = fun_gen2(par.g2_fun_type);
+gxt1 = 0;
+gxt2 = 0;
+g = 0;
+
+%% Voltage function
 Vapp_fun = fun_gen2(par.V_fun_type);
 Vapp = 0;
 
@@ -232,8 +235,13 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % the difference in concentration from equilibrium and the extraction
 % coefficient.
     function [pl,ql,pr,qr] = dfbc(xl,ul,xr,ur,t)
-
-        Vapp = Vapp_fun(par.V_fun_arg, t);
+        
+        switch par.V_fun_type
+            case 'constant'
+                Vapp = par.Vapp;
+            otherwise
+                Vapp = Vapp_fun(par.V_fun_arg, t);
+        end
 
         switch par.N_ionic_species
             case 1

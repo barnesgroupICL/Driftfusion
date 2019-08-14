@@ -26,13 +26,15 @@ par.OC = 0;
 par.mobseti = mobseti;
 
 %% JV settings
+par.t0 = 0;
+par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
+par.tmesh_type = 1;
+par.tpoints = JVscan_pnts;
+
 par.V_fun_type = 'sweep';
 par.V_fun_arg(1) = Vstart;
 par.V_fun_arg(2) = Vend;
-par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
-par.t0 = 0;
-par.tmesh_type = 1;
-par.tpoints = JVscan_pnts;
+par.V_fun_arg(3) = par.tmax;
 
 if option ==1 || option ==3
     
@@ -44,10 +46,12 @@ if option ==1 || option ==3
     disp('Complete.')
     
     %% Dark reverse scan
-    
     disp('Dark reverse scan...')
+    
+    % Sweep settings
     par.V_fun_arg(1) = Vend;
     par.V_fun_arg(2) = Vstart;
+    par.V_fun_arg(3) = par.tmax;
     
     JV.dk.r = df(JV.dk.f, par);
     disp('Complete.')
@@ -81,13 +85,16 @@ if option ==2 || option ==3
     par.mobseti = mobseti;
     
     %% JV settings
+    par.t0 = 0;
+    par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
+    par.tmesh_type = 1;
+    par.tpoints = par.JVscan_pnts;
+    
+    % Sweep settings
     par.V_fun_type = 'sweep';
     par.V_fun_arg(1) = Vstart;
     par.V_fun_arg(2) = Vend;
-    par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
-    par.t0 = 0;
-    par.tmesh_type = 1;
-    par.tpoints = par.JVscan_pnts;
+    par.V_fun_arg(3) = par.tmax;
     
     JV.ill.f = df(sol_i_1S, par);
     JV.ill.f.par.JV = 0;

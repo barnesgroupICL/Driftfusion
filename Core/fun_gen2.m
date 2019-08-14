@@ -1,4 +1,4 @@
-function fun = fun_gen2(g_fun_type, par)
+function fun = fun_gen2(g_fun_type)
 % Function generator for generation profile
 % GX = The input profile as a function of position for 2 dimensional
 % functions
