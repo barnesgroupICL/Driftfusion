@@ -99,10 +99,14 @@ classdef dfplot
             % POS = the readout position
             t = sol.t;
             [j, J, x] = dfana.calcJ(sol);
-
-            pos = find(x <= xpos);
-            pos = pos(end);
-
+            
+            if xpos <= x(1)
+                pos =1;
+            else
+                pos = find(x <= xpos);
+                pos = pos(end);
+            end
+            
             figure(2);
             plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.c(:, pos), t, J.disp(:,pos), t, J.tot(:, pos));
             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal')
