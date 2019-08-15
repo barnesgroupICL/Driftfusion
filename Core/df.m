@@ -38,21 +38,18 @@ end
 % Prevents recalculation of dependent properties by pdepe defined in Methods
 % Can also use AbortSet in class def
 
-dcum = par.dcum;
 Vbi = par.Vbi;
-n0 = par.n0;
 nleft = par.nleft;
 nright = par.nright;
 pleft = par.pleft;
 pright = par.pright;
-dmax = par.dcum(end);
-xx = par.xx;
-x_ihalf = getvarihalf(xx);
+xmesh = par.xx;
+x_ihalf = par.x_ihalf;
+devihalf = par.dev;
 dev = par.dev;
-devihalf = getdevihalf(par);
 
 %% Spatial mesh
-x = xx;
+x = xmesh;
 par.xpoints = length(x);
 
 %% Time mesh
@@ -169,7 +166,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
         if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) == 0
 
-            i = find(par.xx <= x);
+            i = find(xmesh <= x);
             i = i(end);
 
             switch par.N_ionic_species
@@ -179,13 +176,13 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         u0 = [par.nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
                             par.pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
                             dev.Ncat(i);
-                            (x/par.xx(end))*Vbi;];
+                            (x/xmesh(end))*Vbi;];
                         % Multi-layered
                     else
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
-                            (x/par.xx(end))*Vbi;];
+                            (x/xmesh(end))*Vbi;];
                     end
                 case 2
                     if length(par.dcell) == 1
@@ -193,14 +190,14 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         u0 = [par.nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
                             par.pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
                             dev.Ncat(i);
-                            (x/par.xx(end))*Vbi;
+                            (x/xmesh(end))*Vbi;
                             dev.Nion(i);];
                         % Multi-layered
                     else
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
-                            (x/par.xx(end))*Vbi;
+                            (x/xmesh(end))*Vbi;
                             dev.Nion(i);];
                     end
             end

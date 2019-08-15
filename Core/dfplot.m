@@ -37,7 +37,7 @@ classdef dfplot
 
             % Call dfana to obtain band energies and QFLs
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [Ecb, Evb, Efn, Efp] = dfana.QFL2(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
 
             xnm = x*1e7;    % x in nm for plotting
 
@@ -801,7 +801,6 @@ classdef dfplot
             hold off
         end
 
-
         function ELx_single(varargin)
             % Energy Level diagram, and charge densities plotter
             % SOL = the solution structure
@@ -828,8 +827,8 @@ classdef dfplot
 
             % Call dfana to obtain band energies and QFLs
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [Ecb, Evb, Efn, Efp] = dfana.QFL2(sol);
-
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            %x = par.x_ihalf;
             xnm = x*1e7;    % x in nm for plotting
             FH1 = figure(22);
             for i = 1:length(tarr)

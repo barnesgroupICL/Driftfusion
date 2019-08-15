@@ -210,7 +210,9 @@ classdef pc
         genspace = [];
         x = [];
         xx = [];
+        x_ihalf = [];
         dev = [];
+        dev_ihalf = [];
         t = [];
         xpoints = [];
         Vapp_params = [];
@@ -237,7 +239,6 @@ classdef pc
         d
         parr
         d_active
-        %dev
         dcum
         dcum0           % includes first entry as zero
         dEAdx
@@ -558,14 +559,22 @@ classdef pc
         
         function par = refresh(par)
             par.xx = meshgen_x(par);
-            par.dev = pc.builddev(par);
+            par.x_ihalf = getvarihalf(par.xx);
+            par.dev = pc.builddev(par, 'iwhole');
+            par.dev_ihalf = pc.builddev(par, 'ihalf');
             % Get generation profiles
             par.gx1 = generation(par, par.light_source1, par.laser_lambda1);
             par.gx2 = generation(par, par.light_source2, par.laser_lambda2);
         end
         
-        function dev = builddev(par)
-            xmesh = par.xx;
+        function dev = builddev(par, meshoption)
+            switch meshoption
+                case 'iwhole'
+                    xmesh = par.xx;
+                case 'ihalf'
+                    xmesh = getvarihalf(par.xx);
+            end
+            
             % BUILDDEV builds the properties for the device as
             % concatenated arrays such that each property can be called for
             % each point including grading at interfaces. For future
@@ -824,12 +833,15 @@ classdef pc
                 end
 
             end
-
-            % Centre difference gradients
-            dev.gradNc = gradient(dev.Nc, xmesh);
-            dev.gradNv = gradient(dev.Nv, xmesh);
-            dev.gradEA = gradient(dev.EA, xmesh);
-            dev.gradIP = gradient(dev.IP, xmesh);
+            
+            switch par.intgradfun
+                case 'erf'
+                    % Centre difference gradients
+                    dev.gradNc = gradient(dev.Nc, xmesh);
+                    dev.gradNv = gradient(dev.Nv, xmesh);
+                    dev.gradEA = gradient(dev.EA, xmesh);
+                    dev.gradIP = gradient(dev.IP, xmesh);
+            end
             dev.nt = F.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.stats);
             dev.pt = F.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.stats);
         end

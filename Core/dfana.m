@@ -63,7 +63,8 @@ classdef dfana
             
         end
         
-        function [Ecb, Evb, Efn, Efp] = QFL(sol)
+        function [Ecb, Evb, Efn, Efp] = QFL_ihalf(sol)
+            % Calculates the QFLs on the i_half xmesh
             % u is the solution structure
             % Simple structure names
             [u,t,xmesh,par,dev,n0,p0,a0,c0,V0] = dfana.splitsol(sol);
@@ -76,7 +77,7 @@ classdef dfana
                 c(ii,:) = getvarihalf(c0(ii,:));
                 V(ii,:) = getvarihalf(V0(ii,:));
             end
-            dev_ihalf = getdevihalf(par);
+            dev_ihalf = par.dev_ihalf;
             
             % Create 2D matrices for multiplication with solutions
             EAmat = repmat(dev_ihalf.EA, length(t), 1);
@@ -111,15 +112,16 @@ classdef dfana
                 Efp_ihalf = real(Evb_ihalf-(par.kB*par.T/par.q)*log(p./Nvmat));        % Hole quasi-Fermi level
             end
             
-            Efn = zeros(length(t), length(xmesh));
-            Efp = zeros(length(t), length(xmesh));
-            
-            for ii = 1:length(t)
-                Efn(ii,:) = interp1(x, Efn_ihalf(ii,:), xmesh);
-                Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
-                Ecb(ii,:) = interp1(x, Ecb_ihalf(ii,:), xmesh);
-                Evb(ii,:) = interp1(x, Evb_ihalf(ii,:), xmesh);
-            end
+            Efn = Efn_ihalf;% zeros(length(t), length(xmesh));
+            Efp = Efp_ihalf;% zeros(length(t), length(xmesh));
+            Ecb = Ecb_ihalf;
+            Evb = Evb_ihalf;
+%             for ii = 1:length(t)
+%                 Efn(ii,:) = interp1(x, Efn_ihalf(ii,:), xmesh);
+%                 Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
+%                 Ecb(ii,:) = interp1(x, Ecb_ihalf(ii,:), xmesh);
+%                 Evb(ii,:) = interp1(x, Evb_ihalf(ii,:), xmesh);
+%             end
         end
         
         function [Ecb, Evb, Efn, Efp] = QFL2(sol)
@@ -192,10 +194,11 @@ classdef dfana
                 c(ii,:) = getvarihalf(c0(ii,:));
                 V(ii,:) = getvarihalf(V0(ii,:));
             end
-            dev_ihalf = getdevihalf(par);
+            
+            dev_ihalf = par.dev_ihalf;
             % Create 2D matrices for multiplication with solutions
-            EAmat = repmat(dev.EA, length(t), 1);
-            IPmat = repmat(dev.IP, length(t), 1);
+            EAmat = repmat(dev_ihalf.EA, length(t), 1);
+            IPmat = repmat(dev_ihalf.IP, length(t), 1);
             NAmat = repmat(dev_ihalf.NA, length(t), 1);
             NDmat = repmat(dev_ihalf.ND, length(t), 1);
             Ncmat = repmat(dev_ihalf.Nc, length(t), 1);
@@ -209,8 +212,8 @@ classdef dfana
             
             [j, J, x] = dfana.calcJ(sol);
             for i = 1:length(t)
-                deltaEfn(i,:) = cumtrapz(x, J.n(i,:)./(par.e*n(i,:).*mue_mat(i,:)), 2);
-                deltaEfp(i,:) = cumtrapz(x, J.p(i,:)./(par.e*p(i,:).*muh_mat(i,:)), 2);
+                deltaEfn(i,:) = cumtrapz(x, J.n(i,:)./(par.e.*mue_mat(i,:).*n(i,:)), 2);
+                deltaEfp(i,:) = cumtrapz(x, J.p(i,:)./(par.e.*muh_mat(i,:).*p(i,:)), 2);
             end
             % Boundary values - electrostatic potential is assumed to be
             % zero at left-hand boundary
@@ -231,16 +234,16 @@ classdef dfana
                 Efp_l = real(par.IP(1)-(par.kB*par.T/par.q)*log(p(:,1)./Nvmat(:,1)));        % Hole quasi-Fermi level
             end
             
-            Efn_ihalf = Efn_l + deltaEfn;
-            Efp_ihalf = Efp_l + deltaEfp;
+            Efn = Efn_l + deltaEfn;
+            Efp = Efp_l + deltaEfp;
             
-            for ii = 1:length(t)
-                Efn(ii,:) = interp1(x, Efn_ihalf(ii,:), xmesh);
-                Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
-            end
+%             for ii = 1:length(t)
+%                 Efn(ii,:) = interp1(x, Efn_ihalf(ii,:), xmesh);
+%                 Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
+%             end
             
-            Ecb = EAmat-V0;                                 % Conduction band potential
-            Evb = IPmat-V0;                                 % Valence band potential
+            Ecb = EAmat-V;                                 % Conduction band potential
+            Evb = IPmat-V;                                 % Valence band potential
         end
         
         
@@ -257,7 +260,7 @@ classdef dfana
                 a_ihalf(ii,:) = getvarihalf(a(ii,:));
                 c_ihalf(ii,:) = getvarihalf(c(ii,:));
             end
-            x = getvarihalf(xmesh);
+            x = par.x_ihalf;
             g = sol.g;
             
             for i = 1:length(x)
