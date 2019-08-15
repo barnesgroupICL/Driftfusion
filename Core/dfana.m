@@ -424,8 +424,8 @@ classdef dfana
             % obtain SOL components for easy referencing
             
             [u,t,xmesh,par,dev_i,n,p,a,c,V] = dfana.splitsol(sol);
-            xhalfmesh = getxihalf(sol);
-            dev_ihalf = getdevihalf(par);
+            xhalfmesh = par.x_ihalf;
+            dev_ihalf = par.dev_ihalf;
             
             switch option
                 case 1
