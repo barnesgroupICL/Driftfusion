@@ -1,4 +1,4 @@
-function fun = fun_gen(g_fun_type)
+function fun = fun_gen(fun_type)
 % Function generator for generation profile
 % Some of the functions in this code are based on SFG.M by Hiroyuki Kato Copyright (c) 2013
 % The license details are contained with sfg_license
@@ -15,7 +15,7 @@ function fun = fun_gen(g_fun_type)
 %% 'sin'
 % COEFF = [DC_int, Delta_A, frequency, phase]
 
-switch g_fun_type
+switch fun_type
     case 'constant'
         fun = @(coeff, t) coeff(1);
     case 'sweep'
