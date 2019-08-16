@@ -12,8 +12,6 @@ disp('Current voltage scan')
 % Vend          = scan end voltage
 % option        1 = dark only, 2 = light only, 3 = dark & light
 
-%[JV.dk.f, JV.dk.r, JV.ill.f, JV.ill.r] = deal(0);
-
 % Read parameters structure into structure par
 par = sol_ini.par;
 
@@ -66,20 +64,26 @@ if option ==2 || option ==3
     
     %% 1 Sun quasi equilibrium solution
     disp('Illuminated quasi-equilibrium solution')
+    % Log time mesh
+    par.tmesh_type = 1;
+    par.tmax = 1e-3;
+    par.t0 = 0;%par.tmax*1e-6;
+    
     par.JV = 0;
     par.mobseti = 0;          % Switch ion mobility off for illumination step
     par.V_fun_type = 'constant';
-    par.int1 = Intensity;
-    
-    % Log time mesh
-    par.tmesh_type = 2;
-    par.tmax = 1e-3;
-    par.t0 = par.tmax*1e-6;
+    par.g1_fun_type = 'sweep';
+    % COEFF = [Amplitude_initial, Amplitude_final, tmax]
+    par.g1_fun_arg = [0, Intensity, par.tmax];
     
     sol_i_1S = df(sol_ini, par);
     disp('Complete.')
     
     %% Light forward
+    par.g1_fun_type = 'constant';
+    % COEFF = [Amplitude_initial, Amplitude_final, tmax]
+    par.g1_fun_arg = Intensity;
+    par.int1 = Intensity;
     
     disp('Illuminated forward scan...')
     par.mobseti = mobseti;
@@ -88,7 +92,7 @@ if option ==2 || option ==3
     par.t0 = 0;
     par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
     par.tmesh_type = 1;
-    par.tpoints = par.JVscan_pnts;
+    par.tpoints = JVscan_pnts;
     
     % Sweep settings
     par.V_fun_type = 'sweep';
@@ -111,7 +115,7 @@ if option ==2 || option ==3
     
     disp('JV scan complete.')
     
-    dfplot.JV(JV,option)
+%     dfplot.JV(JV,option)
     JV.stats = dfana.JVstats(JV);
 end
 toc
