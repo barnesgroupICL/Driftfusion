@@ -34,7 +34,7 @@ classdef dfana
             NDmat = repmat(dev.ND, length(t), 1);
             Ncmat = repmat(dev.Nc, length(t), 1);
             Nvmat = repmat(dev.Nv, length(t), 1);
-            Nionmat = repmat(dev.Nion, length(t), 1);
+            Nanimat = repmat(dev.Nani, length(t), 1);
             Ncatmat = repmat(dev.Ncat, length(t), 1);
             eppmat = repmat(dev.epp, length(t), 1);
             nimat = repmat(dev.ni, length(t), 1);
@@ -86,7 +86,7 @@ classdef dfana
             NDmat = repmat(dev_ihalf.ND, length(t), 1);
             Ncmat = repmat(dev_ihalf.Nc, length(t), 1);
             Nvmat = repmat(dev_ihalf.Nv, length(t), 1);
-            Nionmat = repmat(dev_ihalf.Nion, length(t), 1);
+            Nanimat = repmat(dev_ihalf.Nani, length(t), 1);
             Ncatmat = repmat(dev_ihalf.Ncat, length(t), 1);
             eppmat = repmat(dev_ihalf.epp, length(t), 1);
             nimat = repmat(dev_ihalf.ni, length(t), 1);
@@ -144,7 +144,7 @@ classdef dfana
             NDmat = repmat(dev_ihalf.ND, length(t), 1);
             Ncmat = repmat(dev_ihalf.Nc, length(t), 1);
             Nvmat = repmat(dev_ihalf.Nv, length(t), 1);
-            Nionmat = repmat(dev_ihalf.Nion, length(t), 1);
+            Nanimat = repmat(dev_ihalf.Nani, length(t), 1);
             Ncatmat = repmat(dev_ihalf.Ncat, length(t), 1);
             eppmat = repmat(dev_ihalf.epp, length(t), 1);
             nimat = repmat(dev_ihalf.ni, length(t), 1);
@@ -186,8 +186,7 @@ classdef dfana
             Ecb = EAmat-V;                                 % Conduction band potential
             Evb = IPmat-V;                                 % Valence band potential
         end
-        
-        
+         
         function [j, J, x] = calcJ(sol)
             % Current, J and flux, j calculation from continuity equations
             % Calculated on the i+0.5 grid
@@ -202,7 +201,7 @@ classdef dfana
                 c_ihalf(ii,:) = getvarihalf(c(ii,:));
             end
             x = par.x_ihalf;
-            g = sol.g;
+            [~,~,g] = dfana.calcg(sol);
             
             for i = 1:length(x)
                 dndt(:,i) = gradient(n_ihalf(:,i), t);
@@ -305,6 +304,28 @@ classdef dfana
             J.tot = J.n + J.p + J.a + J.c + J.disp;
         end
         
+        function [g1, g2, g] = calcg(sol)
+            par = sol.par;
+            tmesh = sol.t;
+            %% Generation function
+            switch par.g1_fun_type
+                case 'constant'
+                    g1 = repmat(par.int1.*par.gx1, length(tmesh), 1);
+                otherwise
+                    g1_fun = fun_gen(par.g1_fun_type);
+                    g1 = g1_fun(par.g1_fun_arg, tmesh')*par.gx1;
+            end
+            
+            switch par.g2_fun_type
+                case 'constant'
+                    g2 = repmat(par.int2.*par.gx2, length(tmesh), 1);
+                otherwise
+                    g2_fun = fun_gen(par.g2_fun_type);
+                    g2 = g2_fun(par.g2_fun_arg, tmesh')*par.gx2;
+            end
+            g = g1 + g2;
+        end
+        
         function U = calcU(sol)
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
@@ -387,7 +408,7 @@ classdef dfana
             mue_mat = dev.mue;
             muh_mat = dev.muh;
             mu_cat = dev.mucat;
-            mu_ion = dev.muion;
+            mu_ani = dev.muani;
             gradEA_mat = dev.gradEA;
             gradIP_mat = dev.gradIP;
             gradNc_mat = dev.gradNc;
@@ -461,8 +482,8 @@ classdef dfana
                 jdd.adiff = zeros(length(t), length(xout));
                 jdd.adrift = zeros(length(t), length(xout));
             elseif par.N_ionic_species == 2
-                jdd.adiff = par.mobseti*-(-mu_ion.*par.kB*par.T.*dadx);
-                jdd.adrift = par.mobseti*-(mu_ion.*aloc.*dVdx);
+                jdd.adiff = par.mobseti*-(-mu_ani.*par.kB*par.T.*dadx);
+                jdd.adrift = par.mobseti*-(mu_ani.*aloc.*dVdx);
             end
             
             jdd.n = jdd.ndrift + jdd.ndiff;
