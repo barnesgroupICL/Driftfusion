@@ -4,7 +4,7 @@ function sol_IMPS = do_IMPS(sol_ini, int_base, int_delta, frequency, tmax, tpoin
 % INT_BASE = constant (DC) bias component [mulitples of GX]
 % INT_DELTA = variable (AC) bias component [mulitples of GX]
 disp(['Starting IMPS, base intensity ', num2str(int_base), ', delta intensity ', num2str(int_delta),...
-    ', at frequency ', num2str(frequency)]);
+    ', at frequency ', num2str(frequency), ' Hz']);
 par = sol_ini.par;
 
 % Setup time mesh
