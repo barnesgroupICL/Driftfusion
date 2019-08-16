@@ -721,7 +721,7 @@ classdef dfana
            Ncatmat = repmat(dev.Ncat, length(t), 1);
            eppmat = repmat(dev.epp, length(t), 1);
            
-           rhocat = a - Ncatmat;
+           rhocat = c - Ncatmat;
            Fion = cumtrapz(x, rhocat, 2)./(eppmat*par.epp0);
         end
         
