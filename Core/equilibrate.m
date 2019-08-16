@@ -187,9 +187,6 @@ par.K_cation = 1;
 soleq.ion = df(soleq_i_nosrh, par);
 disp('Complete')
 
-% dfplot.ELx(soleq.ion);
-% dfplot.Jx(soleq.ion)
-
 disp('EQUILIBRATION COMPLETE')
 toc
 
