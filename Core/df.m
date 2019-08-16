@@ -127,7 +127,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 source = [g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     0;
-                    (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-devihalf.NA(i)+devihalf.ND(i)-devihalf.Nion(i)+u(3))];
+                    (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-devihalf.NA(i)+devihalf.ND(i)-devihalf.Nani(i)+u(3))];
 
             case 2
                 % Prefactors set to 1 for time dependent components - can add other
@@ -150,7 +150,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     par.mobset*(devihalf.muh(i)*u(2)*(DuDx(4)-devihalf.gradIP(i))+(Dp*(DuDx(2)-((u(2)/devihalf.Nv(i))*devihalf.gradNv(i)))));
                     par.K_cation*par.mobseti*(devihalf.mucat(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(devihalf.DOScat(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
                     (devihalf.epp(i)/max(par.epp))*DuDx(4);
-                    par.K_anion*par.mobseti*(devihalf.muion(i)*(u(5)*-DuDx(4)+par.kB*par.T*(DuDx(5)+(u(5)*(DuDx(5)/(devihalf.DOSion(i)-u(5)))))));];
+                    par.K_anion*par.mobseti*(devihalf.muani(i)*(u(5)*-DuDx(4)+par.kB*par.T*(DuDx(5)+(u(5)*(DuDx(5)/(devihalf.DOSani(i)-u(5)))))));];
 
                 source = [g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
                     g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
@@ -191,14 +191,14 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                             par.pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
                             dev.Ncat(i);
                             (x/xmesh(end))*Vbi;
-                            dev.Nion(i);];
+                            dev.Nani(i);];
                         % Multi-layered
                     else
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
                             (x/xmesh(end))*Vbi;
-                            dev.Nion(i);];
+                            dev.Nani(i);];
                     end
             end
         elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
@@ -380,22 +380,6 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         end
     end
 
-%% Generation function
-switch par.g1_fun_type
-    case 'constant'
-        gxt1_save = repmat(par.int1.*par.gx1, length(t), 1);
-    otherwise
-        gxt1_save = g1_fun(par.g1_fun_arg, tmesh')*par.gx1;
-end
-
-switch par.g2_fun_type
-    case 'constant'
-        gxt2_save = repmat(par.int2.*par.gx2, length(t), 1);
-    otherwise
-        gxt2_save = g2_fun(par.g2_fun_arg, tmesh')*par.gx2;
-end
-g_save = gxt1_save + gxt2_save;
-
 % Store final voltage reading
 par.Vapp = Vapp;
 
@@ -403,7 +387,6 @@ par.Vapp = Vapp;
 solstruct.u = u;
 solstruct.x = x;
 solstruct.t = t;
-solstruct.g = g_save;
 
 % Store parameters structure
 solstruct.par = par;
