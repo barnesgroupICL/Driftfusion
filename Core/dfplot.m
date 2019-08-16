@@ -494,7 +494,61 @@ classdef dfplot
             %legend('n', 'p')
             hold off
         end
+        
+        function gx(varargin)
+            % Carrier densities as a function of position
+            if length(varargin) == 1
+                sol = varargin{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                tarr = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                tarr = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+            
+            par = sol.par;
+            t = sol.t;
+            [g1, g2, g] = dfana.calcg(sol);
+            
+            xnm = par.x_ihalf*1e7;
+            figure(121)
+            for i = 1:length(tarr)
+                % find the time
+                p1 = find(sol.t >= tarr(i));
+                p1 = p1(1);
 
+                semilogy(xnm, (g1(p1, :)), xnm, (g2(p1, :)), xnm, (g(p1, :)))
+                hold on
+            end
+            xlabel('Position [nm]')
+            ylabel('Generation rate [cm-3s-1]')
+            legend('g1', 'g2', 'g total')
+            hold off
+        end
+        
+        function gxt(sol)
+            % Carrier densities as a function of position
+            par = sol.par;
+            t = sol.t;
+            [~, ~, g] = dfana.calcg(sol);
+            
+            xnm = par.x_ihalf*1e7;
+            figure(122)
+
+            surf(sol.par.x_ihalf, sol.t, g)
+            xlabel('Position [cm]')
+            ylabel('Time [s]')
+            zlabel('Generation rate [cm-3s-1]')
+        end
+            
         function Ux(varargin)
             % Carrier densities as a function of position
             if length(varargin) == 1
@@ -527,7 +581,7 @@ classdef dfplot
                 hold on
             end
             xlabel('Position [nm]')
-            ylabel('Carrier density [V]')
+            ylabel('Recombination rate [cm-3s-1]')
             legend('Ubtb', 'Usrh', 'Utot')
             hold off
         end
