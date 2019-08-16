@@ -716,6 +716,22 @@ classdef dfana
             sigma = trapz(x, rho, 2);
         end
         
+        function Fion = calcFion(sol)
+           [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol); 
+           Ncatmat = repmat(dev.Ncat, length(t), 1);
+           eppmat = repmat(dev.epp, length(t), 1);
+           
+           rhocat = a - Ncatmat;
+           Fion = cumtrapz(x, rhocat, 2)./(eppmat*par.epp0);
+        end
+        
+        function Vion = calcVion(sol)
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol); 
+            
+            Fion = dfana.calcFion(sol);
+            Vion = -cumtrapz(x, Fion,2);
+        end
+        
         function [U,Ux] = pdentrp(singular,m,xL,uL,xR,uR,xout)
             %PDENTRP  Interpolation helper function for PDEPE.
             %   [U,UX] = PDENTRP(M,XL,UL,XR,UR,XOUT) uses solution values UL at XL and UR at XR

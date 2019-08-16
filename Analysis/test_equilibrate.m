@@ -27,7 +27,8 @@ par.tpoints = 40;
 
 par.JV = 0;
 par.Vapp = 0;
-par.Int = 0;
+par.int1 = 0;
+par.int2 = 0;
 par.pulseon = 0; 
 par.OC = 0;
 par.tmesh_type = 2;

@@ -1120,7 +1120,17 @@ classdef dfplot
             ylabel('-Electrostatic potential [V]')
             hold off
             xlim([xrange(1), xrange(2)])
-
+        end
+        
+        function Fion(sol)
+            Fion = dfana.calcFion(sol);
+            t = sol.t;
+            
+            figure(20)
+            plot(t, Fion(:,end))
+            xlabel('Time')
+            ylabel('Ion field [Vcm-1]')
+        
         end
     end
 end

@@ -59,8 +59,5 @@ dfplot.Voct(sol_OC);
 % Plot generation profile as a function of x_ihalf and t
 x_ihalf = getvarihalf(sol_VTROTTR(1).x);
 
-figure(200)
-surf(x_ihalf, sol_VTROTTR(1).t, sol_VTROTTR(1).g)
-xlabel('Position [cm]')
-ylabel('Time [s]')
-zlabel('Generation rate [cm-3s-1]')
+%% Plot the generation rate as a function of x and t
+dfplot.gxt(sol_VTROTTR(1))

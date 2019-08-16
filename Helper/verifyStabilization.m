@@ -65,7 +65,7 @@ for i = 1:length(sol_matrix(1, 1, :))
     difference = sum(abs(profile_end - profile_at_time)); % sum up all the differences between the profiles
     % if the values change more than one tenthousandth, the solution is
     % considered not stable
-    threshold = 1e-4 * sum(abs(profile_end - mean(profile_end))); % sum up absolute values, ignore constant bias
+    threshold = 1e-5 * sum(abs(profile_end - mean(profile_end))); % sum up absolute values, ignore constant bias
     stable = difference <= threshold;
 
     if stable
