@@ -22,7 +22,49 @@ classdef dfana
             end
         end
         
-        function [Ecb, Evb, Efn, Efp] = QFLs(sol)
+                 function [Ecb, Evb, Efn, Efp] = QFLs(sol)
+            % u is the solution structure
+            % Simple structure names
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            % Create 2D matrices for multiplication with solutions
+            EAmat = repmat(dev.EA, length(t), 1);
+            IPmat = repmat(dev.IP, length(t), 1);
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            Ncmat = repmat(dev.Nc, length(t), 1);
+            Nvmat = repmat(dev.Nv, length(t), 1);
+            Nionmat = repmat(dev.Nion, length(t), 1);
+            Ncatmat = repmat(dev.Ncat, length(t), 1);
+            eppmat = repmat(dev.epp, length(t), 1);
+            nimat = repmat(dev.ni, length(t), 1);
+            
+            Ecb = EAmat-V;                                 % Conduction band potential
+            Evb = IPmat-V;                                 % Valence band potential
+            
+            Efn = zeros(size(n,1), size(n,2));
+            Efp = zeros(size(n,1), size(n,2));
+            
+            if par.stats == 'Fermi'
+                
+                for i = 1:size(n,1)           % time
+                    for j = 1:size(n,2)       % position
+                        Efn(i,j) = F.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
+                        Efp(i,j) = F.Efp_fd_fun(p(i,j), dev.Efp(j,:),  dev.p_fd(j,:));
+                    end
+                end
+                Efn = Efn-V;
+                Efp = Efp-V;
+                
+            elseif par.stats == 'Boltz'
+                Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./Ncmat));        % Electron quasi-Fermi level
+                Efp = real(Evb-(par.kB*par.T/par.q)*log(p./Nvmat));        % Hole quasi-Fermi level
+            end
+            
+        end
+        
+        function [Ecb, Evb, Efn, Efp] = QFL_ihalf(sol)
+            % Calculates the QFLs on the i_half xmesh
             % u is the solution structure
             % Simple structure names
             [u,t,xmesh,par,dev,n0,p0,a0,c0,V0] = dfana.splitsol(sol);
@@ -35,7 +77,7 @@ classdef dfana
                 c(ii,:) = getvarihalf(c0(ii,:));
                 V(ii,:) = getvarihalf(V0(ii,:));
             end
-            dev_ihalf = getdevihalf(par);
+            dev_ihalf = par.dev_ihalf;
             
             % Create 2D matrices for multiplication with solutions
             EAmat = repmat(dev_ihalf.EA, length(t), 1);
@@ -70,15 +112,16 @@ classdef dfana
                 Efp_ihalf = real(Evb_ihalf-(par.kB*par.T/par.q)*log(p./Nvmat));        % Hole quasi-Fermi level
             end
             
-            Efn = zeros(length(t), length(xmesh));
-            Efp = zeros(length(t), length(xmesh));
-            
-            for ii = 1:length(t)
-                Efn(ii,:) = interp1(x, Efn_ihalf(ii,:), xmesh);
-                Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
-                Ecb(ii,:) = interp1(x, Ecb_ihalf(ii,:), xmesh);
-                Evb(ii,:) = interp1(x, Evb_ihalf(ii,:), xmesh);
-            end
+            Efn = Efn_ihalf;% zeros(length(t), length(xmesh));
+            Efp = Efp_ihalf;% zeros(length(t), length(xmesh));
+            Ecb = Ecb_ihalf;
+            Evb = Evb_ihalf;
+%             for ii = 1:length(t)
+%                 Efn(ii,:) = interp1(x, Efn_ihalf(ii,:), xmesh);
+%                 Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
+%                 Ecb(ii,:) = interp1(x, Ecb_ihalf(ii,:), xmesh);
+%                 Evb(ii,:) = interp1(x, Evb_ihalf(ii,:), xmesh);
+%             end
         end
         
         function [Ecb, Evb, Efn, Efp] = QFL_J(sol)
@@ -522,10 +565,12 @@ classdef dfana
         
         function Vapp = calcVapp(sol)
             par = sol.par;
-            if par.JV == 2
-                Vapp = par.Vapp_func(par.Vapp_params, sol.t);
-            else
-                Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
+            switch par.V_fun_type
+                case 'constant'
+                    Vapp = ones(1,length(sol.t))*par.Vapp;
+                otherwise
+                    Vapp_fun = fun_gen(par.V_fun_type);
+                    Vapp = Vapp_fun(par.V_fun_arg, sol.t);
             end
         end
         
@@ -535,7 +580,8 @@ classdef dfana
             if isfield(JVsol, 'ill')
                 if isfield(JVsol.ill, 'f')
                     Vapp = dfana.calcVapp(JVsol.ill.f);
-                    [j,J] = dfana.calcJ(JVsol.ill.f);
+                    Vapp = Vapp';
+                    [~,J] = dfana.calcJ(JVsol.ill.f);
                     try
                         stats.Jsc_f = interp1(Vapp, J.tot(:, end), 0);
                     catch
@@ -569,6 +615,7 @@ classdef dfana
                 
                 if isfield(JVsol.ill, 'r')
                     Vapp = dfana.calcVapp(JVsol.ill.r);
+                    Vapp = Vapp';
                     [j,J] = dfana.calcJ(JVsol.ill.r);
                     try
                         stats.Jsc_r = interp1(Vapp, J.tot(:, end), 0);
@@ -630,7 +677,7 @@ classdef dfana
         
         function value = Voct(sol)
             %Get QFLs
-            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            [~, ~, Efn, Efp] = dfana.QFLs(sol);
             value = Efn(:, end) - Efp(:, 1);
         end
         
