@@ -21,10 +21,10 @@ par = sol_ini.par;
 %% Set parameters for initial dark solution with Rs on
 par.mobseti = 0;
 par.Int = 0;
-par.tmesh_type = 2;
+par.tmesh_type = 1;
 par.tpoints = 100;
-par.tmax = 1e-5;
-par.t0 = par.tmax/1e6;
+par.tmax = 1e-3;
+par.t0 = 0;
 par.Rs = Rs;
 par.Rs_initial = 1;
 
@@ -32,28 +32,22 @@ par.Rs_initial = 1;
 % necessary because the current at equilibrium does not reach zero. This
 % step applies a small voltage simulating the series resistance
 disp(['initial dark solution with Rs = ', num2str(Rs), ' Ohms switched on'])
+
 sol_Rs = df(sol_ini, par);
+
 disp('Complete')
-
-% Second solution to ensure stabilisation
-par.Rs_initial = 0;
-par.tmax = 1e-3;
-par.t0 = par.tmax/1e6;
-
-sol_ini = df(sol_Rs, par);
-
 %% Parameters for initial illuminated solution
+par.Rs_initial = 0;
 par.int1 = Int;
 par.tmesh_type = 2;
 par.tpoints = tpoints;
 par.tmax = tmax;
 par.t0 = par.tmax/1e6;
 par.mobseti = mobseti;
-par.mobset = 1;
 
 %% Get initial illuminated solution
 disp(['SPV initial solution, tmax = ', num2str(par.tmax)])
-sol = df(sol_ini, par);
+sol = df(sol_Rs, par);
 disp('Complete')
 
 %% Run stabilisation if selected

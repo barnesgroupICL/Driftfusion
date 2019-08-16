@@ -1132,5 +1132,47 @@ classdef dfplot
             ylabel('Ion field [Vcm-1]')
         
         end
+        
+        function PLx(varargin)
+            % Volumetric charge density (rho) as a funciton of position
+            % A time array can be used as a second input argument
+
+            if length(varargin) == 1
+                sol = varargin{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 2
+                sol = varargin{1};
+                tarr = varargin{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(varargin) == 3
+                sol = varargin{1};
+                tarr = varargin{2};
+                xrange = varargin{3};
+                pointtype = 't';
+            end
+
+            U = dfana.calcU(sol);
+            
+            xnm = sol.x*1e7;
+            figure(21)
+            for i = 1:length(tarr)
+                % find the time
+                p1 = find(sol.t <= tarr(i));
+                p1 = p1(end);
+
+                plot(xnm, U.btb(p1, :))
+                hold on
+
+            end
+            xlabel('Position [nm]')
+            ylabel('Radiatve recombination [cm-3s-1]')
+            hold off
+            xlim([xrange(1), xrange(2)])
+
+        end
+        
     end
 end

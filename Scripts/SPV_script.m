@@ -58,3 +58,4 @@ dfplot.ELx(spvsol.ill);
 % electrostatic potential as a function of position for 5 different times
 dfplot.Vx(spvsol.ill, [0,1,2,4,8]);
 
+dfplot.PLt(spvsol.ill);
