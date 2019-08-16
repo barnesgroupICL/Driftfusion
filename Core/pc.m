@@ -717,8 +717,9 @@ classdef pc
                                     dE0dx = (par.E0(i+1)-par.E0(i-1))/(par.d(i));
                                     dev.E0(j) = par.E0(i-1) + xprime*dE0dx;
                                     % Uniform generation rate
-                                    dg0dx = (par.g0(i+1)-par.g0(i-1))/(par.d(i));
-                                    dev.g0(j) = par.g0(i-1) + xprime*dg0dx;
+%                                     dg0dx = (par.g0(i+1)-par.g0(i-1))/(par.d(i));
+%                                     dev.g0(j) = par.g0(i-1) + xprime*dg0dx;
+                                    dev.g0(j) = 0;
                                     % Radiative recombination coefficient
                                     dkraddx = (par.krad(i+1)-par.krad(i-1))/(par.d(i));
                                     dev.krad(j) = par.krad(i-1) + xprime*dkraddx;
@@ -782,7 +783,8 @@ classdef pc
                                     dev.mucat(j) = par.mucat(i-1) + (par.mucat(i+1)-par.mucat(i-1))*dev.erf(j);
                                     dev.epp(j) = par.epp(i-1) + (par.epp(i+1)-par.epp(i-1))*dev.erf(j);
                                     dev.E0(j) = par.E0(i-1) + (par.E0(i+1)-par.E0(i-1))*dev.erf(j);
-                                    dev.g0(j) = par.g0(i-1) + (par.g0(i+1)-par.g0(i-1))*dev.erf(j);
+                                    %dev.g0(j) = par.g0(i-1) + (par.g0(i+1)-par.g0(i-1))*dev.erf(j);
+                                    dev.g0(j) = 0;
                                     dev.krad(j) = par.krad(i-1) + (par.krad(i+1)-par.krad(i-1))*dev.erf(j);
                                     dev.Et(j) = par.Et(i-1) + (par.Et(i+1)-par.Et(i-1))*dev.erf(j);
                                     dev.Nion(j) = par.Nion(i-1) + (par.Nion(i+1)-par.Nion(i-1))*dev.erf(j);
