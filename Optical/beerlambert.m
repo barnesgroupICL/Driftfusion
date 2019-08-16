@@ -27,6 +27,7 @@ switch par.side
         pcum1 = [1,par.pcum+1];
         pcell = par.pcell;
     case 2
+        % Flip properties for side 2
         layers = fliplr(par.stack);
         layer_type = fliplr(par.layer_type);
         x = x(end)-fliplr(par.xx);
@@ -44,7 +45,6 @@ switch source_type
             msg = ['Error in BEERLAMBERT - laser wavelength must be in the range ', num2str(lambda(1)), ' - ', num2str(lambda(end)), ' nm'];
             error(msg);
         end
-        
         I0 = zeros(length(lambda));
         I0(laserlambda-lambda(1)) = 1e-3*par.pulsepow;   % convert to wcm-2
     otherwise
@@ -62,9 +62,9 @@ k_layer_next = zeros(1,size(lambda,2));
 n = zeros(length(x),size(lambda,2));
 k = zeros(length(x),size(lambda,2));
 
-% try
+try
     for i = 1:length(layers)    %size(layers,2)
-        switch par.layer_type{1,i}
+        switch layer_type{1,i}
             case {'layer', 'active'}
                 [n_layer, k_layer] = LoadRefrIndex(layers{i},lambda);
                 n(pcum1(i):pcum1(i+1),:) = repmat(n_layer,pcell(i)+1, 1);
@@ -74,30 +74,21 @@ k = zeros(length(x),size(lambda,2));
                 [n_layer_next, k_layer_next] = LoadRefrIndex(layers{i+1},lambda);
                 xprime = x(pcum1(i):pcum1(i+1)) - x(pcum1(i));
                 xprime = xprime';
-                switch par.intgradfun
-                	case 'linear'
-                        n(pcum1(i):pcum1(i+1),:) = n_layer + (n_layer_next - n_layer).*(xprime/xprime(end));
-                        k(pcum1(i):pcum1(i+1),:) = k_layer + (k_layer_next - k_layer).*(xprime/xprime(end));
-                    case 'erf'
-                        myerf = ((erf(2*pi*(xprime-par.d(i)/2)/(par.d(i)))+1)/2);
-                        n(pcum1(i):pcum1(i+1),:) = n_layer + (n_layer_next - n_layer).*myerf;
-                        k(pcum1(i):pcum1(i+1),:) = k_layer + (k_layer_next - k_layer).*myerf;
-                end
+                k(pcum1(i):pcum1(i+1),:) = zeros(length(xprime),length(lambda));
+%                 switch par.intgradfun
+%                 	case 'linear'
+%                         n(pcum1(i):pcum1(i+1),:) = n_layer + (n_layer_next - n_layer).*(xprime/xprime(end));
+%                         k(pcum1(i):pcum1(i+1),:) = k_layer + (k_layer_next - k_layer).*(xprime/xprime(end));
+%                     case 'erf'
+%                         myerf = ((erf(2*pi*(xprime-par.d(i)/2)/(par.d(i)))+1)/2);
+%                         n(pcum1(i):pcum1(i+1),:) = n_layer + (n_layer_next - n_layer).*myerf;
+%                         k(pcum1(i):pcum1(i+1),:) = k_layer + (k_layer_next - k_layer).*myerf;
+%                 end
         end
     end
-% catch
-%     error('Material name in stack does not match that in the Index of Refraction Library. Please check the names contained in the ''stack'' cell of the parameters object are correct.')
-% end
-
-% For the time being, the optical properties are changed abruptly mid-way
-% through the interface. Grading of the optical properties is desirable
-% in future versions.
-% switch par.side
-%     case 1
-%         xarr = [0, par.d];
-%     case 2
-%         xarr = [0, fliplr(par.d)];
-% end
+catch
+    error('Material name in stack does not match that in the Index of Refraction Library. Please check the names contained in the ''stack'' cell of the parameters object are correct.')
+end
 
 xcum = par.pcum;
 
@@ -123,22 +114,7 @@ end
 end
 Gentot = trapz(lambda, Gen, 2);
 
-% %% grade generation linearly at interfaces
-% Gentot_copy = Gentot;
-% for i = 1:length(layers)
-%     if strcmp(par.layer_type{1,i}, 'junction') == 1
-%         xprime = x(pcum1(i):pcum1(i+1)+1) - x(pcum1(i));
-%         xprime = xprime';
-%         switch par.intgradfun
-%             case 'linear'
-%                 Gentot(pcum1(i):pcum1(i+1)+1) = Gentot_copy(pcum1(i)) + ((Gentot_copy(pcum1(i+1)+1) - Gentot_copy(pcum1(i)))*(xprime/xprime(end)));
-%             case 'erf'
-%                 myerf = ((erf(2*pi*(xprime-par.d(i)/2)/(par.d(i)))+1)/2);
-%                 Gentot(pcum1(i):pcum1(i+1)+1) = Gentot_copy(pcum1(i)) + (Gentot_copy(pcum1(i+1)+1) - Gentot_copy(pcum1(i)))*myerf;
-%         end
-%     end
-% end
-
+% Flip profiles if side 2
 if par.side == 2
     I = flipud(I);
     Gen = flipud(Gen);
