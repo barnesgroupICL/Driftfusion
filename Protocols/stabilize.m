@@ -50,8 +50,8 @@ min_tmax_ions = 10;
 min_tmax_freecharges = 1e-3;
 
 % if both mobilities are set
-if max(par.muion) && par.mue(1)
-    par.tmax = min([min_tmax_ions, par.tmax*1e4, 2^(-log10(max(par.muion))) / 10 + 2^(-log10(par.mue(1)))]);
+if max(par.mucat) && par.mue(1)
+    par.tmax = min([min_tmax_ions, par.tmax*1e4, 2^(-log10(max(par.mucat))) / 10 + 2^(-log10(par.mue(1)))]);
     min_tmax = min_tmax_ions;
 % if ionic mobility is zero but free charges mobility is set
 elseif par.mue(1)

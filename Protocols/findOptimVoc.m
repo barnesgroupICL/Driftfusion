@@ -59,8 +59,8 @@ if ~originalCurrent(end) % if the original current is exactly zero
 end
 
 % set an initial time for stabilization tmax
-if max(asymstruct.par.muion)
-    asymstruct.par.tmax = min(5e0, 2^(-log10(max(asymstruct.par.muion))) / 10 + 2^(-log10(asymstruct.par.mue(1))));
+if max(asymstruct.par.mucat)
+    asymstruct.par.tmax = min(5e0, 2^(-log10(max(asymstruct.par.mucat))) / 10 + 2^(-log10(asymstruct.par.mue(1))));
 else
     asymstruct.par.tmax = min(1e-2, 2^(-log10(asymstruct.par.mue(1))));
 end

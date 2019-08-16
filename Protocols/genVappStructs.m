@@ -39,8 +39,8 @@ function structCell = genVappStructs(asymstruct, Vapp_array)
 asymstruct_Vapp = asymstruct;
 
 % estimate a good tmax
-if asymstruct_Vapp.par.muion
-    tmax_temp = min(1e1, 2^(-log10(asymstruct_Vapp.par.muion)) / 10 + 2^(-log10(asymstruct_Vapp.par.mue(1))));
+if asymstruct_Vapp.par.mucat
+    tmax_temp = min(1e1, 2^(-log10(asymstruct_Vapp.par.mucat)) / 10 + 2^(-log10(asymstruct_Vapp.par.mue(1))));
 else
     tmax_temp = min(1e-2, 2^(-log10(asymstruct_Vapp.par.mue(1))));
 end

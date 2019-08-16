@@ -20,7 +20,7 @@ p = dev.Nv.*exp(((dev.IP - V0) - par.PhiA)/(par.kB*par.T));
 p_midact = round((pcum1(3)+pcum1(4))/2);
 
 c = ones(1, length(par.xx)).*dev.Ncat;
-a = ones(1, length(par.xx)).*dev.Nion;
+a = ones(1, length(par.xx)).*dev.Nani;
 
 % Point limits for the active layer
 p_active_l = pcum1(par.active_layer(1)-1)+1;
@@ -32,26 +32,26 @@ V0_active(p_active_l:p_active_r) = V0(p_active_l:p_active_r);
 %% Get appropriate ionic densities of states (Beta) that ensure the total integrated charge is the same as that
 % of the uniform integrated charge
 Ncat_int = trapz(par.xx(p_active_l:p_active_r), dev.Ncat(p_active_l:p_active_r));
-Nion_int = trapz(par.xx(p_active_l:p_active_r), dev.Nion(p_active_l:p_active_r));
+Nani_int = trapz(par.xx(p_active_l:p_active_r), dev.Nani(p_active_l:p_active_r));
 
 Beta_c = Ncat_int/(trapz(par.xx(p_active_l:p_active_r), ...
     exp((V0_active(p_midact) - V0_active(p_active_l:p_active_r))/(par.kB*par.T))));
 
-Beat_a = Nion_int/(trapz(par.xx(p_active_l:p_active_r), ...
+Beat_a = Nani_int/(trapz(par.xx(p_active_l:p_active_r), ...
     exp((V0_active(p_active_l:p_active_r) - V0_active(p_midact))/(par.kB*par.T))));
 
 % c(p_active_l:p_active_r) = Beta_c.*exp((V0_active(p_midact) - V0_active(p_active_l:p_active_r))/(par.kB*par.T));
 % a(p_active_l:p_active_r) = Beat_a.*exp((V0_active(p_active_l:p_active_r) - V0_active(p_midact))/(par.kB*par.T));
 
 c(p_active_l:p_active_r) = dev.Ncat(p_active_l:p_active_r).*exp((V0_active(p_midact) - V0_active(p_active_l:p_active_r))/(par.kB*par.T));
-a(p_active_l:p_active_r) = dev.Nion(p_active_l:p_active_r).*exp((V0_active(p_active_l:p_active_r) - V0_active(p_midact))/(par.kB*par.T));
+a(p_active_l:p_active_r) = dev.Nani(p_active_l:p_active_r).*exp((V0_active(p_active_l:p_active_r) - V0_active(p_midact))/(par.kB*par.T));
 
 c = dev.Ncat.*exp((V0_active(p_midact) - V0_active)/(par.kB*par.T));
-a = dev.Nion.*exp((V0_active - V0_active(p_midact))/(par.kB*par.T));
+a = dev.Nani.*exp((V0_active - V0_active(p_midact))/(par.kB*par.T));
 
 % Normalise to uniform integrated density in the active layer
 Ncat_int = trapz(par.xx(p_active_l:p_active_r), dev.Ncat(p_active_l:p_active_r));
-Nion_int = trapz(par.xx(p_active_l:p_active_r), dev.Nion(p_active_l:p_active_r));
+Nani_int = trapz(par.xx(p_active_l:p_active_r), dev.Nani(p_active_l:p_active_r));
 c_int = trapz(par.xx(p_active_l:p_active_r), c(p_active_l:p_active_r));
 a_int = trapz(par.xx(p_active_l:p_active_r), a(p_active_l:p_active_r));
 

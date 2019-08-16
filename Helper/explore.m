@@ -361,7 +361,7 @@ classdef explore
             exsol.x(exsol.x==0) = NaN;
             
             if strmatch(yproperty,'a_f')
-                y = y-exsol.par_base.Nion(1);
+                y = y-exsol.par_base.Nani(1);
             end
             
             parval1 = cell2mat(exsol.parvalues(1));

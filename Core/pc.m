@@ -153,17 +153,17 @@ classdef pc
         N_ionic_species = 1;
         K_anion = 1;                    % Coefficients to easily accelerate ions
         K_cation = 1;                   % Coefficients to easily accelerate ions
-        Nion = [1e19];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.
+        Nani = [1e19];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.
         Ncat = [1e19];
         % Approximate density of iodide sites [cm-3]
         % Limits the density of iodide vancancies
-        DOSion = [1.21e22];                 % P. Calado thesis
+        DOSani = [1.21e22];                 % P. Calado thesis
         DOScat = [1.21e22];
         %% Mobilities   [cm2V-1s-1]
         mue = [1];         % electron mobility
         muh = [1];         % hole mobility
         
-        muion = [1e-10];          % ion mobility
+        muani = [1e-10];          % ion mobility
         mucat = [1e-14];
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
@@ -311,11 +311,11 @@ classdef pc
                 end
             end
             
-            % Warn if DOSion is set to zero in any layers - leads to
+            % Warn if DOSani is set to zero in any layers - leads to
             % infinite diffusion rate
-            for i = 1:length(par.DOSion)
-                if par.DOSion(i) <= 0
-                    msg = 'ion DOS (DOSion) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
+            for i = 1:length(par.DOSani)
+                if par.DOSani(i) <= 0
+                    msg = 'ion DOS (DOSani) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
                     error(msg);
                 end
             end
@@ -350,7 +350,7 @@ classdef pc
             elseif length(par.muh) ~= length(par.d)
                 msg = 'Hole mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.muion) ~= length(par.d)
+            elseif length(par.muani) ~= length(par.d)
                 msg = 'Ion mobility array (muh) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.NA) ~= length(par.d)
@@ -365,11 +365,11 @@ classdef pc
             elseif length(par.Nv) ~= length(par.d)
                 msg = 'Effective density of states array (Nv) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.Nion) ~= length(par.d)
-                msg = 'Background ion density (Nion) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.Nani) ~= length(par.d)
+                msg = 'Background ion density (Nani) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.DOSion) ~= length(par.d)
-                msg = 'Ion density of states array (DOSion) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.DOSani) ~= length(par.d)
+                msg = 'Ion density of states array (DOSani) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.epp) ~= length(par.d)
                 msg = 'Relative dielectric constant array (epp) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
@@ -585,17 +585,17 @@ classdef pc
             dev.IP = zeros(1, length(xmesh));
             dev.mue = zeros(1, length(xmesh));
             dev.muh = zeros(1, length(xmesh));
-            dev.muion = zeros(1, length(xmesh));
+            dev.muani = zeros(1, length(xmesh));
             dev.NA = zeros(1, length(xmesh));
             dev.ND = zeros(1, length(xmesh));
             dev.Nc = zeros(1, length(xmesh));
             dev.Nv = zeros(1, length(xmesh));
-            dev.Nion = zeros(1, length(xmesh));
+            dev.Nani = zeros(1, length(xmesh));
             dev.Ncat = zeros(1, length(xmesh));
             dev.ni = zeros(1, length(xmesh));
             dev.n0 = zeros(1, length(xmesh));
             dev.p0 = zeros(1, length(xmesh));
-            dev.DOSion = zeros(1, length(xmesh));
+            dev.DOSani = zeros(1, length(xmesh));
             dev.epp = zeros(1, length(xmesh));
             dev.krad = zeros(1, length(xmesh));
             dev.gradEA = zeros(1, length(xmesh));
@@ -644,7 +644,7 @@ classdef pc
                             dev.IP(j) = par.IP(i);
                             dev.mue(j) = par.mue(i);
                             dev.muh(j) = par.muh(i);
-                            dev.muion(j) = par.muion(i);
+                            dev.muani(j) = par.muani(i);
                             dev.mucat(j) = par.mucat(i);
                             dev.Nc(j) = par.Nc(i);
                             dev.Nv(j) = par.Nv(i);
@@ -652,9 +652,9 @@ classdef pc
                             dev.ND(j) = par.ND(i);
                             dev.epp(j) = par.epp(i);
                             dev.ni(j) = par.ni(i);
-                            dev.Nion(j) = par.Nion(i);
+                            dev.Nani(j) = par.Nani(i);
                             dev.Ncat(j) = par.Ncat(i);
-                            dev.DOSion(j) = par.DOSion(i);
+                            dev.DOSani(j) = par.DOSani(i);
                             dev.DOScat(j) = par.DOScat(i);
                             dev.krad(j) = par.krad(i);
                             dev.n0(j) = par.n0(i);
@@ -705,8 +705,8 @@ classdef pc
                                     dmuhdx = (par.muh(i+1)-par.muh(i-1))/(par.d(i));
                                     dev.muh(j) = par.muh(i-1) + xprime*dmuhdx;
                                     % Ion mobility
-                                    dmuiondx = (par.muion(i+1)-par.muion(i-1))/(par.d(i));
-                                    dev.muion(j) = par.muion(i-1) + xprime*dmuiondx;
+                                    dmuanidx = (par.muani(i+1)-par.muani(i-1))/(par.d(i));
+                                    dev.muani(j) = par.muani(i-1) + xprime*dmuanidx;
                                     % Cation mobility
                                     dmucatdx = (par.mucat(i+1)-par.mucat(i-1))/(par.d(i));
                                     dev.mucat(j) = par.mucat(i-1) + xprime*dmucatdx;
@@ -730,14 +730,14 @@ classdef pc
                                     dev.taun(j) = par.taun(i);
                                     dev.taup(j) = par.taup(i);
                                     % Static ion background density
-                                    dNiondx = (par.Nion(i+1)-par.Nion(i-1))/(par.d(i));
-                                    dev.Nion(j) = par.Nion(i-1) + xprime*dNiondx;
+                                    dNanidx = (par.Nani(i+1)-par.Nani(i-1))/(par.d(i));
+                                    dev.Nani(j) = par.Nani(i-1) + xprime*dNanidx;
                                     % Static ion background density
                                     dNcatdx = (par.Ncat(i+1)-par.Ncat(i-1))/(par.d(i));
                                     dev.Ncat(j) = par.Ncat(i-1) + xprime*dNcatdx;
                                     % Ion density of states
-                                    dDOSiondx = (par.DOSion(i+1)-par.DOSion(i-1))/(par.d(i));
-                                    dev.DOSion(j) = par.DOSion(i-1) + xprime*dDOSiondx;
+                                    dDOSanidx = (par.DOSani(i+1)-par.DOSani(i-1))/(par.d(i));
+                                    dev.DOSani(j) = par.DOSani(i-1) + xprime*dDOSanidx;
                                     % Ion density of states
                                     dDOScatdx = (par.DOScat(i+1)-par.DOScat(i-1))/(par.d(i));
                                     dev.DOScat(j) = par.DOScat(i-1) + xprime*dDOScatdx;
@@ -779,7 +779,7 @@ classdef pc
                                     dev.Eif(j) = par.Eif(i-1) + (par.Eif(i+1)-par.Eif(i-1))*dev.erf(j);
                                     dev.mue(j) = par.mue(i-1) + (par.mue(i+1)-par.mue(i-1))*dev.erf(j);
                                     dev.muh(j) = par.muh(i-1) + (par.muh(i+1)-par.muh(i-1))*dev.erf(j);
-                                    dev.muion(j) = par.muion(i-1) + (par.muion(i+1)-par.muion(i-1))*dev.erf(j);
+                                    dev.muani(j) = par.muani(i-1) + (par.muani(i+1)-par.muani(i-1))*dev.erf(j);
                                     dev.mucat(j) = par.mucat(i-1) + (par.mucat(i+1)-par.mucat(i-1))*dev.erf(j);
                                     dev.epp(j) = par.epp(i-1) + (par.epp(i+1)-par.epp(i-1))*dev.erf(j);
                                     dev.E0(j) = par.E0(i-1) + (par.E0(i+1)-par.E0(i-1))*dev.erf(j);
@@ -787,9 +787,9 @@ classdef pc
                                     dev.g0(j) = 0;
                                     dev.krad(j) = par.krad(i-1) + (par.krad(i+1)-par.krad(i-1))*dev.erf(j);
                                     dev.Et(j) = par.Et(i-1) + (par.Et(i+1)-par.Et(i-1))*dev.erf(j);
-                                    dev.Nion(j) = par.Nion(i-1) + (par.Nion(i+1)-par.Nion(i-1))*dev.erf(j);
+                                    dev.Nani(j) = par.Nani(i-1) + (par.Nani(i+1)-par.Nani(i-1))*dev.erf(j);
                                     dev.Ncat(j) = par.Ncat(i-1) + (par.Ncat(i+1)-par.Ncat(i-1))*dev.erf(j);
-                                    dev.DOSion(j) = par.DOSion(i-1) + (par.DOSion(i+1)-par.DOSion(i-1))*dev.erf(j);
+                                    dev.DOSani(j) = par.DOSani(i-1) + (par.DOSani(i+1)-par.DOSani(i-1))*dev.erf(j);
                                     dev.DOScat(j) = par.DOScat(i-1) + (par.DOScat(i+1)-par.DOScat(i-1))*dev.erf(j);
                                     dev.Nc(j) = par.Nc(i-1) + (par.Nc(i+1)-par.Nc(i-1))*dev.erf(j);
                                     dev.Nv(j) = par.Nv(i-1) + (par.Nv(i+1)-par.Nv(i-1))*dev.erf(j);
@@ -881,13 +881,29 @@ classdef pc
             
             par.Nc = T{:, 'Nc'}';
             par.Nv = T{:, 'Nv'}';
-            par.Nion = T{:, 'Nion'}';
+            try 
+                par.Nani = T{:, 'Nion'}';   % Backward compatibility
+            end
+            try 
+                par.Nani = T{:, 'Nani'}';
+            end
             par.Ncat = T{:, 'Ncat'}';
-            par.DOSion = T{:, 'DOSion'}';
+            try
+                par.DOSani = T{:, 'DOSion'}';   % backwards compatibility
+            end
+            try
+                par.DOSani = T{:, 'DOSani'}';
+            end
             par.DOScat = T{:, 'DOScat'}';
             par.mue = T{:, 'mue'}';
             par.muh = T{:, 'muh'}';
-            par.muion = T{:, 'muion'}';
+            try
+                par.muani = T{:, 'muion'}';
+            end
+                
+            try
+                par.muani = T{:, 'muani'}';
+            end
             par.mucat = T{:, 'mucat'}';
             par.epp = T{:, 'epp'}';
             

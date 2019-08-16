@@ -114,7 +114,7 @@ par.Rs = 0;
 disp('Closed circuit equilibrium with ions')
 
 % Take ratio of electron and ion mobilities in the active layer
-rat_anion = par.mue(par.active_layer)/par.muion(par.active_layer);
+rat_anion = par.mue(par.active_layer)/par.muani(par.active_layer);
 rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
 
 % If the ratio is infinity (ion mobility set to zero) then set the ratio to
