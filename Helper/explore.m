@@ -22,9 +22,9 @@ classdef explore
             str1 = char(parnames(1));
             str2 = char(parnames(2));
             errorlog = zeros(length(parval1), length(parval2));
-            
+
             j = 1;
-            for i = 1:length(parval1)
+            parfor i = 1:length(parval1)
                 
                 par = par_base;
                 par.Ana = 0;
@@ -51,19 +51,20 @@ classdef explore
                 FF_r = zeros(1, length(parval2));
                 n_av = zeros(1, length(parval2));
                 p_av = zeros(1, length(parval2));
-                % Stabilised profiles
-                n_f = zeros(length(parval2), 2000);
-                p_f = zeros(length(parval2), 2000);
-                a_f = zeros(length(parval2), 2000);
-                V_f = zeros(length(parval2), 2000);
-                x = zeros(length(parval2), 2000);
+                errortemp = zeros(1,length(parval2));
+                % Stabilised profiles - Not currently working
+%                 n_f = zeros(length(parval1), length(parval2), 10000);
+%                 p_f = zeros(length(parval1), length(parval2), 10000);
+%                 a_f = zeros(length(parval1), length(parval2), 10000);
+%                 V_f = zeros(length(parval1), length(parval2), 10000);
+%                 x = zeros(length(parval1), length(parval2), 10000);
+            
                 Voc_stable = zeros(length(parval2), JVpnts);
                 PLint = zeros(length(parval2), JVpnts);
                 Vapp_f = zeros(1, JVpnts);
                 J_f = zeros(length(parval2), JVpnts);
                 Vapp_r = zeros(1, JVpnts);
                 J_r = zeros(length(parval2), JVpnts);
-                errortemp = zeros(1,length(parval2));
                 
                 for j = 1:length(parval2)
                     try
@@ -94,10 +95,10 @@ classdef explore
                         stats = dfana.JVstats(JV);
                         
                         % Write stats into temporary variables
-                        Vapp_f(j,:) = JV.ill.f.Vapp;
-                        J_f(j,:) =  JV.ill.f.J.tot(:,end);
-                        Vapp_r(j,:) = JV.ill.r.Vapp;
-                        J_r(j,:) = JV.ill.r.J.tot(:,end);
+                        Vapp_f(j,:) = dfana.calcVapp(JV.ill.f);
+                        J_f(j,:) = explore.getJtot(JV.ill.f);
+                        Vapp_r(j,:) = dfana.calcVapp(JV.ill.r);
+                        J_r(j,:) = explore.getJtot(JV.ill.r);
                         Voc_f(j) = stats.Voc_f;
                         Voc_r(j) = stats.Voc_r;
                         Jsc_f(j) = stats.Jsc_f;
@@ -108,7 +109,8 @@ classdef explore
                         FF_r(j) = stats.FF_r;
                         
                         % For steady-state solution
-                        sol_ill = lighton_Rs(soleq.ion, Int, 1, 1e-6, 0, JVpnts);
+                        % lighton_Rs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
+                        sol_ill = lighton_Rs(soleq.ion, Int, -10, 1, 1e6, JVpnts);
                         
                         % Write steady-state solutions into temporary
                         % variables
@@ -116,11 +118,11 @@ classdef explore
                         PLint(j,:) = dfana.PLt(sol_ill);
                         n_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),1));
                         p_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),2));
-                        n_f = explore.writevar(n_f, j, par.xx, sol_ill.u(end,:,1));
-                        p_f = explore.writevar(p_f, j, par.xx, sol_ill.u(end,:,2));
-                        a_f = explore.writevar(a_f, j, par.xx, sol_ill.u(end,:,3));
-                        V_f = explore.writevar(V_f, j, par.xx, sol_ill.u(end,:,4));
-                        x = explore.writevar(x, j, par.xx, sol_ill.x);
+%                         n_f = explore.writevar(n_f, i, j, par.xx, sol_ill.u(end,:,1));
+%                         p_f = explore.writevar(p_f, i, j, par.xx, sol_ill.u(end,:,2));
+%                         a_f = explore.writevar(a_f, i, j, par.xx, sol_ill.u(end,:,3));
+%                         V_f = explore.writevar(V_f, i, j, par.xx, sol_ill.u(end,:,4));
+%                         x = explore.writevar(x, i, j, par.xx, sol_ill.x);
                         errortemp(j) = 0;
                     catch
                         warning(['DRIFTFUSION FAILURE: Run no. ', num2str((i-1)*length(parval2) + j), ', ', str1, '= ',num2str(parval1(i)), ', ', str2, '= ', num2str(parval2(j))]);
@@ -144,11 +146,11 @@ classdef explore
                 DD(i,:,:) = J_r;
                 EE(i,:) = n_av;
                 FF(i,:) = p_av;
-                GG(i,:,:) = n_f;
-                HH(i,:,:) = p_f;
-                II(i,:,:) = a_f;
-                JJ(i,:,:) = V_f;
-                KK(i,:,:) = x;
+%                 GG = n_f;
+%                 HH = p_f;
+%                 II = a_f;
+%                 JJ = V_f;
+%                 KK = x;
                 errorlog(i,:) = errortemp;
                 
             end
@@ -186,11 +188,17 @@ classdef explore
             
         end
         
-        function var = writevar(var, j, xx, arr)
+        function Jtot = getJtot(sol)
+           % Extract the total current for current structure
+           [~,J] = dfana.calcJ(sol);
+           Jtot = J.tot(:,end);
+        end
+        
+        function var = writevar(var, i, j, xx, arr)
             % EXPLORE.WRITEVAR writes array ARR to variable VAR using variable length
             % assignment, which is not usually allowed in PARFOR loops. This
             % allows the solution with different length vectors to be stored.
-            var(j,1:length(xx)) = arr;
+            var(i, j, 1:length(xx)) = arr;
         end
         
         function par = helper(par, parname, parvalue)
@@ -339,7 +347,7 @@ classdef explore
             % contained within EXSOL
             par = exsol.par_base;
             
-            eval(['y = exsol_Voc', yproperty,';']);
+            eval(['y = exsol.', yproperty,';']);
             if length(par1logical) > length(exsol.parval1)
                 par1logical = par1logical(1:length(exsol.parval1));
             end
@@ -500,7 +508,6 @@ classdef explore
             
         end
         
-        
         function plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
             % plotting function for plotting carrier densities as a
             % function of Voc
@@ -629,6 +636,7 @@ classdef explore
                 cb.Ruler.Scale = 'log';
                 cb.Ruler.MinorTick = 'on';
             end
+            end
         end
         
         function plotJV(exsol, par1logical, par2logical)
@@ -658,8 +666,6 @@ classdef explore
             hold off
         end
         
-    end
-    
     end
 
 end
