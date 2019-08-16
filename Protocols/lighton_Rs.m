@@ -17,11 +17,13 @@ par_origin = par;
 
 disp('Switching on illumination')
 par.mobseti = 0;
-par.g1_fun_type = 'constant';
 par.tmax = 1e-3;
 par.t0 = par.tmax/1e6;
 par.Rs_initial = 0;
 par.int1 = int1;
+par.g1_fun_type = 'sweep';
+% COEFF = [Amplitude_initial, Amplitude_final, tmax]
+par.g1_fun_arg = [0, int1, par.tmax];
 
 sol_ill1 = df(sol_ini, par);
 
@@ -41,11 +43,11 @@ sol_Rs = df(sol_ill1, par);
 
 par.Rs_initial = 0;
 par.mobseti = mobseti;
-% If stabtime is entered as zero set to default value
+% If STABLE_TIME is  is entered as zero set to default value
 if stable_time >= 0
     par.tmax = stable_time;
 else
-    par.tmax = 0.1;
+    par.tmax = -stable_time;
 end
 par.t0 = par.tmax/1e6;
 par.tpoints = pnts;
@@ -53,10 +55,11 @@ par.tpoints = pnts;
 disp(['Performing initial transient with tmax = ', num2str(par.tmax)]);
 sol = df(sol_Rs, par);
 
-% Switch off applied voltage during precondition
+% Switch off precondition voltage
 par.Vapp = 0;
 
-if stable_time == -1
+% Stable time is enetered as negative then run to stable solution
+if stable_time < 0
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     
     % loop to check ions have reached stable config- if not accelerate ions by
