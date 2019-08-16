@@ -40,7 +40,7 @@ spvsol = dospv(soleq_tio2_2l.ion, 0.2, 1, 200, 10, 1e6, 0);
 % density, electric field, and potential at the right hand boundary as a 
 % function of time the plots them. The outputs can be store in the output 
 % structure SPVDAT (although this can be called anything).
-spvdat = spvana5(spvsol);
+spvdat = spvana(spvsol);
 
 %% Save your workspace
 % You can rename this and move it later

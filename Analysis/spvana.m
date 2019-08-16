@@ -1,4 +1,4 @@
-function spvdat = spvana5(spvsol)
+function spvdat = spvana(spvsol)
 % A function for analysing the solution SPVSOL from DOSPV2
 
 %% Extract initial parameters and meshes
