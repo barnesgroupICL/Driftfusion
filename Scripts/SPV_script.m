@@ -44,7 +44,7 @@ spvdat = spvana(spvsol);
 
 %% Save your workspace
 % You can rename this and move it later
-save('SPV_temp.mat')
+%save('SPV_temp.mat')
 
 %% Plotting inidividual solutions
 % Various plots are available in the plotting class DFPLOT (You can find this in the 
