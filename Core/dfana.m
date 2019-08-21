@@ -22,7 +22,7 @@ classdef dfana
             end
         end
         
-                 function [Ecb, Evb, Efn, Efp] = QFLs(sol)
+        function [Ecb, Evb, Efn, Efp] = QFLs(sol)
             % u is the solution structure
             % Simple structure names
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
@@ -692,8 +692,10 @@ classdef dfana
         end
         
         function value = PLt(sol)
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            value = trapz(x,(n.*p),2);
+                [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+                
+                kradmat = dev.krad;
+                value = trapz(x,(dev.krad.*(n.*p-dev.ni.^2)),2);
         end
         
         function value = Voct(sol)
@@ -716,13 +718,21 @@ classdef dfana
             sigma = trapz(x, rho, 2);
         end
         
+        function sigma_ion = calcsigma_ion(sol)
+            % calculates the integrated space charge density
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            rho_ion = c-a;
+            sigma_ion = trapz(x, rho_ion, 2);
+        end
+        
         function Fion = calcFion(sol)
            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol); 
            Ncatmat = repmat(dev.Ncat, length(t), 1);
+           Nanimat = repmat(dev.Nani, length(t), 1);
            eppmat = repmat(dev.epp, length(t), 1);
            
-           rhocat = c - Ncatmat;
-           Fion = cumtrapz(x, rhocat, 2)./(eppmat*par.epp0);
+           rhoion = c - Ncatmat - a + Nanimat;
+           Fion = cumtrapz(x, rhoion, 2)./(eppmat*par.epp0);
         end
         
         function Vion = calcVion(sol)
