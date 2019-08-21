@@ -40,7 +40,16 @@ classdef dfplot
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
 
             xnm = x*1e7;    % x in nm for plotting
-
+            
+            FH1 = figure(1); clf;
+            PH1 = subplot(3,1,1);
+            dfplot.colourblocks(sol, [-100, 100]);
+            PH2 = subplot(3,1,2); 
+            dfplot.colourblocks(sol, [1e-30, 1e30]);
+            FH1 = figure(1);
+            PH3 = subplot(3,1,3);
+            dfplot.colourblocks(sol, [1e-30, 1e30]);
+            
             for i = 1:length(tarr)
                 % find the tarr
                 p1 = find(sol.t <= tarr(i));
@@ -49,7 +58,7 @@ classdef dfplot
                 % Band Diagram
                 FH1 = figure(1);
                 PH1 = subplot(3,1,1);
-                plot (xnm, Efn(p1,:), '--', xnm, Efp(p1,:), '--', xnm, Ecb(p1, :), xnm, Evb(p1 ,:));
+                plot(xnm, Efn(p1,:), '--', xnm, Efp(p1,:), '--', xnm, Ecb(p1, :), xnm, Evb(p1 ,:));
                 hold on
 
                 % Final Charge Densities
@@ -70,6 +79,7 @@ classdef dfplot
             xlabel('Position [nm]');
             ylabel('Energy [eV]');
             xlim([xrange(1), xrange(2)]);
+            ylim([min(min(Evb))-0.1, max(max(Ecb))+0.1])
             set(legend,'FontSize',12);
             set(legend,'EdgeColor',[1 1 1]);
             hold off
@@ -79,8 +89,10 @@ classdef dfplot
             legend('\itn', '\itp')
             xlabel('Position [nm]')
             xlim([xrange(1), xrange(2)]);
-            ylim([1e0, 1e20]);
+            ylim([max(max([n,p]))*1e-10, 10*max(max([n,p]))])
+            %ylim([1e0, 1e20]);
             set(legend,'FontSize',12);
+            set(gca, 'YScale','log')
             set(legend,'EdgeColor',[1 1 1]);
             hold off
 
@@ -89,6 +101,11 @@ classdef dfplot
             xlabel('Position [nm]');
             legend('anion', 'cation')
             xlim([xrange(1), xrange(2)]);
+            try
+               ylim([0.9*min(min([a,c])), 1.1*max(max([a,c]))])
+            catch
+               ylim([max(max([a,c]))-par.Nani(par.active_layer), max(max([a,c]))+par.Nani(par.active_layer)])
+            end
             set(legend,'FontSize',12);
             set(legend,'EdgeColor',[1 1 1]);
             hold off
@@ -141,14 +158,15 @@ classdef dfplot
 
             [j, J, x] = dfana.calcJ(sol);
             xnm = x*1e7;
-
+            
+            figure(3)
+            dfplot.colourblocks(sol, [-100, 100]);
             for i = 1:length(tarr)
                 % find the time
                 p1 = find(sol.t <= tarr(i));
                 p1 = p1(end);
 
                 % electron and hole currents as function of position from continuity
-                figure(3)
                 plot(xnm, J.n(p1, :), xnm, J.p(p1, :), xnm, J.a(p1, :), xnm, J.c(p1, :), xnm, J.disp(p1, :), xnm, J.tot(p1, :))
                 hold on
             end
@@ -443,7 +461,9 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
             xnm = sol.x*1e7;
-            figure(12)
+            figure(12); clf;
+            dfplot.colourblocks(sol, [1e-30, 1e30]);
+            
             for i = 1:length(tarr)
                 % find the time
                 p1 = find(sol.t >= tarr(i));
@@ -455,6 +475,7 @@ classdef dfplot
             xlabel('Position [nm]')
             ylabel('Carrier density [cm-3]')
             xlim([xrange(1), xrange(2)])
+            
             %legend('n', 'p')
             hold off
         end
@@ -884,7 +905,9 @@ classdef dfplot
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
             %x = par.x_ihalf;
             xnm = x*1e7;    % x in nm for plotting
-            FH1 = figure(22);
+            figure(22);
+            clf
+            dfplot.colourblocks(sol, [-100, 100]);
             for i = 1:length(tarr)
                 % find the tarr
                 p1 = find(sol.t <= tarr(i));
@@ -894,12 +917,12 @@ classdef dfplot
                 hold on
             end
 
-            figure(22)
             legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
             set(legend,'FontSize',12);
             xlabel('Position [nm]');
             ylabel('Energy [eV]');
             xlim([xrange(1), xrange(2)]);
+            ylim([min(min(Evb))-0.1, max(max(Ecb))+0.1])
             set(legend,'FontSize',12);
             set(legend,'EdgeColor',[1 1 1]);
             hold off
@@ -1265,5 +1288,24 @@ classdef dfplot
             xlim([xrange(1), xrange(2)])
         end
         
+        function colourblocks(sol, yrange)
+           par = sol.par;
+           dcum0 = par.dcum0*1e7;   % Convert to nm
+           
+           %triplets = [1, 0.9, 0.8; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
+           % French flag
+           triplets = [1, 0.9, 0.8; 1, 0.98, 0.7; 1, 1, 1; 1, 1, 0.98; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
+           % Mint
+           %triplets = [0.8, 1, 0.9; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
+                  
+           for i =1:length(dcum0)-1
+              v = [dcum0(i) yrange(2); dcum0(i+1) yrange(2); dcum0(i+1) yrange(1); dcum0(i) yrange(1)];   % vertices position
+              f = [1 2 3 4];    % Faces
+              j = i - (length(triplets)*floor(i/length(triplets)));
+              colour = triplets(j,:);
+              patch('Faces',f,'Vertices',v,'FaceColor',colour, 'EdgeColor','none','HandleVisibility','off')
+           end
+           hold on           
+        end
     end
 end
