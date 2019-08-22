@@ -16,99 +16,20 @@ classdef dfplot
             % SOL = the solution structure
             % TARR = An array containing the times that you wish to plot
             % XRANGE = 2 element array with [xmin, xmax]
-
-            % tarr is a time time array for the time you wish to plot
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
-            % Call dfana to obtain band energies and QFLs
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
-
-            xnm = x*1e7;    % x in nm for plotting
             
-            FH1 = figure(1); clf;
+            FH1 = figure(1);
             PH1 = subplot(3,1,1);
-            dfplot.colourblocks(sol, [-100, 100]);
+            dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'}, {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
+            
             PH2 = subplot(3,1,2); 
-            dfplot.colourblocks(sol, [1e-30, 1e30]);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1)
+            
             FH1 = figure(1);
             PH3 = subplot(3,1,3);
-            dfplot.colourblocks(sol, [1e-30, 1e30]);
-            
-            for i = 1:length(tarr)
-                % find the tarr
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                % Band Diagram
-                FH1 = figure(1);
-                PH1 = subplot(3,1,1);
-                plot(xnm, Efn(p1,:), '--', xnm, Efp(p1,:), '--', xnm, Ecb(p1, :), xnm, Evb(p1 ,:));
-                hold on
-
-                % Final Charge Densities
-                PH2 = subplot(3,1,2);
-                semilogy(xnm, n(p1, :), xnm, p(p1, :));
-                hold on
-
-                % Ionic space charge density
-                PH3 = subplot(3,1,3);
-                plot(xnm, a(p1,:), xnm, c(p1,:));
-                hold on
-            end
-
-            figure(1)
-            subplot(3,1,1);
-            legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
-            set(legend,'FontSize',12);
-            xlabel('Position [nm]');
-            ylabel('Energy [eV]');
-            xlim([xrange(1), xrange(2)]);
-            ylim([min(min(Evb))-0.1, max(max(Ecb))+0.1])
-            set(legend,'FontSize',12);
-            set(legend,'EdgeColor',[1 1 1]);
-            hold off
-
-            subplot(3,1,2);
-            ylabel('Carrier density [cm-3]')
-            legend('\itn', '\itp')
-            xlabel('Position [nm]')
-            xlim([xrange(1), xrange(2)]);
-            ylim([max(max([n,p]))*1e-10, 10*max(max([n,p]))])
-            %ylim([1e0, 1e20]);
-            set(legend,'FontSize',12);
-            set(gca, 'YScale','log')
-            set(legend,'EdgeColor',[1 1 1]);
-            hold off
-
-            subplot(3,1,3);
-            ylabel('Mobile ion density [cm-3]');
-            xlabel('Position [nm]');
-            legend('anion', 'cation')
-            xlim([xrange(1), xrange(2)]);
-            try
-               ylim([0.9*min(min([a,c])), 1.1*max(max([a,c]))])
-            catch
-               ylim([max(max([a,c]))-par.Nani(par.active_layer), max(max([a,c]))+par.Nani(par.active_layer)])
-            end
-            set(legend,'FontSize',12);
-            set(legend,'EdgeColor',[1 1 1]);
-            hold off
+            dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 1)
         end
 
         function Jt(sol, xpos)
@@ -138,90 +59,29 @@ classdef dfplot
             % SOL = the solution structure
             % TARR = An array containing the times that you wish to plot
             % XRANGE = 2 element array with [xmin, xmax]
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [j, J, x] = dfana.calcJ(sol);
-            xnm = x*1e7;
             
-            figure(3)
-            dfplot.colourblocks(sol, [-100, 100]);
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                % electron and hole currents as function of position from continuity
-                plot(xnm, J.n(p1, :), xnm, J.p(p1, :), xnm, J.a(p1, :), xnm, J.c(p1, :), xnm, J.disp(p1, :), xnm, J.tot(p1, :))
-                hold on
-            end
-
-            xlabel('Position [nm]')
-            ylabel('J [A]')
-            legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtot')
-            xlim([xrange(1), xrange(2)])
-            hold off
+            figure(3); clf;           
+            dfplot.x2d(sol, par.x_ihalf, {J.n, J.p, J.a, J.c, J.disp, J.tot},...
+                {'Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtot'}, {'-','-','-','-','-','-'},...
+                'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
 
         function jx(varargin)
-            % Plots the currents
+            % Plots the carrier fluxes
             % SOL = the solution structure
             % TARR = An array containing the times that you wish to plot
             % XRANGE = 2 element array with [xmin, xmax]
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [j, J, x] = dfana.calcJ(sol);
-            xnm = x*1e7;
-
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                % electron and hole currents as function of position from continuity
-                figure(3)
-                plot(xnm, j.n(p1, :), xnm, j.p(p1, :), xnm, j.a(p1, :), xnm, j.c(p1, :), xnm, j.disp(p1, :))
-                hold on
-            end
-
-            xlabel('Position [nm]')
-            ylabel('j [cm-2s-1]')
-            legend('jn', 'jp', 'ja', 'jc', 'jdisp')
-            xlim([xrange(1), xrange(2)])
-            hold off
+            
+            figure(301); clf;           
+            dfplot.x2d(sol, par.x_ihalf, {j.n, j.p, j.a, j.c, j.disp},{'jn', 'jp', 'ja', 'jc', 'jdisp'},...
+                {'-','-','-','-','-'}, 'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
-
 
         function JV(JV, option)
             % JV - a solution from doJV
@@ -264,58 +124,15 @@ classdef dfplot
         function Jddx(varargin)
             % figure(5)
             % drift and diffusion currents as a function of position
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
-            % get drift and diffusion currents
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [~, Jdd, x] = dfana.Jddxt(sol);
-            xnm = x*1e7;
-
-            figure(5)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                plot(xnm, Jdd.ndiff(p1,:), xnm, Jdd.ndrift(p1,:), xnm, Jdd.pdiff(p1,:),...
-                    xnm, Jdd.pdrift(p1,:), xnm, Jdd.adiff(p1,:), xnm, Jdd.adrift(p1,:),...
-                    xnm, Jdd.cdiff(p1,:), xnm, Jdd.cdrift(p1,:));
-                hold on
-            end
-            xlabel('Position [nm]')
-            ylabel('Current density [Acm-2]')
-            legend('Jn,diff', 'Jn,drift', 'Jp,diff', 'Jp,drift', 'Ja,diff', 'Ja,drift', 'Jc,diff', 'Jc,drift')
-            hold off
-
-%             figure(51)
-%             for i = 1:length(tarr)
-%                 % find the time
-%                 p1 = find(sol.t <= tarr(i));
-%                 p1 = p1(end);
-%                 
-%                 plot(xnm, Jdd.n(p1,:), xnm, Jdd.p(p1,:), xnm, Jdd.a(p1,:), xnm, Jdd.c(p1,:), xnm, Jdd.disp(p1,:), xnm, Jdd.tot(p1,:));
-%                 hold on
-%             end
-%             
-%             xlabel('Position [nm]')
-%             ylabel('Current density [Acm-2]')
-%             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal');
-%             hold off
+            
+            figure(301); clf;           
+            dfplot.x2d(sol, x, {Jdd.ndiff, Jdd.ndrift, Jdd.pdiff, Jdd.pdrift,...
+                                    Jdd.adiff, Jdd.adrift, Jdd.cdiff, Jdd.cdrift},...
+                {'Jn,diff', 'Jn,drift', 'Jp,diff', 'Jp,drift', 'Ja,diff', 'Ja,drift', 'Jc,diff', 'Jc,drift'},...
+                {'.','-','.','-','.','-','.','-'},'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
 
         function Voct(sol)
@@ -405,154 +222,41 @@ classdef dfplot
 
         function Vx(varargin)
             % Electrostatic potential as a function of position
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-            V = sol.u(:,:,4)-sol.u(:,1,4);
-
-            xnm = sol.x*1e7;
-            figure(12)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t >= tarr(i));
-                p1 = p1(1);
-
-                plot(xnm, -V(p1, :))
-                hold on
-            end
-            xlabel('Position [nm]')
-            ylabel('-Electrostatic potential [V]')
-            hold off
-            xlim([xrange(1), xrange(2)])
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            figure(12);         
+            dfplot.x2d(sol, x, {V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
-
+        
         function npx(varargin)
             % Carrier densities as a function of position
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            xnm = sol.x*1e7;
-            figure(12); clf;
-            dfplot.colourblocks(sol, [1e-30, 1e30]);
-            
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t >= tarr(i));
-                p1 = p1(1);
-
-                semilogy(xnm, (n(p1, :)), xnm, (p(p1, :)))
-                hold on
-            end
-            xlabel('Position [nm]')
-            ylabel('Carrier density [cm-3]')
-            xlim([xrange(1), xrange(2)])
-            
-            %legend('n', 'p')
-            hold off
+            figure(13); clf;           
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-','-'},...
+                'Carrier density [cm-3]', tarr, xrange, 0, 1)
         end
-
+        
         function acx(varargin)
-            % Carrier densities as a function of position
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
+            % Ionic carrier densities as a function of position
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            xnm = sol.x*1e7;
-            figure(12)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t >= tarr(i));
-                p1 = p1(1);
-
-                semilogy(xnm, (c(p1, :)), xnm, (a(p1, :)))
-                hold on
-            end
-            xlabel('Position [nm]')
-            ylabel('Mobile ion density [V]')
-            legend('c', 'a')
-            hold off
+            figure(14)
+            dfplot.x2d(sol, x, {a,c},{'anion','cation'}, {'-','-'},...
+                'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
         end
         
         function gx(varargin)
-            % Carrier densities as a function of position
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-            
-            par = sol.par;
-            t = sol.t;
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [g1, g2, g] = dfana.calcg(sol);
             
-            xnm = par.x_ihalf*1e7;
-            figure(121)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t >= tarr(i));
-                p1 = p1(1);
-
-                semilogy(xnm, (g1(p1, :)), xnm, (g2(p1, :)), xnm, (g(p1, :)))
-                hold on
-            end
-            xlabel('Position [nm]')
-            ylabel('Generation rate [cm-3s-1]')
-            legend('g1', 'g2', 'g total')
-            hold off
+            figure(15)
+            dfplot.x2d(sol, par.x_ihalf, {g1, g2, g}, {'g1', 'g2', 'g total'},...
+                 {'-','-','-'}, 'Generation rate [cm-3s-1]', tarr, xrange, 0, 0);
         end
         
         function gxt(sol)
@@ -560,51 +264,24 @@ classdef dfplot
             par = sol.par;
             t = sol.t;
             [~, ~, g] = dfana.calcg(sol);
-            
             xnm = par.x_ihalf*1e7;
-            figure(122)
-
-            surf(sol.par.x_ihalf, sol.t, g)
+            
+            figure(16)
+            surf(xnm, sol.t, g)
             xlabel('Position [cm]')
             ylabel('Time [s]')
             zlabel('Generation rate [cm^{-3}s^{-1}]')
         end
             
         function Ux(varargin)
-            % Carrier densities as a function of position
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
+            % Recombination rates as a function of position
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             U = dfana.calcU(sol);
-
-            xnm = sol.x*1e7;
-            figure(12)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t >= tarr(i));
-                p1 = p1(1);
-
-                semilogy(xnm, (U.btb(p1, :)), xnm, (U.srh(p1, :)), xnm, (U.tot(p1, :)))
-                hold on
-            end
-            xlabel('Position [nm]')
-            ylabel('Recombination rate [cm-3s-1]')
-            legend('Ubtb', 'Usrh', 'Utot')
-            hold off
+            
+            figure(17)
+            dfplot.x2d(sol, x, {U.btb, U.srh, U.tot},{'Ubtb', 'Usrh', 'Utot'},...
+                {'-','-','-'}, 'Recombination rate [cm-3s-1]', tarr, xrange, 0, 0);
         end
 
         function JVrec(JV, option)
@@ -739,141 +416,45 @@ classdef dfplot
         function rhox(varargin)
             % Volumetric charge density (rho) as a funciton of position
             % A time array can be used as a second input argument
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             rho = dfana.calcrho(sol);
-
-            xnm = sol.x*1e7;
+            
             figure(19)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                plot(xnm, rho(p1, :))
-                hold on
-            end
-            xlabel('Position [nm]')
-            ylabel('Charge density [cm-3]')
-            hold off
+            dfplot.x2d(sol, x, {rho},{'\rho'},{'-'},'Charge density [cm-3]', tarr, xrange, 0, 0);
         end
 
         function deltarhox(varargin)
             % The change in volumetric charge density (rho) as a funciton of position
             % A time array can be used as a second input argument
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             rho = dfana.calcrho(sol);
             deltarho = rho - rho(1,:);
-
-            xnm = sol.x*1e7;
+            
             figure(20)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                plot(xnm, deltarho(p1, :))
-                hold on
-            end
-            xlabel('Position [nm]')
-            ylabel('Delta charge density [cm-3]')
-            hold off
+            dfplot.x2d(sol, x, {deltarho},{'\Delta \rho'},{'-'},'Delta charge density [cm-3]', tarr, xrange, 0, 0);
         end
 
         function rhoxFxVx(varargin)
             % Three panel figure:
             % Volumetric charge density (rho), Field and potential as a funciton of position
             % A time array can be used as a second input argument
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
-            V = sol.u(:,:,4)-sol.u(:,1,4);
             rho = dfana.calcrho(sol);
             F = dfana.calcF(sol);
 
-            xnm = sol.x*1e7;
-
             figure(21)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t >= tarr(i));
-                p1 = p1(1);
-
-                subplot(3, 1, 1)
-                plot(xnm, rho(p1,:))
-                hold on
-                subplot(3, 1, 2)
-                plot(xnm, F(p1,:))
-                hold on
-                subplot(3, 1, 3)
-                plot(xnm, (V(p1, :)))
-                hold on
-            end
             subplot(3, 1, 1)
-            xlabel('Position [nm]')
-            ylabel('rho [cm-3]')
-            xlim([xnm(1), xnm(end)])
-            hold off
-
+            dfplot.x2d(sol, x, {rho},{'\rho'},{'-'}, 'Charge density [cm-3]', tarr, xrange, 0, 0);
+            
             subplot(3, 1, 2)
-            xlabel('Position [nm]')
-            ylabel('Electric field [Vcm-1]')
-            xlim([xnm(1), xnm(end)])
-            hold off
+            dfplot.x2d(sol, x, {F},{'F'},{'-'},'Electric field [Vcm-1]', tarr, xrange, 0, 0);
 
             subplot(3, 1, 3)
-            xlabel('Position [nm]')
-            ylabel('Electrostatic potential [V]')
-            xlim([xnm(1), xnm(end)])
-            hold off
+            dfplot.x2d(sol, x, {V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
 
         function ELx_single(varargin)
@@ -881,51 +462,13 @@ classdef dfplot
             % SOL = the solution structure
             % TARR = An array containing the times that you wish to plot
             % XRANGE = 2 element array with [xmin, xmax]
-
-            % tarr is a time time array for the time you wish to plot
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
-            % Call dfana to obtain band energies and QFLs
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
-            %x = par.x_ihalf;
-            xnm = x*1e7;    % x in nm for plotting
+            
             figure(22);
-            clf
-            dfplot.colourblocks(sol, [-100, 100]);
-            for i = 1:length(tarr)
-                % find the tarr
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                plot (xnm, Efn(p1,:), '--', xnm, Efp(p1,:), '--', xnm, Ecb(p1, :), xnm, Evb(p1 ,:));
-                hold on
-            end
-
-            legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
-            set(legend,'FontSize',12);
-            xlabel('Position [nm]');
-            ylabel('Energy [eV]');
-            xlim([xrange(1), xrange(2)]);
-            ylim([min(min(Evb))-0.1, max(max(Ecb))+0.1])
-            set(legend,'FontSize',12);
-            set(legend,'EdgeColor',[1 1 1]);
-            hold off
+            dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'},...
+                {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
         end
 
 
@@ -934,378 +477,178 @@ classdef dfplot
             % SOL = the solution structure
             % TARR = An array containing the times that you wish to plot
             % XRANGE = 2 element array with [xmin, xmax]
-
-            % tarr is a time time array for the time you wish to plot
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
-            % Call dfana to obtain band energies and QFLs
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [Ecb, Evb, Efn, Efp] = dfana.QFL2(sol);
-
-            xnm = x*1e7;    % x in nm for plotting
-
-            for i = 1:length(tarr)
-                % find the tarr
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                % Band Diagram
-                FH1 = figure(23);
-                PH1 = subplot(2,1,1);
-                plot (xnm, Efn(p1,:), '--', xnm, Efp(p1,:), '--', xnm, Ecb(p1, :), xnm, Evb(p1 ,:));
-                hold on
-
-                % Final Charge Densities
-                PH2 = subplot(2,1,2);
-                semilogy(xnm, n(p1, :), xnm, p(p1, :));
-                hold on
-            end
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
 
             figure(23)
             subplot(2,1,1);
-            legend('E_{fn}', 'E_{fp}', 'CB', 'VB');
-            set(legend,'FontSize',12);
-            xlabel('Position [nm]');
-            ylabel('Energy [eV]');
-            xlim([xrange(1), xrange(2)]);
-            set(legend,'FontSize',12);
-            set(legend,'EdgeColor',[1 1 1]);
-            hold off
+            dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'},...
+                {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0);
 
             subplot(2,1,2);
-            ylabel('Carrier density [cm-3]')
-            legend('\itn', '\itp')
-            xlabel('Position [nm]')
-            xlim([xrange(1), xrange(2)]);
-            ylim([1e0, 1e20]);
-            set(legend,'FontSize',12);
-            set(legend,'EdgeColor',[1 1 1]);
-            hold off
-
-        end
-
-        function Jnpddx(varargin)
-            % figure(5)
-            % drift and diffusion currents as a function of position
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
-            % get drift and diffusion currents
-            Jdd = dfana.Jddxt(sol);
-            xnm = sol.x*1e7;
-
-            figure(5)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                plot(xnm, Jdd.ndiff(p1,:), xnm, Jdd.ndrift(p1,:), xnm, Jdd.pdiff(p1,:),...
-                    xnm, Jdd.pdrift(p1,:));
-                hold on
-            end
-            xlabel('Position [nm]')
-            ylabel('Current density [Acm-2]')
-            legend('n,diff', 'n,drift', 'p,diff', 'p,drift')
-            hold off
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1);
         end
 
         function Vacx(varargin)
-            % Electrostatic potential as a function of position
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-            V = sol.u(:,:,4)-sol.u(:,1,4);
+            % Potential and ionic charges as a function of position
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            figure(24)
+            subplot(2,1,1);
+            dfplot.x2d(sol, x, {V}, {'V'},...
+                {'-'}, 'Electro. potential [V]', tarr, xrange, 0, 0);
 
-            xnm = sol.x*1e7;
-            figure(12)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t >= tarr(i));
-                p1 = p1(1);
-
-                subplot(2,1,1)
-                plot(xnm, -V(p1, :))
-                hold on
-
-                subplot(2,1,2)
-                plot(xnm, c(p1,:), xnm, a(p1,:))
-                hold on
-                %plot(xnm, a(p1,:))
-
-            end
-            subplot(2,1,1)
-            xlabel('Position [nm]')
-            ylabel('-Electrostatic potential [V]')
-            xlim([xrange(1), xrange(2)])
-            hold off
-
-            subplot(2,1,2)
-            xlabel('Position [nm]')
-            ylabel('Ionic carrier density [cm-3]')
-            xlim([xrange(1), xrange(2)])
-            legend('c','a')
-            hold off
+            subplot(2,1,2);
+            dfplot.x2d(sol, x, {a, c}, {'a', 'c'},...
+                {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);
+            
         end
         
         function Vionacx(varargin)
             % Electrostatic potential as a function of position
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-            V = sol.u(:,:,4)-sol.u(:,1,4);
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             Vion = dfana.calcVion(sol);
             Vel = V - Vion;
             
-            xnm = sol.x*1e7;
-            figure(12)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t >= tarr(i));
-                p1 = p1(1);
+            figure(25)
+            subplot(2,1,1);
+            dfplot.x2d(sol, x, {V, Vion, Vel}, {'V', 'Vion', 'Vel'},...
+                {'--', '.', '-'}, 'Electro. potential [V]', tarr, xrange, 0, 0);
 
-                subplot(2,1,1)
-                plot(xnm, V(p1, :), xnm, Vion(p1, :), xnm, Vel(p1,:))
-                hold on
-
-                subplot(2,1,2)
-                plot(xnm, c(p1,:), xnm, a(p1,:))
-                hold on
-                %plot(xnm, a(p1,:))
-
-            end
-            subplot(2,1,1)
-            xlabel('Position [nm]')
-            ylabel('-Electrostatic potential [V]')
-            legend('V', 'Vion', 'Vel')
-            xlim([xrange(1), xrange(2)])
-            hold off
-
-            subplot(2,1,2)
-            xlabel('Position [nm]')
-            ylabel('Ionic carrier density [cm-3]')
-            xlim([xrange(1), xrange(2)])
-            legend('c','a')
-            hold off
-        end
-
-        function rhoVx(varargin)
-            % Volumetric charge density (rho) as a funciton of position
-            % A time array can be used as a second input argument
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
-            rho = dfana.calcrho(sol);
-            V = sol.u(:,:,4)-sol.u(:,1,4);
-
-            xnm = sol.x*1e7;
-            figure(19)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                subplot(2,1,1)
-                plot(xnm, rho(p1, :))
-                hold on
-
-                subplot(2,1,2)
-                plot(xnm, -V(p1, :))
-                hold on
-            end
-            subplot(2,1,1)
-            xlabel('Position [nm]')
-            ylabel('Charge density [cm-3]')
-            hold off
-            xlim([xrange(1), xrange(2)])
-
-            subplot(2,1,2)
-            xlabel('Position [nm]')
-            ylabel('-Electrostatic potential [V]')
-            hold off
-            xlim([xrange(1), xrange(2)])
+            subplot(2,1,2);
+            dfplot.x2d(sol, x, {a, c}, {'a', 'c'},...
+                {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);
         end
         
-        function Fion(sol)
+        function Fiont(sol)
             Fion = dfana.calcFion(sol);
             t = sol.t;
             
-            figure(20)
+            figure(26)
             plot(t, Fion(:,end))
             xlabel('Time')
             ylabel('Ion field [Vcm-1]')
         end
         
-       function Vionx(varargin)
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
-
-            Vion = dfana.calcVion(sol);
-            
-            xnm = sol.x*1e7;
-            figure(21)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                plot(xnm, Vion(p1, :))
-                hold on
-
-            end
-            xlabel('Position [nm]')
-            ylabel('Ionic component of V [V]')
-            hold off
-            xlim([xrange(1), xrange(2)])
-        end
-        
         function PLx(varargin)
             % Volumetric charge density (rho) as a funciton of position
             % A time array can be used as a second input argument
-
-            if length(varargin) == 1
-                sol = varargin{1};
-                tarr = sol.t(end);
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 2
-                sol = varargin{1};
-                tarr = varargin{2};
-                pointtype = 't';
-                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
-            elseif length(varargin) == 3
-                sol = varargin{1};
-                tarr = varargin{2};
-                xrange = varargin{3};
-                pointtype = 't';
-            end
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
             U = dfana.calcU(sol);
             
-            xnm = sol.x*1e7;
-            figure(21)
-            for i = 1:length(tarr)
-                % find the time
-                p1 = find(sol.t <= tarr(i));
-                p1 = p1(end);
-
-                plot(xnm, U.btb(p1, :))
-                hold on
-
-            end
-            xlabel('Position [nm]')
-            ylabel('Radiatve recombination [cm-3s-1]')
-            hold off
-            xlim([xrange(1), xrange(2)])
+            figure(27)
+            dfplot.x2d(sol, x, {U.btb}, {'Ubtb'},...
+                {'-'}, 'Radiatve recombination rate [cm-3s-1]', tarr, xrange , 0, 0);
         end
         
         function colourblocks(sol, yrange)
            par = sol.par;
            dcum0 = par.dcum0*1e7;   % Convert to nm
            
-           %triplets = [1, 0.9, 0.8; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
+           % Multicoloured
+           % triplets = [1, 0.9, 0.8; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
            % French flag
-           triplets = [1, 0.9, 0.8; 1, 0.98, 0.7; 1, 1, 1; 1, 1, 0.98; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
-           % Mint
-           %triplets = [0.8, 1, 0.9; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
+           % triplets = [1, 0.9, 0.8; 1, 0.98, 0.7; 1, 1, 1; 1, 1, 0.98; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
+           % Cool Mint
+           triplets = [0.8, 1, 0.9; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
                   
            for i =1:length(dcum0)-1
               v = [dcum0(i) yrange(2); dcum0(i+1) yrange(2); dcum0(i+1) yrange(1); dcum0(i) yrange(1)];   % vertices position
               f = [1 2 3 4];    % Faces
               j = i - (length(triplets)*floor(i/length(triplets)));
               colour = triplets(j,:);
-              patch('Faces',f,'Vertices',v,'FaceColor',colour, 'EdgeColor','none','HandleVisibility','off')
+              patch('Faces',f,'Vertices',v,'FaceColor',colour, 'EdgeColor','none');%,'HandleVisibility','off')
            end
            hold on           
         end
+ 
+        function [sol, tarr, pointtype, xrange] = sortarg(args)
+            
+            if length(args) == 1
+                sol = args{1};
+                tarr = sol.t(end);
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(args) == 2
+                sol = args{1};
+                tarr = args{2};
+                pointtype = 't';
+                xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
+            elseif length(args) == 3
+                sol = args{1};
+                tarr = args{2};
+                xrange = args{3};
+                pointtype = 't';
+            end
+        end
+        
+        function x2d(sol, xmesh, variables, legstr, linestyle, ylab, tarr, xrange, logx, logy)
+            % SOL = solution structure
+            % VARIABLES is an array containing the variables for plotting
+            % LEGSTR is the legend string
+            % YLAB = y-axis label
+            % TARR- array of times
+            % XRANGE - limits of the plot as a two element vector
+            % LOGX, LOGY - switches for log axes
+            ax = gca;
+            par = sol.par;
+            xnm = xmesh*1e7;
+             
+            vmin = min(min(cell2mat(variables)));
+            vmax = max(max(cell2mat(variables)));
+            
+            if isempty(findobj(ax,'Type','patch'))
+                dfplot.colourblocks(sol, [(10^-sign(vmin))*vmin, (10^sign(vmax))*vmax]);
+            end
+            
+            vmin_tarr = zeros(length(tarr),length(variables));
+            vmax_tarr = zeros(length(tarr),length(variables));
+            h = zeros(1, length(variables));
+            for i = 1:length(tarr)
+                % find the time
+                p1 = find(sol.t <= tarr(i));
+                p1 = p1(end);
+                    for jj = 1:length(variables)
+                        vtemp = variables{jj};
+                        
+                        vmin_tarr(i,jj) = min(vtemp(p1, :));
+                        vmax_tarr(i,jj) = max(vtemp(p1, :));
+                
+                        h(i,jj) = plot(xnm, variables{jj}(p1, :), char(linestyle(jj)));
+                        hold on
+                    end
+            end
+            xlabel('Position [nm]')
+            ylabel(ylab)
+            if logy == 1
+                set(gca, 'YScale','log');
+            end
+            if logx == 1
+                set(gca, 'XScale','log');
+            end
+            if length(variables) == 1
+                mystr = [];
+                for i = 1:length(tarr)
+                    mystr = [mystr, string(['t = ', num2str(tarr(i)), ' s'])];
+                end
+                lgd = legend(h, mystr);
+            else
+                lgd = legend(h(:,1), legstr);
+            end
+            lgd.FontSize = 12;
+            xlim([xrange(1), xrange(2)])
+            ymin = min(min(vmin_tarr));
+            ymax = max(max(vmax_tarr));
+            if ymin == 0 && ymax == 0
+            else
+                ylim([(1.1^-sign(ymin))*ymin, (1.1^sign(ymax))*ymax])
+            end
+            hold off
+    end
     end
 end
