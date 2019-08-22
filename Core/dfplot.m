@@ -64,7 +64,7 @@ classdef dfplot
             [j, J, x] = dfana.calcJ(sol);
             
             figure(3); clf;           
-            dfplot.x2d(sol, par.x_ihalf, {J.n, J.p, J.a, J.c, J.disp, J.tot},...
+            dfplot.x2d(sol, x, {J.n, J.p, J.a, J.c, J.disp, J.tot},...
                 {'Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtot'}, {'-','-','-','-','-','-'},...
                 'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
@@ -560,7 +560,7 @@ classdef dfplot
            for i =1:length(dcum0)-1
               v = [dcum0(i) yrange(2); dcum0(i+1) yrange(2); dcum0(i+1) yrange(1); dcum0(i) yrange(1)];   % vertices position
               f = [1 2 3 4];    % Faces
-              j = i - (length(triplets)*floor(i/length(triplets)));
+              j = i - ((length(triplets)-1)*floor(i/length(triplets)));
               colour = triplets(j,:);
               patch('Faces',f,'Vertices',v,'FaceColor',colour, 'EdgeColor','none');%,'HandleVisibility','off')
            end
