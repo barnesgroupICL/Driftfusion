@@ -638,7 +638,7 @@ classdef dfplot
                 end
                 lgd = legend(h, mystr);
             else
-                lgd = legend(h(:,1), legstr);
+                lgd = legend(h(1,:), legstr);
             end
             lgd.FontSize = 12;
             xlim([xrange(1), xrange(2)])
