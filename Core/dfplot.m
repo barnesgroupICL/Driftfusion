@@ -605,10 +605,14 @@ classdef dfplot
              
             vmin = min(min(cell2mat(variables)));
             vmax = max(max(cell2mat(variables)));
-            
-            if isempty(findobj(ax,'Type','patch'))                
-                
-                dfplot.colourblocks(sol, [(10^-sign(vmin))*vmin, (10^sign(vmax))*vmax]);
+            vrange = vmax-vmin;
+            if isempty(findobj(ax,'Type','patch'))
+                switch logy
+                    case 0
+                        dfplot.colourblocks(sol, [vmin-(vrange*0.2), vmax+(vrange*0.2)]);
+                    case 1
+                        dfplot.colourblocks(sol, [0.1*vmin, 10*vmax]);
+                end
             end
             
             vmin_tarr = zeros(length(tarr),length(variables));
@@ -650,9 +654,15 @@ classdef dfplot
             xlim([xrange(1), xrange(2)])
             ymin = min(min(vmin_tarr));
             ymax = max(max(vmax_tarr));
+            yrange = ymax - ymin;
             if ymin == 0 && ymax == 0
             else
-                ylim([(1.1^-sign(ymin))*ymin, (1.1^sign(ymax))*ymax])
+                switch logy
+                    case 0
+                        ylim([vmin-(yrange*0.2), vmax+(yrange*0.2)]);
+                    case 1
+                         ylim([0.1*ymin, 10*ymax])
+                end
             end
             hold off
     end
