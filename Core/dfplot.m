@@ -20,15 +20,15 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
             
-            FH1 = figure(1);
-            PH1 = subplot(3,1,1);
+            figure(1);
+            subplot(3,1,1);
             dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'}, {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
             
-            PH2 = subplot(3,1,2); 
+            subplot(3,1,2); 
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1)
             
-            FH1 = figure(1);
-            PH3 = subplot(3,1,3);
+            figure(1);
+            subplot(3,1,3);
             dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 1)
         end
 
@@ -564,7 +564,8 @@ classdef dfplot
               colour = triplets(j,:);
               patch('Faces',f,'Vertices',v,'FaceColor',colour, 'EdgeColor','none');%,'HandleVisibility','off')
            end
-           hold on           
+           
+           hold on
         end
  
         function [sol, tarr, pointtype, xrange] = sortarg(args)
@@ -596,19 +597,24 @@ classdef dfplot
             % XRANGE - limits of the plot as a two element vector
             % LOGX, LOGY - switches for log axes
             ax = gca;
+            if ishold(ax) == 0
+                cla(ax);    % Clear current axis if held
+            end
             par = sol.par;
             xnm = xmesh*1e7;
              
             vmin = min(min(cell2mat(variables)));
             vmax = max(max(cell2mat(variables)));
             
-            if isempty(findobj(ax,'Type','patch'))
+            if isempty(findobj(ax,'Type','patch'))                
+                
                 dfplot.colourblocks(sol, [(10^-sign(vmin))*vmin, (10^sign(vmax))*vmax]);
             end
             
             vmin_tarr = zeros(length(tarr),length(variables));
             vmax_tarr = zeros(length(tarr),length(variables));
             h = zeros(1, length(variables));
+            
             for i = 1:length(tarr)
                 % find the time
                 p1 = find(sol.t <= tarr(i));
