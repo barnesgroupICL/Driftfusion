@@ -751,11 +751,11 @@ classdef pc
                                     % CB effective density of states
                                     dlogNcdx = (log(par.Nc(i+1))-log(par.Nc(i-1)))/(par.d(i));
                                     dev.Nc(j) = exp(log(par.Nc(i-1)) + xprime*dlogNcdx);
-                                    %gradNc = (dev.Nc(j)-dev.Nc(j-1))/xmesh(j);
+                                    %dev.gradNc(j) = exp(dlogNcdx);
                                     % VB effective density of states
                                     dlogNvdx = (log(par.Nv(i+1))-log(par.Nv(i-1)))/(par.d(i));
                                     dev.Nv(j) = exp(log(par.Nv(i-1)) + xprime*dlogNvdx);
-                                    %gradNv = (dev.Nv(j)-dev.Nv(j-1))/xmesh(j);
+                                    %dev.gradNv(j) = exp(dlogNvdx);
                                     % Acceptor density
                                     dlogNAdx = (log(par.NA(i+1))-log(par.NA(i-1)))/(par.d(i));
                                     dev.NA(j) = exp(log(par.NA(i-1)) + xprime*dlogNAdx);
@@ -837,6 +837,17 @@ classdef pc
             end
             
             switch par.intgradfun
+                case 'linear'
+                    % Forward differences
+%                     dev.gradNc = diff(dev.Nc)./diff(xmesh);
+%                     dev.gradNv = diff(dev.Nv)./diff(xmesh);
+%                     dev.gradNc = [dev.gradNc, 0];
+%                     dev.gradNv = [dev.gradNv, 0];
+                    
+                    dev.gradNc = gradient(dev.Nc, xmesh);
+                    dev.gradNv = gradient(dev.Nv, xmesh);
+                    dev.gradEA = gradient(dev.EA, xmesh);
+                    dev.gradIP = gradient(dev.IP, xmesh);
                 case 'erf'
                     % Centre difference gradients
                     dev.gradNc = gradient(dev.Nc, xmesh);
