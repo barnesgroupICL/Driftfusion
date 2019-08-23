@@ -323,12 +323,12 @@ classdef pc
             % Warn if electrode workfunctions are outside of boundary layer
             % bandgap
             if par.Phi_left < par.IP(1) || par.Phi_left > par.EA(1)
-                msg = 'Anode workfunction (Phi_left) out of range: value must exist within left-hand layer band gap';
+                msg = 'Left-hand workfunction (Phi_left) out of range: value must exist within left-hand layer band gap';
                 error(msg)
             end
             
-            if par.Phi_right < par.IP(end) || par.Phi_left > par.EA(end)
-                msg = 'Anode workfunction (Phi_left) out of range: value must exist within right-hand layer band gap';
+            if par.Phi_right < par.IP(end) || par.Phi_right > par.EA(end)
+                msg = 'Right-hand workfunction (Phi_left) out of range: value must exist within right-hand layer band gap';
                 error(msg)
             end
             
