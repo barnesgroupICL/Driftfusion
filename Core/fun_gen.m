@@ -24,5 +24,5 @@ switch fun_type
         % Generate intensity array
         fun = @(coeff, t) coeff(1) + (coeff(2)-coeff(1))*lt(mod(t,coeff(3))*1/coeff(3),coeff(4)/100);
     case 'sin'
-        fun = @(coeff, t) coeff(1) + coeff(2)*(2*sin(2*pi*coeff(3)*t + coeff(4)));
+        fun = @(coeff, t) coeff(1) + coeff(2)*(sin(2*pi*coeff(3)*t + coeff(4)));
 end
