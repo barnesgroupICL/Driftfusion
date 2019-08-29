@@ -265,12 +265,12 @@ classdef dfana
             % Use the minority carrier flux as the boundary condition
             if par.pleft >= par.nleft && par.nright >= par.pright
                 % p-type left boundary, n-type right boundary
-                j.n = jn_r + (deltajn-deltajn(:,end));
-                j.p = jp_l + deltajp;
-            elseif par.nleft >= par.nright && par.pright >= par.nright
-                % n-type left boundary, p-type right boundary
                 j.n = jn_l + deltajn;
                 j.p = jp_r + (deltajp - deltajp(:,end));
+            elseif par.nleft >= par.nright && par.pright >= par.nright
+                % n-type left boundary, p-type right boundary
+                j.n = jn_r + (deltajn-deltajn(:,end));
+                j.p = jp_l + deltajp;
             elseif par.pleft >= par.nleft && par.pright >= par.nright...
                     || par.nleft >= par.pleft && par.nright >= par.pright
                 % p-type both boundaries or n-type both boundaries
