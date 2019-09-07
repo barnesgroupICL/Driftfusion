@@ -788,7 +788,9 @@ classdef pc
                                     dev.gradEA(j) = dEAdxprime;
                                     dIPdxprime = (par.IP(i+1)-par.IP(i-1))/(deff);
                                     dev.gradIP(j) = dIPdxprime;
-
+                                    % DOS gradients
+                                    dev.gradNc(j) = par.Nc(i-1)*dlogNcdx*exp(dlogNcdx*xprime);
+                                    dev.gradNv(j) = par.Nv(i-1)*dlogNvdx*exp(dlogNvdx*xprime);
                                     end
                                 case 'erf'
                                     %% error function
@@ -857,11 +859,6 @@ classdef pc
             
             switch par.intgradfun
                 case 'linear'
-                    % Centre difference gradients
-                    dev.gradNc = gradient(dev.Nc, xmesh);
-                    dev.gradNv = gradient(dev.Nv, xmesh);
-%                     dev.gradEA = gradient(dev.EA, xmesh);
-%                     dev.gradIP = gradient(dev.IP, xmesh);
                 case 'erf'
                     % Centre difference gradients
                     dev.gradNc = gradient(dev.Nc, xmesh);
