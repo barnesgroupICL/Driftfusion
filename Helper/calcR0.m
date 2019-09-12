@@ -1,4 +1,4 @@
-function [JV_ana, R0, k_rad, Voc, G0] = calcR0(EgArr, Jsc_vs_Eg, par)
+function [JV_ana, r0, k_rad, Voc, g0] = calcR0(EgArr, Jsc_vs_Eg, par)
 % calculates
 % use calcJsc first to get Jsc_vs_Eg & egArr
 %% Input arguments
@@ -30,37 +30,38 @@ q = 1.60217662e-19;         % Elementary charge [C]
 % xlabel('Energy [eV]')
 % ylabel('r0(E)')
 
+[~,Jsc_vs_Eg] = calcJsc(0);
 for i =1:length(par.Eg)
-    
+
     % Find maximum Jsc based on step function absorption and 100% EQE
     p = find(EgArr <= par.Eg(i));
     p = p(end);
-    
+
     Jsc(i) = Jsc_vs_Eg(p);
-    
+
     fun = @(E) ((2*pi)/(h^3*c^2))*((E.^2)./(exp((E/(par.kB*par.T))-1)));
-    
-    J0_fd(i) = integral(fun, par.Eg(i), Inf);    % Spectral bb flux density- factor of 2 for back reflector
-    R0(i) = J0_fd(i)./par.d(i);
-    
-    J0(i) = J0_fd(i)*q;
-    
-    k_rad(i) = R0(i)/(par.ni(i)^2);      % cm3s-1
-    
+
+    j0(i) = integral(fun, par.Eg(i), Inf);    % Spectral bb flux density- factor of 2 for back reflector
+    r0(i) = j0(i)./par.d(i);
+
+    J0(i) = j0(i)*q;
+
+    k_rad(i) = r0(i)/(par.ni(i)^2);      % cm3s-1
+
     V = -0.4:1e-2:3.0;
-    
+
     J(i,:) = -Jsc(i) + J0(i).*(exp(V./(par.kB*par.T))-1);  %A cm-2
-    
-    J_dk(i,:) = (J0(i).*exp((V/(par.kB*par.T))-1));
-    
+
+    J_dk(i,:) = J0(i).*(exp(V/(par.kB*par.T))-1);
+
     Voc(i) = (par.kB*par.T).*(log(Jsc(i)./J0(i))+1);
-    
-    G0(i) = Jsc(i)./(par.d(i).*q);           % Generation rate cm-3s-1
-    
+
+    g0(i) = Jsc(i)./(par.d(i).*q);           % Generation rate cm-3s-1
+
     JV_ana.J(i,:) = J(i,:);
     JV_ana.J_dk(i,:) = J_dk(i,:);
     JV_ana.V = V;
-    
+
     if figson == 1
         figure(500)
         plot(V, J(i,:), V, J_dk(i,:))
@@ -70,7 +71,7 @@ for i =1:length(par.Eg)
         xlim([0, V(end)])
         hold on
     end
-    
+
 end
 
     hold off
