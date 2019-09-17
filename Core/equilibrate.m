@@ -23,7 +23,7 @@ par.radset = 1;
 
 %% General initial parameters
 par.tmesh_type = 2;
-par.tpoints = 3;
+par.tpoints = 10;
 
 par.JV = 0;
 par.Vapp = 0;
