@@ -22,7 +22,7 @@ Alternatively, you can download Driftfusion standalone as a folder but you wonâ€
 
 3.	Navigate to your repository/project folder in MATLAB.
 
-4.	Type 'initialise_df' into the command prompt. This adds the subfolders and associated functions to the file path.
+4.	Type `initialise_df` into the command prompt. This adds the subfolders and associated functions to the file path.
 
 5.	The parameters class `pc` defines all the parameters for your device. You can edit the parameters directly in `pc` (found in the `/Core folder` and create  a parameters object by typing:
  
