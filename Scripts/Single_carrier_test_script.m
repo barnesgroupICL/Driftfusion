@@ -8,7 +8,7 @@ par = pc('Input_files/1_layer_single_carrier.csv');
 soleq = equilibrate(par);
 
 % Do JV scn
-JVsol = doJV(soleq.no_ion, 100e-3, 201, 1, 0, 0, 1, 1);
+JVsol = doJV(soleq.el, 100e-3, 201, 1, 0, 0, 1, 1);
 
 % plot JV scan
 dfplot.JV(JVsol, 1);
