@@ -659,7 +659,7 @@ classdef dfplot
             else
                 switch logy
                     case 0
-                        ylim([vmin-(yrange*0.2), vmax+(yrange*0.2)]);
+                        ylim([ymin-(yrange*0.2), ymax+(yrange*0.2)]);
                     case 1
                          ylim([0.1*ymin, 10*ymax])
                 end
