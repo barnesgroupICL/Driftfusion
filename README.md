@@ -22,7 +22,7 @@ Alternatively, you can download Driftfusion standalone as a folder but you wonâ€
 
 3.	Navigate to your repository/project folder in MATLAB.
 
-4.	Type 'initialise_df' into the command prompt. This adds the subfolders and associated functions to the file path.
+4.	Type `initialise_df` into the command prompt. This adds the subfolders and associated functions to the file path.
 
 5.	The parameters class `pc` defines all the parameters for your device. You can edit the parameters directly in `pc` (found in the `/Core folder` and create  a parameters object by typing:
  
@@ -30,17 +30,17 @@ Alternatively, you can download Driftfusion standalone as a folder but you wonâ€
 
 The  names of properties and their units are given in the commented code in the `pc` class.
 	
-6. 	A better way of defining your device is to use the .csv files contained in the `/Input_files` folder. For example, to create a parameters object with default parameters to simulate an inverted PEDOT/perovskite/PCBM stack type:
+6. 	A better way of defining your device is to use the .csv files contained in the `/Input_files` folder. For example, to create a parameters object with default parameters to simulate an inverted PTPD/perovskite/PCBM stack type:
 
-`par = pc('Input_files/pcbm.csv');`
+`par = pc('Input_files/ptpd_mapi_pcbm.csv');`
 
-It is recommended to duplicate the existing .csv files to define your own device and use a programme like Excel or Open Office to edit them. Ensure that the material name given in the 'stack' column matches with one of the materials in the Index of Refraction library if you wish to use the Beer-Lambert optical model.
+It is recommended to duplicate the existing .csv files to define your own device and use a programme like Excel or Open Office to edit them. Ensure that the material name given in the 'stack' column matches with one of the materials in the `Libraries/Index_of_Refraction_library.xls` if you wish to use the Beer-Lambert optical model.
 
 7.	Obtain equilibrium solutions for your device by typing:
  
 `soleq = equilibrate(par)`
  
-Inside soleq are 4 solutions. For perovskites you should generally use `soleq.i_sr` (i = ion and sr = surface recombination).
+Inside soleq are 2 solutions: `soleq.el` and `soleq.ion`. For perovskites you should generally use `soleq.ion`. `soleq.el` is the same device at equilibrium without mobile ions.
  
 8.	Try running a JV using:
  
