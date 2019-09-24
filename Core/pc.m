@@ -771,19 +771,19 @@ classdef pc
                                     dev.Nv(j) = par.Nv(i-1)*exp(dlogNvdx*xprime);  %exp(log(par.Nv(i-1)) + xprime*dlogNvdx);
                                     % Acceptor density
                                     dlogNAdx = (log(par.NA(i+1))-log(par.NA(i-1)))/deff;
-                                    dev.NA(j) = exp(log(par.NA(i-1)) + xprime*dlogNAdx);
+                                    dev.NA(j) = par.NA(i-1)*exp(xprime*dlogNAdx);
                                     % Donor density
                                     dlogNDdx = (log(par.ND(i+1))-log(par.ND(i-1)))/deff;
-                                    dev.ND(j) = exp(log(par.ND(i-1)) + xprime*dlogNDdx);
+                                    dev.ND(j) = par.ND(i-1)*exp(xprime*dlogNDdx);
                                     % Intrinsic carrier densities
                                     dlognidx = (log(par.ni(i+1))-log(par.ni(i-1)))/deff;
-                                    dev.ni(j) = exp(log(par.ni(i-1)) + xprime*dlognidx);
+                                    dev.ni(j) = par.ni(i-1)*exp(xprime*dlognidx);
                                     % Equilibrium carrier densities
                                     dlogn0dx = (log(par.n0(i+1))-log(par.n0(i-1)))/deff;
-                                    dev.n0(j) = exp(log(par.n0(i-1)) + xprime*dlogn0dx);
+                                    dev.n0(j) = par.n0(i-1)*exp(xprime*dlogn0dx);
                                     % Equilibrium carrier densities
                                     dlogp0dx = (log(par.p0(i+1))-log(par.p0(i-1)))/deff;
-                                    dev.p0(j) = exp(log(par.p0(i-1)) + xprime*dlogp0dx);
+                                    dev.p0(j) = par.p0(i-1)*exp(xprime*dlogp0dx);
                                     dEAdxprime = (par.EA(i+1)-par.EA(i-1))/(deff);
                                     dev.gradEA(j) = dEAdxprime;
                                     dIPdxprime = (par.IP(i+1)-par.IP(i-1))/(deff);
