@@ -102,7 +102,7 @@ par.SRHset = 1;
 par.tmax = 1e-6;
 par.t0 = par.tmax/1e3;
 
-soleq.no_ion = df(soleq_nosrh, par);
+soleq.el = df(soleq_nosrh, par);
 disp('Complete')
 
 %% Equilibrium solutions with ion mobility switched on
