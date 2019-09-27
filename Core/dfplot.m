@@ -63,7 +63,7 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [j, J, x] = dfana.calcJ(sol);
             
-            figure(3); clf;           
+            figure(3);            
             dfplot.x2d(sol, x, {J.n, J.p, J.a, J.c, J.disp, J.tot},...
                 {'Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtot'}, {'-','-','-','-','-','-'},...
                 'Current density [Acm-2]', tarr, xrange, 0, 0);
@@ -78,7 +78,7 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [j, J, x] = dfana.calcJ(sol);
             
-            figure(301); clf;           
+            figure(301);            
             dfplot.x2d(sol, par.x_ihalf, {j.n, j.p, j.a, j.c, j.disp},{'jn', 'jp', 'ja', 'jc', 'jdisp'},...
                 {'-','-','-','-','-'}, 'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
@@ -128,7 +128,7 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [~, Jdd, x] = dfana.Jddxt(sol);
             
-            figure(301); clf;           
+            figure(301);            
             dfplot.x2d(sol, x, {Jdd.ndiff, Jdd.ndrift, Jdd.pdiff, Jdd.pdrift,...
                                     Jdd.adiff, Jdd.adrift, Jdd.cdiff, Jdd.cdrift},...
                 {'Jn,diff', 'Jn,drift', 'Jp,diff', 'Jp,drift', 'Ja,diff', 'Ja,drift', 'Jc,diff', 'Jc,drift'},...
@@ -234,7 +234,7 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            figure(13); clf;           
+            figure(13);            
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-','-'},...
                 'Carrier density [cm-3]', tarr, xrange, 0, 1)
         end
