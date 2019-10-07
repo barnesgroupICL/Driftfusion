@@ -435,7 +435,8 @@ classdef dfplot
             figure(20)
             dfplot.x2d(sol, x, {deltarho},{'\Delta \rho'},{'-'},'Delta charge density [cm-3]', tarr, xrange, 0, 0);
         end
-
+       
+        
         function rhoxFxVx(varargin)
             % Three panel figure:
             % Volumetric charge density (rho), Field and potential as a funciton of position
@@ -456,6 +457,24 @@ classdef dfplot
             subplot(3, 1, 3)
             dfplot.x2d(sol, x, {V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
+        
+        function rhoxVx(varargin)
+            % Three panel figure:
+            % Volumetric charge density (rho), Field and potential as a funciton of position
+            % A time array can be used as a second input argument
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+
+            rho = dfana.calcrho(sol);
+
+            figure(211)
+            subplot(2, 1, 1)
+            dfplot.x2d(sol, x, {rho},{'\rho'},{'-'}, 'Charge density [cm-3]', tarr, xrange, 0, 0);
+            
+            subplot(2, 1, 2)
+            dfplot.x2d(sol, x, {-V},{'V'},{'-'},'-Electrostatic potential [V]', tarr, xrange, 0, 0);
+        end
+
 
         function ELx_single(varargin)
             % Energy Level diagram, and charge densities plotter
@@ -555,8 +574,10 @@ classdef dfplot
            % French flag
            % triplets = [1, 0.9, 0.8; 1, 0.98, 0.7; 1, 1, 1; 1, 1, 0.98; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
            % Cool Mint
-           triplets = [0.85, 0.95, 0.7; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
-                  
+           %triplets = [0.85, 0.95, 0.7; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
+           % pn
+           triplets = [0.85, 0.95, 0.7; 1, 1, 1];
+           
            for i =1:length(dcum0)-1
               v = [dcum0(i) yrange(2); dcum0(i+1) yrange(2); dcum0(i+1) yrange(1); dcum0(i) yrange(1)];   % vertices position
               f = [1 2 3 4];    % Faces
