@@ -664,6 +664,8 @@ classdef dfplot
                          ylim([0.1*ymin, 10*ymax])
                 end
             end
+            set(gca, 'Layer', 'top')
+            box on
             hold off
     end
     end
