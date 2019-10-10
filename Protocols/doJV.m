@@ -1,8 +1,6 @@
 function JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
-tic
-disp('Current voltage scan')
 % A procedure for running JV scans using DF
-%% Input arguments
+% Input arguments
 % sol_ini   	= an initial solution - must be at the same Vapp as the
 % starting voltage for the scan- currently set to Vapp = 0 V
 % JVscan_rate   = self-explanatory
@@ -11,6 +9,8 @@ disp('Current voltage scan')
 % Vstart        = scan start voltage
 % Vend          = scan end voltage
 % option        1 = dark only, 2 = light only, 3 = dark & light
+tic
+disp('Current voltage scan')
 
 % Read parameters structure into structure par
 par = sol_ini.par;
