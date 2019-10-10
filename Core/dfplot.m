@@ -691,7 +691,6 @@ classdef dfplot
             end
             set(gca, 'Layer', 'top')
             box on
-            
             hold off
     end
     end
