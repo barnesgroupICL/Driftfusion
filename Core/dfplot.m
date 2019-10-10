@@ -29,7 +29,7 @@ classdef dfplot
             
             figure(1);
             subplot(3,1,3);
-            dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 1)
+            dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
         end
 
         function Jt(sol, xpos)
@@ -680,7 +680,11 @@ classdef dfplot
             else
                 switch logy
                     case 0
-                        ylim([ymin-(yrange*0.2), ymax+(yrange*0.2)]);
+                         if yrange == 0
+                            ylim([ymin*0.9, ymax*1.1]);
+                         else
+                            ylim([ymin-(yrange*0.2), ymax+(yrange*0.2)]);
+                         end
                     case 1
                          ylim([0.1*ymin, 10*ymax])
                 end
