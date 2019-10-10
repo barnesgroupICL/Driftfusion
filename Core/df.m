@@ -5,7 +5,7 @@ function solstruct = df(varargin)
 % matlab pepde solver. This version defines electrons as n and holes as p,
 % and ions as a. V is the electric potential.
 %
-% Authors: Phil Calado, Piers Barnes, Ilario Gelmetti, Ben Hillman,
+% Authors: Philip Calado, Piers RF Barnes, Ilario Gelmetti, Ben Hillman,
 % Imperial College London, 2019
 
 % Deal with varargin arguments
@@ -177,8 +177,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                             par.pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
                             dev.Ncat(i);
                             (x/xmesh(end))*Vbi;];
-                        % Multi-layered
                     else
+                        % Multi-layered
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
@@ -192,8 +192,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                             dev.Ncat(i);
                             (x/xmesh(end))*Vbi;
                             dev.Nani(i);];
-                        % Multi-layered
                     else
+                        % Multi-layered
                         u0 = [dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);

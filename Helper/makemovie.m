@@ -14,11 +14,11 @@ for i = 1:length(sol.t)
     fig1 = gca;
     
 %% You can include limits for subplots here
-%     subplot(2,1,1);
-%     ylim([-4, 4]*1e16)
-%     
-%     subplot(2,1,2);
-%     ylim([0e19, 1.1e19])
+    subplot(2,1,1);
+    ylim([-2, 0.2])
+    
+    subplot(2,1,2);
+    ylim([1e4, 1e17])
     
     if xrange ~= 0
         xlim([xrange(1)*1e7, xrange(2)*1e7])
