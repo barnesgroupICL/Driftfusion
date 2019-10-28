@@ -90,7 +90,7 @@ if option ==2 || option ==3
     
     %% JV settings
     par.t0 = 0;
-    par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
+    par.tmax = abs(Vend- Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
     par.tmesh_type = 1;
     par.tpoints = JVscan_pnts;
     
