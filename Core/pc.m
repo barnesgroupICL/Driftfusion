@@ -106,14 +106,6 @@ classdef pc
         g2_fun_arg = 0;
         % default: Approximate Uniform generation rate @ 1 Sun for 510 nm active layer thickness
 
-        %% Pulse settings
-        pulseon = 0;            % Switch pulse on TPC or TPV
-        laserlambda = 638;      % Pulse wavelength (Beer-Lambert and Transfer Matrix)
-        pulselen = 1e-6;        % Transient pulse length
-        pulsepow = 10;          % Pulse power [mW cm-2] OM2 (Beer-Lambert and Transfer Matrix only)
-        pulsestart = 1e-7;      % Time recorded prior to pulse
-        pulseint = 0.1;         % Pulse intensity (when using uniform generation)
-
         %%%%%%%%%%% LAYER MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
         % Numerical values should be given as a row vector with the number of
         % entries equal to the number of layers specified in STACK
