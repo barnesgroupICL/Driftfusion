@@ -41,9 +41,7 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 
 %assert(logical(asymstruct.par.calcJ), [mfilename ' - calcJ needs to be set and different from zero']);
 
-asymstruct.par.figson = 0;
 asymstruct.par.tpoints = 10;
-asymstruct.par.Ana = 1;
 asymstruct.par.JV = 0;
 
 % find residual current

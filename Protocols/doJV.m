@@ -16,10 +16,8 @@ disp('Current voltage scan')
 par = sol_ini.par;
 
 %%Initial settings
-par.Ana = 1;
 par.figson = 0;
 par.int1 = 0;
-par.pulseon = 0;
 par.OC = 0;
 par.mobseti = mobseti;
 

@@ -39,9 +39,6 @@ par = struct.par;
 par.tpoints = 10;
 par.tmesh_type = 2; % log spaced time mesh
 
-% disable Ana, as the ploting done in pinAna results in an error if the simulation doesn't reach the final time point
-par.Ana = 0;
-
 %% estimate a good tmax
 % a tmax too short would make the solution look stable even
 % if it's not; too large and the simulation could fail
@@ -107,9 +104,6 @@ while forceStabilization || ~verifyStabilization(steadystate_struct.sol, steadys
     end
 
 end
-
-% restore original Ana value
-steadystate_struct.par.Ana = struct.par.Ana;
 
 % re-enable the warnings
 warning('on', 'df:verifyStabilization');

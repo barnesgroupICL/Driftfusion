@@ -38,7 +38,6 @@ function sol_int = changeLight(sol, newInt, tmax)
 %------------- BEGIN CODE --------------
 
 par = sol.par;
-par.pulseon = 0;
 par.tmesh_type = 2;
 par.t0 = 1e-10;
 par.tpoints = 30;

@@ -27,7 +27,6 @@ classdef explore
             parfor i = 1:length(parval1)
                 
                 par = par_base;
-                par.Ana = 0;
                 par = explore.helper(par, str1, parval1(i));
                 
                 if strmatch('dcell', parnames(1)) ~= 0

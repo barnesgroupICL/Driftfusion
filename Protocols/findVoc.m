@@ -19,8 +19,6 @@ par = sol_ini.par;
 
 %% Initital settings
 par.OC = 0;
-par.calcJ = 0;
-par.pulseon = 0;
 JVscan_rate = 1;        %Vs-1
 
 %% Save Surface rec coefficients
@@ -43,7 +41,6 @@ disp('Complete.')
 
 %% Run JV to new potential
 par.mobseti = mobseti;
-par.Ana = 1;
 par.JV = 1;
 par.Vstart = par.Vapp;
 par.Vend = x0;
@@ -52,7 +49,6 @@ par.tmax = abs(par.Vend- par.Vstart)/JVscan_rate;           % Scan time determin
 par.t0 = 0;
 par.tmesh_type = 1;
 par.tpoints = par.JVscan_pnts;
-par.pulseon = 0;
 par.int1 = Int;
       
 sol = df(sol, par);         
@@ -120,7 +116,6 @@ while abs(fx1) > tol
 %     par.tmax = 1e-9;
 %     par.t0 = par.tmax/1e3;
 %     par.Vapp = x1;
-%     par.pulseon = 0;
 %     par.int1 = 0;
 % 
 %     sol = df(sol_eq, par);         

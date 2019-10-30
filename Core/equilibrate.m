@@ -31,13 +31,11 @@ par.int1 = 0;
 par.int2 = 0;
 par.g1_fun_type = 'constant';
 par.g2_fun_type = 'constant';
-par.pulseon = 0; 
 par.OC = 0;
 par.tmesh_type = 2;
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e4;
 par.Rs = 0;
-par.Ana = 0;
 par.BC = 3;     % To enable boundary fluxes to be switched off
 
 %% Switch off mobilities

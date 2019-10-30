@@ -29,13 +29,11 @@ par.JV = 0;
 par.Vapp = 0;
 par.int1 = 0;
 par.int2 = 0;
-par.pulseon = 0; 
 par.OC = 0;
 par.tmesh_type = 2;
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e4;
 par.Rs = 0;
-par.Ana = 0;
 
 %% Switch off mobilities
 par.mobset = 0;

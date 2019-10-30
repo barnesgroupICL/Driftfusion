@@ -15,7 +15,6 @@ par.gen_arg2(3) = tperiod;
 par.gen_arg2(4) = 50;           % Duty cycle
 
 sol_Jtran = df(sol_ini, par);
-sol_Jtran.par.pulseon = 0;
 
 dfplot.Jt(sol_Jtran, 1);
 

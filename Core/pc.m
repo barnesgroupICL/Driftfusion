@@ -81,7 +81,6 @@ classdef pc
         SRHset = 1;
         radset = 1;
         JV = 0;                 % Toggle run JV scan on/off
-        Ana = 1;                % Toggle on/off analysis
         stats = 'Boltz';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
         Fermi_limit = 0.2;      % Max allowable limit for Fermi levels beyond the bands [eV]
         Fermi_Dn_points = 400;  % No. of points in the Fermi-Dirac look-up table
@@ -107,12 +106,7 @@ classdef pc
         % default: Approximate Uniform generation rate @ 1 Sun for 510 nm active layer thickness
 
         %% Pulse settings
-        pulseon = 0;            % Switch pulse on TPC or TPV
-        laserlambda = 638;      % Pulse wavelength (Beer-Lambert and Transfer Matrix)
-        pulselen = 1e-6;        % Transient pulse length
         pulsepow = 10;          % Pulse power [mW cm-2] OM2 (Beer-Lambert and Transfer Matrix only)
-        pulsestart = 1e-7;      % Time recorded prior to pulse
-        pulseint = 0.1;         % Pulse intensity (when using uniform generation)
 
         %%%%%%%%%%% LAYER MATERIAL PROPERTIES %%%%%%%%%%%%%%%%%%%%
         % Numerical values should be given as a row vector with the number of
