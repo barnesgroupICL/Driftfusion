@@ -4,7 +4,7 @@ tic;
 
 % evidence_for_ion_script;
 % 
-example_script;
+% example_script;
 
 Single_carrier_test_script;
 
