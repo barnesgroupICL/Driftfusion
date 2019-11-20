@@ -12,11 +12,11 @@ classdef F
     
     methods (Static)
         
-        function n = nfun(Nc, Ec, Efn, T, stats)
+        function n = nfun(Nc, Ec, Efn, T, prob_distro_function)
             
             kT = F.kB*T;
             
-            if stats == 'Fermi'
+            if prob_distro_function == 'Fermi'
                 % Fermi dirac integral for obtaining electron densities
                 % Nc = conduction band density of states
                 % Ec = conduction band energy
@@ -32,17 +32,17 @@ classdef F
                     end
                 end
                 
-            elseif stats == 'Boltz'
+            elseif prob_distro_function == 'Boltz'
                 n = Nc.*exp((Efn-Ec)./kT);
             end
             
         end
         
-        function p = pfun(Nv, Ev, Efp, T, stats)
+        function p = pfun(Nv, Ev, Efp, T, prob_distro_function)
             
             kT = F.kB*T;
             
-            if stats == 'Fermi'
+            if prob_distro_function == 'Fermi'
                 % Fermi dirac integral for obtaining electron densities
                 % Nc = conduction band density of states
                 % Ec = conduction band energy
@@ -63,7 +63,7 @@ classdef F
                     end
                 end
                 
-            elseif stats == 'Boltz'
+            elseif prob_distro_function == 'Boltz'
                 
                 p = Nv.*exp((Ev-Efp)./kT);
                 

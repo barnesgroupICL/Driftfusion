@@ -27,7 +27,7 @@ classdef pc
         % which define the thickness and number of points of each layer
         % respectively.
         dcell = 400e-7;         % Layer and subsection thickness array
-        pcell = 400;            % Number of points in layers and subsections array
+        pcell = 400;            % Points array
 
         %% Layer description
         % Define the layer type for each of the layers in the device. The
@@ -39,9 +39,9 @@ classdef pc
         % (either LAYER or ACTIVE type)
         % with different properties
         layer_type = {'active'}
-        % Currently STACK is used for reading the optical properties
-        % library. The names here do not influence the electrical properties of the
-        % device. See INDEX OF REFRACTION LIBRARY for choices- names must be enetered
+        % STACK is used for reading the optical properties library.
+        % The names here do not influence the electrical properties of the
+        % device. See INDEX OF REFRACTION LIBRARY for choices- names must be entered
         % exactly as given in the column headings with the '_n', '_k' omitted
         stack = {'MAPICl'}
 
@@ -81,7 +81,7 @@ classdef pc
         SRHset = 1;
         radset = 1;
         JV = 0;                 % Toggle run JV scan on/off
-        stats = 'Boltz';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
+        prob_distro_function = 'Boltz';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
         Fermi_limit = 0.2;      % Max allowable limit for Fermi levels beyond the bands [eV]
         Fermi_Dn_points = 400;  % No. of points in the Fermi-Dirac look-up table
         intgradfun = 'linear'      % Interface gradient function 'linear' = linear, 'erf' = 'error function'
@@ -485,11 +485,11 @@ classdef pc
         %% Donor densities
         function value = get.ND(par)
             value = zeros(1, length(par.stack));
-            value = F.nfun(par.Nc, par.EA, par.E0, par.T, par.stats);
+            value = F.nfun(par.Nc, par.EA, par.E0, par.T, par.prob_distro_function);
 %             for i=1:length(par.stack)
 %                 if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
 %                     if round(par.EA(i) - par.E0(i), 3) < round(par.E0(i) - par.IP(i), 3)
-%                         value(i) = F.nfun(par.Nc(i), par.EA(i), par.E0(i), par.T, par.stats);
+%                         value(i) = F.nfun(par.Nc(i), par.EA(i), par.E0(i), par.T, par.prob_distro_function);
 %                     else
 %                         value(i) = 1e-100;      % To avoid issues with log(0) at interfaces
 %                     end
@@ -500,11 +500,11 @@ classdef pc
         %% Acceptor densities
         function value = get.NA(par)
             value = zeros(1, length(par.stack));
-            value = F.pfun(par.Nv, par.IP, par.E0, par.T, par.stats);
+            value = F.pfun(par.Nv, par.IP, par.E0, par.T, par.prob_distro_function);
 %             for i=1:length(par.stack)
 %                 if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
 %                     if round(par.EA(i) - par.E0(i),3) > round(par.E0(i) - par.IP(i), 3)
-%                         value(i) = F.pfun(par.Nv(i), par.IP(i), par.E0(i), par.T, par.stats);
+%                         value(i) = F.pfun(par.Nv(i), par.IP(i), par.E0(i), par.T, par.prob_distro_function);
 %                     else
 %                         value(i) = 1e-100;      % To avoid issues with log(0) at interfaces
 %                     end
@@ -519,12 +519,12 @@ classdef pc
 
         %% Equilibrium electron densities
         function value = get.n0(par)
-            value = F.nfun(par.Nc, par.EA, par.E0, par.T, par.stats);
+            value = F.nfun(par.Nc, par.EA, par.E0, par.T, par.prob_distro_function);
         end
 
         %% Equilibrium hole densities
         function value = get.p0(par)
-            value = F.pfun(par.Nv, par.IP, par.E0, par.T, par.stats);
+            value = F.pfun(par.Nv, par.IP, par.E0, par.T, par.prob_distro_function);
 
         end
 
@@ -532,22 +532,22 @@ classdef pc
         % Uses metal Fermi energies to calculate boundary densities
         % Electrons left boundary
         function value = get.nleft(par)
-            value = F.nfun(par.Nc(1), par.EA(1), par.Phi_left, par.T, par.stats);
+            value = F.nfun(par.Nc(1), par.EA(1), par.Phi_left, par.T, par.prob_distro_function);
         end
 
         % Electrons right boundary
         function value = get.nright(par)
-            value = F.nfun(par.Nc(end), par.EA(end), par.Phi_right, par.T, par.stats);
+            value = F.nfun(par.Nc(end), par.EA(end), par.Phi_right, par.T, par.prob_distro_function);
         end
 
         % Holes left boundary
         function value = get.pleft(par)
-            value = F.pfun(par.Nv(1), par.IP(1), par.Phi_left, par.T, par.stats);
+            value = F.pfun(par.Nv(1), par.IP(1), par.Phi_left, par.T, par.prob_distro_function);
         end
 
         % holes right boundary
         function value = get.pright(par)
-            value = F.pfun(par.Nv(end), par.IP(end), par.Phi_right, par.T, par.stats);
+            value = F.pfun(par.Nv(end), par.IP(end), par.Phi_right, par.T, par.prob_distro_function);
         end
 
         function value = get.dcum(par)
@@ -625,7 +625,7 @@ classdef pc
             dev.Et = zeros(1, length(xmesh));
             dev.nt = zeros(1, length(xmesh));
             dev.pt = zeros(1, length(xmesh));
-            if par.stats == 'Fermi'
+            if par.prob_distro_function == 'Fermi'
                 % Build diffusion coefficient structure
                 for i =1:length(par.dcum)
                     if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
@@ -685,7 +685,7 @@ classdef pc
                             dev.taup(j) = par.taup(i);
                             dev.Et(j) = par.Et(i);
 
-                            if par.stats =='Fermi'
+                            if par.prob_distro_function =='Fermi'
                                 % Electron diffusion coefficient lookup table
                                 dev.Dnfun(j,:) = Dfd_struct_n(i).Dnfun;
                                 dev.n_fd(j,:) = Dfd_struct_n(i).n_fd;
@@ -817,13 +817,13 @@ classdef pc
                             end
 
                             %% logarithmically graded variables
-%                             dev.ni(j) = F.nfun(dev.Nc(j), dev.EA(j), dev.Eif(j), par.T, par.stats);
-%                             dev.n0(j) = F.nfun(dev.Nc(j), dev.EA(j), dev.E0(j), par.T, par.stats);
-%                             dev.p0(j) = F.pfun(dev.Nv(j), dev.IP(j), dev.E0(j), par.T, par.stats);
-%                             dev.ND(j) = F.nfun(dev.Nc(j), dev.EA(j), dev.E0(j), par.T, par.stats);
-%                             dev.NA(j) = F.pfun(dev.Nv(j), dev.IP(j), dev.E0(j), par.T, par.stats);
+%                             dev.ni(j) = F.nfun(dev.Nc(j), dev.EA(j), dev.Eif(j), par.T, par.prob_distro_function);
+%                             dev.n0(j) = F.nfun(dev.Nc(j), dev.EA(j), dev.E0(j), par.T, par.prob_distro_function);
+%                             dev.p0(j) = F.pfun(dev.Nv(j), dev.IP(j), dev.E0(j), par.T, par.prob_distro_function);
+%                             dev.ND(j) = F.nfun(dev.Nc(j), dev.EA(j), dev.E0(j), par.T, par.prob_distro_function);
+%                             dev.NA(j) = F.pfun(dev.Nv(j), dev.IP(j), dev.E0(j), par.T, par.prob_distro_function);
 
-                            if par.stats == 'Fermi'
+                            if par.prob_distro_function == 'Fermi'
                                 % Build diffusion coefficient structure
                                 startlim = dev.EA(j)-0.4;
                                 endlim = dev.EA(j)+par.Fermi_limit;
@@ -860,8 +860,8 @@ classdef pc
                     dev.gradEA = gradient(dev.EA, xmesh);
                     dev.gradIP = gradient(dev.IP, xmesh);
             end
-            dev.nt = F.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.stats);
-            dev.pt = F.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.stats);
+            dev.nt = F.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.prob_distro_function);
+            dev.pt = F.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.prob_distro_function);
         end
 
         function gx = generation(par, source_type, laserlambda)

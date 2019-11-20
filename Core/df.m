@@ -111,10 +111,10 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     1;
                     0;];
 
-                if par.stats == 'Fermi'
+                if par.prob_distro_function == 'Fermi'
                     Dn = F.D(u(1), devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
                     Dp = F.D(u(2), devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
-                elseif par.stats == 'Boltz'
+                elseif par.prob_distro_function == 'Boltz'
                     Dn = devihalf.mue(i)*par.kB*par.T;
                     Dp = devihalf.muh(i)*par.kB*par.T;
                 end
@@ -138,10 +138,10 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     0
                     1;];
 
-                if par.stats == 'Fermi'
+                if par.prob_distro_function == 'Fermi'
                     Dn = F.D(u(1), devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
                     Dp = F.D(u(2), devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
-                elseif par.stats == 'Boltz'
+                elseif par.prob_distro_function == 'Boltz'
                     Dn = devihalf.mue(i)*par.kB*par.T;
                     Dp = devihalf.muh(i)*par.kB*par.T;
                 end

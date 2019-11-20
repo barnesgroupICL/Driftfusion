@@ -1,4 +1,4 @@
-function JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
+function JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 % A procedure for running JV scans using DF
 % Input arguments
 % sol_ini   	= an initial solution - must be at the same Vapp as the
@@ -37,8 +37,7 @@ if option ==1 || option ==3
     %% Dark forward scan
     
     disp('Dark forward scan...')
-    JV.dk.f = df(sol_ini, par);
-    JV.dk.f.par.JV = 0;
+    JVsol.dk.f = df(sol_ini, par);
     disp('Complete.')
     
     %% Dark reverse scan
@@ -49,7 +48,7 @@ if option ==1 || option ==3
     par.V_fun_arg(2) = Vstart;
     par.V_fun_arg(3) = par.tmax;
     
-    JV.dk.r = df(JV.dk.f, par);
+    JVsol.dk.r = df(JVsol.dk.f, par);
     disp('Complete.')
     
 end
@@ -67,7 +66,6 @@ if option ==2 || option ==3
     par.tmax = 1e-3;
     par.t0 = 0;%par.tmax*1e-6;
     
-    par.JV = 0;
     par.mobseti = 0;          % Switch ion mobility off for illumination step
     par.V_fun_type = 'constant';
     par.g1_fun_type = 'sweep';
@@ -98,8 +96,7 @@ if option ==2 || option ==3
     par.V_fun_arg(2) = Vend;
     par.V_fun_arg(3) = par.tmax;
     
-    JV.ill.f = df(sol_i_1S, par);
-    JV.ill.f.par.JV = 0;
+    JVsol.ill.f = df(sol_i_1S, par);
     disp('Complete.')
     
     %% Light reverse
@@ -107,14 +104,12 @@ if option ==2 || option ==3
     par.V_fun_arg(1) = Vend;
     par.V_fun_arg(2) = Vstart;
     
-    JV.ill.r = df(JV.ill.f, par);
-    JV.ill.r.par.JV = 0;
+    JVsol.ill.r = df(JVsol.ill.f, par);
     disp('Complete.')
     
     disp('JV scan complete.')
     
-%     dfplot.JV(JV,option)
-    JV.stats = dfana.JVstats(JV);
+    JVsol.stats = dfana.JVstats(JVsol);
 end
 toc
 end

@@ -45,7 +45,7 @@ classdef dfana
             Efn = zeros(size(n,1), size(n,2));
             Efp = zeros(size(n,1), size(n,2));
             
-            if par.stats == 'Fermi'
+            if par.prob_distro_function == 'Fermi'
                 
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
@@ -56,7 +56,7 @@ classdef dfana
                 Efn = Efn-V;
                 Efp = Efp-V;
                 
-            elseif par.stats == 'Boltz'
+            elseif par.prob_distro_function == 'Boltz'
                 Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./Ncmat));        % Electron quasi-Fermi level
                 Efp = real(Evb-(par.kB*par.T/par.q)*log(p./Nvmat));        % Hole quasi-Fermi level
             end
@@ -96,7 +96,7 @@ classdef dfana
             Ecb_ihalf = EAmat-V;                                 % Conduction band potential
             Evb_ihalf = IPmat-V;                                 % Valence band potential
             
-            if par.stats == 'Fermi'
+            if par.prob_distro_function == 'Fermi'
                 
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
@@ -107,7 +107,7 @@ classdef dfana
                 Efn_ihalf = Efn_ihalf-V;
                 Efp_ihalf = Efp_ihalf-V;
                 
-            elseif par.stats == 'Boltz'
+            elseif par.prob_distro_function == 'Boltz'
                 Efn_ihalf = real(Ecb_ihalf+(par.kB*par.T/par.q)*log(n./Ncmat));        % Electron quasi-Fermi level
                 Efp_ihalf = real(Evb_ihalf-(par.kB*par.T/par.q)*log(p./Nvmat));        % Hole quasi-Fermi level
             end
@@ -161,7 +161,7 @@ classdef dfana
             %             Efn = zeros(size(n,1), size(n,2));
             %             Efp = zeros(size(n,1), size(n,2));
             
-            if par.stats == 'Fermi'
+            if par.prob_distro_function == 'Fermi'
                 
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
@@ -170,7 +170,7 @@ classdef dfana
                     end
                 end
                 
-            elseif par.stats == 'Boltz'
+            elseif par.prob_distro_function == 'Boltz'
                 Efn_l = real(par.EA(1)+(par.kB*par.T/par.q)*log(n(:,1)./Ncmat(:,1)));        % Electron quasi-Fermi level
                 Efp_l = real(par.IP(1)-(par.kB*par.T/par.q)*log(p(:,1)./Nvmat(:,1)));        % Hole quasi-Fermi level
             end
@@ -455,7 +455,7 @@ classdef dfana
                 end
                 
                 % Diffusion coefficients
-                if par.stats == 'Fermi'
+                if par.prob_distro_function == 'Fermi'
                     for jj = 1:length(x)
                         Dn(i,jj) = F.D(nloc(i,jj), dev.Dnfun(jj,:), dev.n_fd(jj,:));
                         Dp(i,jj) = F.D(ploc(i,jj), dev.Dpfun(jj,:), dev.p_fd(jj,:));
@@ -463,7 +463,7 @@ classdef dfana
                 end
             end
             
-            if par.stats == 'Boltz'
+            if par.prob_distro_function == 'Boltz'
                 Dn_mat = mue_mat*par.kB*par.T;
                 Dp_mat = muh_mat*par.kB*par.T;
             end
