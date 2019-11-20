@@ -954,9 +954,11 @@ classdef pc
             try
                 par.Phi_right = T{1, 'Phi_right'};
             end
-
-            par.Rs = T{1, 'Rs'};
-
+            
+            try
+                par.Rs = T{1, 'Rs'};
+            end
+            
             try
                 par.Et = T{:,'Et'}';
             end
