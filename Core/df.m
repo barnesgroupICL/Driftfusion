@@ -128,16 +128,10 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         g = gxt1 + gxt2;
                 
                 %% Variables
-                n = u(1);
-                p = u(2);
-                c = u(3);
-                V = u(4);
+                n = u(1); p = u(2); c = u(3); V = u(4);
 
                 %% Gradients
-                dndx = dudx(1);
-                dpdx = dudx(2);
-                dcdx = dudx(3);
-                dVdx = dudx(4);
+                dndx = dudx(1); dpdx = dudx(2); dcdx = dudx(3); dVdx = dudx(4);
                 
                 % Prefactors set to 1 for time dependent components - can add other
                 % functions if you want to include the multiple trapping model
