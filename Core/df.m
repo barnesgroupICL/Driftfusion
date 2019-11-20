@@ -67,10 +67,10 @@ Nc = device.Nc;        % Conduction band effective density of states
 Nv = device.Nv;        % Valence band effective density of states
 DOScat = device.DOScat;  % Cation density upper limit
 DOSani = device.DOSani;  % Anion density upper limit
-gradNc = device.Nc;    % Conduction band effective density of states gradient
-gradNv = device.Nv;    % Valence band effective density of states gradient
-gradEA = device.EA;    % Electron Affinity gradient
-gradIP = device.IP;    % Ionisation Potential gradient
+gradNc = device.gradNc;    % Conduction band effective density of states gradient
+gradNv = device.gradNv;    % Valence band effective density of states gradient
+gradEA = device.gradEA;    % Electron Affinity gradient
+gradIP = device.gradIP;    % Ionisation Potential gradient
 epp = device.epp;      % Dielectric constant
 
 %% Spatial mesh
@@ -126,18 +126,12 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         end
 
         g = gxt1 + gxt2;
-
-        switch par.N_ionic_species
-            case 1
                 
                 %% Variables
                 n = u(1);
                 p = u(2);
                 c = u(3);
                 V = u(4);
-%                 if par.N_ionic_species == 2
-%                     a = u(5);
-%                 end
 
                 %% Gradients
                 dndx = dudx(1);
@@ -167,36 +161,17 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     0;
                     (par.q/(max(par.epp)*par.epp0))*(-n+p-devihalf.NA(i)+devihalf.ND(i)-devihalf.Nani(i)+c)];
 
-            case 2
-                % Prefactors set to 1 for time dependent components - can add other
-                % functions if you want to include the multiple trapping model
-                c = [1;
-                    1;
-                    1;
-                    0
-                    1;];
-
-                if par.prob_distro_function == 'Fermi'
-                    Dn = F.D(n, devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
-                    Dp = F.D(p, devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
-                elseif par.prob_distro_function == 'Boltz'
-                    Dn = devihalf.mue(i)*par.kB*par.T;
-                    Dp = devihalf.muh(i)*par.kB*par.T;
+                if par.N_ionic_species == 2
+                    % Add anion variable
+                    a = u(5);
+                    dadx = dudx(5);
+                    
+                    coeff = [coeff;1];
+                    flux = [flux; K_anion*mobseti*(muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a))))));];
+                    source = [source; 0];
                 end
-
-                flux = [par.mobset*(devihalf.mue(i)*n*(-dVdx+devihalf.gradEA(i))+(Dn*(dndx-((n/devihalf.Nc(i))*devihalf.gradNc(i)))));
-                    par.mobset*(devihalf.muh(i)*p*(dVdx-devihalf.gradIP(i))+(Dp*(dpdx-((p/devihalf.Nv(i))*devihalf.gradNv(i)))));
-                    par.K_cation*par.mobseti*(devihalf.mucat(i)*(c*dVdx+par.kB*par.T*(dcdx+(c*(dcdx/(devihalf.DOScat(i)-c))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
-                    (devihalf.epp(i)/max(par.epp))*dVdx;
-                    par.K_anion*par.mobseti*(devihalf.muani(i)*(u(5)*-dVdx+par.kB*par.T*(DuDx(5)+(u(5)*(DuDx(5)/(devihalf.DOSani(i)-u(5)))))));];
-
-                source = [g - par.radset*devihalf.krad(i)*((n*p)-(devihalf.ni(i)^2)) - par.SRHset*(((n*p)-devihalf.ni(i)^2)/((devihalf.taun(i)*(p+devihalf.pt(i))) + (devihalf.taup(i)*(n+devihalf.nt(i)))));
-                    g - par.radset*devihalf.krad(i)*((n*p)-(devihalf.ni(i)^2)) - par.SRHset*(((n*p)-devihalf.ni(i)^2)/((devihalf.taun(i)*(p+devihalf.pt(i))) + (devihalf.taup(i)*(n+devihalf.nt(i)))));
-                    0;
-                    (par.q/(max(par.epp)*par.epp0))*(-n+p-devihalf.NA(i)+devihalf.ND(i)-u(5)+c);
-                    0;];
-        end
-    end
+                
+    end                                       
 
 % --------------------------------------------------------------------------
 % Define initial conditions.
