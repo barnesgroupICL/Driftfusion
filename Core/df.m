@@ -37,7 +37,6 @@ end
 %% Unpack dependent properties
 % Prevents recalculation of dependent properties by pdepe defined in Methods
 % Can also use AbortSet in class def
-
 Vbi = par.Vbi;
 nleft = par.nleft;
 nright = par.nright;
@@ -45,8 +44,34 @@ pleft = par.pleft;
 pright = par.pright;
 xmesh = par.xx;
 x_ihalf = par.x_ihalf;
-devihalf = par.dev;
+devihalf = par.dev_ihalf;
 dev = par.dev;
+
+%% Constants
+kB = par.kB;
+T = par.T;
+
+%% Switches and accelerator coefficients
+mobset = par.mobset;        % Electronic carrier transport switch
+mobseti = par.mobseti;      % Ionic carrier transport switch
+K_cation = par.K_cation;    % Cation transport rate multiplier
+K_anion = par.K_anion;      % Anion transport rate multiplier
+
+%% Device parameters
+device = par.dev_ihalf;
+mue = device.mue;      % Electron mobility
+muh = device.muh;      % Hole mobility
+mucat = device.mucat;  % Cation mobility
+muani = device.muani;  % Anion mobility
+Nc = device.Nc;        % Conduction band effective density of states
+Nv = device.Nv;        % Valence band effective density of states
+DOScat = device.DOScat;  % Cation density upper limit
+DOSani = device.DOSani;  % Anion density upper limit
+gradNc = device.Nc;    % Conduction band effective density of states gradient
+gradNv = device.Nv;    % Valence band effective density of states gradient
+gradEA = device.EA;    % Electron Affinity gradient
+gradIP = device.IP;    % Ionisation Potential gradient
+epp = device.epp;      % Dielectric constant
 
 %% Spatial mesh
 x = xmesh;
@@ -80,7 +105,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
 %% Subfunctions
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
-    function [c,flux,source,iterations] = dfpde(x,t,u,DuDx)
+    function [coeff,flux,source,iterations] = dfpde(x,t,u,dudx)
 
         % Get position point
         i = find(x_ihalf <= x);
@@ -104,31 +129,43 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
         switch par.N_ionic_species
             case 1
+                
+                %% Variables
+                n = u(1);
+                p = u(2);
+                c = u(3);
+                V = u(4);
+%                 if par.N_ionic_species == 2
+%                     a = u(5);
+%                 end
+
+                %% Gradients
+                dndx = dudx(1);
+                dpdx = dudx(2);
+                dcdx = dudx(3);
+                dVdx = dudx(4);
+                
                 % Prefactors set to 1 for time dependent components - can add other
                 % functions if you want to include the multiple trapping model
-                c = [1;
-                    1;
-                    1;
-                    0;];
+                coeff = [1;1;1;0;];
 
                 if par.prob_distro_function == 'Fermi'
-                    Dn = F.D(u(1), devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
-                    Dp = F.D(u(2), devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
+                    Dn = F.D(n, devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
+                    Dp = F.D(p, devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
                 elseif par.prob_distro_function == 'Boltz'
-                    Dn = devihalf.mue(i)*par.kB*par.T;
-                    Dp = devihalf.muh(i)*par.kB*par.T;
+                    Dn = mue(i)*kB*T;
+                    Dp = muh(i)*kB*T;
                 end
 
-                flux = flux_equation_editor(u, DuDx, Dn, Dp, i, par);
-%                 flux = [par.mobset*(devihalf.mue(i)*u(1)*(-DuDx(4)+devihalf.gradEA(i))+(Dn*(DuDx(1)-((u(1)/devihalf.Nc(i))*devihalf.gradNc(i)))));
-%                     par.mobset*(devihalf.muh(i)*u(2)*(DuDx(4)-devihalf.gradIP(i))+(Dp*(DuDx(2)-((u(2)/devihalf.Nv(i))*devihalf.gradNv(i)))));
-%                     par.K_cation*par.mobseti*(devihalf.mucat(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(devihalf.DOScat(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
-%                     (devihalf.epp(i)/max(par.epp))*DuDx(4);];
+                flux = [mobset*(mue(i)*n*(-dVdx+gradEA(i))+(Dn*(dndx-((n/Nc(i))*gradNc(i)))));
+                    mobset*(muh(i)*p*(dVdx-gradIP(i))+(Dp*(dpdx-((p/Nv(i))*gradNv(i)))));
+                    K_cation*mobseti*(mucat(i)*(c*dVdx+kB*T*(dcdx+(c*(dcdx/(DOScat(i)-c))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
+                    (epp(i)/max(par.epp))*dVdx;];
 
-                source = [g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
-                    g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
+                source = [g - par.radset*devihalf.krad(i)*((n*p)-(devihalf.ni(i)^2)) - par.SRHset*(((n*p)-devihalf.ni(i)^2)/((devihalf.taun(i)*(p+devihalf.pt(i))) + (devihalf.taup(i)*(n+devihalf.nt(i)))));
+                    g - par.radset*devihalf.krad(i)*((n*p)-(devihalf.ni(i)^2)) - par.SRHset*(((n*p)-devihalf.ni(i)^2)/((devihalf.taun(i)*(p+devihalf.pt(i))) + (devihalf.taup(i)*(n+devihalf.nt(i)))));
                     0;
-                    (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-devihalf.NA(i)+devihalf.ND(i)-devihalf.Nani(i)+u(3))];
+                    (par.q/(max(par.epp)*par.epp0))*(-n+p-devihalf.NA(i)+devihalf.ND(i)-devihalf.Nani(i)+c)];
 
             case 2
                 % Prefactors set to 1 for time dependent components - can add other
@@ -140,24 +177,23 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     1;];
 
                 if par.prob_distro_function == 'Fermi'
-                    Dn = F.D(u(1), devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
-                    Dp = F.D(u(2), devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
+                    Dn = F.D(n, devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
+                    Dp = F.D(p, devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
                 elseif par.prob_distro_function == 'Boltz'
                     Dn = devihalf.mue(i)*par.kB*par.T;
                     Dp = devihalf.muh(i)*par.kB*par.T;
                 end
 
-                flux = flux_equation_editor(u, DuDx, Dn, Dp, i, par);
-%                     [par.mobset*(devihalf.mue(i)*u(1)*(-DuDx(4)+devihalf.gradEA(i))+(Dn*(DuDx(1)-((u(1)/devihalf.Nc(i))*devihalf.gradNc(i)))));
-%                     par.mobset*(devihalf.muh(i)*u(2)*(DuDx(4)-devihalf.gradIP(i))+(Dp*(DuDx(2)-((u(2)/devihalf.Nv(i))*devihalf.gradNv(i)))));
-%                     par.K_cation*par.mobseti*(devihalf.mucat(i)*(u(3)*DuDx(4)+par.kB*par.T*(DuDx(3)+(u(3)*(DuDx(3)/(devihalf.DOScat(i)-u(3)))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
-%                     (devihalf.epp(i)/max(par.epp))*DuDx(4);
-%                     par.K_anion*par.mobseti*(devihalf.muani(i)*(u(5)*-DuDx(4)+par.kB*par.T*(DuDx(5)+(u(5)*(DuDx(5)/(devihalf.DOSani(i)-u(5)))))));];
+                flux = [par.mobset*(devihalf.mue(i)*n*(-dVdx+devihalf.gradEA(i))+(Dn*(dndx-((n/devihalf.Nc(i))*devihalf.gradNc(i)))));
+                    par.mobset*(devihalf.muh(i)*p*(dVdx-devihalf.gradIP(i))+(Dp*(dpdx-((p/devihalf.Nv(i))*devihalf.gradNv(i)))));
+                    par.K_cation*par.mobseti*(devihalf.mucat(i)*(c*dVdx+par.kB*par.T*(dcdx+(c*(dcdx/(devihalf.DOScat(i)-c))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
+                    (devihalf.epp(i)/max(par.epp))*dVdx;
+                    par.K_anion*par.mobseti*(devihalf.muani(i)*(u(5)*-dVdx+par.kB*par.T*(DuDx(5)+(u(5)*(DuDx(5)/(devihalf.DOSani(i)-u(5)))))));];
 
-                source = [g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
-                    g - par.radset*devihalf.krad(i)*((u(1)*u(2))-(devihalf.ni(i)^2)) - par.SRHset*(((u(1)*u(2))-devihalf.ni(i)^2)/((devihalf.taun(i)*(u(2)+devihalf.pt(i))) + (devihalf.taup(i)*(u(1)+devihalf.nt(i)))));
+                source = [g - par.radset*devihalf.krad(i)*((n*p)-(devihalf.ni(i)^2)) - par.SRHset*(((n*p)-devihalf.ni(i)^2)/((devihalf.taun(i)*(p+devihalf.pt(i))) + (devihalf.taup(i)*(n+devihalf.nt(i)))));
+                    g - par.radset*devihalf.krad(i)*((n*p)-(devihalf.ni(i)^2)) - par.SRHset*(((n*p)-devihalf.ni(i)^2)/((devihalf.taun(i)*(p+devihalf.pt(i))) + (devihalf.taup(i)*(n+devihalf.nt(i)))));
                     0;
-                    (par.q/(max(par.epp)*par.epp0))*(-u(1)+u(2)-devihalf.NA(i)+devihalf.ND(i)-u(5)+u(3));
+                    (par.q/(max(par.epp)*par.epp0))*(-n+p-devihalf.NA(i)+devihalf.ND(i)-u(5)+c);
                     0;];
         end
     end
