@@ -155,13 +155,15 @@ while any(all_stable) == 0
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 end
 
-disp('Switching on series resistance')
+if par_origin.Rs ~= 0
+    disp('Switching on series resistance')
 
-par.Rs = par_origin.Rs;
-par.tmax = 1e-6;
-par.t0 = 1e-12;
+    par.Rs = par_origin.Rs;
+    par.tmax = 1e-6;
+    par.t0 = 1e-12;
 
-sol = df(sol, par);
+    sol = df(sol, par);
+end
 
 % write solution and reset ion mobility
 soleq_i_nosrh = sol;
