@@ -104,7 +104,7 @@ x = xmesh;
 t = meshgen_t(par);
 tmesh = t;
 
-%% Generation function
+%% Generation
 g1_fun = fun_gen(par.g1_fun_type);
 g2_fun = fun_gen(par.g2_fun_type);
 gxt1 = 0;
@@ -184,21 +184,31 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             Dp = muh(i)*kB*T;
         end
         
-        flux = [mobset*(mue(i)*n*(-dVdx+gradEA(i))+(Dn*(dndx-((n/Nc(i))*gradNc(i)))));
-            mobset*(muh(i)*p*(dVdx-gradIP(i))+(Dp*(dpdx-((p/Nv(i))*gradNv(i)))));
-            K_cation*mobseti*(mucat(i)*(c*dVdx+kB*T*(dcdx+(c*(dcdx/(DOScat(i)-c))))));       % Nerst-Planck-Poisson approach ref: Borukhov 1997
-            (epp(i)/eppmax)*dVdx;];
+        %% Fluxes
+        flux_electron	= mue(i)*n*(-dVdx+gradEA(i))+(Dn*(dndx-((n/Nc(i))*gradNc(i))));
+        flux_hole       = muh(i)*p*(dVdx-gradIP(i))+(Dp*(dpdx-((p/Nv(i))*gradNv(i))));
+        flux_cation     = mucat(i)*(c*dVdx+kB*T*(dcdx+(c*(dcdx/(DOScat(i)-c)))));               % Nerst-Planck-Poisson approach ref: Borukhov 1997
+        flux_potential  = (epp(i)/eppmax)*dVdx;
         
-        source = [g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i))) + (taup(i)*(n+nt(i)))));
-            g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i))) + (taup(i)*(n+nt(i)))));
-            0;
-            (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c)];
+        flux = [mobset*flux_electron; mobset*flux_hole; K_cation*mobseti*(flux_cation); flux_potential]; 
+            
+        %% sources
+        source_electron = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i))) + (taup(i)*(n+nt(i)))));
+        source_hole     = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i))) + (taup(i)*(n+nt(i)))));
+        source_cation   = 0;
+        source_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c);
+        
+        source = [source_electron; source_hole; source_cation; source_potential];
         
         if N_ionic_species == 2
-            %% Add flux and source for anions
+            %% Add terms anions
             coeff = [coeff;1];
-            flux = [flux; K_anion*mobseti*(muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a))))));];
-            source = [source; 0];
+                        
+            flux_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
+            flux = [flux; K_anion*mobseti*(flux_anion)];
+            
+            source_anion = 0;
+            source = [source; source_anion];
         end
         
     end
