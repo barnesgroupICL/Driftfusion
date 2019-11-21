@@ -65,6 +65,8 @@ SRHset = par.SRHset;        % SRH recombination switch
 device = par.dev_ihalf;
 mue = device.mue;           % Electron mobility
 muh = device.muh;           % Hole mobility
+Dn = mue*kB*T;           % Electron diffusion coefficient
+Dp = muh*kB*T;           % hole diffusion coefficient
 mucat = device.mucat;       % Cation mobility
 muani = device.muani;       % Anion mobility
 Nc = device.Nc;             % Conduction band effective density of states
@@ -175,24 +177,16 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         % Prefactors set to 1 for time dependent components - can add other
         % functions if you want to include the multiple trapping model
         coeff = [1;1;1;0;];
-        
-        if par.prob_distro_function == 'Fermi'
-            Dn = F.D(n, devihalf.Dnfun(i,:), devihalf.n_fd(i,:));
-            Dp = F.D(p, devihalf.Dpfun(i,:), devihalf.p_fd(i,:));
-        elseif par.prob_distro_function == 'Boltz'
-            Dn = mue(i)*kB*T;
-            Dp = muh(i)*kB*T;
-        end
-        
+          
         %% Fluxes
-        flux_electron	= mue(i)*n*(-dVdx+gradEA(i))+(Dn*(dndx-((n/Nc(i))*gradNc(i))));
-        flux_hole       = muh(i)*p*(dVdx-gradIP(i))+(Dp*(dpdx-((p/Nv(i))*gradNv(i))));
+        flux_electron	= mue(i)*n*(-dVdx+gradEA(i))+(Dn(i)*(dndx-((n/Nc(i))*gradNc(i))));
+        flux_hole       = muh(i)*p*(dVdx-gradIP(i))+(Dp(i)*(dpdx-((p/Nv(i))*gradNv(i))));
         flux_cation     = mucat(i)*(c*dVdx+kB*T*(dcdx+(c*(dcdx/(DOScat(i)-c)))));               % Nerst-Planck-Poisson approach ref: Borukhov 1997
         flux_potential  = (epp(i)/eppmax)*dVdx;
         
         flux = [mobset*flux_electron; mobset*flux_hole; K_cation*mobseti*(flux_cation); flux_potential]; 
             
-        %% sources
+        %% Sources
         source_electron = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i))) + (taup(i)*(n+nt(i)))));
         source_hole     = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i))) + (taup(i)*(n+nt(i)))));
         source_cation   = 0;
@@ -242,7 +236,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         % Single layer
                         u0 = [nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
                             pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
-                            Ncat(i);
+                            dev.Ncat(i);
                             (x/xmesh(end))*Vbi;
                             dev.Nani(i);];
                     else
