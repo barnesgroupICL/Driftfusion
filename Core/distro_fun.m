@@ -1,4 +1,4 @@
-classdef F
+classdef distro_fun
     % distribution function Class -
     % calculates carrier densities for different distribution functions -
     % should be renamed!
@@ -14,7 +14,7 @@ classdef F
         
         function n = nfun(Nc, Ec, Efn, T, prob_distro_function)
             
-            kT = F.kB*T;
+            kT = distro_fun.kB*T;
             
             if prob_distro_function == 'Fermi'
                 % Fermi dirac integral for obtaining electron densities
@@ -28,7 +28,7 @@ classdef F
                 for i=1:length(Nc)
                     if isnan(Nc(i)) == 0    % ignores interfaces
                         fn = @(E) ((E/kT).^0.5)./(1 + exp((E-Efn(i)+Ec(i))/kT));
-                        n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(fn, 0, F.uplimit));
+                        n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(fn, 0, distro_fun.uplimit));
                     end
                 end
                 
@@ -40,7 +40,7 @@ classdef F
         
         function p = pfun(Nv, Ev, Efp, T, prob_distro_function)
             
-            kT = F.kB*T;
+            kT = distro_fun.kB*T;
             
             if prob_distro_function == 'Fermi'
                 % Fermi dirac integral for obtaining electron densities
@@ -59,7 +59,7 @@ classdef F
                 for i=1:length(Nv)
                     if isnan(Nv(i)) == 0        % ignores interfaces
                         fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));
-                        p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, 0, F.uplimit));
+                        p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, 0, distro_fun.uplimit));
                     end
                 end
                 
@@ -96,8 +96,8 @@ classdef F
                     h = @(E) g(E).*f(E);
                     k = @(E) g(E).*dfdE(E);
                     
-                    n(i) = real(((2*Nc)/(kT*pi^0.5))*integral(f, 0, F.uplimit));
-                    dndE(i) = ((2*Nc)/(kT*pi^0.5))*integral(dfdE, 0, F.uplimit);
+                    n(i) = real(((2*Nc)/(kT*pi^0.5))*integral(f, 0, distro_fun.uplimit));
+                    dndE(i) = ((2*Nc)/(kT*pi^0.5))*integral(dfdE, 0, distro_fun.uplimit);
                     
                 end
                 
@@ -138,8 +138,8 @@ classdef F
                     h = @(E) g(E).*f(E);
                     k = @(E) g(E).*dfdE(E);
                     
-                    p(i) = real(((2*Nv)/(kT*pi^0.5))*integral(f, 0, F.uplimit));
-                    dpdE(i) = ((2*Nv)/(kT*pi^0.5))*integral(dfdE, 0, F.uplimit);
+                    p(i) = real(((2*Nv)/(kT*pi^0.5))*integral(f, 0, distro_fun.uplimit));
+                    dpdE(i) = ((2*Nv)/(kT*pi^0.5))*integral(dfdE, 0, distro_fun.uplimit);
                 end
                 
                 Dpfd.Dpfun = muh*(p./dpdE);

@@ -49,8 +49,8 @@ classdef dfana
                 
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
-                        Efn(i,j) = F.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
-                        Efp(i,j) = F.Efp_fd_fun(p(i,j), dev.Efp(j,:),  dev.p_fd(j,:));
+                        Efn(i,j) = distro_fun.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
+                        Efp(i,j) = distro_fun.Efp_fd_fun(p(i,j), dev.Efp(j,:),  dev.p_fd(j,:));
                     end
                 end
                 Efn = Efn-V;
@@ -100,8 +100,8 @@ classdef dfana
                 
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
-                        Efn_ihalf(i,j) = F.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
-                        Efp_ihalf(i,j) = F.Efp_fd_fun(p(i,j), dev.Efp(j,:),  dev.p_fd(j,:));
+                        Efn_ihalf(i,j) = distro_fun.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
+                        Efp_ihalf(i,j) = distro_fun.Efp_fd_fun(p(i,j), dev.Efp(j,:),  dev.p_fd(j,:));
                     end
                 end
                 Efn_ihalf = Efn_ihalf-V;
@@ -165,8 +165,8 @@ classdef dfana
                 
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
-                        Efn_l(i) = F.Efn_fd_fun(n(i,1), dev_ihalf.Efn(j,1),  dev_ihalf.n_fd(j,1));
-                        Efp_l(i) = F.Efp_fd_fun(p(i,1), dev_ihalf.Efp(j,1),  dev_ihalf.p_fd(j,1));
+                        Efn_l(i) = distro_fun.Efn_fd_fun(n(i,1), dev_ihalf.Efn(j,1),  dev_ihalf.n_fd(j,1));
+                        Efp_l(i) = distro_fun.Efp_fd_fun(p(i,1), dev_ihalf.Efp(j,1),  dev_ihalf.p_fd(j,1));
                     end
                 end
                 
@@ -457,8 +457,8 @@ classdef dfana
                 % Diffusion coefficients
                 if par.prob_distro_function == 'Fermi'
                     for jj = 1:length(x)
-                        Dn(i,jj) = F.D(nloc(i,jj), dev.Dnfun(jj,:), dev.n_fd(jj,:));
-                        Dp(i,jj) = F.D(ploc(i,jj), dev.Dpfun(jj,:), dev.p_fd(jj,:));
+                        Dn(i,jj) = distro_fun.D(nloc(i,jj), dev.Dnfun(jj,:), dev.n_fd(jj,:));
+                        Dp(i,jj) = distro_fun.D(ploc(i,jj), dev.Dpfun(jj,:), dev.p_fd(jj,:));
                     end
                 end
             end

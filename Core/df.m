@@ -65,8 +65,8 @@ SRHset = par.SRHset;        % SRH recombination switch
 device = par.dev_ihalf;
 mue = device.mue;           % Electron mobility
 muh = device.muh;           % Hole mobility
-Dn = mue*kB*T;           % Electron diffusion coefficient
-Dp = muh*kB*T;           % hole diffusion coefficient
+Dn = mue*kB*T;              % Electron diffusion coefficient
+Dp = muh*kB*T;              % Hole diffusion coefficient
 mucat = device.mucat;       % Cation mobility
 muani = device.muani;       % Anion mobility
 Nc = device.Nc;             % Conduction band effective density of states
@@ -137,9 +137,8 @@ options = odeset('MaxStep', par.MaxStepFactor*0.1*abs(par.tmax - par.t0), 'RelTo
 u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
 %% Subfunctions
-% Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of c, f, and s)
-    function [coeff,flux,source] = dfpde(x,t,u,dudx)
-        
+% Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of C,F,S)
+    function [C,F,S] = dfpde(x,t,u,dudx)   
         % Get position point
         i = find(x_ihalf <= x);
         i = i(end);
@@ -164,51 +163,51 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         n = u(1); p = u(2); c = u(3); V = u(4);
         
         if N_ionic_species == 2
-            % Add anion variable
-            a = u(5);
+            a = u(5);           % Include anion variable
             dadx = dudx(5);
         else
-            a = Nani(i);
+            a = Nani(i);        % Otherwise set anion density to be background
         end
         
         %% Gradients
         dndx = dudx(1); dpdx = dudx(2); dcdx = dudx(3); dVdx = dudx(4);
         
-        % Prefactors set to 1 for time dependent components - can add other
-        % functions if you want to include the multiple trapping model
-        coeff = [1;1;1;0;];
+        %% Equation editor
+        % Time-dependence prefactor term
+        C_electron = 1;
+        C_hole = 1;
+        C_cation = 1;
+        C_potential = 0;
+        C = [C_electron; C_hole; C_cation; C_potential];
           
-        %% Fluxes
-        flux_electron	= mue(i)*n*(-dVdx+gradEA(i))+(Dn(i)*(dndx-((n/Nc(i))*gradNc(i))));
-        flux_hole       = muh(i)*p*(dVdx-gradIP(i))+(Dp(i)*(dpdx-((p/Nv(i))*gradNv(i))));
-        flux_cation     = mucat(i)*(c*dVdx+kB*T*(dcdx+(c*(dcdx/(DOScat(i)-c)))));               % Nerst-Planck-Poisson approach ref: Borukhov 1997
-        flux_potential  = (epp(i)/eppmax)*dVdx;
-        
-        flux = [mobset*flux_electron; mobset*flux_hole; K_cation*mobseti*(flux_cation); flux_potential]; 
+        % Flux terms
+        F_electron   = mue(i)*n*(-dVdx+gradEA(i))+(Dn(i)*(dndx-((n/Nc(i))*gradNc(i))));
+        F_hole       = muh(i)*p*(dVdx-gradIP(i))+(Dp(i)*(dpdx-((p/Nv(i))*gradNv(i))));
+        F_cation     = mucat(i)*(c*dVdx+kB*T*(dcdx+(c*(dcdx/(DOScat(i)-c)))));              
+        F_potential  = (epp(i)/eppmax)*dVdx;
+        F = [mobset*F_electron; mobset*F_hole; K_cation*mobseti*(F_cation); F_potential]; 
             
-        %% Sources
-        source_electron = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i))) + (taup(i)*(n+nt(i)))));
-        source_hole     = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i))) + (taup(i)*(n+nt(i)))));
-        source_cation   = 0;
-        source_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c);
-        
-        source = [source_electron; source_hole; source_cation; source_potential];
+        % Source terms
+        S_electron = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S_hole     = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S_cation   = 0;
+        S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c);
+        S = [S_electron; S_hole; S_cation; S_potential];
         
         if N_ionic_species == 2
-            %% Add terms anions
-            coeff = [coeff;1];
+            % Add terms anions
+            C_anion = 1;
+            C = [C; C_anion];
                         
-            flux_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
-            flux = [flux; K_anion*mobseti*(flux_anion)];
+            F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
+            F = [F; K_anion*mobseti*(F_anion)];
             
-            source_anion = 0;
-            source = [source; source_anion];
-        end
-        
+            S_anion = 0;
+            S = [S; S_anion];
+        end        
     end
 
-% --------------------------------------------------------------------------
-% Define initial conditions.
+%% Define initial conditions.
     function u0 = dfic(x)
         
         if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) == 0
@@ -266,8 +265,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         end
     end
 
-% --------------------------------------------------------------------------
-
+%% Boundary conditions
 % Define boundary condtions, refer PDEPE help for the precise meaning of p
 % and you l and r refer to left and right.
 % in this example I am controlling the flux through the boundaries using
@@ -282,7 +280,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 Vapp = Vapp_fun(par.V_fun_arg, t);
         end
         
-        %% Easy variable names
+        % Easy variable names
         nl = ul(1); pl = ul(2); cl = ul(3); Vl = ul(4);
         nr = ur(1); pr = ur(2); cr = ur(3); Vr = ur(4);
         
@@ -291,7 +289,6 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         end
         
         switch par.BC
-            % case 1 is obsolete
             case 2
                 % Non- selective contacts - fixed charge densities for majority carrier
                 % and flux for minority carriers- use recombination
@@ -311,7 +308,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 qr = [0; 1; 1; 0;];
                 
                 if N_ionic_species == 2
-                    %% Second element are the boundary condition coefficients for anions
+                    % Second element are the boundary condition coefficients for anions
                     pl = [pl; 0];
                     ql = [ql; 1];
                     pr = [pr; 0];
@@ -319,11 +316,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 end
 
             case 3
-                % Flux boundary conditions for both carrier types. Leads to
-                % inaccurate calculation at low currents due to the small
-                % fractional change in majority carrier density at interface. May
-                % be more reliable at high currents than BC2 since does not rely on
-                % integrating continuity equations across the device.
+                % Flux boundary conditions for both carrier types.
                 
                 % Calculate series resistance voltage Vres
                 if par.Rs == 0
