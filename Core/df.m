@@ -1,12 +1,16 @@
 function solstruct = df(varargin)
-
 % Core DRIFTFUSION function- organises properties and inputs for pdepe
 % A routine to test solving the diffusion and drift equations using the
-% matlab pepde solver. This version defines electrons as n and holes as p,
-% and ions as a. V is the electric potential.
+% matlab pepde solver.
 %
 % Authors: Philip Calado, Piers RF Barnes, Ilario Gelmetti, Ben Hillman,
 % Imperial College London, 2019
+
+% n = u(1) = electron density
+% p = u(2) = holes density
+% c = u(3) = cation density
+% V = u(4) = electrostatic potential
+% a = u(5) = anion density
 
 %% Deal with input arguments
 if length(varargin) == 0
@@ -138,6 +142,9 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
 %% Subfunctions
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of C,F,S)
+% C = Time-dependence prefactor
+% F = Flux terms
+% S = Source terms
     function [C,F,S] = dfpde(x,t,u,dudx)   
         % Get position point
         i = find(x_ihalf <= x);
@@ -194,8 +201,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c);
         S = [S_electron; S_hole; S_cation; S_potential];
         
-        if N_ionic_species == 2
-            % Add terms anions
+        if N_ionic_species == 2     % Condition for anion terms
             C_anion = 1;
             C = [C; C_anion];
                         
