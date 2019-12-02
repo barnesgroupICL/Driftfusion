@@ -45,7 +45,7 @@ pleft = par.pleft;
 pright = par.pright;
 xmesh = par.xx;
 x_ihalf = par.x_ihalf;
-devihalf = par.dev;
+devihalf = par.dev_ihalf;
 dev = par.dev;
 
 %% Spatial mesh
