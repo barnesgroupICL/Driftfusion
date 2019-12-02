@@ -506,7 +506,7 @@ classdef dfplot
                 {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0);
 
             subplot(2,1,2);
-            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 0);
         end
 
         function Vacx(varargin)
@@ -570,13 +570,13 @@ classdef dfplot
            dcum0 = par.dcum0*1e7;   % Convert to nm
            
            % Multicoloured
-           % triplets = [1, 0.9, 0.8; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
+           % triplets = [1, 0.87, 0.87; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
            % French flag
-           % triplets = [1, 0.9, 0.8; 1, 0.98, 0.7; 1, 1, 1; 1, 1, 0.98; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
+           % triplets = [1, 0.87, 0.87; 1, 0.98, 0.7; 1, 1, 1; 1, 1, 0.98; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
            % Cool Mint
            triplets = [0.85, 0.95, 0.7; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
            % pn
-           % triplets = [0.85, 0.95, 0.7; 1, 1, 1];
+           % triplets = [1, 0.87, 0.87; 0.85, 0.92, 1];
            
            for i =1:length(dcum0)-1
               v = [dcum0(i) yrange(2); dcum0(i+1) yrange(2); dcum0(i+1) yrange(1); dcum0(i) yrange(1)];   % vertices position
@@ -626,6 +626,11 @@ classdef dfplot
              
             vmin = min(min(cell2mat(variables)));
             vmax = max(max(cell2mat(variables)));
+            
+            if vmin == 0 && vmax == 0
+                vmin = -1;
+                vmax = 1;
+            end
             vrange = vmax-vmin;
             if isempty(findobj(ax,'Type','patch'))
                 switch logy

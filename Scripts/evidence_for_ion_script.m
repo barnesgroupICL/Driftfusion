@@ -44,7 +44,7 @@ JV.tc_0V_to_m1V = doJV(soleq_tc.ion, 1e-6, 40, 0, 1e10, 0, -1, 1);
 % Scan from -1.0 V to 1.4 V dark and light
 JV.tc_m1V_to_1p2V = doJV(JV.tc_0V_to_m1V.dk.f, 40, 200, 1, 10, -1, 1.2, 3);
 
-% Plot the JV's and set limits
+%% Plot the JV's and set limits
 dfplot.JV(JV.bc_m1V_to_1p2V,3);
 hold on
 dfplot.JV(JV.tc_m1V_to_1p2V,3);
