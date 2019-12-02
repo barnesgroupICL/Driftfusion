@@ -619,16 +619,16 @@ classdef pc
                                     case 'lin_graded'
                                         gradient = (property(i+1)-property(i-1))/deff;
                                         if gradient_property == 1
-                                            devprop(j) = interface_switch*(gradient);
+                                            devprop(j) = gradient;
                                         else
-                                            devprop(j) = interface_switch*(property(i-1) + xprime*gradient);
+                                            devprop(j) = property(i-1) + xprime*gradient;
                                         end
                                     case 'log_graded'
-                                        gradient = (log(property(i+1))-log(property(i-1)))/deff;
+                                        log_gradient = (log(property(i+1))-log(property(i-1)))/deff;
                                         if gradient_property == 1
-                                            devprop(j) = interface_switch*(property(i-1)*gradient*exp(gradient*xprime));
+                                            devprop(j) = property(i-1)*log_gradient*exp(log_gradient*xprime);
                                         else
-                                            devprop(j) = interface_switch*(property(i-1)*exp(gradient*xprime));
+                                            devprop(j) = property(i-1)*exp(log_gradient*xprime);
                                         end
                                 end
                             end
