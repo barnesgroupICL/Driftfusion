@@ -14,11 +14,11 @@ for i = 1:length(sol.t)
     fig1 = gca;
     
 %% You can include limits for subplots here
-    subplot(2,1,1);
-    ylim([-2, 0.2])
-    
-    subplot(2,1,2);
-    ylim([1e4, 1e17])
+%     subplot(2,1,1);
+%     ylim([-2, 0.2])
+%     
+%     subplot(2,1,2);
+%     ylim([0, 3.5e16])
     
     if xrange ~= 0
         xlim([xrange(1)*1e7, xrange(2)*1e7])
@@ -27,15 +27,15 @@ for i = 1:length(sol.t)
     if yrange ~= 0
         ylim([yrange(1), yrange(2)])
     end
-    
-    Framefile(i) = getframe(gcf);
+    set(gcf,'color','w');
     
     % Voltage counter
     if Vcounter
-        dim = [.2 0 .3 .3];
+        dim = [.2 0 .3 .2];
         Vnow = round(Vapp(i), 2, 'decimal');
         anno = ['V = ', num2str(Vnow), ' V'];
         T = annotation('textbox', dim, 'String', anno, 'FitBoxToText','on');
+        T.EdgeColor = 'none';
         T.FontSize = 16;
         drawnow
     end
@@ -46,10 +46,12 @@ for i = 1:length(sol.t)
         tnow = round(sol.t(i), 2, 'decimal');
         anno = ['t = ', num2str(tnow), ' s'];
         T = annotation('textbox', dim, 'String', anno, 'FitBoxToText','on');
+        T.EdgeColor = 'none';
         T.FontSize = 16;
         drawnow
     end
     
+    Framefile(i) = getframe(gcf);
 end
 
 moviewrite(Framefile, movie_name);
@@ -63,7 +65,7 @@ movie_name = [movie_name, '.avi'];
 
 % Write to file
 myVideo = VideoWriter(movie_name);
-myVideo.FrameRate = 6;
+myVideo.FrameRate = 20;
 open(myVideo);
 writeVideo(myVideo, Framefile);
 close(myVideo);
