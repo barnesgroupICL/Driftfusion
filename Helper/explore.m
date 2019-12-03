@@ -145,11 +145,11 @@ classdef explore
                 DD(i,:,:) = J_r;
                 EE(i,:) = n_av;
                 FF(i,:) = p_av;
-%                 GG = n_f;
-%                 HH = p_f;
-%                 II = a_f;
-%                 JJ = V_f;
-%                 KK = x;
+%                 GG(i,:) = n_f;
+%                 HH(i,:) = p_f;
+%                 II(i,:) = a_f;
+%                 JJ(i,:) = V_f;
+%                 KK(i,:) = x;
                 errorlog(i,:) = errortemp;
                 
             end
@@ -180,7 +180,7 @@ classdef explore
 %             exsol.p_f = HH;
 %             exsol.a_f = II;
 %             exsol.V_f = JJ;
-            exsol.x = KK;
+%             exsol.x = KK;
             exsol.errorlog = errorlog;
             
             toc
