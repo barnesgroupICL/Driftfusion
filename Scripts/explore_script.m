@@ -5,23 +5,17 @@
 par_ptpd = pc('input_files/ptpd_mapi_pcbm.csv');
 
 % For the first example we will run JV and steady-state Voc for 3 different
-% active layer thicknesses and light intensities
-ptpd_parex_dactive_light_33 = explore.explore2par(par_ptpd, {'dcell(1,3)','Int'},...
-    {[40e-7, 140e-7, 340e-7, 740e-7], logspace(-2,0,3)}, 200);
-% ptpd_parex_dactive_light_33 = explore.explore2par(par_ptpd, {'dcell(1,3)','Int'},...
-%     {[40e-7, 740e-7], [10]}, 200);
+% active layer thicknesses and light intensities 
+ptpd_parex_dactive_light_43 = explore.explore2par(par_ptpd, {'dcell(1,3)','Int'},...
+    {[100e-7, 200e-7, 400e-7, 800e-7], logspace(-2,0,3)}, 200);
 
-% Example plots
+%% Example plots
 % 1 sun JV plot for different active layer thickness
-explore.plotJV(ptpd_parex_dactive_light_33, [1,1,1], [0,1,0])
-legend('d_{active} = 100 nm', 'd_{active} = 200 nm', 'd_{active} = 400 nm')
+explore.plotJV(ptpd_parex_dactive_light_43, [1,1,1,1], [0,0,1])
+legend('d_{active} = 100 nm', 'd_{active} = 200 nm', 'd_{active} = 400 nm', 'd_{active} = 800 nm')
 
 % Plot the reverse scan Voc as a function of thickness and light intensity as a surface
-explore.plotsurf(ptpd_parex_dactive_light_33, 'Voc_r', 1, 0, 0)
-
-% Plot the steady-state ion charge density profiles as a function of
-% thickness at 1 sun
-explore.plotprof_2D(ptpd_parex_dactive_light_33, 'a_f', [1,1,1], [0,1,0], 0,0)
+explore.plotsurf(ptpd_parex_dactive_light_43, 'Voc_r', 1, 0, 0)
 
 % Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in
