@@ -6,10 +6,10 @@ par_ptpd = pc('input_files/ptpd_mapi_pcbm.csv');
 
 % For the first example we will run JV and steady-state Voc for 3 different
 % active layer thicknesses and light intensities
-% ptpd_parex_dactive_light_33 = explore.explore2par(par_ptpd, {'dcell(1,4)','Int'},...
-%     {[40e-7, 140e-7, 340e-7, 740e-7], logspace(-2,0,3)}, 200);
 ptpd_parex_dactive_light_33 = explore.explore2par(par_ptpd, {'dcell(1,4)','Int'},...
-    {[40e-7, 740e-7], [10]}, 200);
+    {[40e-7, 140e-7, 340e-7, 740e-7], logspace(-2,0,3)}, 200);
+% ptpd_parex_dactive_light_33 = explore.explore2par(par_ptpd, {'dcell(1,4)','Int'},...
+%     {[40e-7, 740e-7], [10]}, 200);
 
 % Example plots
 % 1 sun JV plot for different active layer thickness

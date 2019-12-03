@@ -23,8 +23,7 @@ par.g1_fun_arg(4) = 0;          % phase
 disp('Applying oscillating optical bias')
 sol_IMPS = df(sol_ini, par);
 
-%% Plot the J as a function of t
-dfplot.Jt(sol_IMPS,0)
+
 
 disp('IMPS complete')
 end

@@ -176,10 +176,10 @@ classdef explore
             exsol.par_base = par_base;
             exsol.stats.n_av = EE;
             exsol.stats.p_av = FF;
-            exsol.n_f = GG;
-            exsol.p_f = HH;
-            exsol.a_f = II;
-            exsol.V_f = JJ;
+%             exsol.n_f = GG;
+%             exsol.p_f = HH;
+%             exsol.a_f = II;
+%             exsol.V_f = JJ;
             exsol.x = KK;
             exsol.errorlog = errorlog;
             

@@ -27,9 +27,6 @@ par.g1_fun_arg(4) = 0;          % phase
 disp('Applying oscillating optical bias')
 sol_IMVS = df(sol_ill, par);
 
-%% Plot the Voc as a function of t
-dfplot.Voct(sol_IMVS);
-
 disp('IMVS complete')
 
 end
