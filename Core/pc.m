@@ -490,30 +490,12 @@ classdef pc
         function value = get.ND(par)
             value = zeros(1, length(par.stack));
             value = distro_fun.nfun(par.Nc, par.EA, par.E0, par.T, par.prob_distro_function);
-%             for i=1:length(par.stack)
-%                 if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
-%                     if round(par.EA(i) - par.E0(i), 3) < round(par.E0(i) - par.IP(i), 3)
-%                         value(i) = distro_fun.nfun(par.Nc(i), par.EA(i), par.E0(i), par.T, par.prob_distro_function);
-%                     else
-%                         value(i) = 1e-100;      % To avoid issues with log(0) at interfaces
-%                     end
-%                 end
-%             end
         end
 
         %% Acceptor densities
         function value = get.NA(par)
             value = zeros(1, length(par.stack));
             value = distro_fun.pfun(par.Nv, par.IP, par.E0, par.T, par.prob_distro_function);
-%             for i=1:length(par.stack)
-%                 if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
-%                     if round(par.EA(i) - par.E0(i),3) > round(par.E0(i) - par.IP(i), 3)
-%                         value(i) = distro_fun.pfun(par.Nv(i), par.IP(i), par.E0(i), par.T, par.prob_distro_function);
-%                     else
-%                         value(i) = 1e-100;      % To avoid issues with log(0) at interfaces
-%                     end
-%                 end
-%             end
         end
 
         %% Intrinsic carrier densities (Boltzmann)

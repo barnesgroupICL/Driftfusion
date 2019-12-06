@@ -194,7 +194,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         F_hole       = muh(i)*p*(dVdx-gradIP(i))+(Dp(i)*(dpdx-((p/Nv(i))*gradNv(i))));
         F_cation     = mucat(i)*(c*dVdx+kB*T*(dcdx+(c*(dcdx/(DOScat(i)-c)))));              
         F_potential  = (epp(i)/eppmax)*dVdx;
-        F = [mobset*F_electron; mobset*F_hole; K_cation*mobseti*(F_cation); F_potential]; 
+        F = [mobset*F_electron; mobset*F_hole; K_cation*mobseti*F_cation; F_potential]; 
             
         % Source terms
         S_electron = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
