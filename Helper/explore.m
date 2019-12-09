@@ -38,7 +38,7 @@ classdef explore
                 end
                 
                 % Refresh device
-                par = pc.refresh(par);
+                par = refresh_device(par);
                 
                 Voc_f = zeros(1, length(parval2));
                 Voc_r = zeros(1, length(parval2));
@@ -79,7 +79,7 @@ classdef explore
                             par = explore.helper(par, str2, parval2(j));
                             Int = 1;
                             % Refresh device
-                            par = pc.refresh(par);
+                            par = refresh_device(par);
                         end
                         
                         % Obtain equilibrium solution - could be calculated
@@ -381,7 +381,7 @@ classdef explore
                     end
                     
                     % Refresh device
-                    par = pc.refresh(par);
+                    par = refresh_device(par);
                     
                     for j = 1:length(exsol.parval2)
                         if par2logical(j) == 1
@@ -439,7 +439,7 @@ classdef explore
                             end
                             
                             % Refresh device
-                            par = pc.refresh(par);
+                            par = refresh_device(par);
                             
                             dev = par.dev;
                             
@@ -542,7 +542,7 @@ classdef explore
                 end
                 
                 % Refresh device
-                par = pc.refresh(par);
+                par = refresh_device(par);
                 x = par.xx;
                 dev = par.dev;
                 

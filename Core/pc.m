@@ -279,7 +279,7 @@ classdef pc
                 % Use argument as filepath and overwrite properties using
                 % PC.IMPORTPROPERTIES
                 filepath = varargin;
-                par = pc.importproperties(par, filepath);
+                par = import_properties(par, filepath);
             elseif length(varargin) > 1
                 filepath = varargin{1, 1};
                 warning('pc should have 0 or 1 input arguments- only the first argument will be used for the filepath')
@@ -400,7 +400,7 @@ classdef pc
             % changing device thickness on the fly. These are not present
             % in the dependent variables as it is too costly to have them
             % continuously called.
-            par = pc.refresh(par);
+            par = refresh_device(par);
         end
 
         function par = set.xmesh_type(par, value)
@@ -559,257 +559,12 @@ classdef pc
             xx = meshgen_x(par);
         end
 
-        function par = refresh(par)
-            par.xx = meshgen_x(par);
-            par.x_ihalf = getvarihalf(par.xx);
-            par.dev = pc.builddev(par, 'iwhole');
-            par.dev_ihalf = pc.builddev(par, 'ihalf');
-            % Get generation profiles
-            par.gx1 = pc.generation(par, par.light_source1, par.laser_lambda1);
-            par.gx2 = pc.generation(par, par.light_source2, par.laser_lambda2);
-        end
+
         
-        function devprop = buildproperty(property, xmesh, par, interface_switch, gradient_property)
-            % Builds the device property - i.e. defines the properties at
-            % every x position in the device
-            % property          - the variable name of the propery e.g. par.EA
-            % xmesh             - as name suggests
-            % par               - parameters object
-            % interface_switch  -
-            % 'zeroed' = set property value to zero for interfaces
-            % 'constant' = constant property values in interfaces
-            % 'lin_graded' = graded property values in interfaces
-            % 'log_graded' = graded property values in interfaces
-            % gradient_properties - 1 if the property is a gradient e.g.
-            % dEAdx, 0 otherwise
-            
-            devprop = zeros(1, length(xmesh));
-            
-            for i=1:length(par.dcum)
-                for j = 1:length(xmesh)
-                    if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
-                        if xmesh(j) >= par.dcum0(i)
-                            if gradient_property == 1
-                                devprop(j) = 0;
-                            else
-                                devprop(j) = property(i);
-                            end
-                        end
-                    elseif any(strcmp(par.layer_type{1,i}, {'junction'})) == 1
-                        % Interfaces
-                        if xmesh(j) >= par.dcum0(i)
-                            xprime = xmesh(j)-par.dcum0(i);
-                            if xmesh(j) >= par.dcum0(i)
-                                deff = par.d(i);
-                                switch interface_switch
-                                    case 'zeroed'
-                                        devprop(j) = 0;
-                                    case 'constant'
-                                        devprop(j) = property(i);
-                                    case 'lin_graded'
-                                        gradient = (property(i+1)-property(i-1))/deff;
-                                        if gradient_property == 1
-                                            devprop(j) = gradient;
-                                        else
-                                            devprop(j) = property(i-1) + xprime*gradient;
-                                        end
-                                    case 'log_graded'
-                                        log_gradient = (log(property(i+1))-log(property(i-1)))/deff;
-                                        if gradient_property == 1
-                                            devprop(j) = property(i-1)*log_gradient*exp(log_gradient*xprime);
-                                        else
-                                            devprop(j) = property(i-1)*exp(log_gradient*xprime);
-                                        end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
+
         
         
-        function dev = builddev(par, meshoption)
-            switch meshoption
-                case 'iwhole'
-                    xmesh = par.xx;
-                case 'ihalf'
-                    xmesh = getvarihalf(par.xx);
-            end
-            % BUILDDEV builds the properties for the device as
-            % arrays such that each property can be called for
-            % each point including grading at interfaces.
-            
-            % Linaerly graded properties
-            dev.EA = pc.buildproperty(par.EA, xmesh, par, 'lin_graded', 0);
-            dev.IP = pc.buildproperty(par.IP, xmesh, par, 'lin_graded', 0);
-            dev.mue = pc.buildproperty(par.mue, xmesh, par, 'lin_graded', 0);
-            dev.muh = pc.buildproperty(par.muh, xmesh, par, 'lin_graded', 0);
-            dev.mucat = pc.buildproperty(par.mucat, xmesh, par, 'lin_graded', 0);
-            dev.muani = pc.buildproperty(par.muani, xmesh, par, 'lin_graded', 0);
-            dev.epp = pc.buildproperty(par.epp, xmesh, par, 'lin_graded', 0);
-            dev.krad = pc.buildproperty(par.krad, xmesh, par, 'lin_graded', 0);
-            dev.E0 = pc.buildproperty(par.E0, xmesh, par, 'lin_graded', 0);
-            dev.Et = pc.buildproperty(par.Et, xmesh, par, 'lin_graded', 0);
-            dev.taun = pc.buildproperty(par.taun, xmesh, par, 'constant', 0);
-            dev.taup = pc.buildproperty(par.taup, xmesh, par, 'constant', 0);
-            dev.k_iongen = pc.buildproperty(par.k_iongen, xmesh, par, 'lin_graded', 0);
-            dev.k_ionrec = pc.buildproperty(par.k_ionrec, xmesh, par, 'lin_graded', 0);
-            
-            % Logarithmically graded properties
-            dev.NA = pc.buildproperty(par.NA, xmesh, par, 'log_graded', 0);
-            dev.ND = pc.buildproperty(par.ND, xmesh, par, 'log_graded', 0);
-            dev.Nc = pc.buildproperty(par.Nc, xmesh, par, 'log_graded', 0);
-            dev.Nv = pc.buildproperty(par.Nv, xmesh, par, 'log_graded', 0);
-            dev.Nani = pc.buildproperty(par.Nani, xmesh, par, 'log_graded', 0);
-            dev.Ncat = pc.buildproperty(par.Ncat, xmesh, par, 'log_graded', 0);
-            dev.ni = pc.buildproperty(par.ni, xmesh, par, 'log_graded', 0);
-            dev.n0 = pc.buildproperty(par.n0, xmesh, par, 'log_graded', 0);
-            dev.p0 = pc.buildproperty(par.p0, xmesh, par, 'log_graded', 0);
-            dev.DOSani = pc.buildproperty(par.DOSani, xmesh, par, 'log_graded', 0);
-            dev.DOScat = pc.buildproperty(par.DOScat, xmesh, par, 'log_graded', 0);
-            
-            % Properties that are zeroed in the interfaces
-            dev.g0 = pc.buildproperty(par.g0, xmesh, par, 'zeroed', 0);
-        
-            % Gradient properties
-            dev.gradEA = pc.buildproperty(par.EA, xmesh, par, 'lin_graded', 1);
-            dev.gradIP = pc.buildproperty(par.IP, xmesh, par, 'lin_graded', 1);
-            dev.gradNc = pc.buildproperty(par.Nc, xmesh, par, 'log_graded', 1);
-            dev.gradNv = pc.buildproperty(par.Nv, xmesh, par, 'log_graded', 1);
-            
-            dev.nt = distro_fun.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.prob_distro_function);
-            dev.pt = distro_fun.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.prob_distro_function);
-        end
 
-        function gx = generation(par, source_type, laserlambda)
-            % This function calls the correct funciton to calculate generation profiles as a function of position
-            % SOURCE_TYPE = either 'AM15' or 'laser'
-            % LASERLAMBDA = Laser wavelength - ignored if SOURCE_TYPE = AM15
 
-            xsolver = getvarihalf(par.xx);
-            switch par.OM
-                case 0
-                    gx = getvarihalf(par.dev.g0);    % This currently results in the generation profile being stored twice and could be optimised
-                case 1
-                    % beerlambert(par, x, source_type, laserlambda, figson)
-                    gx = beerlambert(par, par.xx, source_type, laserlambda, 0);
-                    % interpolate for i+0.5 mesh
-                    gx = interp1(par.xx, gx, xsolver);
-            end
-
-        end
-
-        function par = importproperties(par, filepath)
-            % A function to overwrite the properties in par with those imported from a
-            % text file located in filepath
-            T = readtable(filepath{1,1});
-
-            par.layer_type = T{:,'layer_type'}';
-            par.stack = T{:,'stack'}';
-            par.dcell = T{:, 'thickness'}';
-            par.pcell = T{:, 'points'}';
-            par.EA = T{:, 'EA'}';
-            par.IP = T{:, 'IP'}';
-            par.E0 = T{:, 'E0'}';
-
-            par.Nc = T{:, 'Nc'}';
-            par.Nv = T{:, 'Nv'}';
-            try
-                par.Nani = T{:, 'Nion'}';   % Backward compatibility
-            end
-            try
-                par.Nani = T{:, 'Nani'}';
-            end
-            par.Ncat = T{:, 'Ncat'}';
-            try
-                par.DOSani = T{:, 'DOSion'}';   % backwards compatibility
-            end
-            try
-                par.DOSani = T{:, 'DOSani'}';
-            end
-            par.DOScat = T{:, 'DOScat'}';
-            par.mue = T{:, 'mue'}';
-            par.muh = T{:, 'muh'}';
-            try
-                par.muani = T{:, 'muion'}';
-            end
-
-            try
-                par.muani = T{:, 'muani'}';
-            end
-            par.mucat = T{:, 'mucat'}';
-            par.epp = T{:, 'epp'}';
-
-            try
-                par.g0 = T{:, 'G0'}';   % For backwards compatibility
-            end
-
-            try
-                par.g0 = T{:, 'g0'}';
-            end
-
-            par.krad = T{:, 'krad'}';
-            par.taun = T{:, 'taun_SRH'}';
-            par.taup = T{:, 'taup_SRH'}';
-            par.sn_l = T{1, 'sn_l'}';
-            par.sp_l = T{1, 'sp_l'}';
-            par.sn_r = T{1, 'sn_r'}';
-            par.sp_r = T{1, 'sp_r'}';
-
-            try
-                par.Phi_left = T{1, 'PhiA'};
-            end
-
-            try
-                par.Phi_left = T{1, 'Phi_left'};    % For backwards compatibility
-            end
-
-            try
-                par.Phi_right = T{1, 'PhiC'};       % For backwards compatibility
-            end
-
-            try
-                par.Phi_right = T{1, 'Phi_right'};
-            end
-            
-            try
-                par.Rs = T{1, 'Rs'};
-            end
-            
-            try
-                par.Et = T{:,'Et'}';
-            end
-
-            try
-                par.Et = T{:,'Et_bulk'}';   % For backwards compatibility
-            end
-
-            try
-                par.OM = T{1, 'OM'};
-            catch
-                warning('No optical model (OM) specified in .csv Using default in PC')
-            end
-
-            try
-                par.xmesh_type = T{1, 'xmesh_type'};
-            catch
-                warning('No spatial mesh type (xmesh_type) defined in .csv . Using default in PC')
-            end
-
-            try
-                par.side = T{1, 'side'};
-            catch
-                warning('Illumination side (side) undefined in .csv . Using default in PC')
-            end
-
-            try
-                par.N_ionic_species = T{1, 'N_ionic_species'};
-            catch
-                warning('No of ionic species (N_ionic_species) undefined in .csv. Using default in PC')
-            end
-
-        end
     end
-
 end
