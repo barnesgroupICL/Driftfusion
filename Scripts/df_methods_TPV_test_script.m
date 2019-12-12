@@ -6,7 +6,7 @@ soleq_tpv = equilibrate(par_tpv);
 
 % Decrease maximum timestep for better time accuracy (note slows solution
 % considerably)
-soleq_tpv.no_ion.par.MaxStepFactor = 0.01;
+soleq_tpv.el.par.MaxStepFactor = 0.01;
 
 %% Do the TPV
 % Note in this instance due to the use of a single slab of material and
@@ -16,9 +16,9 @@ soleq_tpv.no_ion.par.MaxStepFactor = 0.01;
 tmax = 20e-6;
 duty = 5; 
 
-[sol_TPV_0p1sun, sol_ill_0p1sun] = doTPV(soleq_tpv.no_ion, 0.1, 10, 0, 0, 0.02, tmax, 1000, duty);
-[sol_TPV_1sun, sol_ill_1sun] = doTPV(soleq_tpv.no_ion, 1, 10, 0, 0, 0.2, tmax, 1000, duty);
-[sol_TPV_10sun, sol_ill_10sun] = doTPV(soleq_tpv.no_ion, 10, 10, 0, 0, 2, tmax, 1000, duty);
+[sol_TPV_0p1sun, sol_ill_0p1sun] = doTPV(soleq_tpv.el, 0.1, 10, 0, 0, 0.02, tmax, 1000, duty);
+[sol_TPV_1sun, sol_ill_1sun] = doTPV(soleq_tpv.el, 1, 10, 0, 0, 0.2, tmax, 1000, duty);
+[sol_TPV_10sun, sol_ill_10sun] = doTPV(soleq_tpv.el, 10, 10, 0, 0, 2, tmax, 1000, duty);
 
 %% get Delta Voc
 Voc_0p1sun = dfana.Voct(sol_TPV_0p1sun);
