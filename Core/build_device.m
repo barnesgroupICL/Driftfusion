@@ -22,8 +22,6 @@ dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
 dev.Et = build_property(par.Et, xmesh, par, 'lin_graded', 0);
 dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
 dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
-dev.k_iongen = build_property(par.k_iongen, xmesh, par, 'lin_graded', 0);
-dev.k_ionrec = build_property(par.k_ionrec, xmesh, par, 'lin_graded', 0);
 
 % Logarithmically graded properties
 dev.NA = build_property(par.NA, xmesh, par, 'log_graded', 0);
