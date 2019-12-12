@@ -227,7 +227,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         % Single layer
                         u0 = [nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
                             pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
-                            Ncat(i);
+                            dev.Ncat(i);
                             (x/xmesh(end))*Vbi;];
                     else
                         % Multi-layered
