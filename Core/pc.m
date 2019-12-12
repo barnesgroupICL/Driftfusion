@@ -191,10 +191,6 @@ classdef pc
         k_defect_p = 0;
         k_defect_n = 0;
         
-        %% Ionic recombination and generation rates
-        k_iongen = [0,0,0,0,0];
-        k_ionrec = [0,0,0,0,0];
-        
         %% Current voltage scan parameters
         % Soon to be obselete
         Vstart = 0;             % Initial scan point
