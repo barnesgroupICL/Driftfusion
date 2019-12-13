@@ -113,7 +113,7 @@ classdef explore
                         
                         % Write steady-state solutions into temporary
                         % variables
-                        Voc_stable(j,:) = dfana.Voct(sol_ill);
+                        Voc_stable(j,:) = dfana.calcVQFL(sol_ill);
                         PLint(j,:) = dfana.PLt(sol_ill);
                         n_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),1));
                         p_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),2));

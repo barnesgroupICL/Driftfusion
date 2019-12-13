@@ -698,10 +698,16 @@ classdef dfana
                 value = trapz(x,(dev.krad.*(n.*p-dev.ni.^2)),2);
         end
         
-        function value = Voct(sol)
-            %Get QFLs
+        function VQFL = calcVQFL(sol)
+            % Get QFLs
             [~, ~, Efn, Efp] = dfana.QFLs(sol);
-            value = Efn(:, end) - Efp(:, 1);
+            if par.pleft >= par.nleft && par.nright >= par.pright
+                % p-type left boundary, n-type right boundary
+                VQFL = Efn(:, end) - Efp(:, 1);
+            elseif par.nleft >= par.nright && par.pright >= par.nright
+                 % n-type left boundary, p-type right boundary
+                VQFL = Efp(:, end) - Efn(:, 1);
+            end
         end
         
         function deltaV = deltaVt(sol, p1, p2)
