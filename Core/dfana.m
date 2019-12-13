@@ -336,13 +336,13 @@ classdef dfana
             kradmat = repmat(dev.krad, length(t), 1);
             taunmat = repmat(dev.taun, length(t), 1);
             taupmat = repmat(dev.taup, length(t), 1);
-            ntmat = repmat(dev.nt, length(t), 1);
-            ptmat = repmat(dev.pt, length(t), 1);
+            n0 = repmat(dev.n0, length(t), 1);
+            p0 = repmat(dev.p0, length(t), 1);
             
             % Recombination
             U.btb = kradmat.*(n.*p - nimat.^2);
             
-            U.srh = ((n.*p - nimat.^2)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
+            U.srh = taunmat(i)*(n-n0(i)) + taupmat(i)*(p-p0(i));
             
             U.tot = U.btb + U.srh;
         end
@@ -699,9 +699,15 @@ classdef dfana
         end
         
         function value = Voct(sol)
-            %Get QFLs
+            % Get QFLs
             [~, ~, Efn, Efp] = dfana.QFLs(sol);
-            value = Efn(:, end) - Efp(:, 1);
+            if par.pleft >= par.nleft && par.nright >= par.pright
+                % p-type left boundary, n-type right boundary
+                value = Efn(:, end) - Efp(:, 1);
+            elseif par.nleft >= par.nright && par.pright >= par.nright
+                 % n-type left boundary, p-type right boundary
+                value = Efp(:, end) - Efn(:, 1);
+            end
         end
         
         function deltaV = deltaVt(sol, p1, p2)

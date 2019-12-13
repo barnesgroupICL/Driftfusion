@@ -85,6 +85,8 @@ epp = device.epp;           % Dielectric constant
 eppmax = max(par.epp);      % Maximum dielectric constant (for normalisation)
 krad = device.krad;         % Radiative recombination rate coefficient
 ni = device.ni;             % Intrinsic carrier density
+n0 = device.n0;             % Intrinsic carrier density
+p0 = device.p0;             % Intrinsic carrier density
 taun = device.taun;         % Electron SRH time constant
 taup = device.taup;         % Electron SRH time constant
 nt = device.nt;             % SRH electron trap constant
@@ -194,9 +196,9 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         F_potential  = (epp(i)/eppmax)*dVdx;
         F = [mobset*F_electron; mobset*F_hole; K_cation*mobseti*F_cation; F_potential]; 
             
-        % Source terms
-        S_electron = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S_hole     = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        % Source terms - simplified first order recombination terms
+        S_electron = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(taun(i)*(n-n0(i)) + taup(i)*(p-p0(i))); %- SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S_hole     = g - radset*krad(i)*((n*p)-(ni(i)^2)) - SRHset*(taun(i)*(n-n0(i)) + taup(i)*(p-p0(i)));%- SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
         S_cation   = 0;
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
         S = [S_electron; S_hole; S_cation; S_potential];
