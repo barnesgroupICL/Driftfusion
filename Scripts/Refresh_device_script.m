@@ -27,7 +27,7 @@ dfplot.JV(JV_tio2_base, 3)
 figure(4)
 hold on
 dfplot.JV(JV_tio2_low_rec, 3)
-legend('Base, dk F', 'Base, dk R', 'Base, 1sun F', 'Base, 1sun R',...
-    'Low rec, dk F', 'Low rec, dk R', 'Low rec, 1sun F', 'Low rec, 1sun R') 
 ylim([-25e-3, 10e-3])
+legend('Base, dk F', 'Base, dk R', 'Base, 1sun F', 'Base, 1sun R',...
+    'Low rec, dk F', 'Low rec, dk R', 'Low rec, 1sun F', 'Low rec, 1sun R')
 hold off

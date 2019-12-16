@@ -21,7 +21,7 @@ catch
     warning('No thickness array (thickness) defined in .csv . Using default in PC')
 end
 try
-    par.pcell = T{:, 'points'}';
+    par.layer_points = T{:, 'layer_points'}';
 catch
     warning('No layer points array (points) defined in .csv . Using default in PC')
 end
@@ -205,5 +205,7 @@ end
 try
     par.Phi_right = T{1, 'PhiC'}; 
 end
-
+try
+    par.layer_points = T{:, 'points'}';
+end
 end
