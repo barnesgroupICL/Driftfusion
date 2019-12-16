@@ -29,7 +29,7 @@ sol_ill1 = df(sol_ini, par);
 
 par.g1_fun_type = 'constant';
 par.tmesh_type = 2;
-par.tmax = 1e-3;
+par.tmax = 1e-6;
 par.t0 = par.tmax/1e6;
 par.tpoints = 10;
 par.JV = 0;
