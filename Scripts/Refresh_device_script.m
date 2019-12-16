@@ -1,3 +1,7 @@
+% This scripts demonstrates the use of the REFRESH_DEVICE function to
+% rebuild the device strutcures PAR.DEV, PAR.DEV_IHALF, and the grids PAR.X and
+% PAR.X_IHALF.
+
 %% Initialise Driftfusion
 initialise_df
 
