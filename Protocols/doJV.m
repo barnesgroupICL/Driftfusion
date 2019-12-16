@@ -1,4 +1,4 @@
-function JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
+function JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option, option2)
 % A procedure for running JV scans using DF
 % Input arguments
 % sol_ini   	= an initial solution - must be at the same Vapp as the
@@ -9,6 +9,7 @@ function JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vst
 % Vstart        = scan start voltage
 % Vend          = scan end voltage
 % option        1 = dark only, 2 = light only, 3 = dark & light
+% option2       1 = forward only, 2 = cyclic
 tic
 disp('Current voltage scan')
 
@@ -40,17 +41,18 @@ if option ==1 || option ==3
     JVsol.dk.f = df(sol_ini, par);
     disp('Complete.')
     
-    %% Dark reverse scan
-    disp('Dark reverse scan...')
-    
-    % Sweep settings
-    par.V_fun_arg(1) = Vend;
-    par.V_fun_arg(2) = Vstart;
-    par.V_fun_arg(3) = par.tmax;
-    
-    JVsol.dk.r = df(JVsol.dk.f, par);
-    disp('Complete.')
-    
+    if option2 == 2
+        %% Dark reverse scan
+        disp('Dark reverse scan...')
+        
+        % Sweep settings
+        par.V_fun_arg(1) = Vend;
+        par.V_fun_arg(2) = Vstart;
+        par.V_fun_arg(3) = par.tmax;
+        
+        JVsol.dk.r = df(JVsol.dk.f, par);
+        disp('Complete.')
+    end
 end
 
 if option ==2 || option ==3
@@ -99,14 +101,15 @@ if option ==2 || option ==3
     JVsol.ill.f = df(sol_i_1S, par);
     disp('Complete.')
     
-    %% Light reverse
-    disp('Illuminated reverse scan...')
-    par.V_fun_arg(1) = Vend;
-    par.V_fun_arg(2) = Vstart;
-    
-    JVsol.ill.r = df(JVsol.ill.f, par);
-    disp('Complete.')
-    
+    if option2 == 2
+        %% Light reverse
+        disp('Illuminated reverse scan...')
+        par.V_fun_arg(1) = Vend;
+        par.V_fun_arg(2) = Vstart;
+        
+        JVsol.ill.r = df(JVsol.ill.f, par);
+        disp('Complete.')
+    end
     disp('JV scan complete.')
     
     JVsol.stats = dfana.JVstats(JVsol);
