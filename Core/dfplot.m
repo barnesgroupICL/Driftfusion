@@ -97,7 +97,6 @@ classdef dfplot
                 figure(4)
                 plot(Vapp.dk.f, J.dk.f.tot(:,end), '--', Vapp.dk.r, J.dk.r.tot(:,end));
                 hold on
-
             end
 
             if option == 2 || option == 3

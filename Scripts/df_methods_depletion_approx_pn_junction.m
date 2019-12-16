@@ -22,7 +22,7 @@ par_pn_tau1em5 = par_pn_base;
 par_pn_tau1em5.taun(1) = 1e-5;
 par_pn_tau1em5.taup(end) = 1e-5;
 
-par_pn_tau1em5 = pc.refresh(par_pn_tau1em5);
+par_pn_tau1em5 = refresh_device(par_pn_tau1em5);
 
 soleq_tau1em5 = equilibrate_short(par_pn_tau1em5);
 
@@ -41,7 +41,7 @@ par_pn_tau1em7 = par_pn_base;
 par_pn_tau1em7.taun(1) = 1e-7;
 par_pn_tau1em7.taup(end) = 1e-7;
 
-par_pn_tau1em7 = pc.refresh(par_pn_tau1em7);
+par_pn_tau1em7 = refresh_device(par_pn_tau1em7);
 
 soleq_tau1em7 = equilibrate_short(par_pn_tau1em7);
 
