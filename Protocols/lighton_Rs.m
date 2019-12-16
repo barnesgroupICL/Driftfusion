@@ -39,9 +39,15 @@ par.Rs_initial = 1;
 
 disp('Switching on series resistance- initial fast linear sweep')
 
-sol_Rs = df(sol_ill1, par);
+sol = df(sol_ill1, par);
 
+% Longer step to reach stabilisation
 par.Rs_initial = 0;
+par.tmax = 1e-3;
+par.t0 = par.tmax/1e6;
+
+sol_Rs = df(sol, par);
+
 par.mobseti = mobseti;
 % If STABLE_TIME is  is entered as zero set to default value
 if stable_time >= 0
