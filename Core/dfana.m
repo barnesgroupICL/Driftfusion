@@ -701,15 +701,16 @@ classdef dfana
         function VQFL = calcVQFL(sol)
             % Get QFLs
             [~, ~, Efn, Efp] = dfana.QFLs(sol);
-=======
             par = sol.par;
-
             if par.pleft >= par.nleft && par.nright >= par.pright
                 % p-type left boundary, n-type right boundary
                 VQFL = Efn(:, end) - Efp(:, 1);
             elseif par.nleft >= par.nright && par.pright >= par.nright
                  % n-type left boundary, p-type right boundary
                 VQFL = Efp(:, end) - Efn(:, 1);
+            else
+                % If all equal the choose arbitrary boundaries
+                VQFL = Efn(:, end) - Efp(:, 1);
             end
         end
 
