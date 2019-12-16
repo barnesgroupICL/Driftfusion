@@ -336,13 +336,13 @@ classdef dfana
             kradmat = repmat(dev.krad, length(t), 1);
             taunmat = repmat(dev.taun, length(t), 1);
             taupmat = repmat(dev.taup, length(t), 1);
-            n0 = repmat(dev.n0, length(t), 1);
-            p0 = repmat(dev.p0, length(t), 1);
+            n0mat = repmat(dev.n0, length(t), 1);
+            p0mat = repmat(dev.p0, length(t), 1);
 
             % Recombination
             U.btb = kradmat.*(n.*p - nimat.^2);
 
-            U.srh = taunmat(i)*(n-n0(i)) + taupmat(i)*(p-p0(i));
+            U.srh = (1./taunmat)*(n-n0mat) + (1./taupmat)*(p-p0mat);
 
             U.tot = U.btb + U.srh;
         end
@@ -373,7 +373,7 @@ classdef dfana
             % Recombination
             U.btb = kradmat.*(n_ihalf.*p_ihalf - nimat.^2);
 
-            U.srh = ((n_ihalf.*p_ihalf - nimat.^2)./((taunmat.*(p_ihalf+ptmat)) + (taupmat.*(n_ihalf+ntmat))));
+            U.srh = (1./taunmat)*(n-n0mat) + (1./taupmat)*(p-p0mat);
 
             U.tot = U.btb + U.srh;
         end
