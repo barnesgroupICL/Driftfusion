@@ -1,7 +1,5 @@
 % A script to perform a transients of the transient photovoltage
 % measurement
-% close all
-% clear all
 
 %% Read-in params
 par_tio2 = pc('input_files/spiro_mapi_tio2.csv');
@@ -42,7 +40,7 @@ for i = 1:Ntr
     sol_VTROTTR(i) = do_light_pulse(sol_temp, 1, 50e-6, 400, 2, 0, 1);
     
     % Extract Voc vs t and subtract baseline
-    Voc(i,:) = dfana.Voct(sol_VTROTTR(i));
+    Voc(i,:) = dfana.calcVQFL(sol_VTROTTR(i));
     deltaV(i,:) = Voc(i,:) -  Voc(i,1);
     
     % Plot the outputs

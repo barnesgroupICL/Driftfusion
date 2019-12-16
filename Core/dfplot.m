@@ -136,7 +136,7 @@ classdef dfplot
         end
 
         function Voct(sol)
-            Voc = dfana.Voct(sol);
+            Voc = dfana.calcVQFL(sol);
             figure(6)
             plot(sol.t, Voc)
             xlabel('Time [s]')
