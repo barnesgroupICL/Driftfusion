@@ -167,7 +167,7 @@ switch par.xmesh_type
             
             if any(strcmp(par.layer_type{1,i-1}, {'layer', 'active'})) == 1
             
-            alpha = 0.7;
+            par.xmesh_coeff(i-1) = 0.7;
             parr = 1:1:pcell(i-1)+1;
             darr = 0:dcell(i-1)/pcell(i-1):dcum0(i);
             
@@ -175,11 +175,10 @@ switch par.xmesh_type
                 p1 = pcum0(i-1);
             else
                 p1 = pcum0(i-1);
-            end
-                
+            end 
 %             if i == length(dcum0)
 %                 p2 =            
-            x_layer = ((erf(2*pi*alpha*(parr-pcell(i-1)/2)/pcell(i-1))+1)/2);
+            x_layer = ((erf(2*pi*par.xmesh_coeff(i-1)*(parr-pcell(i-1)/2)/pcell(i-1))+1)/2);
             % Subtract base to get zero
             x_layer = x_layer-x_layer(1);
             % Normalise the funciton
@@ -188,9 +187,8 @@ switch par.xmesh_type
             x_layer = x_layer*dcell(i-1);
             % Write to x           
             x(pcum0(i-1):pcum0(i)) = x_layer + x(p1);
-            
+ 
             elseif strcmp(par.layer_type{1,i-1}, 'junction') == 1
-            
                   x_layer = linspace(dcum0(i-1), dcum0(i), pcell(i-1)+1);
                   x(1, pcum0(i-1):pcum0(i)) = x_layer;
             end
