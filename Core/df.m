@@ -124,8 +124,6 @@ g1_fun_type = par.g1_fun_type;
 g2_fun_type = par.g2_fun_type;
 g1_fun_arg = par.g1_fun_arg;
 g2_fun_arg = par.g2_fun_arg;
-k_iongen = device.k_iongen;
-k_ionrec = device.k_ionrec;
 
 %% Voltage function
 Vapp_fun = fun_gen(par.V_fun_type);
