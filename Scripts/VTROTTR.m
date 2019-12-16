@@ -1,7 +1,5 @@
 % A script to perform a transients of the transient photovoltage
 % measurement
-% close all
-% clear all
 
 %% Read-in params
 par_tio2 = pc('input_files/spiro_mapi_tio2.csv');

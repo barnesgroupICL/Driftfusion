@@ -58,7 +58,7 @@ hold off
 Voc_transient_bc = lighton_Rs(soleq_bc.ion, 1, 1, 1, 1e6, 400);
 Voc_transient_tc = lighton_Rs(soleq_tc.ion, 1, 1, 1, 1e6, 400);
 
-% Plot the Voc transients
+%% Plot the Voc transients
 dfplot.Voct(Voc_transient_bc);
 hold on
 dfplot.Voct(Voc_transient_tc);

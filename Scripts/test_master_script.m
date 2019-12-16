@@ -18,4 +18,6 @@ VTROTTR;
 
 IMVS_IMPS_script;
 
+Refresh_device_script;
+
 toc;

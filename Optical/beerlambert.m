@@ -25,7 +25,7 @@ switch par.side
         layers = par.stack;
         layer_type = par.layer_type;
         pcum1 = [1,par.pcum+1];
-        pcell = par.pcell;
+        layer_points = par.layer_points;
     case 2
         % Flip properties for side 2
         layers = fliplr(par.stack);
@@ -33,7 +33,7 @@ switch par.side
         x = x(end)-fliplr(par.xx);
         pcum1 = fliplr([1,par.pcum+1]);
         pcum1 = (pcum1(1)+1) - pcum1;
-        pcell = fliplr(par.pcell);
+        layer_points = fliplr(par.layer_points);
 end
 
 switch source_type
@@ -67,8 +67,8 @@ try
         switch layer_type{1,i}
             case {'layer', 'active'}
                 [n_layer, k_layer] = LoadRefrIndex(layers{i},lambda);
-                n(pcum1(i):pcum1(i+1),:) = repmat(n_layer,pcell(i)+1, 1);
-                k(pcum1(i):pcum1(i+1),:) = repmat(k_layer,pcell(i)+1, 1);       
+                n(pcum1(i):pcum1(i+1),:) = repmat(n_layer,layer_points(i)+1, 1);
+                k(pcum1(i):pcum1(i+1),:) = repmat(k_layer,layer_points(i)+1, 1);       
             case 'junction'
                 [n_layer, k_layer] = LoadRefrIndex(layers{i-1},lambda);
                 [n_layer_next, k_layer_next] = LoadRefrIndex(layers{i+1},lambda);
