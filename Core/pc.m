@@ -27,7 +27,7 @@ classdef pc
         % which define the thickness and number of points of each layer
         % respectively.
         dcell = 400e-7;         % Layer and subsection thickness array
-        pcell = 400;            % Points array
+        layer_points = 400;            % Points array
 
         %% Layer description
         % Define the layer type for each of the layers in the device. The
@@ -455,16 +455,16 @@ classdef pc
         end
         %% Layer thicknesses [cm]
         function value = get.d(par)
-            % For backwards comptibility. pcell and parr arre the now the
+            % For backwards comptibility. layer_points and parr arre the now the
             % same thing
             value = par.dcell;
         end
 
         %% Layer points
         function value = get.parr(par)
-            % For backwards comptibility. pcell and parr arre the now the
+            % For backwards comptibility. layer_points and parr arre the now the
             % same thing
-            value = par.pcell;
+            value = par.layer_points;
         end
 
         %% Band gap energies    [eV]
@@ -538,11 +538,11 @@ classdef pc
         end
 
         function value = get.pcum(par)
-            value = cumsum(par.pcell);
+            value = cumsum(par.layer_points);
         end
 
         function value = get.pcum0(par)
-            value = [1, cumsum(par.pcell)];
+            value = [1, cumsum(par.layer_points)];
         end
 
         function value = get.dcum0(par)
@@ -554,14 +554,7 @@ classdef pc
 
         function xx = xmeshini(par) % For backwards compatibility
             xx = meshgen_x(par);
-        end
-
-
-        
-
-        
-        
-
+        end     
 
     end
 end

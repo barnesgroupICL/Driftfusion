@@ -435,7 +435,7 @@ classdef explore
                             
                             if strmatch('dcell(1,4)', exsol.parnames(1)) ~= 0
                                 pcontact = round(exsol.parval1(i)*1e7);
-                                par.pcell(1,4) = pcontact*1;
+                                par.layer_points(1,4) = pcontact*1;
                             end
                             
                             % Refresh device
