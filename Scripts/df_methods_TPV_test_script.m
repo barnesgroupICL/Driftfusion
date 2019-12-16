@@ -21,13 +21,13 @@ duty = 5;
 [sol_TPV_10sun, sol_ill_10sun] = doTPV(soleq_tpv.el, 10, 10, 0, 0, 2, tmax, 1000, duty);
 
 %% get Delta Voc
-Voc_0p1sun = dfana.Voct(sol_TPV_0p1sun);
+Voc_0p1sun = dfana.calcVQFL(sol_TPV_0p1sun);
 deltaVoc_0p1sun = Voc_0p1sun-Voc_0p1sun(1);
 
-Voc_1sun = dfana.Voct(sol_TPV_1sun);
+Voc_1sun = dfana.calcVQFL(sol_TPV_1sun);
 deltaVoc_1sun = Voc_1sun-Voc_1sun(1);
 
-Voc_10sun = dfana.Voct(sol_TPV_10sun);
+Voc_10sun = dfana.calcVQFL(sol_TPV_10sun);
 deltaVoc_10sun = Voc_10sun-Voc_10sun(1);
 
 %% Shift time
@@ -55,8 +55,11 @@ TPV0Dstruct_1sun = TPV_0D(par_tpv, 1, 0.2, tmax, duty);
 TPV0Dstruct_1sun = TPV_0D(par_tpv, 10, 2, tmax, duty);
 
 figure(600)
+xlim([-1e-6, 15e-6])
 legend('DF, 0.1 sun', 'DF, 1 sun', 'DF, 10 sun', 'Analytical')
 hold off
 figure(601)
+xlim([0,15e-6])
+ylim([1e-10,1e-2])
 legend('DF, 0.1 sun', 'DF, 1 sun', 'DF, 10 sun', 'Analytical')
 hold off

@@ -701,7 +701,22 @@ classdef dfana
         function value = Voct(sol)
             %Get QFLs
             [~, ~, Efn, Efp] = dfana.QFLs(sol);
+<<<<<<< Updated upstream
             value = Efn(:, end) - Efp(:, 1);
+=======
+            par = sol.par;
+            
+            if par.pleft >= par.nleft && par.nright >= par.pright
+                % p-type left boundary, n-type right boundary
+                VQFL = Efn(:, end) - Efp(:, 1);
+            elseif par.nleft >= par.nright && par.pright >= par.nright
+                 % n-type left boundary, p-type right boundary
+                VQFL = Efp(:, end) - Efn(:, 1);
+            else
+                % If everything is equal choose arbitrary boundaries
+                VQFL = Efn(:, end) - Efp(:, 1);
+            end
+>>>>>>> Stashed changes
         end
         
         function deltaV = deltaVt(sol, p1, p2)
