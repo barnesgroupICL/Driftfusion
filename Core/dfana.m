@@ -342,7 +342,7 @@ classdef dfana
             % Recombination
             U.btb = kradmat.*(n.*p - nimat.^2);
 
-            U.srh = (1./taunmat)*(n-n0mat) + (1./taupmat)*(p-p0mat);
+            U.srh = (1./taunmat).*(n-n0mat) + (1./taupmat).*(p-p0mat);
 
             U.tot = U.btb + U.srh;
         end
@@ -350,7 +350,6 @@ classdef dfana
         function U = calcU_ihalf(sol)
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
             for ii = 1:length(t)
                 n_ihalf(ii,:) = getvarihalf(n(ii,:));
                 p_ihalf(ii,:) = getvarihalf(p(ii,:));
@@ -358,7 +357,6 @@ classdef dfana
                 c_ihalf(ii,:) = getvarihalf(c(ii,:));
             end
             x = getvarihalf(x);
-
             devihalf = getdevihalf(par);
 
             % Property matrices
@@ -367,15 +365,15 @@ classdef dfana
             kradmat = repmat(devihalf.krad, length(t), 1);
             taunmat = repmat(devihalf.taun, length(t), 1);
             taupmat = repmat(devihalf.taup, length(t), 1);
-            ntmat = repmat(devihalf.nt, length(t), 1);
-            ptmat = repmat(devihalf.pt, length(t), 1);
+            n0mat = repmat(devihalf.n0, length(t), 1);
+            p0mat = repmat(devihalf.p0, length(t), 1);
 
             % Recombination
-            U.btb = kradmat.*(n_ihalf.*p_ihalf - nimat.^2);
+            U.btb = 0;%kradmat.*(n_ihalf.*p_ihalf - nimat.^2);
 
-            U.srh = (1./taunmat)*(n-n0mat) + (1./taupmat)*(p-p0mat);
+            U.srh = (1./taunmat).*(n_ihalf-n0mat) + (1./taupmat).*(p_ihalf-p0mat);
 
-            U.tot = U.btb + U.srh;
+            U.tot = U.srh;
         end
 
         function [jdd, Jdd, xout] = Jddxt(sol)

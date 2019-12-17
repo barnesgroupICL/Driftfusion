@@ -8,7 +8,7 @@ figson = 1;
 %% Physical constants
 h = 4.135667662e-15;        % Plancks constant [eVs-1]
 c = 29979245800;            % Speed of light [cms-1]
-kB = 8.617330350e-5;        % Boltzmann constant [eV K^-1]
+kB = par.kB;        % Boltzmann constant [eV K^-1]
 q = par.e;%1.60217662e-19;         % Elementary charge [C]
 
 % E_dis = 1.6:0.01:1600;
@@ -63,7 +63,7 @@ q = par.e;%1.60217662e-19;         % Elementary charge [C]
     
     if figson == 1
         figure(4)
-        plot(V, J_dk, V, J)
+        plot(V, J_dk, '--', V, J, '--')
         xlabel('Applied Voltage [V]')
         ylabel('Current density [Acm-2]')
         ylim([-50e-3, 30e-3])

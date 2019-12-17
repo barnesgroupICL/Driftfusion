@@ -87,33 +87,35 @@ classdef dfplot
             % JV - a solution from doJV
             % OPTION - 1 = dark only, 2 = light only, 3 = dark & light
             % JV is a structure containing dark and illuminated JVs
-
             if option == 1 || option == 3
                 [j, J.dk.f] = dfana.calcJ(JV.dk.f);
                 Vapp.dk.f = dfana.calcVapp(JV.dk.f);
-                [j, J.dk.r] = dfana.calcJ(JV.dk.r);
-                Vapp.dk.r = dfana.calcVapp(JV.dk.r);
-
+                
                 figure(4)
-                plot(Vapp.dk.f, J.dk.f.tot(:,end), '--', Vapp.dk.r, J.dk.r.tot(:,end));
+                plot(Vapp.dk.f, J.dk.f.tot(:,end));
                 hold on
+                if isfield(JV.dk, 'r')
+                    [j, J.dk.r] = dfana.calcJ(JV.dk.r);
+                    Vapp.dk.r = dfana.calcVapp(JV.dk.r);
+                    plot(Vapp.dk.r, J.dk.r.tot(:,end))
+                end
             end
 
             if option == 2 || option == 3
-
                 [j, J.ill.f] = dfana.calcJ(JV.ill.f);
                 Vapp.ill.f = dfana.calcVapp(JV.ill.f);
-                [j, J.ill.r] = dfana.calcJ(JV.ill.r);
-                Vapp.ill.r = dfana.calcVapp(JV.ill.r);
-
                 figure(4)
-                plot(Vapp.ill.f, J.ill.f.tot(:,end),'--')%, 'Color', [0, 0.4470, 0.7410]);
+                plot(Vapp.ill.f, J.ill.f.tot(:,end))%, 'Color', [0, 0.4470, 0.7410]);
                 hold on
-                plot(Vapp.ill.r, J.ill.r.tot(:,end));%,'Color', [0, 0.4470, 0.7410]);
+                if isfield(JV.ill, 'r')
+                    [j, J.ill.r] = dfana.calcJ(JV.ill.r);
+                    Vapp.ill.r = dfana.calcVapp(JV.ill.r);
+                    plot(Vapp.ill.r, J.ill.r.tot(:,end));%,'Color', [0, 0.4470, 0.7410]);
+                end
             end
 
             figure(4)
-            %ylim([-30e-3, 10e-3]);
+            ylim([-30e-3, 10e-3]);
             xlabel('Applied voltage [V]')
             ylabel('Current density [Acm-2]');
             hold off

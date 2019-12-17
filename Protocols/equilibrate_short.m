@@ -17,7 +17,7 @@ sol.u = 0;
 par_origin = par;
 
 % Start with zero SRH recombination
-par.SRHset = 0;
+par.SRHset = 1;
 % Radiative rec could initially be set to zero in addition if required
 par.radset = 1;
 
@@ -51,6 +51,7 @@ disp('Complete')
 par.BC = par_origin.BC;
 par.mobset = 1;
 par.radset = 1;
+par.SRHset = 1;
 
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e6;
