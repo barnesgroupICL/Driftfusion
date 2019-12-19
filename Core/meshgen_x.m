@@ -155,20 +155,22 @@ switch par.xmesh_type
         dcell = par.dcell;
         layer_points = par.layer_points;
         
+        % For backwards compatibility
+        if length(par.xmesh_coeff) < length(layer_points)
+            xmesh_coeff = 0.7*ones(1, length(layer_points));     
+        else
+            xmesh_coeff = par.xmesh_coeff;
+        end
+        
         x = zeros(1, pcum0(end)-1);
         
         for i = 2:length(dcum0)
             if any(strcmp(par.layer_type{1,i-1}, {'layer', 'active'})) == 1
                 parr = 1:1:layer_points(i-1)+1;
-                darr = 0:dcell(i-1)/layer_points(i-1):dcum0(i);
-                if i == 2
-                    p1 = pcum0(i-1);
-                else
-                    p1 = pcum0(i-1);
-                end
-                %             if i == length(dcum0)
-                %                 p2 =
-                x_layer = ((erf(2*pi*par.xmesh_coeff(i-1)*(parr-layer_points(i-1)/2)/layer_points(i-1))+1)/2);
+                darr = 0:dcell(i-1)/layer_points(i-1):dcum0(i);  
+                 p1 = pcum0(i-1);
+                     
+                x_layer = ((erf(2*pi*xmesh_coeff(i-1)*(parr-layer_points(i-1)/2)/layer_points(i-1))+1)/2);
                 % Subtract base to get zero
                 x_layer = x_layer-x_layer(1);
                 % Normalise the funciton

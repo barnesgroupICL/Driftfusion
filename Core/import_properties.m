@@ -26,7 +26,7 @@ catch
     warning('No layer points array (points) defined in .csv . Using default in PC')
 end
 try
-    par.xmesh_coeff = T{:, 'xmesh_coeff '}';
+    par.xmesh_coeff = T{:, 'xmesh_coeff'}';
 catch
     warning('No xmesh coefficient array (xmesh_coeff) defined in .csv . Using default in PC')
 end
