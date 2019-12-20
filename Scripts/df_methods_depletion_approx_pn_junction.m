@@ -3,7 +3,7 @@ initialise_df
 %% Create parameters objects
 par_pn_base = pc('Input_files/pn_junction_DA_compare.csv');
 
-soleq_base = equilibrate_short(par_pn_base);
+soleq_base = equilibrate(par_pn_base, 1);
 
 %% Base parameters current-voltage
 % JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
@@ -24,7 +24,7 @@ par_pn_tau1em7.taup(end) = 1e-7;
 % Refresh the device to rebuild device structures
 par_pn_tau1em7 = refresh_device(par_pn_tau1em7);
 
-soleq_tau1em7 = equilibrate_short(par_pn_tau1em7);
+soleq_tau1em7 = equilibrate(par_pn_tau1em7, 1);
 
 %% JV
 JV_tau1em7 = doJV(soleq_tau1em7, 1e-9, 241, 1, 0, 0, 0.8, 3, 1);
@@ -43,7 +43,7 @@ par_pn_tau1em8.taun(1) = 1e-8;
 par_pn_tau1em8.taup(end) = 1e-8;
 par_pn_tau1em8 = refresh_device(par_pn_tau1em8);
 
-soleq_tau1em8 = equilibrate_short(par_pn_tau1em8);
+soleq_tau1em8 = equilibrate(par_pn_tau1em8, 1);
 
 %% JV
 JV_tau1em8 = doJV(soleq_tau1em8, 1e-9, 241, 1, 0, 0, 0.8, 3, 1);
