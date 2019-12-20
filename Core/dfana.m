@@ -514,7 +514,6 @@ classdef dfana
             Jdd.tot = par.e*jdd.tot;
         end
 
-
         function [FV, Frho] = calcF(sol)
             % Electric field caculation
             % FV = Field calculated from the gradient of the potential
@@ -680,15 +679,6 @@ classdef dfana
             end
         end
 
-        function F = Ft(sol, ppos)
-            % Field as a function of time at point position PPOS
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            for i = 1:length(t)
-                F(i,:) = -gradient(V(i,:),x);
-            end
-            F = F(:,ppos);
-        end
-
         function value = PLt(sol)
                 [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
@@ -700,13 +690,15 @@ classdef dfana
             % Get QFLs
             [~, ~, Efn, Efp] = dfana.QFLs(sol);
             par = sol.par;
-            
             if par.pleft >= par.nleft && par.nright >= par.pright
                 % p-type left boundary, n-type right boundary
                 VQFL = Efn(:, end) - Efp(:, 1);
             elseif par.nleft >= par.nright && par.pright >= par.nright
-                 % n-type left boundary, p-type right boundary
+                % n-type left boundary, p-type right boundary
                 VQFL = Efp(:, end) - Efn(:, 1);
+            else
+                % If all equal the choose arbitrary boundaries
+                VQFL = Efn(:, end) - Efp(:, 1);
             end
         end
 

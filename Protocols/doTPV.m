@@ -8,7 +8,7 @@ function [sol_TPV, sol_ill] = doTPV(sol_ini, bias_int, stab_time, mobseti, Rs, p
 % RS = Series resistance - recommended to use Rs = 1e6 for approx open
 % circuit
 
-% Get o
+% Get open circuit solution
 sol_ill = lighton_Rs(sol_ini, bias_int, stab_time, mobseti, Rs, tpoints);
 % A function to switch the light on and record the transient state with a
 % series resistance Rs
@@ -28,7 +28,5 @@ par.g2_fun_arg(3) = tmax;
 par.g2_fun_arg(4) = duty;           % Duty cycle
 
 sol_TPV = df(sol_ill, par);
-
-dfplot.Voct(sol_TPV);
 
 end

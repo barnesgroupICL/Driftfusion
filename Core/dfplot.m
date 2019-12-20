@@ -19,14 +19,14 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
-            
+
             figure(1);
             subplot(3,1,1);
             dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'}, {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
-            
-            subplot(3,1,2); 
+
+            subplot(3,1,2);
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1)
-            
+
             figure(1);
             subplot(3,1,3);
             dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
@@ -37,14 +37,14 @@ classdef dfplot
             % POS = the readout position
             t = sol.t;
             [j, J, x] = dfana.calcJ(sol);
-            
+
             if xpos <= x(1)
-                pos =1;
+                pos = 1;
             else
                 pos = find(x <= xpos);
                 pos = pos(end);
             end
-            
+
             figure(2);
             plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.c(:, pos), t, J.disp(:,pos), t, J.tot(:, pos));
             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal')
@@ -62,8 +62,8 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [j, J, x] = dfana.calcJ(sol);
-            
-            figure(3);            
+
+            figure(3);
             dfplot.x2d(sol, x, {J.n, J.p, J.a, J.c, J.disp, J.tot},...
                 {'Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtot'}, {'-','-','-','-','-','-'},...
                 'Current density [Acm-2]', tarr, xrange, 0, 0);
@@ -77,8 +77,8 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [j, J, x] = dfana.calcJ(sol);
-            
-            figure(301);            
+
+            figure(301);
             dfplot.x2d(sol, par.x_ihalf, {j.n, j.p, j.a, j.c, j.disp},{'jn', 'jp', 'ja', 'jc', 'jdisp'},...
                 {'-','-','-','-','-'}, 'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
@@ -90,7 +90,7 @@ classdef dfplot
             if option == 1 || option == 3
                 [j, J.dk.f] = dfana.calcJ(JV.dk.f);
                 Vapp.dk.f = dfana.calcVapp(JV.dk.f);
-                
+
                 figure(4)
                 plot(Vapp.dk.f, J.dk.f.tot(:,end));
                 hold on
@@ -128,8 +128,8 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [~, Jdd, x] = dfana.Jddxt(sol);
-            
-            figure(301);            
+
+            figure(301);
             dfplot.x2d(sol, x, {Jdd.ndiff, Jdd.ndrift, Jdd.pdiff, Jdd.pdrift,...
                                     Jdd.adiff, Jdd.adrift, Jdd.cdiff, Jdd.cdrift},...
                 {'Jn,diff', 'Jn,drift', 'Jp,diff', 'Jp,drift', 'Ja,diff', 'Ja,drift', 'Jc,diff', 'Jc,drift'},...
@@ -187,7 +187,6 @@ classdef dfplot
         end
 
         function logJVapp3D(sol, pos, ylogon)
-
             t = sol.t;
             [j, J] = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol)';
@@ -211,7 +210,6 @@ classdef dfplot
                 set(s1,'YScale','linear');
             end
             hold off
-
         end
 
         function xmesh(sol)
@@ -225,21 +223,21 @@ classdef dfplot
             % Electrostatic potential as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            
-            figure(12);         
+
+            figure(12);
             dfplot.x2d(sol, x, {V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
-        
+
         function npx(varargin)
             % Carrier densities as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            figure(13);            
+            figure(13);
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-','-'},...
                 'Carrier density [cm-3]', tarr, xrange, 0, 1)
         end
-        
+
         function acx(varargin)
             % Ionic carrier densities as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
@@ -249,37 +247,37 @@ classdef dfplot
             dfplot.x2d(sol, x, {a,c},{'anion','cation'}, {'-','-'},...
                 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
         end
-        
+
         function gx(varargin)
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [g1, g2, g] = dfana.calcg(sol);
-            
+
             figure(15)
             dfplot.x2d(sol, par.x_ihalf, {g1, g2, g}, {'g1', 'g2', 'g total'},...
                  {'-','-','-'}, 'Generation rate [cm-3s-1]', tarr, xrange, 0, 0);
         end
-        
+
         function gxt(sol)
             % Carrier densities as a function of position
             par = sol.par;
             t = sol.t;
             [~, ~, g] = dfana.calcg(sol);
             xnm = par.x_ihalf*1e7;
-            
+
             figure(16)
             surf(xnm, sol.t, g)
             xlabel('Position [cm]')
             ylabel('Time [s]')
             zlabel('Generation rate [cm^{-3}s^{-1}]')
         end
-            
+
         function Ux(varargin)
             % Recombination rates as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             U = dfana.calcU(sol);
-            
+
             figure(17)
             dfplot.x2d(sol, x, {U.btb, U.srh, U.tot},{'Ubtb', 'Usrh', 'Utot'},...
                 {'-','-','-'}, 'Recombination rate [cm-3s-1]', tarr, xrange, 0, 0);
@@ -352,14 +350,21 @@ classdef dfplot
                 ,'Jrec,srh-int for','Jrec,srh-int rev','Jrec,srh-bulk for','Jrec,srh-bulk rev')
         end
 
-        function Ft(sol, ppos)
-            % Absolute field strength as a function of time at point
-            % position PPOS
-            F = dfana.Ft(sol,ppos);
-            xpos = sol.x(ppos);
+        function Ft(sol, xpos)
+            % Absolute field strength F as a function of time at point
+            % position XPOS
+            x = sol.x;
+            if xpos <= x(1)
+                pos = 1;            % POS is the point position
+            else
+                pos = find(x <= xpos);
+                pos = pos(end);
+            end
+
+            F = dfana.calcF(sol);
 
             figure(14)
-            plot(sol.t, F)
+            plot(sol.t, F(:,pos))
             xlabel('Time [s]')
             ylabel(['Electric Field at pos x = ', num2str(round(xpos*1e7)), 'nm [Vcm-1]'])
         end
@@ -420,7 +425,7 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             rho = dfana.calcrho(sol);
-            
+
             figure(19)
             dfplot.x2d(sol, x, {rho},{'\rho'},{'-'},'Charge density [cm-3]', tarr, xrange, 0, 0);
         end
@@ -432,12 +437,11 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             rho = dfana.calcrho(sol);
             deltarho = rho - rho(1,:);
-            
+
             figure(20)
             dfplot.x2d(sol, x, {deltarho},{'\Delta \rho'},{'-'},'Delta charge density [cm-3]', tarr, xrange, 0, 0);
         end
-       
-        
+
         function rhoxFxVx(varargin)
             % Three panel figure:
             % Volumetric charge density (rho), Field and potential as a funciton of position
@@ -451,14 +455,14 @@ classdef dfplot
             figure(21)
             subplot(3, 1, 1)
             dfplot.x2d(sol, x, {rho},{'\rho'},{'-'}, 'Charge density [cm-3]', tarr, xrange, 0, 0);
-            
+
             subplot(3, 1, 2)
             dfplot.x2d(sol, x, {F},{'F'},{'-'},'Electric field [Vcm-1]', tarr, xrange, 0, 0);
 
             subplot(3, 1, 3)
             dfplot.x2d(sol, x, {V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
-        
+
         function rhoxVx(varargin)
             % Three panel figure:
             % Volumetric charge density (rho), Field and potential as a funciton of position
@@ -471,11 +475,10 @@ classdef dfplot
             figure(211)
             subplot(2, 1, 1)
             dfplot.x2d(sol, x, {rho},{'\rho'},{'-'}, 'Charge density [cm-3]', tarr, xrange, 0, 0);
-            
+
             subplot(2, 1, 2)
             dfplot.x2d(sol, x, {-V},{'V'},{'-'},'-Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
-
 
         function ELx_single(varargin)
             % Energy Level diagram, and charge densities plotter
@@ -485,12 +488,11 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
-            
+
             figure(22);
             dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'},...
                 {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
         end
-
 
         function ELnpx(varargin)
             % Energy Level diagram, and charge densities plotter
@@ -514,7 +516,7 @@ classdef dfplot
             % Potential and ionic charges as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            
+
             figure(24)
             subplot(2,1,1);
             dfplot.x2d(sol, x, {V}, {'V'},...
@@ -523,16 +525,15 @@ classdef dfplot
             subplot(2,1,2);
             dfplot.x2d(sol, x, {a, c}, {'a', 'c'},...
                 {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);
-            
         end
-        
+
         function Vionacx(varargin)
             % Electrostatic potential as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             Vion = dfana.calcVion(sol);
             Vel = V - Vion;
-            
+
             figure(25)
             subplot(2,1,1);
             dfplot.x2d(sol, x, {V, Vion, Vel}, {'V', 'Vion', 'Vel'},...
@@ -542,17 +543,26 @@ classdef dfplot
             dfplot.x2d(sol, x, {a, c}, {'a', 'c'},...
                 {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);
         end
-        
-        function Fiont(sol)
+
+        function Fiont(sol, xpos)
+            % Field contribution from ionic charge FION as a function of time at position XPOS
+            x = sol.x;
+            if xpos <= x(1)
+                pos = 1;            % POS is the point position
+            else
+                pos = find(x <= xpos);
+                pos = pos(end);
+            end
+
             Fion = dfana.calcFion(sol);
             t = sol.t;
-            
+
             figure(26)
-            plot(t, Fion(:,end))
+            plot(t, Fion(:,pos))
             xlabel('Time')
             ylabel('Ion field [Vcm-1]')
         end
-        
+
         function PLx(varargin)
             % Volumetric charge density (rho) as a funciton of position
             % A time array can be used as a second input argument
@@ -560,16 +570,16 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
             U = dfana.calcU(sol);
-            
+
             figure(27)
             dfplot.x2d(sol, x, {U.btb}, {'Ubtb'},...
                 {'-'}, 'Radiatve recombination rate [cm-3s-1]', tarr, xrange , 0, 0);
         end
-        
+
         function colourblocks(sol, yrange)
            par = sol.par;
            dcum0 = par.dcum0*1e7;   % Convert to nm
-           
+
            % Multicoloured
            % triplets = [1, 0.87, 0.87; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
            % French flag
@@ -578,7 +588,7 @@ classdef dfplot
            triplets = [0.85, 0.95, 0.7; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
            % pn
            % triplets = [1, 0.87, 0.87; 0.85, 0.92, 1];
-           
+
            for i =1:length(dcum0)-1
               v = [dcum0(i) yrange(2); dcum0(i+1) yrange(2); dcum0(i+1) yrange(1); dcum0(i) yrange(1)];   % vertices position
               f = [1 2 3 4];    % Faces
@@ -586,12 +596,12 @@ classdef dfplot
               colour = triplets(j,:);
               patch('Faces',f,'Vertices',v,'FaceColor',colour, 'EdgeColor','none');%,'HandleVisibility','off')
            end
-           
+
            hold on
         end
- 
+
         function [sol, tarr, pointtype, xrange] = sortarg(args)
-            
+
             if length(args) == 1
                 sol = args{1};
                 tarr = sol.t(end);
@@ -609,7 +619,7 @@ classdef dfplot
                 pointtype = 't';
             end
         end
-        
+
         function x2d(sol, xmesh, variables, legstr, linestyle, ylab, tarr, xrange, logx, logy)
             % SOL = solution structure
             % VARIABLES is an array containing the variables for plotting
@@ -624,10 +634,10 @@ classdef dfplot
             end
             par = sol.par;
             xnm = xmesh*1e7;
-             
+
             vmin = min(min(cell2mat(variables)));
             vmax = max(max(cell2mat(variables)));
-            
+
             if vmin == 0 && vmax == 0
                 vmin = -1;
                 vmax = 1;
@@ -641,21 +651,21 @@ classdef dfplot
                         dfplot.colourblocks(sol, [0.1*vmin, 10*vmax]);
                 end
             end
-            
+
             vmin_tarr = zeros(length(tarr),length(variables));
             vmax_tarr = zeros(length(tarr),length(variables));
             h = zeros(1, length(variables));
-            
+
             for i = 1:length(tarr)
                 % find the time
                 p1 = find(sol.t <= tarr(i));
                 p1 = p1(end);
                     for jj = 1:length(variables)
                         vtemp = variables{jj};
-                        
+
                         vmin_tarr(i,jj) = min(vtemp(p1, :));
                         vmax_tarr(i,jj) = max(vtemp(p1, :));
-                
+
                         h(i,jj) = plot(xnm, variables{jj}(p1, :), char(linestyle(jj)));
                         hold on
                     end
