@@ -40,7 +40,8 @@ hold off
 
 %% Plot the electrostatic potential for PS 1a during forward illuminated scan
 dfplot.Vx(JV_1a.ill.f, 1e9*[0, 0.2, 0.4, 0.6, 0.8]);
-legend('HTL','interface 1','Active layer','Interface 2','ETL','0 V', '0.2 V', '0.4 V', '0.6 V', '0.8 V')
+legend('HTL', 'interface 1', 'Active layer', 'Interface 2', 'ETL',...
+    '0 V', '0.2 V', '0.4 V', '0.6 V', '0.8 V')
 
 %% Plot the electron and hole profiles for PS 1a during forward illuminated scan
 dfplot.npx(JV_1a.ill.f, 1e9*[0, 0.2, 0.4, 0.6, 0.8]);
