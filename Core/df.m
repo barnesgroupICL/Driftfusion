@@ -281,7 +281,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         
         switch par.V_fun_type
             case 'constant'
-                Vapp = par.Vapp;
+                Vapp = par.V_fun_arg(1);
             otherwise
                 Vapp = Vapp_fun(par.V_fun_arg, t);
         end
