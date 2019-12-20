@@ -516,7 +516,6 @@ classdef dfana
             Jdd.tot = par.e*jdd.tot;
         end
         
-        
         function [FV, Frho] = calcF(sol)
             % Electric field caculation
             % FV = Field calculated from the gradient of the potential
@@ -681,16 +680,7 @@ classdef dfana
             else
             end
         end
-        
-        function F = Ft(sol, ppos)
-            % Field as a function of time at point position PPOS
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            for i = 1:length(t)
-                F(i,:) = -gradient(V(i,:),x);
-            end
-            F = F(:,ppos);
-        end
-        
+                
         function value = PLt(sol)
                 [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
                 
