@@ -188,9 +188,9 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         C = [C_electron; C_hole; C_cation; C_potential];
           
         % Flux terms
-        F_electron   = mue(i)*n*(-dVdx+gradEA(i))+(Dn(i)*(dndx-((n/Nc(i))*gradNc(i))));
-        F_hole       = muh(i)*p*(dVdx-gradIP(i))+(Dp(i)*(dpdx-((p/Nv(i))*gradNv(i))));
-        F_cation     = mucat(i)*(c*dVdx+kB*T*(dcdx+(c*(dcdx/(DOScat(i)-c)))));              
+        F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
+        F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
+        F_cation     = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));              
         F_potential  = (epp(i)/eppmax)*dVdx;
         F = [mobset*F_electron; mobset*F_hole; K_cation*mobseti*F_cation; F_potential]; 
             
