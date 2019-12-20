@@ -36,8 +36,8 @@ for i = 1:Ntr
     sol_temp.par.MaxStepFactor = 0.1;
     
     %% Freeze ions during pulse, 1 us pulse, with 49 us decay
-    % sol_pulse = do_light_pulse(sol_ini, pulse_int, tmax, tpoints, duty, mobseti, log_timemesh)
-    sol_VTROTTR(i) = do_light_pulse(sol_temp, 1, 50e-6, 400, 2, 0, 1);
+    % sol_pulse = doLightPulse(sol_ini, pulse_int, tmax, tpoints, duty, mobseti, log_timemesh)
+    sol_VTROTTR(i) = doLightPulse(sol_temp, 1, 50e-6, 400, 2, 0, 1);
     
     % Extract Voc vs t and subtract baseline
     Voc(i,:) = dfana.calcVQFL(sol_VTROTTR(i));
