@@ -190,14 +190,7 @@ classdef pc
         %% Defect recombination rate coefficient
         % Currently not used
         k_defect_p = 0;
-        k_defect_n = 0;
-        
-        %% Current voltage scan parameters
-        % Soon to be obselete
-        Vstart = 0;             % Initial scan point
-        Vend = 1.2;             % Final scan point
-        JVscan_rate = 1;        % JV scan rate (Vs-1)
-        JVscan_pnts = 100;      % JV scan points
+        k_defect_n = 0; 
 
         %% Dynamically created variables
         genspace = [];
@@ -208,8 +201,6 @@ classdef pc
         dev_ihalf = [];
         t = [];
         xpoints = [];
-        Vapp_params = [];
-        Vapp_func = @(str) [];
         gx1 = [];       % Light source 1
         gx2 = [];       % Light source 2
 

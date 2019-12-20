@@ -1,4 +1,4 @@
-function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
+function [sol_Voc, Voc] = findOptimVoc(sol)
 %findOptimVOC - Stabilize an asymmetric solution to the real open circuit voltage
 % which is the applied voltage where the current is minimized,
 % starting from the voltage present in the given solution. The suggested
@@ -6,7 +6,7 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 % profile are close to OC conditions) and break in a half with
 % asymmetricize. Requires MATLAB's Optimization Toolbox.
 %
-% Syntax:  [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
+% Syntax:  [sol_Voc, Voc] = findOptimVoc(sol)
 %
 % Inputs:
 %   ASYMSTRUCT - an asymmetric struct as created by PINDRIFT, ideally
@@ -39,31 +39,31 @@ function [asymstruct_voc, Voc] = findOptimVoc(asymstruct)
 
 %------------- BEGIN CODE --------------
 
-%assert(logical(asymstruct.par.calcJ), [mfilename ' - calcJ needs to be set and different from zero']);
+%assert(logical(sol.par.calcJ), [mfilename ' - calcJ needs to be set and different from zero']);
 
-asymstruct.par.tpoints = 10;
-asymstruct.par.JV = 0;
+sol.par.tpoints = 10;
+sol.par.JV = 0;
 
 % find residual current
-[~, originalCurrent] = dfana(asymstruct);
+[~, originalCurrent] = dfana.calcJ(sol);
 
-disp([mfilename ' - Original voltage: ' num2str(asymstruct.par.Vapp, 8) ' V; original current: ' num2str(originalCurrent(end)) ' mA/cm2'])
+disp([mfilename ' - Original voltage: ' num2str(sol.par.Vapp, 8) ' V; original current: ' num2str(originalCurrent(end)) ' mA/cm2'])
 
 if ~originalCurrent(end) % if the original current is exactly zero
     warning([mfilename ' - The initial residual current is zero, no better VOC can be found'])
-    asymstruct_voc = asymstruct;
-    Voc = asymstruct.par.Vapp;
+    sol_Voc = sol;
+    Voc = sol.par.Vapp;
     return;
 end
 
 % set an initial time for stabilization tmax
-if max(asymstruct.par.mucat)
-    asymstruct.par.tmax = min(5e0, 2^(-log10(max(asymstruct.par.mucat))) / 10 + 2^(-log10(asymstruct.par.mue(1))));
+if max(sol.par.mucat)
+    sol.par.tmax = min(5e0, 2^(-log10(max(sol.par.mucat))) / 10 + 2^(-log10(sol.par.mue(1))));
 else
-    asymstruct.par.tmax = min(1e-2, 2^(-log10(asymstruct.par.mue(1))));
+    sol.par.tmax = min(1e-2, 2^(-log10(sol.par.mue(1))));
 end
 
-asymstruct.par.t0 = asymstruct.par.tmax / 1e6;
+sol.par.t0 = sol.par.tmax / 1e6;
 
 %% estimate search range, assuming that a higher voltage causes a more positive current
 
@@ -77,18 +77,18 @@ dVlimit = 1.3;
 for dV = [0.01, repelem(0.2, 4), repelem(0.05, 9)]
     % this assumes that a more positive voltage results in more positive
     % current
-    [~, newCurrent, asymstruct_newVapp] = IgiveCurrentForVoltage(asymstruct, asymstruct.par.Vapp - sign(previousCurrent) * dV);
+    [~, newCurrent, sol_newVapp] = IgiveCurrentForVoltage(sol, sol.par.Vapp - sign(previousCurrent) * dV);
     if sign(newCurrent) ~= sign(originalCurrent(end))
         dVlimit = dV;
         % if the current is smaller, the new solution is used as starting
         % point, otherwise the solution of the previous cycle is used
         if abs(newCurrent) < abs(previousCurrent)
-            asymstruct = asymstruct_newVapp;
+            sol = sol_newVapp;
         end
         break
     else
         % the new solution is used as next point
-        asymstruct = asymstruct_newVapp;
+        sol = sol_newVapp;
         % store the new solution current value for next cycle
         previousCurrent = newCurrent;
     end
@@ -99,12 +99,12 @@ disp([mfilename ' - Search range: ' num2str(dVlimit) ' V'])
 %% do the search
 
 % the tmax obtained in the previous step could be too big and make some next step to fail
-asymstruct.par.tmax = asymstruct.par.tmax / 10;
-asymstruct.par.t0 = asymstruct.par.t0 / 10;
+sol.par.tmax = sol.par.tmax / 10;
+sol.par.t0 = sol.par.t0 / 10;
 
-% here asymstruct is a fixed input, while Vapp is the input that will be
+% here sol is a fixed input, while Vapp is the input that will be
 % optimized
-fun = @(Vapp) IgiveCurrentForVoltage(asymstruct, Vapp);
+fun = @(Vapp) IgiveCurrentForVoltage(sol, Vapp);
 
 % StepTolerance is usually what stops the minimization here
 % MaxFunctionEvaluations is 100 by default, reducing to 50 but even smaller
@@ -114,45 +114,45 @@ options = optimoptions('fmincon', 'StepTolerance', 1e-7, 'FunctionTolerance', 1e
 % the starting point is the currently present voltage
 % the constraints does not work when using the default interior-point
 % algorithm, no idea why
-Voc = fmincon(fun, asymstruct.par.Vapp, [1; -1], [asymstruct.par.Vapp + dVlimit; -(asymstruct.par.Vapp - dVlimit)], [], [], [], [], [], options);
+Voc = fmincon(fun, sol.par.Vapp, [1; -1], [sol.par.Vapp + dVlimit; -(sol.par.Vapp - dVlimit)], [], [], [], [], [], options);
 
 %% stabilize at the real Voc
 
-asymstruct.par.tpoints = 30;
-asymstruct.par.JV = 2; % mode for arbitrary Vapp profiles
-Vstart = asymstruct.par.Vapp; % current applied voltage
+sol.par.tpoints = 30;
+sol.par.JV = 2; % mode for arbitrary Vapp profiles
+Vstart = sol.par.Vapp; % current applied voltage
 Vend = Voc; % new Voc
-asymstruct.par.tmax = asymstruct.par.tmax / 10;
+sol.par.tmax = sol.par.tmax / 10;
 % the third parameter is the time point when the change from the old
 % voltage to the new one happens
-asymstruct.par.Vapp_params = [Vstart, Vend, 10 * asymstruct.par.t0];
+sol.par.Vapp_params = [Vstart, Vend, 10 * sol.par.t0];
 % starts at Vstart, linear Vapp decrease for the first points, then constant to Vend
-asymstruct.par.Vapp_func = @(coeff, t) (coeff(1) + (coeff(2)-coeff(1)).*t/coeff(3)) .* (t < coeff(3)) + coeff(2) .* (t >= coeff(3));
+sol.par.Vapp_func = @(coeff, t) (coeff(1) + (coeff(2)-coeff(1)).*t/coeff(3)) .* (t < coeff(3)) + coeff(2) .* (t >= coeff(3));
 
-asymstruct_voc = df(asymstruct, asymstruct.par);
+sol_Voc = df(sol, sol.par);
 
 %% stabilize
 
 % eliminate JV configuration
-asymstruct_voc.par.JV = 0;
+sol_Voc.par.JV = 0;
 % should be set anyway, but for avoiding risks, set Vapp
-asymstruct_voc.par.Vapp = Vend;
+sol_Voc.par.Vapp = Vend;
 
-asymstruct_voc = stabilize(asymstruct_voc); % go to steady state
+sol_Voc = stabilize(sol_Voc); % go to steady state
 
 % save Vend also in Vapp field of the struct
-asymstruct_voc.Vapp = Vend;
+sol_Voc.Vapp = Vend;
 % restore figson
-asymstruct_voc.par.figson = 1;
+sol_Voc.par.figson = 1;
 
 disp([mfilename ' - VOC found at ' num2str(Vend, 8) ' V'])
 
 end
 
 %% take out the last current point
-function [minimizeMe, current, asymstruct_newVapp] = IgiveCurrentForVoltage(asymstruct, Vapp)
+function [minimizeMe, current, sol_newVapp] = IgiveCurrentForVoltage(sol, Vapp)
 
-par = asymstruct.par;
+par = sol.par;
 
 par.JV = 2; % mode for arbitrary Vapp profiles
 Vstart = par.Vapp; % current applied voltage
@@ -165,12 +165,12 @@ par.Vapp_func = @(coeff, t) (coeff(1) + (coeff(2)-coeff(1)).*t/coeff(3)) .* (t <
 
 % the voltage step simulation can fail, shortening tmax (as in the catch block) could solve
 try
-    asymstruct_newVapp = df(asymstruct, par);
+    sol_newVapp = df(sol, par);
 catch
     disp([mfilename ' - the voltage change failed, trying again with shorter tmax'])
     par.tmax = par.tmax / 10;
     par.t0 = par.t0 / 10;
-    asymstruct_newVapp = df(asymstruct, par);
+    sol_newVapp = df(sol, par);
 end
 
 % eliminate JV configuration before stabilizing
@@ -179,15 +179,15 @@ par.JV = 0;
 par.Vapp = Vend;
 
 warning('off', 'df:verifyStabilization');
-while ~verifyStabilization(asymstruct_newVapp.sol, asymstruct_newVapp.t, 1e-2) % check stability
+while ~verifyStabilization(sol_newVapp.sol, sol_newVapp.t, 1e-2) % check stability
     disp([mfilename ' - Stabilizing over ' num2str(par.tmax) ' s']);
-    asymstruct_newVapp = df(asymstruct_newVapp, par);
+    sol_newVapp = df(sol_newVapp, par);
     par.tmax = par.tmax * 5;
     par.t0 = par.t0 * 5;
 end
 warning('on', 'df:verifyStabilization');
 
-[~, Jn] = dfana(asymstruct_newVapp);
+[~, Jn] = dfana(sol_newVapp);
 
 current = Jn(end);
 % I want the absolute value, but it's nicer to take the squared rather than

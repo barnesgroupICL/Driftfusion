@@ -12,7 +12,7 @@ initialise_df
 % open it in Excel and then edit the parameters. Save it as a different
 % name and then use that as the file in the path of the input argument to
 % PC (the parameters class):
-par_tio2_2l = pc('input_files/SPV_TiO2_MAPI_bilayer.csv');
+par_tio2_2l = pc('input_files/spv_tio2_mapi_bilayer.csv');
 
 %% Get equilibrium solutions
 % You will find that with the default parameters, contained in the above
@@ -31,7 +31,7 @@ soleq_tio2_2l = equilibrate(par_tio2_2l);
 % regarding the input arguments. The code splits the solution into 2 parts-
 % the illuminated step and the dark step, SPVSOL.ILL and SPVSOL.DK.
 % Input arguments: dospv(sol_ini, Int, mobseti, tpoints, tmax, Rs, stabilise)
-spvsol = dospv(soleq_tio2_2l.ion, 0.2, 1, 200, 10, 1e6, 0);
+spvsol = doSPV(soleq_tio2_2l.ion, 0.2, 1, 200, 10, 1e6, 0);
 
 %% Analyse the solution
 % SPVANA (in the Analysis folder) takes the two solutions contained in SPVSOL, extracts the charge

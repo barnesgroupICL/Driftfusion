@@ -1,4 +1,4 @@
-function sol_IMVS = do_IMVS(sol_ini, int_base, int_delta, frequency, tmax, tpoints)
+function sol_IMVS = doIMVS(sol_ini, int_base, int_delta, frequency, tmax, tpoints)
 % Switches to open circuit at INT_BASE, runs to stabilised OC then performs IMVS measurement at the
 % specified FREQUENCY
 % INT_BASE = constant (DC) bias component [mulitples of GX]
