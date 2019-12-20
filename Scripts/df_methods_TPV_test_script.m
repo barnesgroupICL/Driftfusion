@@ -2,7 +2,7 @@
 par_tpv = pc('Input_files/TPV_test.csv');
 
 %% Get equilibrium
-soleq_tpv = equilibrate(par_tpv);
+soleq_tpv = equilibrate(par_tpv, 1);
 
 % Decrease maximum timestep for better time accuracy (note slows solution
 % considerably)

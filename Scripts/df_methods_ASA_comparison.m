@@ -9,10 +9,10 @@ par_2a = pc('Input_files/3_layer_methods_test2a.csv');
 par_2b = pc('Input_files/3_layer_methods_test2b.csv');
 
 %% Find equilibrium solutions
-soleq_1a = equilibrate(par_1a);
-soleq_1b = equilibrate(par_1b);
-soleq_2a = equilibrate(par_2a);
-soleq_2b = equilibrate(par_2b);
+soleq_1a = equilibrate(par_1a, 1);
+soleq_1b = equilibrate(par_1b, 1);
+soleq_2a = equilibrate(par_2a, 1);
+soleq_2b = equilibrate(par_2b, 1);
 
 %% Perform current-voltage scans
 % JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
