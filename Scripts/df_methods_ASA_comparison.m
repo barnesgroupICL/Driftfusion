@@ -18,10 +18,10 @@ soleq_2b = equilibrate(par_2b);
 % JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 JV_1a = doJV(soleq_1a.el, 1e-9, 261, 1, 0, 0, 1.3, 3);
 JV_1b = doJV(soleq_1b.el, 1e-9, 261, 1, 0, 0, 1.3, 3);
-JV_2a = doJV(soleq_2a.el, 1e-9, 241, 1, 0, 0, 1.3, 3);
-JV_2b = doJV(soleq_2b.el, 1e-9, 241, 1, 0, 0, 1.3, 3);
+JV_2a = doJV(soleq_2a.el, 1e-9, 261, 1, 0, 0, 1.3, 3);
+JV_2b = doJV(soleq_2b.el, 1e-9, 261, 1, 0, 0, 1.3, 3);
 
-%% plot the current voltage curves
+%% Plot the current voltage curves
 dfplot.JV(JV_1a,3)
 hold on
 dfplot.JV(JV_1b,3)
