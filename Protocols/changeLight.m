@@ -1,5 +1,5 @@
 function sol_int = changeLight(sol, newInt, tmax)
-%CHANGELIGHT - Stabilize solutions at a new light intensity
+% CHANGELIGHT - Stabilize solutions at a new light intensity
 %
 % Syntax:  sol_int = changeLight(sol, newInt, tmax)
 %

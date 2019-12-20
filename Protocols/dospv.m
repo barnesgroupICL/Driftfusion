@@ -1,4 +1,4 @@
-function spvsol = dospv(sol_ini, Int, mobseti, tpoints, tmax, Rs, stabilise)
+function spvsol = doSPV(sol_ini, Int, mobseti, tpoints, tmax, Rs, stabilise)
 % A function for switching the light on and off with a series
 % resistance Rs
 
@@ -32,10 +32,13 @@ par.Rs_initial = 1;
 % necessary because the current at equilibrium does not reach zero. This
 % step applies a small voltage simulating the series resistance
 disp(['initial dark solution with Rs = ', num2str(Rs), ' Ohms switched on'])
+sol_Rs_temp = df(sol_ini, par);
 
-sol_Rs = df(sol_ini, par);
-
+% Rs stablisation step before switching on ion mobility
+par.Rs_initial = 0;
+sol_Rs = df(sol_Rs_temp, par);
 disp('Complete')
+
 %% Parameters for initial illuminated solution
 par.Rs_initial = 0;
 par.int1 = Int;

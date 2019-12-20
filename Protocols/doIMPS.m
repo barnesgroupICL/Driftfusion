@@ -1,5 +1,5 @@
-function sol_IMPS = do_IMPS(sol_ini, int_base, int_delta, frequency, tmax, tpoints)
-% Switches to open circuit at INT_BASE, runs to stabilised OC then performs IMPS measurement at the
+function sol_IMPS = doIMPS(sol_ini, int_base, int_delta, frequency, tmax, tpoints)
+% Performs IMPS measurement at the
 % specified FREQUENCY
 % INT_BASE = constant (DC) bias component [mulitples of GX]
 % INT_DELTA = variable (AC) bias component [mulitples of GX]

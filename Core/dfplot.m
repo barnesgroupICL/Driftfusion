@@ -39,7 +39,7 @@ classdef dfplot
             [j, J, x] = dfana.calcJ(sol);
             
             if xpos <= x(1)
-                pos =1;
+                pos = 1;
             else
                 pos = find(x <= xpos);
                 pos = pos(end);
@@ -97,7 +97,6 @@ classdef dfplot
                 figure(4)
                 plot(Vapp.dk.f, J.dk.f.tot(:,end), '--', Vapp.dk.r, J.dk.r.tot(:,end));
                 hold on
-
             end
 
             if option == 2 || option == 3
@@ -186,7 +185,6 @@ classdef dfplot
         end
 
         function logJVapp3D(sol, pos, ylogon)
-
             t = sol.t;
             [j, J] = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol)';
@@ -210,7 +208,6 @@ classdef dfplot
                 set(s1,'YScale','linear');
             end
             hold off
-
         end
 
         function xmesh(sol)
@@ -351,14 +348,21 @@ classdef dfplot
                 ,'Jrec,srh-int for','Jrec,srh-int rev','Jrec,srh-bulk for','Jrec,srh-bulk rev')
         end
 
-        function Ft(sol, ppos)
-            % Absolute field strength as a function of time at point
-            % position PPOS
-            F = dfana.Ft(sol,ppos);
-            xpos = sol.x(ppos);
+        function Ft(sol, xpos)
+            % Absolute field strength F as a function of time at point
+            % position XPOS
+            x = sol.x;
+            if xpos <= x(1)
+                pos = 1;            % POS is the point position
+            else
+                pos = find(x <= xpos);
+                pos = pos(end);
+            end
 
+            F = dfana.calcF(sol);
+            
             figure(14)
-            plot(sol.t, F)
+            plot(sol.t, F(:,pos))
             xlabel('Time [s]')
             ylabel(['Electric Field at pos x = ', num2str(round(xpos*1e7)), 'nm [Vcm-1]'])
         end
@@ -436,7 +440,6 @@ classdef dfplot
             dfplot.x2d(sol, x, {deltarho},{'\Delta \rho'},{'-'},'Delta charge density [cm-3]', tarr, xrange, 0, 0);
         end
        
-        
         function rhoxFxVx(varargin)
             % Three panel figure:
             % Volumetric charge density (rho), Field and potential as a funciton of position
@@ -475,7 +478,6 @@ classdef dfplot
             dfplot.x2d(sol, x, {-V},{'V'},{'-'},'-Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
 
-
         function ELx_single(varargin)
             % Energy Level diagram, and charge densities plotter
             % SOL = the solution structure
@@ -489,7 +491,6 @@ classdef dfplot
             dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'},...
                 {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
         end
-
 
         function ELnpx(varargin)
             % Energy Level diagram, and charge densities plotter
@@ -521,8 +522,7 @@ classdef dfplot
 
             subplot(2,1,2);
             dfplot.x2d(sol, x, {a, c}, {'a', 'c'},...
-                {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);
-            
+                {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);    
         end
         
         function Vionacx(varargin)
@@ -542,12 +542,21 @@ classdef dfplot
                 {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);
         end
         
-        function Fiont(sol)
+        function Fiont(sol, xpos)
+            % Field contribution from ionic charge FION as a function of time at position XPOS
+            x = sol.x;
+            if xpos <= x(1)
+                pos = 1;            % POS is the point position
+            else
+                pos = find(x <= xpos);
+                pos = pos(end);
+            end
+            
             Fion = dfana.calcFion(sol);
             t = sol.t;
             
             figure(26)
-            plot(t, Fion(:,end))
+            plot(t, Fion(:,pos))
             xlabel('Time')
             ylabel('Ion field [Vcm-1]')
         end

@@ -1,5 +1,5 @@
 function steadystate_struct = stabilize(struct)
-%STABILIZE - Simulates the solution increasing the maximum time until when steady state is reached
+% STABILIZE - Simulates the solution increasing the maximum time until when steady state is reached
 %
 % Syntax:  steadystate_struct = stabilize(struct)
 %
@@ -81,11 +81,11 @@ end
 % the warnings are not needed here
 warning('off', 'df:verifyStabilization');
 
-while forceStabilization || ~verifyStabilization(steadystate_struct.sol, steadystate_struct.t, 1e-3) % check stability
+while forceStabilization || ~verifyStabilization(steadystate_struct.u, steadystate_struct.t, 1e-3) % check stability
     disp([mfilename ' - Stabilizing ' inputname(1) ' over ' num2str(par.tmax) ' s with an applied voltage of ' num2str(par.Vapp) ' V']);
     % every cycle starts from the last timepoint of the previous cycle
     steadystate_struct = df(steadystate_struct, par);
-    if size(steadystate_struct.sol, 1) ~= steadystate_struct.par.tpoints % simulation failed
+    if size(steadystate_struct.u, 1) ~= steadystate_struct.par.tpoints % simulation failed
         % if the stabilization breaks (does not reach the final time point), reduce the tmax
         par.tmax = par.tmax / 10;
         par.t0 = par.tmax / 1e8;
