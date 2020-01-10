@@ -47,7 +47,7 @@ sol_int = sol;
 if tmax
     tmax_temp = tmax;
 else % if tmax was zero, estimate a good one
-    if par.mucat
+    if par.mobseti
         tmax_temp = min(1, 2^(-log10(par.mucat)) / 10 + 2^(-log10(par.mue(1))));
     else
         tmax_temp = min(1e-3, 2^(-log10(par.mue(1))));
