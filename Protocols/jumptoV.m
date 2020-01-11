@@ -25,6 +25,7 @@ par = sol_ini.par;
 %% Set up sweep
 tjump = 1e-6;
 par.tmesh_type = 1;
+par.t0 = 0;
 par.V_fun_type = 'sweep';
 par.V_fun_arg(1) = par.Vapp;
 par.V_fun_arg(2) = Vjump;
@@ -33,8 +34,8 @@ par.V_fun_arg(3) = tjump;
 par.mobseti = 0;
 
 disp('Initial jump with zero ion mobility')
-% Vapp_function(sol_ini, Vapp_func, tmax, tpoints, logtime)
 jump1 = df(sol_ini, par);
+disp('Complete')
 
 par = jump1.par;
 
