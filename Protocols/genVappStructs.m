@@ -1,106 +1,91 @@
-function structCell = genVappStructs(asymstruct, Vapp_array)
-%GENVAPPSTRUCTS - Generates a cell containing asymmetric structures of solutions at various applied voltages
-%
-% Syntax:  structCell = genVappStructs(asymstruct, Vapp_array)
-%
-% Inputs:
-%   ASYMSTRUCT - a solution asymmetric struct as created by PINDRIFT.
-%   VAPP_ARRAY - an array containing the requested Vapp list.
-%
-% Outputs:
-%   STRUCTCELL - a cell containing structs of solutions at various applied
-%     voltages, ordered with ascending voltages
-%
-% Example:
-%   structs_Vapp_dark = genVappStructs(sol_i_eq_SR, 0:0.2:1);
-%     generates dark solutions at 0, 0.2, 0.4, 0.6, 0.8 and 1 V applied voltages
-%   structs_Vapp_dark = genVappStructs(sol_i_eq_SR, linspace(0, 1, 15));
-%     generates dark solutions at 15 different voltages from 0 to 1 V
-%   structs_Vapp_dark = genVappStructs(sol_i_eq_SR, [0, 0.8, 0.9]);
-%     generates dark solutions at a list of applied voltages, remember that
-%     the list will have an ascending ordering in the output structure
-%
-% Other m-files required: df, dfana
-% Subfunctions: none
-% MAT-files required: none
-%
-% See also genIntStructs, df.
+function VappSol = genVappStructs(solini, Vapp_arr, mobseti)
+% Obtain steady-state solutions for applied voltages defined by VAPP_ARR
+% solstruct should be a stablised solution
+% If MOBSETI = 1 ions are accelerated to obtain steady state
+% P Calado 2019, Imperial College London
+% Adapted from original code by I. Gelmetti
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
-% Imperial College London
-% October 2017; Last revision: January 2018
+% Store parameters
+par = solini.par;
 
-%------------- BEGIN CODE --------------
+Vapp_arr = [solini.par.Vapp, Vapp_arr];    % include intial potential in array in case
 
-asymstruct_Vapp = asymstruct;
+% Store initial solution
+sol = solini;
 
-% estimate a good tmax
-if asymstruct_Vapp.par.mucat
-    tmax_temp = min(1e1, 2^(-log10(asymstruct_Vapp.par.mucat)) / 10 + 2^(-log10(asymstruct_Vapp.par.mue(1))));
-else
-    tmax_temp = min(1e-2, 2^(-log10(asymstruct_Vapp.par.mue(1))));
+for i = 1:length(Vapp_arr)-1
+    
+    disp([mfilename ' - applied voltage ' num2str(Vapp_arr(i+1))])
+    name = matlab.lang.makeValidName([inputname(1) '_Vapp_' num2str(Vapp_arr(i+1))]);
+    
+    if mobseti
+        % Take ratio of electron and ion mobilities in the active layer
+        rat_anion = par.mue(par.active_layer)/par.muani(par.active_layer);
+        rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+        
+        % If the ratio is infinity (ion mobility set to zero) then set the ratio to
+        % zero instead
+        if isnan(rat_anion) || isinf(rat_anion)
+            rat_anion = 0;
+        end
+        
+        if isnan(rat_cation) || isinf(rat_cation)
+            rat_cation = 0;
+        end
+        
+        par.mobseti = 1;           % Ions are accelerated to reach equilibrium
+        par.K_anion = rat_anion;
+        par.K_cation = rat_cation;
+    end
+    
+    par.tmesh_type = 1;
+    par.t0 = 0;
+    par.tmax = 1e-2;
+    par.V_fun_type = 'sweep';
+    par.V_fun_arg(1) = Vapp_arr(i);
+    par.V_fun_arg(2) = Vapp_arr(i+1);
+    par.V_fun_arg(3) = par.tmax;
+    
+    sol = df(sol, par);
+    
+    par.V_fun_type = 'constant';
+    par.V_fun_arg(1) = Vapp_arr(i+1);
+
+    sol = df(sol, par);
+        
+    % Check that the solution is steady-state
+    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
+    j = 0;
+    while any(all_stable) == 0
+        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
+        
+        par.tmax = par.tmax*10;
+        par.t0 = par.tmax/1e6;
+        
+        sol = df(sol, par);
+        
+        all_stable = verifyStabilization(sol.u, sol.t, 0.7);
+    end
+    
+    % reset ion coeffs before storing
+    if mobseti
+        sol.par.K_anion = 1;
+        sol.par.K_cation = 1;
+    end
+    % if there's only one solution then duplicate sol structure
+    if length(Vapp_arr)-1 == 1
+        
+        VappSol = sol;
+        
+        % if there's multiple solutions, store in a master struct
+    else
+        
+        VappSol{1, i} = sol;
+        VappSol{2, i} = name;
+        
+    end
+    
 end
 
-% usually the solution in short circuit is given in input, so start from
-% zero Vapp
-Vapp_array = sort(Vapp_array, 'ascend');
-
-% pre allocate
-structCell = cell(2, length(Vapp_array));
-
-%% generate solutions
-for i = 1:length(Vapp_array)
-    disp([mfilename ' - applied voltage ' num2str(Vapp_array(i))])
-    name = matlab.lang.makeValidName([inputname(1) '_Vapp_' num2str(Vapp_array(i))]);
-    % decrease annoiance by figures popping up
-    asymstruct_Vapp.par.figson = 0;
-    
-    par = asymstruct_Vapp.par;
-    % prepare parameters for the voltage change
-    par.tmesh_type = 2;
-    par.t0 = 1e-10;
-    par.tpoints = 50; % wide, does not matter much but have to be bigger than t_npoints_V_step
-    par.calcJ = 0; % we do not need to calculate current here
-    par.tmax = tmax_temp;
-
-    % ideal sudden change is voltage maybe cannot be solved
-    % boundary conditions have to be changed more slowly 
-    % the solver needs at least one point at the starting voltage, before switching to short circuit
-    par.JV = 2; % new mode for arbitrary Vapp profiles
-    [Vapp_arr, ~] = dfana(asymstruct_Vapp); % quasi-fermi levels are needed for knowing the current Voc
-    Vstart = Vapp_arr(end); % current Voc
-    Vend = Vapp_array(i); % final Voc
-    
-    % the third parameter is the time point when the change from the old
-    % voltage to the new one happens
-    par.Vapp_params = [Vstart, Vend, 10 * par.t0];
-    % starts at Vstart, linear Vapp decrease for the first points, then constant to Vend
-    par.Vapp_func = @(coeff, t) (coeff(1) + (coeff(2)-coeff(1)).*t/coeff(3)) .* (t < coeff(3)) + coeff(2) .* (t >= coeff(3));
-
-    % go to the new Vapp
-    asymstruct_Vapp = df(asymstruct_Vapp, par);
-    
-    %% stabilize
-    
-    % should be set anyway, but for avoiding risks, set Vapp
-    asymstruct_Vapp.par.Vapp = Vend;
-    % eliminate JV configuration before saving (useless as stabilize would eliminate it anyway...)
-    asymstruct_Vapp.par.JV = 0;
-    
-    asymstruct_Vapp = stabilize(asymstruct_Vapp); % go to steady state
-    
-    % restore figson before saving
-    asymstruct_Vapp.par.figson = 1;
-
-    % re-establish the original calcJ
-    asymstruct_Vapp.par.calcJ = asymstruct.par.calcJ;
-
-    structCell{1, i} = asymstruct_Vapp;
-    structCell{2, i} = name;
 end
 
-%------------- END OF CODE --------------
