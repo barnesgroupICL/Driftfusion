@@ -13,7 +13,7 @@ function fun = fun_gen(fun_type)
 %% 'square'
 % COEFF = [A_low, A_high, time_period, duty_cycle]
 %% 'sin'
-% COEFF = [DC_int, Delta_A, frequency, phase]
+% COEFF = [DC_offset, Delta_A, frequency, phase]
 
 switch fun_type
     case 'constant'
@@ -25,4 +25,11 @@ switch fun_type
         fun = @(coeff, t) coeff(1) + (coeff(2)-coeff(1))*lt(mod(t,coeff(3))*1/coeff(3),coeff(4)/100);
     case 'sin'
         fun = @(coeff, t) coeff(1) + coeff(2)*(sin(2*pi*coeff(3)*t + coeff(4)));
+    case 'sweep2'
+        fun = @(coeff, t) coeff(1) + [(coeff(2)-coeff(1))*t(t<=coeff(3)/2)/coeff(3),...
+                                   -(coeff(2)-coeff(1))*(t(t>coeff(3)/2)/coeff(3) -  2*t(t==coeff(3)/2)/coeff(3))];
+    case 'tri'
+        % COEFF = [OFFSET, V1, V2, tmax]  tmax is defined by the input
+        % time array
+        fun = @(coeff, t) triangle_fun_singlecycle(coeff, t);
 end
