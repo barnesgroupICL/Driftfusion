@@ -36,17 +36,11 @@ classdef dfplot
             % Currents as a function of time
             % POS = the readout position
             t = sol.t;
-            [j, J, x] = dfana.calcJ(sol);
-            
-            if xpos <= x(1)
-                pos = 1;
-            else
-                pos = find(x <= xpos);
-                pos = pos(end);
-            end
+            [j, J, xmesh] = dfana.calcJ(sol);
+            ppos = getpointpos(xpos, xmesh);
             
             figure(2);
-            plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.c(:, pos), t, J.disp(:,pos), t, J.tot(:, pos));
+            plot(t, J.n(:, ppos),t, J.p(:, ppos),t, J.a(:, ppos),t, J.c(:, ppos), t, J.disp(:,ppos), t, J.tot(:, ppos));
             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal')
             xlabel('time [s]');
             ylabel('J [A cm^{-2}]');
@@ -158,25 +152,35 @@ classdef dfplot
             ylabel('Vapp [V]')
         end
 
-        function JVapp(sol, pos)
+        function JVapp(sol, xpos)
+            
+            % Obtain point position from x position
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+            
             [j, J] = dfana.calcJ(sol);
             Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
+            
             figure(9)
-            plot(Vapp, J.n(:, pos),Vapp, J.p(:, pos),Vapp, J.a(:, pos),Vapp, J.disp(:,pos), Vapp, J.tot(:, pos));
+            plot(Vapp, J.n(:, ppos),Vapp, J.p(:, ppos),Vapp, J.a(:, ppos),Vapp, J.disp(:,ppos), Vapp, J.tot(:, ppos));
             legend('Jn', 'Jp', 'Ja', 'Jdisp', 'Jtotal')
-            xlabel('Vapp [V]');
-            ylabel('J [A cm^{-2}]');
+            xlabel('Applied Voltage, Vapp [V]');
+            ylabel('Current Density, J [A cm^{-2}]');
             set(legend,'FontSize',16);
             set(legend,'EdgeColor',[1 1 1]);
         end
 
-         function logJVapp(sol, pos)
+         function logJVapp(sol, xpos)
             % plot the log of the mod J
+            
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+            
             [j, J] = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol);
-
+           
             figure(10)
-            semilogy(Vapp, abs(J.tot(:,pos)), Vapp, abs(J.n(:,pos)), Vapp, abs(J.p(:,pos)), Vapp, abs(J.a(:,pos)),Vapp, abs(J.c(:,pos)), Vapp, abs(J.disp(:,pos)));
+            semilogy(Vapp, abs(J.tot(:,ppos)), Vapp, abs(J.n(:,ppos)), Vapp, abs(J.p(:,ppos)), Vapp, abs(J.a(:,ppos)),Vapp, abs(J.c(:,ppos)), Vapp, abs(J.disp(:,ppos)));
             xlabel('Vapp [V]');
             ylabel('|J| [A cm^{-2}]');
             legend('Jtot', 'Jn', 'Jp', 'Ja', 'Jc', 'Jdisp')
@@ -184,11 +188,15 @@ classdef dfplot
             set(legend,'EdgeColor',[1 1 1]);
         end
 
-        function logJVapp3D(sol, pos, ylogon)
+        function logJVapp3D(sol, xpos, ylogon)
+            
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+            
             t = sol.t;
             [j, J] = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol)';
-            Jtot=J.tot(:, pos);
+            Jtot=J.tot(:, ppos);
 
             figure(11)
             surface('XData', [Vapp Vapp],             ... % N.B.  XYZC Data must have at least 2 cols
@@ -351,18 +359,13 @@ classdef dfplot
         function Ft(sol, xpos)
             % Absolute field strength F as a function of time at point
             % position XPOS
-            x = sol.x;
-            if xpos <= x(1)
-                pos = 1;            % POS is the point position
-            else
-                pos = find(x <= xpos);
-                pos = pos(end);
-            end
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
 
             F = dfana.calcF(sol);
             
             figure(14)
-            plot(sol.t, F(:,pos))
+            plot(sol.t, F(:,ppos))
             xlabel('Time [s]')
             ylabel(['Electric Field at pos x = ', num2str(round(xpos*1e7)), 'nm [Vcm-1]'])
         end
@@ -544,19 +547,14 @@ classdef dfplot
         
         function Fiont(sol, xpos)
             % Field contribution from ionic charge FION as a function of time at position XPOS
-            x = sol.x;
-            if xpos <= x(1)
-                pos = 1;            % POS is the point position
-            else
-                pos = find(x <= xpos);
-                pos = pos(end);
-            end
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
             
             Fion = dfana.calcFion(sol);
             t = sol.t;
             
             figure(26)
-            plot(t, Fion(:,pos))
+            plot(t, Fion(:,ppos))
             xlabel('Time')
             ylabel('Ion field [Vcm-1]')
         end
