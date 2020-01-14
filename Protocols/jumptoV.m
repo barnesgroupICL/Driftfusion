@@ -73,7 +73,9 @@ par.t0 = par.tmax/1e8;
 par.tmesh_type = 2;
 par.tpoints = 200;
 
+disp('Dwell stage...')
 sol = df(jump1, par);
+
 j = 1;
 if stabilise
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
@@ -91,7 +93,7 @@ if stabilise
         j = j+1;
     end
 end
-
+disp('Complete')
 sol_relax = sol;
 sol_relax.par.K_cation = 1;
 sol_relax.par.K_anion = 1;
