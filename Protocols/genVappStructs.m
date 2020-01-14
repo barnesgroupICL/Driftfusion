@@ -32,7 +32,6 @@ for i = 1:length(Vapp_arr)-1
         if isnan(rat_cation) || isinf(rat_cation)
             rat_cation = 0;
         end
-        
         par.mobseti = 1;           % Ions are accelerated to reach equilibrium
         par.K_anion = rat_anion;
         par.K_cation = rat_cation;
@@ -58,7 +57,6 @@ for i = 1:length(Vapp_arr)-1
     j = 0;
     while any(all_stable) == 0
         disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-        
         par.tmax = par.tmax*10;
         par.t0 = par.tmax/1e6;
         
@@ -74,17 +72,12 @@ for i = 1:length(Vapp_arr)-1
     end
     % if there's only one solution then duplicate sol structure
     if length(Vapp_arr)-1 == 1
-        
         VappSol = sol;
-        
         % if there's multiple solutions, store in a master struct
     else
-        
         VappSol{1, i} = sol;
         VappSol{2, i} = name;
-        
     end
-    
 end
 
 end
