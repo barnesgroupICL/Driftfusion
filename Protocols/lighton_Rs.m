@@ -11,7 +11,7 @@ function sol_ill = lighton_Rs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
 % circuit
 % PNTS = Number of time points in the solution
 
-disp(['Starting LIGHTON, Intensity = ', num2str(int1), ' Rs = ', num2str(Rs)])
+disp(['Starting LIGHTON_RS, Intensity = ', num2str(int1), ' Rs = ', num2str(Rs)])
 par = sol_ini.par;
 par_origin = par;
 
@@ -34,19 +34,23 @@ par.t0 = par.tmax/1e6;
 par.tpoints = 10;
 par.JV = 0;
 
-par.Rs = Rs;
-par.Rs_initial = 1;
-
-disp('Switching on series resistance- initial fast linear sweep')
-
-sol = df(sol_ill1, par);
-
-% Longer step to reach stabilisation
-par.Rs_initial = 0;
-par.tmax = 1e-3;
-par.t0 = par.tmax/1e6;
-
-sol_Rs = df(sol, par);
+if Rs >0
+    par.Rs = Rs;
+    par.Rs_initial = 1;
+    
+    disp('Switching on series resistance- initial fast linear sweep')
+    sol = df(sol_ill1, par);
+    disp('Complete')
+    
+    % Longer step to reach stabilisation
+    par.Rs_initial = 0;
+    par.tmax = 1e-3;
+    par.t0 = par.tmax/1e6;
+    
+    sol_Rs = df(sol, par);
+else
+    sol_Rs = sol_ill1;
+end
 
 par.mobseti = mobseti;
 % If STABLE_TIME is  is entered as zero set to default value
@@ -88,8 +92,6 @@ end
 sol_ill = sol;
 sol_ill.par.mobseti = par_origin.mobseti;
 
-%dfplot.ELx(sol_ill);
-%dfplot.Voct(sol_ill);
-disp('LIGHTON complete')
+disp('LIGHTON_RS complete')
 
 end

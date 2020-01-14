@@ -1,5 +1,5 @@
 function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startInt, endInt, points, include_dark)
-%GENINTSTRUCTSREALVOC - Generates a cell containing structures of solutions at various light intensities at an accurate VOC
+% GENINTSTRUCTSREALVOC - Generates a cell containing structures of solutions at various light intensities at an accurate VOC
 % This script just uses other three scripts: genIntStructs, findOptimVoc
 % and asymmetricize. Both symmetric and asymmetric solutions are supported
 % in input, but the usage of symmetric solutions is strongly encouraged as
@@ -8,7 +8,7 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startIn
 % Syntax:  [structCell, VOCs] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
 %
 % Inputs:
-%   STRUCT_EQ - a solution struct as created by PINDRIFT in dark
+%   STRUCT_EQ - a solution struct as created by DRIFTFUSION in dark
 %     conditions, preferably a symmetric (open circuit) solution
 %   STARTINT - higher requested illumination.
 %   ENDINT - lower requested illumination.
@@ -79,8 +79,8 @@ for i = 1:nsolutions
     % use findOptimVoc for finding the applied voltage that minimizes the
     % residual current
     disp([mfilename ' - finding real Voc for illumination intensity ' num2str(badVocStructCell{1, i}.par.int1)])
-    [asymstruct_Int_Voc, VOC] = findOptimVoc(asymstruct_Int);
-    
+    light_intensity = asymstruct_Int.par.int1;
+    [asymstruct_Int_Voc, VOC] = findVocDirect(asymstruct_Int, light_intensity, 1);
     % restore figson before saving
     asymstruct_Int_Voc.par.figson = 1;
     % replace the solution at the bad VOC with the new one

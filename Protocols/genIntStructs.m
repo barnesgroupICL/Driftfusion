@@ -69,12 +69,15 @@ for i = 1:length(Int_array)
     % decrease annoiance by figures popping up
     struct_Int.par.figson = 0;
     % in any case except dark (it would work, should not be needed), stabilize at the new intensity
-    if Int_array(i)
+    if Int_array(i) ~= 0
         struct_Int = changeLight(struct_Int, Int_array(i), changeLight_tmax); % change light intensity
         changeLight_tmax = max(struct_Int.par.tmax / 5, 1e-8); % time to use for next iteration
     end
+    
+    [~,J,~] = dfana.calcJ(struct_Int);
+    J_temp = J.tot(:,end);
+    V_temp = dfana.calcVapp(struct_Int);
 
-    [V_temp, J_temp] = dfana(struct_Int);
     V_array(i) = V_temp(end);
     J_array(i) = J_temp(end);
 
