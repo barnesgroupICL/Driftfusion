@@ -92,8 +92,6 @@ end
 sol_ill = sol;
 sol_ill.par.mobseti = par_origin.mobseti;
 
-%dfplot.ELx(sol_ill);
-%dfplot.Voct(sol_ill);
 disp('LIGHTON_RS complete')
 
 end
