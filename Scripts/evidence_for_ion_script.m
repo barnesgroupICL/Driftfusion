@@ -54,9 +54,9 @@ hold off
 
 %% Open circuit voltage tranisents
 % Using Rs = 1 MOhm rather than the mirrored cell approach.
-% lighton_Rs(sol_ini, Int, stab_time, mobseti, Rs, pnts)
-Voc_transient_bc = lighton_Rs(soleq_bc.ion, 1, 1, 1, 1e6, 400);
-Voc_transient_tc = lighton_Rs(soleq_tc.ion, 1, 1, 1, 1e6, 400);
+% lightonRs(sol_ini, Int, stab_time, mobseti, Rs, pnts)
+Voc_transient_bc = lightonRs(soleq_bc.ion, 1, 1, 1, 1e6, 400);
+Voc_transient_tc = lightonRs(soleq_tc.ion, 1, 1, 1, 1e6, 400);
 
 %% Plot the Voc transients
 dfplot.Voct(Voc_transient_bc);

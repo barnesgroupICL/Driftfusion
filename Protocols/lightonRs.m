@@ -1,4 +1,4 @@
-function sol_ill = lighton_Rs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
+function sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
 % A function to switch the light on and record the transient state with a
 % series resistance Rs
 %% Input arguments

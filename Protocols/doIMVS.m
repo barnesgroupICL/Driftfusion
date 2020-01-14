@@ -7,8 +7,8 @@ disp(['Starting IMVS, base intensity ', num2str(int_base), ', delta intensity ',
     ', at frequency ', num2str(frequency)]);
 par = sol_ini.par;
 
-%sol_ill = lighton_Rs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
-sol_ill = lighton_Rs(sol_ini, int_base, -1, 1, 1e6, 100);
+%sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
+sol_ill = lightonRs(sol_ini, int_base, -1, 1, 1e6, 100);
 par = sol_ill.par;
 
 % Setup time mesh

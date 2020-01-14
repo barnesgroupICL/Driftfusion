@@ -1,4 +1,4 @@
-function sol = Vapp_function(sol_ini, Vapp_func, Vapp_coeff, tmax, tpoints, logtime)
+function sol = VappFunction(sol_ini, Vapp_func, Vapp_coeff, tmax, tpoints, logtime)
 % Applies a voltage function using the initial conditions defined by
 % SOL_INI
 % Input arguments:

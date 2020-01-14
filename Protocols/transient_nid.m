@@ -13,7 +13,7 @@ function sol_OC = transient_nid(sol_ini, int_arr, stab_time, mobseti, Rs, pnts)
 % P. Calado, 2019, Imperial College London
 
 for i = 1:length(int_arr)
-    sol_OC(i) = lighton_Rs(sol_ini, int_arr(i), stab_time, mobseti, Rs, pnts);
+    sol_OC(i) = lightonRs(sol_ini, int_arr(i), stab_time, mobseti, Rs, pnts);
 end
 
 end

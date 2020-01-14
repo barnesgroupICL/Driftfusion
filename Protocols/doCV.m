@@ -13,7 +13,7 @@ par = sol_ini.par;
 V0 = par.Vapp;
 
 if light_intensity > 0
-    sol = lighton_Rs(sol_ini, light_intensity, -1, 0, 0, 10);
+    sol = lightonRs(sol_ini, light_intensity, -1, 0, 0, 10);
 else
     sol = sol_ini;
 end
@@ -23,7 +23,7 @@ deltaV = abs(Vmax-Vmin)+abs(Vmin-Vmax)+abs(V0-Vmin);
 tmax = (scan_rate*deltaV);
 
 disp('Performing cyclic voltamagram')
-sol_CV = Vapp_function(sol, 'tri', [V0, Vmax, Vmin, cycles, tmax/cycles], tmax, tpoints, 0);
+sol_CV = VappFunction(sol, 'tri', [V0, Vmax, Vmin, cycles, tmax/cycles], tmax, tpoints, 0);
 disp('Complete')
 
 end

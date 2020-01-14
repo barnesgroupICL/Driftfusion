@@ -9,7 +9,7 @@ function [sol_TPV, sol_ill] = doTPV(sol_ini, bias_int, stab_time, mobseti, Rs, p
 % circuit
 
 % Get open circuit solution
-sol_ill = lighton_Rs(sol_ini, bias_int, stab_time, mobseti, Rs, tpoints);
+sol_ill = lightonRs(sol_ini, bias_int, stab_time, mobseti, Rs, tpoints);
 % A function to switch the light on and record the transient state with a
 % series resistance Rs
 par = sol_ill.par;
