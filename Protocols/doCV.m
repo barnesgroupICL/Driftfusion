@@ -9,7 +9,6 @@ function sol_CV = doCV(sol_ini, light_intensity, Vmax, Vmin, scan_rate, cycles, 
 % CYCLES = No. of scan cycles
 % TPOINTS = No. of points in output time array
 % P. Calado, 2020, Imperial College London
-
 par = sol_ini.par;
 V0 = par.Vapp;
 
