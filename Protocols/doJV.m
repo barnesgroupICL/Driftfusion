@@ -59,15 +59,15 @@ if option ==2 || option ==3
         error('Intensity cannot be zero- use option 1 for dark scan instead')
     end
     
+    par = sol_ini.par;      % reset parameters
     %% 1 Sun quasi equilibrium solution
     disp('Illuminated quasi-equilibrium solution')
-    % Log time mesh
     par.tmesh_type = 1;
     par.tmax = 1e-3;
     par.t0 = 0;%par.tmax*1e-6;
     
     par.mobseti = 0;          % Switch ion mobility off for illumination step
-    par.V_fun_type = 'constant';
+    % Set up light sweep
     par.g1_fun_type = 'sweep';
     % COEFF = [Amplitude_initial, Amplitude_final, tmax]
     par.g1_fun_arg = [0, Intensity, par.tmax];
