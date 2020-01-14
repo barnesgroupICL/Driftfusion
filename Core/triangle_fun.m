@@ -1,34 +1,21 @@
-function Vout = triangle_fun(coeff, t)
+function y = triangle_fun(coeff, t)
 % Generates a triangle wave form
+% Readou coefficients:
+y0 = coeff(1);
+y1 = coeff(2);
+y2 = coeff(3);
+periods = coeff(4);
+tperiod = coeff(5);
+tmax = tperiod*periods;
 
-V0 = coeff(1);
-V1 = coeff(2);
-V2 = coeff(3);
-cycles = coeff(4);
-tmax = coeff(5);
-if cycles == 1
-    p_per_cycle = length(t)-1;
-else
-    p_per_cycle = floor(length(t)/cycles);   % Points per cycle
-end
+deltay = abs(y1-y0)+abs(y2-y1)+abs(y0-y2);
+k = deltay/tperiod;
 
-Vout = zeros(1, length(t));
-% scan rate
-deltaV = abs(V1-V0)+abs(V2-V1)+abs(V0-V2);
-k = (deltaV)/(tmax/cycles);
+t1 = abs(y1-y0)/k;
+t2 = t1+abs(y2-y1)/k;
 
-t1 = abs(V1-V0)/k;
-t2 = t1+abs(V2-V1)/k;
-t3 = t2+abs(V0-V2)/k;
-
-V_1cycle(t<t1) = V0+(V1-V0).*t(t<t1)./t1;
-V_1cycle(t>=t1 & t<t2) = V1+((V2-V1).*(t(t>=t1 & t<t2)-t1))./(t2-t1);
-V_1cycle(t>=t2) = V2+(V0-V2).*(t(t>=t2)-t2)/(tmax/cycles-t2);
-
-for i=1:cycles
-    p1 = 1+((i-1)*p_per_cycle);
-    p2 = 1+(i*p_per_cycle);
-    Vout(p1:p2) = V_1cycle(1:1+p_per_cycle);
-end
+y = lt(mod(t,tperiod), t1).*(y0+(y1-y0).*mod(t,tperiod)./t1) +...
+    ge(mod(t,tperiod), t1).*lt(mod(t,tperiod), t2).*(y1+((y2-y1).*mod((t-t1),tperiod)./(t2-t1))) +...
+    ge(mod(t,tperiod), t2).*lt(mod(t,tperiod), tmax).*(y2+((y0-y2).*mod((t-t2),tperiod)./(tperiod-t2)));
 
 end
