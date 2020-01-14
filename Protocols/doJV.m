@@ -16,15 +16,13 @@ disp('Current voltage scan')
 par = sol_ini.par;
 
 %%Initial settings
-par.figson = 0;
 par.int1 = 0;
-par.OC = 0;
 par.mobseti = mobseti;
 
 %% JV settings
+par.tmesh_type = 1;
 par.t0 = 0;
 par.tmax = abs(Vend - Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
-par.tmesh_type = 1;
 par.tpoints = JVscan_pnts;
 
 par.V_fun_type = 'sweep';
@@ -64,13 +62,17 @@ if option ==2 || option ==3
     disp('Illuminated quasi-equilibrium solution')
     par.tmesh_type = 1;
     par.tmax = 1e-3;
-    par.t0 = 0;%par.tmax*1e-6;
+    par.t0 = 0;
+    par.tpoints = 10;
     
     par.mobseti = 0;          % Switch ion mobility off for illumination step
     % Set up light sweep
     par.g1_fun_type = 'sweep';
     % COEFF = [Amplitude_initial, Amplitude_final, tmax]
     par.g1_fun_arg = [0, Intensity, par.tmax];
+    
+    par.V_fun_type = 'constant';
+    par.V_fun_arg(1) = par.Vapp;
     
     sol_i_1S = df(sol_ini, par);
     disp('Complete.')
@@ -85,9 +87,9 @@ if option ==2 || option ==3
     par.mobseti = mobseti;
     
     %% JV settings
+    par.tmesh_type = 1;
     par.t0 = 0;
     par.tmax = abs(Vend- Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
-    par.tmesh_type = 1;
     par.tpoints = JVscan_pnts;
     
     % Sweep settings
