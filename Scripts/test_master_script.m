@@ -6,9 +6,9 @@ evidence_for_ion_script;
 
 example_script;
 
-Single_layer_test_script;
+single_layer_test_script;
 
-Single_carrier_CV_script;
+single_carrier_CV_script;
 
 transient_nid_script;
 
@@ -18,7 +18,7 @@ VTROTTR;
 
 IMVS_IMPS_script;
 
-Refresh_device_script;
+refresh_device_script;
 
 SPV_script;
 

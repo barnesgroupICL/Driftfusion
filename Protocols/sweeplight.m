@@ -1,4 +1,4 @@
-function sol_sweep = sweeplight(sol_ini, tmax, tpoints, end_int)
+function sol_sweep = sweepLight(sol_ini, tmax, tpoints, end_int)
 % Linear light intensity sweep from the intensity of the input solution SOL_INI to
 % the intensity defined by END_INT
 % P. Calado, Imperial College London, 2019
