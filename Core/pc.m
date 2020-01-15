@@ -229,6 +229,7 @@ classdef pc
         d_active
         dcum
         dcum0           % includes first entry as zero
+        d_midactive
         dEAdx
         dIPdx
         dNcdx
@@ -443,6 +444,10 @@ classdef pc
         %% Active layer thickness
         function value = get.d_active(par)
             value = sum(par.dcell(par.active_layer(1):par.active_layer(end)));
+        end
+    
+        function value = get.d_midactive(par)
+           value = par.dcum(par.active_layer(1)-1) + par.d_active/2;
         end
         %% Layer thicknesses [cm]
         function value = get.d(par)
