@@ -9,6 +9,8 @@ function sol_CV = doCV(sol_ini, light_intensity, Vmax, Vmin, scan_rate, cycles, 
 % CYCLES = No. of scan cycles
 % TPOINTS = No. of points in output time array
 % P. Calado, 2020, Imperial College London
+disp('Starting DOCV')
+
 par = sol_ini.par;
 V0 = par.Vapp;
 
@@ -18,12 +20,13 @@ else
     sol = sol_ini;
 end
 
-% Calculate tmax from scan rate and voltage points
+% Calculate tmax from scan rate and absolute change in voltage, deltaV
 deltaV = abs(Vmax-Vmin)+abs(Vmin-Vmax)+abs(V0-Vmin);
-tmax = (scan_rate*deltaV);
+tmax = deltaV/scan_rate;
 
 disp('Performing cyclic voltamagram')
 sol_CV = VappFunction(sol, 'tri', [V0, Vmax, Vmin, cycles, tmax/cycles], tmax, tpoints, 0);
 disp('Complete')
 
+disp('DOCV complete')
 end

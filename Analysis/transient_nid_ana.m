@@ -44,7 +44,7 @@ xlabel('Time [s]')
 ylabel('Voc [V]')
 
 figure(401)
-plot(t, nidt_mean)
+semilogx(t, nidt_mean)
 xlabel('Time [s]')
 ylabel('nid')
 xlim([t(1), t(end)])
