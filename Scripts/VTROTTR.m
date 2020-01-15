@@ -8,8 +8,8 @@ par_tio2 = pc('input_files/spiro_mapi_tio2.csv');
 soleq_tio2 = equilibrate(par_tio2);
 
 %% Perform open circiut voltage transient
-% lighton_Rs(sol_ini, int1, stab_time, mobseti, Rs, pnts)
-sol_OC = lighton_Rs(soleq_tio2.ion, 1, 10, 1, 1e6, 400);
+% lightonRs(sol_ini, int1, stab_time, mobseti, Rs, pnts)
+sol_OC = lightonRs(soleq_tio2.ion, 1, 10, 1, 1e6, 400);
 
 %% Create array of Ntr linearly spaced times
 Ntr = 6;    % Number of voltage transients

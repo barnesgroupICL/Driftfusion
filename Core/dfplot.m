@@ -36,17 +36,11 @@ classdef dfplot
             % Currents as a function of time
             % POS = the readout position
             t = sol.t;
-            [j, J, x] = dfana.calcJ(sol);
-
-            if xpos <= x(1)
-                pos = 1;
-            else
-                pos = find(x <= xpos);
-                pos = pos(end);
-            end
+            [j, J, xmesh] = dfana.calcJ(sol);
+            ppos = getpointpos(xpos, xmesh);
 
             figure(2);
-            plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.c(:, pos), t, J.disp(:,pos), t, J.tot(:, pos));
+            plot(t, J.n(:, ppos),t, J.p(:, ppos),t, J.a(:, ppos),t, J.c(:, ppos), t, J.disp(:,ppos), t, J.tot(:, ppos));
             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal')
             xlabel('time [s]');
             ylabel('J [A cm^{-2}]');
@@ -131,7 +125,7 @@ classdef dfplot
 
             figure(301);
             dfplot.x2d(sol, x, {Jdd.ndiff, Jdd.ndrift, Jdd.pdiff, Jdd.pdrift,...
-                                    Jdd.adiff, Jdd.adrift, Jdd.cdiff, Jdd.cdrift},...
+                Jdd.adiff, Jdd.adrift, Jdd.cdiff, Jdd.cdrift},...
                 {'Jn,diff', 'Jn,drift', 'Jp,diff', 'Jp,drift', 'Ja,diff', 'Ja,drift', 'Jc,diff', 'Jc,drift'},...
                 {'.','-','.','-','.','-','.','-'},'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
@@ -160,25 +154,51 @@ classdef dfplot
             ylabel('Vapp [V]')
         end
 
-        function JVapp(sol, pos)
+        function JVapp(sol, xpos)
+            % Obtain point position from x position
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+
             [j, J] = dfana.calcJ(sol);
             Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
+
             figure(9)
-            plot(Vapp, J.n(:, pos),Vapp, J.p(:, pos),Vapp, J.a(:, pos),Vapp, J.disp(:,pos), Vapp, J.tot(:, pos));
+            plot(Vapp, J.n(:, ppos),Vapp, J.p(:, ppos),Vapp, J.a(:, ppos),Vapp, J.disp(:,ppos), Vapp, J.tot(:, ppos));
             legend('Jn', 'Jp', 'Ja', 'Jdisp', 'Jtotal')
-            xlabel('Vapp [V]');
-            ylabel('J [A cm^{-2}]');
+            xlabel('Applied Voltage, Vapp [V]');
+            ylabel('Current Density, J [A cm^{-2}]');
             set(legend,'FontSize',16);
             set(legend,'EdgeColor',[1 1 1]);
         end
 
-         function logJVapp(sol, pos)
+        function JtotVapp(sol, xpos)
+            % Obtain point position from x position
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+
+            [j, J] = dfana.calcJ(sol);
+            Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
+
+            figure(91)
+            plot(Vapp, J.tot(:, ppos));
+            xlabel('Applied Voltage, Vapp [V]');
+            ylabel('Current Density, J [A cm^{-2}]');
+            set(legend,'FontSize',16);
+            set(legend,'EdgeColor',[1 1 1]);
+        end
+
+
+        function logJVapp(sol, xpos)
             % plot the log of the mod J
+
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+
             [j, J] = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol);
 
             figure(10)
-            semilogy(Vapp, abs(J.tot(:,pos)), Vapp, abs(J.n(:,pos)), Vapp, abs(J.p(:,pos)), Vapp, abs(J.a(:,pos)),Vapp, abs(J.c(:,pos)), Vapp, abs(J.disp(:,pos)));
+            semilogy(Vapp, abs(J.tot(:,ppos)), Vapp, abs(J.n(:,ppos)), Vapp, abs(J.p(:,ppos)), Vapp, abs(J.a(:,ppos)),Vapp, abs(J.c(:,ppos)), Vapp, abs(J.disp(:,ppos)));
             xlabel('Vapp [V]');
             ylabel('|J| [A cm^{-2}]');
             legend('Jtot', 'Jn', 'Jp', 'Ja', 'Jc', 'Jdisp')
@@ -186,20 +206,24 @@ classdef dfplot
             set(legend,'EdgeColor',[1 1 1]);
         end
 
-        function logJVapp3D(sol, pos, ylogon)
+        function logJVapp3D(sol, xpos, ylogon)
+
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+
             t = sol.t;
             [j, J] = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol)';
-            Jtot=J.tot(:, pos);
+            Jtot=J.tot(:, ppos);
 
             figure(11)
             surface('XData', [Vapp Vapp],             ... % N.B.  XYZC Data must have at least 2 cols
-            'YData', [abs(Jtot) abs(Jtot)],             ...
-            'ZData', [t' t'], ...
-            'CData', [t' t'],             ...
-            'FaceColor', 'none',        ...
-            'EdgeColor', 'interp',      ...
-            'Marker', 'none','LineWidth',1);
+                'YData', [abs(Jtot) abs(Jtot)],             ...
+                'ZData', [t' t'], ...
+                'CData', [t' t'],             ...
+                'FaceColor', 'none',        ...
+                'EdgeColor', 'interp',      ...
+                'Marker', 'none','LineWidth',1);
             s1 = gca;
             xlabel('Vapp [V]');
             ylabel('|J| [A cm^{-2}]');
@@ -213,10 +237,10 @@ classdef dfplot
         end
 
         function xmesh(sol)
-           figure(11)
-           plot(sol.x)
-           xlabel('Position [cm]')
-           ylabel('Point')
+            figure(11)
+            plot(sol.x)
+            xlabel('Position [cm]')
+            ylabel('Point')
         end
 
         function Vx(varargin)
@@ -255,7 +279,7 @@ classdef dfplot
 
             figure(15)
             dfplot.x2d(sol, par.x_ihalf, {g1, g2, g}, {'g1', 'g2', 'g total'},...
-                 {'-','-','-'}, 'Generation rate [cm-3s-1]', tarr, xrange, 0, 0);
+                {'-','-','-'}, 'Generation rate [cm-3s-1]', tarr, xrange, 0, 0);
         end
 
         function gxt(sol)
@@ -353,70 +377,65 @@ classdef dfplot
         function Ft(sol, xpos)
             % Absolute field strength F as a function of time at point
             % position XPOS
-            x = sol.x;
-            if xpos <= x(1)
-                pos = 1;            % POS is the point position
-            else
-                pos = find(x <= xpos);
-                pos = pos(end);
-            end
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
 
             F = dfana.calcF(sol);
 
             figure(14)
-            plot(sol.t, F(:,pos))
+            plot(sol.t, F(:,ppos))
             xlabel('Time [s]')
             ylabel(['Electric Field at pos x = ', num2str(round(xpos*1e7)), 'nm [Vcm-1]'])
         end
 
         function sigmat(sol)
-           % Plot the integrated space charge density [cm-2] as a function of time
-           sigma = dfana.calcsigma(sol);
-           t = sol.t;
+            % Plot the integrated space charge density [cm-2] as a function of time
+            sigma = dfana.calcsigma(sol);
+            t = sol.t;
 
-           figure(15)
-           plot(t, sigma)
-           xlabel('Time [s]')
-           ylabel('sigma [C cm-2]')
+            figure(15)
+            plot(t, sigma)
+            xlabel('Time [s]')
+            ylabel('sigma [C cm-2]')
         end
 
         function Qt(sol, x1, x2)
-           % Plot the integrated space charge density in Coulombs [Ccm-2] as a function of time
-           [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            % Plot the integrated space charge density in Coulombs [Ccm-2] as a function of time
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-           p1 = find(x<=x1);
-           p1 = p1(end);
-           p2 = find(x<=x2);
-           p2 = p2(end);
+            p1 = find(x<=x1);
+            p1 = p1(end);
+            p2 = find(x<=x2);
+            p2 = p2(end);
 
-           sigma = dfana.calcsigma(sol);
-           Q = par.e*sigma(:, x1:x2);
+            sigma = dfana.calcsigma(sol);
+            Q = par.e*sigma(:, x1:x2);
 
-           figure(17)
-           plot(t, Q)
-           xlabel('Time [s]')
-           ylabel('Charge [C cm-2]')
-           xlim([t(1), t(end)])
+            figure(17)
+            plot(t, Q)
+            xlabel('Time [s]')
+            ylabel('Charge [C cm-2]')
+            xlim([t(1), t(end)])
         end
 
         function QVapp(sol, x1, x2)
-           % Integrated charge density as a function of applied voltage
-           [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            % Integrated charge density as a function of applied voltage
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-           p1 = find(x<=x1);
-           p1 = p1(end);
-           p2 = find(x<=x2);
-           p2 = p2(end);
+            p1 = find(x<=x1);
+            p1 = p1(end);
+            p2 = find(x<=x2);
+            p2 = p2(end);
 
-           sigma = dfana.calcsigma(sol);
-           Vapp = dfana.calcVapp(sol);
-           Q = par.e*sigma(:, x1:x2);
+            sigma = dfana.calcsigma(sol);
+            Vapp = dfana.calcVapp(sol);
+            Q = par.e*sigma(:, x1:x2);
 
-           figure(17)
-           plot(Vapp, Q)
-           xlabel('Vapp [V]')
-           ylabel('Charge [C cm-2]')
-           xlim([Vapp(1), Vapp(end)])
+            figure(17)
+            plot(Vapp, Q)
+            xlabel('Vapp [V]')
+            ylabel('Charge [C cm-2]')
+            xlim([Vapp(1), Vapp(end)])
         end
 
         function rhox(varargin)
@@ -546,19 +565,14 @@ classdef dfplot
 
         function Fiont(sol, xpos)
             % Field contribution from ionic charge FION as a function of time at position XPOS
-            x = sol.x;
-            if xpos <= x(1)
-                pos = 1;            % POS is the point position
-            else
-                pos = find(x <= xpos);
-                pos = pos(end);
-            end
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
 
             Fion = dfana.calcFion(sol);
             t = sol.t;
 
             figure(26)
-            plot(t, Fion(:,pos))
+            plot(t, Fion(:,ppos))
             xlabel('Time')
             ylabel('Ion field [Vcm-1]')
         end
@@ -660,15 +674,15 @@ classdef dfplot
                 % find the time
                 p1 = find(sol.t <= tarr(i));
                 p1 = p1(end);
-                    for jj = 1:length(variables)
-                        vtemp = variables{jj};
+                for jj = 1:length(variables)
+                    vtemp = variables{jj};
 
-                        vmin_tarr(i,jj) = min(vtemp(p1, :));
-                        vmax_tarr(i,jj) = max(vtemp(p1, :));
+                    vmin_tarr(i,jj) = min(vtemp(p1, :));
+                    vmax_tarr(i,jj) = max(vtemp(p1, :));
 
-                        h(i,jj) = plot(xnm, variables{jj}(p1, :), char(linestyle(jj)));
-                        hold on
-                    end
+                    h(i,jj) = plot(xnm, variables{jj}(p1, :), char(linestyle(jj)));
+                    hold on
+                end
             end
             xlabel('Position [nm]')
             ylabel(ylab)
@@ -696,18 +710,18 @@ classdef dfplot
             else
                 switch logy
                     case 0
-                         if yrange == 0
+                        if yrange == 0
                             ylim([ymin*0.9, ymax*1.1]);
-                         else
+                        else
                             ylim([ymin-(yrange*0.2), ymax+(yrange*0.2)]);
-                         end
+                        end
                     case 1
-                         ylim([0.1*ymin, 10*ymax])
+                        ylim([0.1*ymin, 10*ymax])
                 end
             end
             set(gca, 'Layer', 'top')
             box on
             hold off
-    end
+        end
     end
 end

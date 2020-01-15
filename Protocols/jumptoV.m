@@ -25,6 +25,7 @@ par = sol_ini.par;
 %% Set up sweep
 tjump = 1e-6;
 par.tmesh_type = 1;
+par.t0 = 0;
 par.V_fun_type = 'sweep';
 par.V_fun_arg(1) = par.Vapp;
 par.V_fun_arg(2) = Vjump;
@@ -33,8 +34,8 @@ par.V_fun_arg(3) = tjump;
 par.mobseti = 0;
 
 disp('Initial jump with zero ion mobility')
-% Vapp_function(sol_ini, Vapp_func, tmax, tpoints, logtime)
 jump1 = df(sol_ini, par);
+disp('Complete')
 
 par = jump1.par;
 
@@ -72,7 +73,9 @@ par.t0 = par.tmax/1e8;
 par.tmesh_type = 2;
 par.tpoints = 200;
 
+disp('Dwell stage...')
 sol = df(jump1, par);
+
 j = 1;
 if stabilise
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
@@ -90,7 +93,7 @@ if stabilise
         j = j+1;
     end
 end
-
+disp('Complete')
 sol_relax = sol;
 sol_relax.par.K_cation = 1;
 sol_relax.par.K_anion = 1;
