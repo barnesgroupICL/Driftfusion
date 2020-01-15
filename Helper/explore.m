@@ -109,7 +109,7 @@ classdef explore
                         
                         % For steady-state solution
                         % lighton_Rs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
-                        sol_ill = lighton_Rs(soleq.ion, Int, -10, 1, 1e6, JVpnts);
+                        sol_ill = lightonRs(soleq.ion, Int, -10, 1, 1e6, JVpnts);
                         
                         % Write steady-state solutions into temporary
                         % variables

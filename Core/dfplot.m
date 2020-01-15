@@ -8,9 +8,9 @@ classdef dfplot
     % array as the second argument- the procedure will loop and plot the
     % solution at multiple times.
     % The third optional argument defines the x-range.
-
+    
     methods (Static)
-
+        
         function ELx(varargin)
             % Energy Level diagram, and charge densities plotter
             % SOL = the solution structure
@@ -24,36 +24,30 @@ classdef dfplot
             subplot(3,1,1);
             dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'}, {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
             
-            subplot(3,1,2); 
+            subplot(3,1,2);
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1)
             
             figure(1);
             subplot(3,1,3);
             dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
         end
-
+        
         function Jt(sol, xpos)
             % Currents as a function of time
             % POS = the readout position
             t = sol.t;
-            [j, J, x] = dfana.calcJ(sol);
-            
-            if xpos <= x(1)
-                pos = 1;
-            else
-                pos = find(x <= xpos);
-                pos = pos(end);
-            end
+            [j, J, xmesh] = dfana.calcJ(sol);
+            ppos = getpointpos(xpos, xmesh);
             
             figure(2);
-            plot(t, J.n(:, pos),t, J.p(:, pos),t, J.a(:, pos),t, J.c(:, pos), t, J.disp(:,pos), t, J.tot(:, pos));
+            plot(t, J.n(:, ppos),t, J.p(:, ppos),t, J.a(:, ppos),t, J.c(:, ppos), t, J.disp(:,ppos), t, J.tot(:, ppos));
             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal')
             xlabel('time [s]');
             ylabel('J [A cm^{-2}]');
             set(legend,'FontSize',16);
             set(legend,'EdgeColor',[1 1 1]);
         end
-
+        
         function Jx(varargin)
             % Plots the currents
             % SOL = the solution structure
@@ -63,12 +57,12 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [j, J, x] = dfana.calcJ(sol);
             
-            figure(3);            
+            figure(3);
             dfplot.x2d(sol, x, {J.n, J.p, J.a, J.c, J.disp, J.tot},...
                 {'Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtot'}, {'-','-','-','-','-','-'},...
                 'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
-
+        
         function jx(varargin)
             % Plots the carrier fluxes
             % SOL = the solution structure
@@ -78,48 +72,48 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [j, J, x] = dfana.calcJ(sol);
             
-            figure(301);            
+            figure(301);
             dfplot.x2d(sol, par.x_ihalf, {j.n, j.p, j.a, j.c, j.disp},{'jn', 'jp', 'ja', 'jc', 'jdisp'},...
                 {'-','-','-','-','-'}, 'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
-
+        
         function JV(JV, option)
             % JV - a solution from doJV
             % OPTION - 1 = dark only, 2 = light only, 3 = dark & light
             % JV is a structure containing dark and illuminated JVs
-
+            
             if option == 1 || option == 3
                 [j, J.dk.f] = dfana.calcJ(JV.dk.f);
                 Vapp.dk.f = dfana.calcVapp(JV.dk.f);
                 [j, J.dk.r] = dfana.calcJ(JV.dk.r);
                 Vapp.dk.r = dfana.calcVapp(JV.dk.r);
-
+                
                 figure(4)
                 plot(Vapp.dk.f, J.dk.f.tot(:,end), '--', Vapp.dk.r, J.dk.r.tot(:,end));
                 hold on
             end
-
+            
             if option == 2 || option == 3
-
+                
                 [j, J.ill.f] = dfana.calcJ(JV.ill.f);
                 Vapp.ill.f = dfana.calcVapp(JV.ill.f);
                 [j, J.ill.r] = dfana.calcJ(JV.ill.r);
                 Vapp.ill.r = dfana.calcVapp(JV.ill.r);
-
+                
                 figure(4)
                 plot(Vapp.ill.f, J.ill.f.tot(:,end),'--')%, 'Color', [0, 0.4470, 0.7410]);
                 hold on
                 plot(Vapp.ill.r, J.ill.r.tot(:,end));%,'Color', [0, 0.4470, 0.7410]);
             end
-
+            
             figure(4)
             %ylim([-30e-3, 10e-3]);
             xlabel('Applied voltage [V]')
             ylabel('Current density [Acm-2]');
             hold off
-
+            
         end
-
+        
         function Jddx(varargin)
             % figure(5)
             % drift and diffusion currents as a function of position
@@ -127,13 +121,13 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [~, Jdd, x] = dfana.Jddxt(sol);
             
-            figure(301);            
+            figure(301);
             dfplot.x2d(sol, x, {Jdd.ndiff, Jdd.ndrift, Jdd.pdiff, Jdd.pdrift,...
-                                    Jdd.adiff, Jdd.adrift, Jdd.cdiff, Jdd.cdrift},...
+                Jdd.adiff, Jdd.adrift, Jdd.cdiff, Jdd.cdrift},...
                 {'Jn,diff', 'Jn,drift', 'Jp,diff', 'Jp,drift', 'Ja,diff', 'Ja,drift', 'Jc,diff', 'Jc,drift'},...
                 {'.','-','.','-','.','-','.','-'},'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
-
+        
         function Voct(sol)
             Voc = dfana.calcVQFL(sol);
             figure(6)
@@ -141,7 +135,7 @@ classdef dfplot
             xlabel('Time [s]')
             ylabel('Voc [V]')
         end
-
+        
         function PLt(sol)
             PL = dfana.PLt(sol);
             figure(7)
@@ -149,7 +143,7 @@ classdef dfplot
             xlabel('Time [s]')
             ylabel('PL [cm-2s-1]')
         end
-
+        
         function Vappt(sol)
             % Difference in potential between the left and right boundary
             figure(8)
@@ -157,51 +151,81 @@ classdef dfplot
             xlabel('Time [s]')
             ylabel('Vapp [V]')
         end
-
-        function JVapp(sol, pos)
+        
+        function JVapp(sol, xpos)
+            % Obtain point position from x position
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+            
             [j, J] = dfana.calcJ(sol);
             Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
+            
             figure(9)
-            plot(Vapp, J.n(:, pos),Vapp, J.p(:, pos),Vapp, J.a(:, pos),Vapp, J.disp(:,pos), Vapp, J.tot(:, pos));
+            plot(Vapp, J.n(:, ppos),Vapp, J.p(:, ppos),Vapp, J.a(:, ppos),Vapp, J.disp(:,ppos), Vapp, J.tot(:, ppos));
             legend('Jn', 'Jp', 'Ja', 'Jdisp', 'Jtotal')
-            xlabel('Vapp [V]');
-            ylabel('J [A cm^{-2}]');
+            xlabel('Applied Voltage, Vapp [V]');
+            ylabel('Current Density, J [A cm^{-2}]');
             set(legend,'FontSize',16);
             set(legend,'EdgeColor',[1 1 1]);
         end
-
-         function logJVapp(sol, pos)
+        
+        function JtotVapp(sol, xpos)
+            % Obtain point position from x position
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+            
+            [j, J] = dfana.calcJ(sol);
+            Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
+            
+            figure(91)
+            plot(Vapp, J.tot(:, ppos));
+            xlabel('Applied Voltage, Vapp [V]');
+            ylabel('Current Density, J [A cm^{-2}]');
+            set(legend,'FontSize',16);
+            set(legend,'EdgeColor',[1 1 1]);
+        end
+        
+        
+        function logJVapp(sol, xpos)
             % plot the log of the mod J
+            
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+            
             [j, J] = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol);
-
+            
             figure(10)
-            semilogy(Vapp, abs(J.tot(:,pos)), Vapp, abs(J.n(:,pos)), Vapp, abs(J.p(:,pos)), Vapp, abs(J.a(:,pos)),Vapp, abs(J.c(:,pos)), Vapp, abs(J.disp(:,pos)));
+            semilogy(Vapp, abs(J.tot(:,ppos)), Vapp, abs(J.n(:,ppos)), Vapp, abs(J.p(:,ppos)), Vapp, abs(J.a(:,ppos)),Vapp, abs(J.c(:,ppos)), Vapp, abs(J.disp(:,ppos)));
             xlabel('Vapp [V]');
             ylabel('|J| [A cm^{-2}]');
             legend('Jtot', 'Jn', 'Jp', 'Ja', 'Jc', 'Jdisp')
             set(legend,'FontSize',16);
             set(legend,'EdgeColor',[1 1 1]);
         end
-
-        function logJVapp3D(sol, pos, ylogon)
+        
+        function logJVapp3D(sol, xpos, ylogon)
+            
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+            
             t = sol.t;
             [j, J] = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol)';
-            Jtot=J.tot(:, pos);
-
+            Jtot=J.tot(:, ppos);
+            
             figure(11)
             surface('XData', [Vapp Vapp],             ... % N.B.  XYZC Data must have at least 2 cols
-            'YData', [abs(Jtot) abs(Jtot)],             ...
-            'ZData', [t' t'], ...
-            'CData', [t' t'],             ...
-            'FaceColor', 'none',        ...
-            'EdgeColor', 'interp',      ...
-            'Marker', 'none','LineWidth',1);
+                'YData', [abs(Jtot) abs(Jtot)],             ...
+                'ZData', [t' t'], ...
+                'CData', [t' t'],             ...
+                'FaceColor', 'none',        ...
+                'EdgeColor', 'interp',      ...
+                'Marker', 'none','LineWidth',1);
             s1 = gca;
             xlabel('Vapp [V]');
             ylabel('|J| [A cm^{-2}]');
-
+            
             if ylogon
                 set(s1,'YScale','log');
             else
@@ -209,20 +233,20 @@ classdef dfplot
             end
             hold off
         end
-
+        
         function xmesh(sol)
-           figure(11)
-           plot(sol.x)
-           xlabel('Position [cm]')
-           ylabel('Point')
+            figure(11)
+            plot(sol.x)
+            xlabel('Position [cm]')
+            ylabel('Point')
         end
-
+        
         function Vx(varargin)
             % Electrostatic potential as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            figure(12);         
+            figure(12);
             dfplot.x2d(sol, x, {V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
         
@@ -230,8 +254,8 @@ classdef dfplot
             % Carrier densities as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
-            figure(13);            
+            
+            figure(13);
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-','-'},...
                 'Carrier density [cm-3]', tarr, xrange, 0, 1)
         end
@@ -240,7 +264,7 @@ classdef dfplot
             % Ionic carrier densities as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             figure(14)
             dfplot.x2d(sol, x, {a,c},{'anion','cation'}, {'-','-'},...
                 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
@@ -253,7 +277,7 @@ classdef dfplot
             
             figure(15)
             dfplot.x2d(sol, par.x_ihalf, {g1, g2, g}, {'g1', 'g2', 'g total'},...
-                 {'-','-','-'}, 'Generation rate [cm-3s-1]', tarr, xrange, 0, 0);
+                {'-','-','-'}, 'Generation rate [cm-3s-1]', tarr, xrange, 0, 0);
         end
         
         function gxt(sol)
@@ -269,7 +293,7 @@ classdef dfplot
             ylabel('Time [s]')
             zlabel('Generation rate [cm^{-3}s^{-1}]')
         end
-            
+        
         function Ux(varargin)
             % Recombination rates as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
@@ -280,52 +304,52 @@ classdef dfplot
             dfplot.x2d(sol, x, {U.btb, U.srh, U.tot},{'Ubtb', 'Usrh', 'Utot'},...
                 {'-','-','-'}, 'Recombination rate [cm-3s-1]', tarr, xrange, 0, 0);
         end
-
+        
         function JVrec(JV, option)
             % Plots recombination currents for JV
-
+            
             % JV - a solution from doJV
             % OPTION - 1 = dark only, 2 = light only, 3 = dark & light
             % JV is a structure containing dark and illuminated JVs
-
+            
             if option == 1 || option == 3
                 [j, J.dk.f] = dfana.calcJ(JV.dk.f);
                 Vapp.dk.f = dfana.calcVapp(JV.dk.f);
                 [j, J.dk.r] = dfana.calcJ(JV.dk.r);
                 Vapp.dk.r = dfana.calcVapp(JV.dk.r);
-
+                
                 figure(13)
                 plot(Vapp.dk.f, J.dk.f.tot(:,end), '--', Vapp.dk.r, J.dk.r.tot(:,end));
                 hold on
             end
-
+            
             if option == 2 || option == 3
                 solf = JV.ill.f;
                 solr = JV.ill.r;
                 par = solf.par;
                 pcum0 = par.pcum0;
-
+                
                 [j, J.ill.f] = dfana.calcJ(JV.ill.f);
                 Vapp.ill.f = dfana.calcVapp(JV.ill.f);
                 [j, J.ill.r] = dfana.calcJ(JV.ill.r);
                 Vapp.ill.r = dfana.calcVapp(JV.ill.r);
-
+                
                 U_f = dfana.calcU(JV.ill.f);
                 Jrec_btb_f = JV.ill.f.par.e*trapz(JV.ill.f.x, U_f.btb, 2);
                 Jrec_srhint_f = JV.ill.f.par.e*trapz(JV.ill.f.x(pcum0(2)+1:pcum0(3)), U_f.srh(:,pcum0(2)+1:pcum0(3)), 2)...
                     +JV.ill.f.par.e*trapz(JV.ill.f.x(pcum0(4)+1:pcum0(5)), U_f.srh(:,pcum0(4)+1:pcum0(5)), 2);
                 Jrec_srhbulk_f = JV.ill.f.par.e*trapz(JV.ill.f.x(pcum0(3)+1:pcum0(4)), U_f.srh(:,pcum0(3)+1:pcum0(4)), 2);
                 Jrec_tot_f = JV.ill.f.par.e*trapz(JV.ill.f.x, U_f.tot, 2);
-
+                
                 U_r = dfana.calcU(JV.ill.r);
                 Jrec_btb_r = JV.ill.f.par.e*trapz(JV.ill.r.x, U_r.btb, 2);
                 Jrec_srhint_r = JV.ill.r.par.e*trapz(JV.ill.r.x(pcum0(2)+1:pcum0(3)), U_r.srh(:,pcum0(2)+1:pcum0(3)), 2)...
                     +JV.ill.r.par.e*trapz(JV.ill.r.x(pcum0(4)+1:pcum0(5)), U_r.srh(:,pcum0(4)+1:pcum0(5)), 2);
                 Jrec_srhbulk_r = JV.ill.r.par.e*trapz(JV.ill.r.x(pcum0(3)+1:pcum0(4)), U_r.srh(:,pcum0(3)+1:pcum0(4)), 2);
                 Jrec_tot_r = JV.ill.r.par.e*trapz(JV.ill.r.x, U_r.tot, 2);
-
+                
                 cc=lines(4);
-
+                
                 figure(13)
                 plot(Vapp.ill.f, J.ill.f.tot(:,end),'--', 'Color', cc(1,:));
                 hold on
@@ -338,7 +362,7 @@ classdef dfplot
                 plot(Vapp.ill.f, Jrec_srhbulk_f,'--','Color', cc(4,:));
                 plot(Vapp.ill.r, Jrec_srhbulk_r, 'Color', cc(4,:));
             end
-
+            
             figure(13)
             ylim([-30e-3, 10e-3]);
             xlabel('Applied voltage [V]')
@@ -347,76 +371,71 @@ classdef dfplot
             legend('Illumated for', 'Illumated rev','Jrec,btb for','Jrec,btb rev'...
                 ,'Jrec,srh-int for','Jrec,srh-int rev','Jrec,srh-bulk for','Jrec,srh-bulk rev')
         end
-
+        
         function Ft(sol, xpos)
             % Absolute field strength F as a function of time at point
             % position XPOS
-            x = sol.x;
-            if xpos <= x(1)
-                pos = 1;            % POS is the point position
-            else
-                pos = find(x <= xpos);
-                pos = pos(end);
-            end
-
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+            
             F = dfana.calcF(sol);
             
             figure(14)
-            plot(sol.t, F(:,pos))
+            plot(sol.t, F(:,ppos))
             xlabel('Time [s]')
             ylabel(['Electric Field at pos x = ', num2str(round(xpos*1e7)), 'nm [Vcm-1]'])
         end
-
+        
         function sigmat(sol)
-           % Plot the integrated space charge density [cm-2] as a function of time
-           sigma = dfana.calcsigma(sol);
-           t = sol.t;
-
-           figure(15)
-           plot(t, sigma)
-           xlabel('Time [s]')
-           ylabel('sigma [C cm-2]')
+            % Plot the integrated space charge density [cm-2] as a function of time
+            sigma = dfana.calcsigma(sol);
+            t = sol.t;
+            
+            figure(15)
+            plot(t, sigma)
+            xlabel('Time [s]')
+            ylabel('sigma [C cm-2]')
         end
-
+        
         function Qt(sol, x1, x2)
-           % Plot the integrated space charge density in Coulombs [Ccm-2] as a function of time
-           [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
-           p1 = find(x<=x1);
-           p1 = p1(end);
-           p2 = find(x<=x2);
-           p2 = p2(end);
-
-           sigma = dfana.calcsigma(sol);
-           Q = par.e*sigma(:, x1:x2);
-
-           figure(17)
-           plot(t, Q)
-           xlabel('Time [s]')
-           ylabel('Charge [C cm-2]')
-           xlim([t(1), t(end)])
+            % Plot the integrated space charge density in Coulombs [Ccm-2] as a function of time
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            p1 = find(x<=x1);
+            p1 = p1(end);
+            p2 = find(x<=x2);
+            p2 = p2(end);
+            
+            sigma = dfana.calcsigma(sol);
+            Q = par.e*sigma(:, x1:x2);
+            
+            figure(17)
+            plot(t, Q)
+            xlabel('Time [s]')
+            ylabel('Charge [C cm-2]')
+            xlim([t(1), t(end)])
         end
-
+        
         function QVapp(sol, x1, x2)
-           % Integrated charge density as a function of applied voltage
-           [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
-           p1 = find(x<=x1);
-           p1 = p1(end);
-           p2 = find(x<=x2);
-           p2 = p2(end);
-
-           sigma = dfana.calcsigma(sol);
-           Vapp = dfana.calcVapp(sol);
-           Q = par.e*sigma(:, x1:x2);
-
-           figure(17)
-           plot(Vapp, Q)
-           xlabel('Vapp [V]')
-           ylabel('Charge [C cm-2]')
-           xlim([Vapp(1), Vapp(end)])
+            % Integrated charge density as a function of applied voltage
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            p1 = find(x<=x1);
+            p1 = p1(end);
+            p2 = find(x<=x2);
+            p2 = p2(end);
+            
+            sigma = dfana.calcsigma(sol);
+            Vapp = dfana.calcVapp(sol);
+            Q = par.e*sigma(:, x1:x2);
+            
+            figure(17)
+            plot(Vapp, Q)
+            xlabel('Vapp [V]')
+            ylabel('Charge [C cm-2]')
+            xlim([Vapp(1), Vapp(end)])
         end
-
+        
         function rhox(varargin)
             % Volumetric charge density (rho) as a funciton of position
             % A time array can be used as a second input argument
@@ -427,7 +446,7 @@ classdef dfplot
             figure(19)
             dfplot.x2d(sol, x, {rho},{'\rho'},{'-'},'Charge density [cm-3]', tarr, xrange, 0, 0);
         end
-
+        
         function deltarhox(varargin)
             % The change in volumetric charge density (rho) as a funciton of position
             % A time array can be used as a second input argument
@@ -439,24 +458,24 @@ classdef dfplot
             figure(20)
             dfplot.x2d(sol, x, {deltarho},{'\Delta \rho'},{'-'},'Delta charge density [cm-3]', tarr, xrange, 0, 0);
         end
-       
+        
         function rhoxFxVx(varargin)
             % Three panel figure:
             % Volumetric charge density (rho), Field and potential as a funciton of position
             % A time array can be used as a second input argument
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             rho = dfana.calcrho(sol);
             F = dfana.calcF(sol);
-
+            
             figure(21)
             subplot(3, 1, 1)
             dfplot.x2d(sol, x, {rho},{'\rho'},{'-'}, 'Charge density [cm-3]', tarr, xrange, 0, 0);
             
             subplot(3, 1, 2)
             dfplot.x2d(sol, x, {F},{'F'},{'-'},'Electric field [Vcm-1]', tarr, xrange, 0, 0);
-
+            
             subplot(3, 1, 3)
             dfplot.x2d(sol, x, {V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
@@ -467,9 +486,9 @@ classdef dfplot
             % A time array can be used as a second input argument
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             rho = dfana.calcrho(sol);
-
+            
             figure(211)
             subplot(2, 1, 1)
             dfplot.x2d(sol, x, {rho},{'\rho'},{'-'}, 'Charge density [cm-3]', tarr, xrange, 0, 0);
@@ -477,7 +496,7 @@ classdef dfplot
             subplot(2, 1, 2)
             dfplot.x2d(sol, x, {-V},{'V'},{'-'},'-Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
-
+        
         function ELx_single(varargin)
             % Energy Level diagram, and charge densities plotter
             % SOL = the solution structure
@@ -491,7 +510,7 @@ classdef dfplot
             dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'},...
                 {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
         end
-
+        
         function ELnpx(varargin)
             % Energy Level diagram, and charge densities plotter
             % SOL = the solution structure
@@ -500,16 +519,16 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
-
+            
             figure(23)
             subplot(2,1,1);
             dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'},...
                 {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0);
-
+            
             subplot(2,1,2);
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1);
         end
-
+        
         function Vacx(varargin)
             % Potential and ionic charges as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
@@ -519,10 +538,10 @@ classdef dfplot
             subplot(2,1,1);
             dfplot.x2d(sol, x, {V}, {'V'},...
                 {'-'}, 'Electro. potential [V]', tarr, xrange, 0, 0);
-
+            
             subplot(2,1,2);
             dfplot.x2d(sol, x, {a, c}, {'a', 'c'},...
-                {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);    
+                {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);
         end
         
         function Vionacx(varargin)
@@ -536,7 +555,7 @@ classdef dfplot
             subplot(2,1,1);
             dfplot.x2d(sol, x, {V, Vion, Vel}, {'V', 'Vion', 'Vel'},...
                 {'--', '.', '-'}, 'Electro. potential [V]', tarr, xrange, 0, 0);
-
+            
             subplot(2,1,2);
             dfplot.x2d(sol, x, {a, c}, {'a', 'c'},...
                 {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);
@@ -544,19 +563,14 @@ classdef dfplot
         
         function Fiont(sol, xpos)
             % Field contribution from ionic charge FION as a function of time at position XPOS
-            x = sol.x;
-            if xpos <= x(1)
-                pos = 1;            % POS is the point position
-            else
-                pos = find(x <= xpos);
-                pos = pos(end);
-            end
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
             
             Fion = dfana.calcFion(sol);
             t = sol.t;
             
             figure(26)
-            plot(t, Fion(:,pos))
+            plot(t, Fion(:,ppos))
             xlabel('Time')
             ylabel('Ion field [Vcm-1]')
         end
@@ -566,7 +580,7 @@ classdef dfplot
             % A time array can be used as a second input argument
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             U = dfana.calcU(sol);
             
             figure(27)
@@ -575,29 +589,29 @@ classdef dfplot
         end
         
         function colourblocks(sol, yrange)
-           par = sol.par;
-           dcum0 = par.dcum0*1e7;   % Convert to nm
-           
-           % Multicoloured
-           % triplets = [1, 0.87, 0.87; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
-           % French flag
-           % triplets = [1, 0.87, 0.87; 1, 0.98, 0.7; 1, 1, 1; 1, 1, 0.98; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
-           % Cool Mint
-           triplets = [0.85, 0.95, 0.7; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
-           % pn
-           % triplets = [1, 0.87, 0.87; 0.85, 0.92, 1];
-           
-           for i =1:length(dcum0)-1
-              v = [dcum0(i) yrange(2); dcum0(i+1) yrange(2); dcum0(i+1) yrange(1); dcum0(i) yrange(1)];   % vertices position
-              f = [1 2 3 4];    % Faces
-              j = i - ((length(triplets)-1)*floor(i/length(triplets)));
-              colour = triplets(j,:);
-              patch('Faces',f,'Vertices',v,'FaceColor',colour, 'EdgeColor','none');%,'HandleVisibility','off')
-           end
-           
-           hold on
+            par = sol.par;
+            dcum0 = par.dcum0*1e7;   % Convert to nm
+            
+            % Multicoloured
+            % triplets = [1, 0.87, 0.87; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
+            % French flag
+            % triplets = [1, 0.87, 0.87; 1, 0.98, 0.7; 1, 1, 1; 1, 1, 0.98; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
+            % Cool Mint
+            triplets = [0.85, 0.95, 0.7; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
+            % pn
+            % triplets = [1, 0.87, 0.87; 0.85, 0.92, 1];
+            
+            for i =1:length(dcum0)-1
+                v = [dcum0(i) yrange(2); dcum0(i+1) yrange(2); dcum0(i+1) yrange(1); dcum0(i) yrange(1)];   % vertices position
+                f = [1 2 3 4];    % Faces
+                j = i - ((length(triplets)-1)*floor(i/length(triplets)));
+                colour = triplets(j,:);
+                patch('Faces',f,'Vertices',v,'FaceColor',colour, 'EdgeColor','none');%,'HandleVisibility','off')
+            end
+            
+            hold on
         end
- 
+        
         function [sol, tarr, pointtype, xrange] = sortarg(args)
             
             if length(args) == 1
@@ -632,7 +646,7 @@ classdef dfplot
             end
             par = sol.par;
             xnm = xmesh*1e7;
-             
+            
             vmin = min(min(cell2mat(variables)));
             vmax = max(max(cell2mat(variables)));
             
@@ -658,15 +672,15 @@ classdef dfplot
                 % find the time
                 p1 = find(sol.t <= tarr(i));
                 p1 = p1(end);
-                    for jj = 1:length(variables)
-                        vtemp = variables{jj};
-                        
-                        vmin_tarr(i,jj) = min(vtemp(p1, :));
-                        vmax_tarr(i,jj) = max(vtemp(p1, :));
-                
-                        h(i,jj) = plot(xnm, variables{jj}(p1, :), char(linestyle(jj)));
-                        hold on
-                    end
+                for jj = 1:length(variables)
+                    vtemp = variables{jj};
+                    
+                    vmin_tarr(i,jj) = min(vtemp(p1, :));
+                    vmax_tarr(i,jj) = max(vtemp(p1, :));
+                    
+                    h(i,jj) = plot(xnm, variables{jj}(p1, :), char(linestyle(jj)));
+                    hold on
+                end
             end
             xlabel('Position [nm]')
             ylabel(ylab)
@@ -694,18 +708,18 @@ classdef dfplot
             else
                 switch logy
                     case 0
-                         if yrange == 0
+                        if yrange == 0
                             ylim([ymin*0.9, ymax*1.1]);
-                         else
+                        else
                             ylim([ymin-(yrange*0.2), ymax+(yrange*0.2)]);
-                         end
+                        end
                     case 1
-                         ylim([0.1*ymin, 10*ymax])
+                        ylim([0.1*ymin, 10*ymax])
                 end
             end
             set(gca, 'Layer', 'top')
             box on
             hold off
-    end
+        end
     end
 end
