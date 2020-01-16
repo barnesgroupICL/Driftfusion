@@ -36,7 +36,7 @@ classdef dfplot
             % Currents as a function of time
             % POS = the readout position
             t = sol.t;
-            [j, J, xmesh] = dfana.calcJ(sol);
+            [J, j, xmesh] = dfana.calcJ(sol);
             ppos = getpointpos(xpos, xmesh);
 
             figure(2);
@@ -55,7 +55,7 @@ classdef dfplot
             % XRANGE = 2 element array with [xmin, xmax]
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [j, J, x] = dfana.calcJ(sol);
+            [J, j, x] = dfana.calcJ(sol);
 
             figure(3);
             dfplot.x2d(sol, x, {J.n, J.p, J.a, J.c, J.disp, J.tot},...
@@ -70,7 +70,7 @@ classdef dfplot
             % XRANGE = 2 element array with [xmin, xmax]
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [j, J, x] = dfana.calcJ(sol);
+            [J, j, x] = dfana.calcJ(sol);
 
             figure(301);
             dfplot.x2d(sol, par.x_ihalf, {j.n, j.p, j.a, j.c, j.disp},{'jn', 'jp', 'ja', 'jc', 'jdisp'},...
@@ -82,8 +82,10 @@ classdef dfplot
             % OPTION - 1 = dark only, 2 = light only, 3 = dark & light
             % JV is a structure containing dark and illuminated JVs
             if option == 1 || option == 3
-                [j, J.dk.f] = dfana.calcJ(JV.dk.f);
+                J.dk.f = dfana.calcJ(JV.dk.f);
                 Vapp.dk.f = dfana.calcVapp(JV.dk.f);
+                J.dk.r = dfana.calcJ(JV.dk.r);
+                Vapp.dk.r = dfana.calcVapp(JV.dk.r);
 
                 figure(4)
                 plot(Vapp.dk.f, J.dk.f.tot(:,end));
@@ -96,8 +98,12 @@ classdef dfplot
             end
 
             if option == 2 || option == 3
-                [j, J.ill.f] = dfana.calcJ(JV.ill.f);
+
+                J.ill.f = dfana.calcJ(JV.ill.f);
                 Vapp.ill.f = dfana.calcVapp(JV.ill.f);
+                J.ill.r = dfana.calcJ(JV.ill.r);
+                Vapp.ill.r = dfana.calcVapp(JV.ill.r);
+
                 figure(4)
                 plot(Vapp.ill.f, J.ill.f.tot(:,end))%, 'Color', [0, 0.4470, 0.7410]);
                 hold on
@@ -159,7 +165,7 @@ classdef dfplot
             xmesh = sol.x;
             ppos = getpointpos(xpos, xmesh);
 
-            [j, J] = dfana.calcJ(sol);
+            J = dfana.calcJ(sol);
             Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
 
             figure(9)
@@ -176,7 +182,7 @@ classdef dfplot
             xmesh = sol.x;
             ppos = getpointpos(xpos, xmesh);
 
-            [j, J] = dfana.calcJ(sol);
+            J = dfana.calcJ(sol);
             Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
 
             figure(91)
@@ -194,7 +200,7 @@ classdef dfplot
             xmesh = sol.x;
             ppos = getpointpos(xpos, xmesh);
 
-            [j, J] = dfana.calcJ(sol);
+            J = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol);
 
             figure(10)
@@ -212,7 +218,7 @@ classdef dfplot
             ppos = getpointpos(xpos, xmesh);
 
             t = sol.t;
-            [j, J] = dfana.calcJ(sol);
+            J = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol)';
             Jtot=J.tot(:, ppos);
 
@@ -315,9 +321,9 @@ classdef dfplot
             % JV is a structure containing dark and illuminated JVs
 
             if option == 1 || option == 3
-                [j, J.dk.f] = dfana.calcJ(JV.dk.f);
+                J.dk.f = dfana.calcJ(JV.dk.f);
                 Vapp.dk.f = dfana.calcVapp(JV.dk.f);
-                [j, J.dk.r] = dfana.calcJ(JV.dk.r);
+                J.dk.r = dfana.calcJ(JV.dk.r);
                 Vapp.dk.r = dfana.calcVapp(JV.dk.r);
 
                 figure(13)
@@ -331,9 +337,9 @@ classdef dfplot
                 par = solf.par;
                 pcum0 = par.pcum0;
 
-                [j, J.ill.f] = dfana.calcJ(JV.ill.f);
+                J.ill.f = dfana.calcJ(JV.ill.f);
                 Vapp.ill.f = dfana.calcVapp(JV.ill.f);
-                [j, J.ill.r] = dfana.calcJ(JV.ill.r);
+                J.ill.r = dfana.calcJ(JV.ill.r);
                 Vapp.ill.r = dfana.calcVapp(JV.ill.r);
 
                 U_f = dfana.calcU(JV.ill.f);

@@ -151,7 +151,7 @@ classdef dfana
             mue_mat = repmat(dev_ihalf.mue, length(t), 1);
             muh_mat = repmat(dev_ihalf.muh, length(t), 1);
 
-            [j, J, x] = dfana.calcJ(sol);
+            [J, j, x] = dfana.calcJ(sol);
             for i = 1:length(t)
                 deltaEfn(i,:) = cumtrapz(x, J.n(i,:)./(par.e.*mue_mat(i,:).*n(i,:)), 2);
                 deltaEfp(i,:) = cumtrapz(x, J.p(i,:)./(par.e.*muh_mat(i,:).*p(i,:)), 2);
@@ -187,7 +187,7 @@ classdef dfana
             Evb = IPmat-V;                                 % Valence band potential
         end
 
-        function [j, J, x] = calcJ(sol)
+        function [J, j, x] = calcJ(sol)
             % Current, J and flux, j calculation from continuity equations
             % Calculated on the i+0.5 grid
             option = 2;
@@ -599,7 +599,7 @@ classdef dfana
                 if isfield(JVsol.ill, 'f')
                     Vapp = dfana.calcVapp(JVsol.ill.f);
                     Vapp = Vapp';
-                    [~,J] = dfana.calcJ(JVsol.ill.f);
+                    J = dfana.calcJ(JVsol.ill.f);
                     try
                         stats.Jsc_f = interp1(Vapp, J.tot(:, end), 0);
                     catch
@@ -634,7 +634,7 @@ classdef dfana
                 if isfield(JVsol.ill, 'r')
                     Vapp = dfana.calcVapp(JVsol.ill.r);
                     Vapp = Vapp';
-                    [j,J] = dfana.calcJ(JVsol.ill.r);
+                    J = dfana.calcJ(JVsol.ill.r);
                     try
                         stats.Jsc_r = interp1(Vapp, J.tot(:, end), 0);
                     catch
