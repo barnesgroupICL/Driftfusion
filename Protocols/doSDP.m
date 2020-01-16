@@ -50,13 +50,13 @@ for i = 1:length(tdwell_arr)
     disp('Complete')
     
     % Obtain basline current
-    [~,J_dwell,~] = dfana.calcJ(sol_dwell);
+    J_dwell = dfana.calcJ(sol_dwell);
     sdpsol.Jdk(i) = J_dwell.tot(end, end);
     
     % Use end point of dark current as baseline- could average if noisy
     sol_pulse = doLightPulse(sol_dwell, pulse_int, pulse_tmax, tpoints, duty, 0, 1);
     
-    [~,J_pulse,~] = dfana.calcJ(sol_pulse);
+    J_pulse = dfana.calcJ(sol_pulse);
     sdpsol.Jtr(:,i) = J_pulse.tot(:, end) - sdpsol.Jdk(i);
 end
 
