@@ -189,7 +189,7 @@ classdef explore
         
         function Jtot = getJtot(sol)
            % Extract the total current for current structure
-           [~,J] = dfana.calcJ(sol);
+           J = dfana.calcJ(sol);
            Jtot = J.tot(:,end);
         end
         
