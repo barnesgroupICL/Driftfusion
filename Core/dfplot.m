@@ -84,9 +84,7 @@ classdef dfplot
             if option == 1 || option == 3
                 J.dk.f = dfana.calcJ(JV.dk.f);
                 Vapp.dk.f = dfana.calcVapp(JV.dk.f);
-                J.dk.r = dfana.calcJ(JV.dk.r);
-                Vapp.dk.r = dfana.calcVapp(JV.dk.r);
-
+                
                 figure(4)
                 plot(Vapp.dk.f, J.dk.f.tot(:,end));
                 hold on
@@ -101,9 +99,7 @@ classdef dfplot
 
                 J.ill.f = dfana.calcJ(JV.ill.f);
                 Vapp.ill.f = dfana.calcVapp(JV.ill.f);
-                J.ill.r = dfana.calcJ(JV.ill.r);
-                Vapp.ill.r = dfana.calcVapp(JV.ill.r);
-
+                
                 figure(4)
                 plot(Vapp.ill.f, J.ill.f.tot(:,end))%, 'Color', [0, 0.4470, 0.7410]);
                 hold on
