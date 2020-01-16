@@ -7,7 +7,7 @@ soleq_base = equilibrate(par_pn_base, 1);
 
 %% Base parameters current-voltage
 % JV = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
-JV_base = doJV(soleq_base, 1e-9, 241, 1, 0, 0, 0.8, 3, 1);
+JV_base = doJV(soleq_base.el, 1e-9, 241, 1, 0, 0, 0.8, 3, 1);
 
 %% Plot JV
 dfplot.JV(JV_base,3);
@@ -27,7 +27,7 @@ par_pn_tau1em7 = refresh_device(par_pn_tau1em7);
 soleq_tau1em7 = equilibrate(par_pn_tau1em7, 1);
 
 %% JV
-JV_tau1em7 = doJV(soleq_tau1em7, 1e-9, 241, 1, 0, 0, 0.8, 3, 1);
+JV_tau1em7 = doJV(soleq_tau1em7.el, 1e-9, 241, 1, 0, 0, 0.8, 3, 1);
 
 %% Plots
 dfplot.JV(JV_tau1em7,3);
@@ -46,7 +46,7 @@ par_pn_tau1em8 = refresh_device(par_pn_tau1em8);
 soleq_tau1em8 = equilibrate(par_pn_tau1em8, 1);
 
 %% JV
-JV_tau1em8 = doJV(soleq_tau1em8, 1e-9, 241, 1, 0, 0, 0.8, 3, 1);
+JV_tau1em8 = doJV(soleq_tau1em8.el, 1e-9, 241, 1, 0, 0, 0.8, 3, 1);
 
 %% Plots
 dfplot.JV(JV_tau1em8,3);
