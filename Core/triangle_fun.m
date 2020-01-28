@@ -1,6 +1,6 @@
 function y = triangle_fun(coeff, t)
 % Generates a triangle wave form
-% Readou coefficients:
+% Readout coefficients:
 y0 = coeff(1);
 y1 = coeff(2);
 y2 = coeff(3);
@@ -11,6 +11,7 @@ tmax = tperiod*periods;
 deltay = abs(y1-y0)+abs(y2-y1)+abs(y0-y2);
 k = deltay/tperiod;
 
+t0 = 0;
 t1 = abs(y1-y0)/k;
 t2 = t1+abs(y2-y1)/k;
 

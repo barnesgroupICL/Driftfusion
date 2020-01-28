@@ -35,6 +35,8 @@ for i = 1:length(Vapp_arr)-1
         par.mobseti = 1;           % Ions are accelerated to reach equilibrium
         par.K_anion = rat_anion;
         par.K_cation = rat_cation;
+    else
+        par.mobseti = 0;
     end
     
     par.tmesh_type = 1;
@@ -69,6 +71,9 @@ for i = 1:length(Vapp_arr)-1
     if mobseti
         sol.par.K_anion = 1;
         sol.par.K_cation = 1;
+        sol.par.mobseti = 1;
+    else
+        sol.par.mobseti = 1;
     end
     % if there's only one solution then duplicate sol structure
     if length(Vapp_arr)-1 == 1
