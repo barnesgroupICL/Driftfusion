@@ -13,7 +13,7 @@ function fun = fun_gen(fun_type)
 %% 'square'
 % COEFF = [A_low, A_high, time_period, duty_cycle]
 %% 'sin'
-% COEFF = [DC_offset, Delta_A, frequency, phase]
+% COEFF = [DC_offset, Delta_AC, frequency, phase]
 
 switch fun_type
     case 'constant'
