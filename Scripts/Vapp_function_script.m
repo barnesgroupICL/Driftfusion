@@ -13,11 +13,12 @@ par.t0 = 0;
 par.tmax = 1e-2;
 par.tpoints = 200;
 
-par.V_fun_type = 'sin';
-par.V_fun_arg(1) = 0;
-par.V_fun_arg(2) = 20e-3;
-par.V_fun_arg(3) = 1e3;
-par.V_fun_arg(4) = 0;
+%% Define the voltage function
+par.V_fun_type = 'sin';         % Voltage function type
+par.V_fun_arg(1) = 0;           % DC offset voltage (V)
+par.V_fun_arg(2) = 20e-3;       % AC voltage amplitude (V)
+par.V_fun_arg(3) = 1e3;         % Frequency (Hz)
+par.V_fun_arg(4) = 0;           % Phase (Rads)
 
 disp('Applying oscillating potential')
 sol_Vapp = df(soleq_singlecar.ion, par);

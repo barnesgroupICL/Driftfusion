@@ -1,6 +1,5 @@
 % Single layer test
-clear all
-close all
+
 % Load parameters
 par = pc('Input_files/1_layer_test.csv');
 
