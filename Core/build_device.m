@@ -9,6 +9,10 @@ switch meshoption
         xmesh = getvarihalf(par.xx);
 end
 
+% Constant properties
+dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
+dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
+
 % Linearly graded properties
 dev.EA = build_property(par.EA, xmesh, par, 'lin_graded', 0);
 dev.IP = build_property(par.IP, xmesh, par, 'lin_graded', 0);
@@ -20,8 +24,6 @@ dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
 dev.krad = build_property(par.krad, xmesh, par, 'lin_graded', 0);
 dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
 dev.Et = build_property(par.Et, xmesh, par, 'lin_graded', 0);
-dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
-dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
 
 % Logarithmically graded properties
 dev.NA = build_property(par.NA, xmesh, par, 'log_graded', 0);
