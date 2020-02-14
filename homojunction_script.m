@@ -22,18 +22,22 @@ soleq.mobile_dope = equilibrate(par.mobile_dope);
 JV.mobile_dope = doJV(soleq.mobile_dope.el, 1e-3, 100, 1, 0, 0, -1.2, 2);
 JV.mobile_dope_i = doJV(soleq.mobile_dope.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
 
-par.intrinsic_Nion1e17 = pc('input_files/Nion1e17 p-i-n.csv');
+%%
+par.intrinsic_Nion1e17 = pc('input_files/Nion1e17 intrinsic.csv');
 soleq.intrinsic_Nion1e17 = equilibrate(par.intrinsic_Nion1e17);
 JV.intrinsic_Nion1e17 = doJV(soleq.intrinsic_Nion1e17.el, 1e-3, 100, 1, 0, 0, 1.2, 2);
 JV.intrinsic_Nion1e17_i = doJV(soleq.intrinsic_Nion1e17.ion, 1e-3, 100, 1, 1, 0, 1.2, 2);
 
+%%
 par.hom_Nion1e17 = pc('input_files/Nion1e17 homojunction.csv');
 soleq.hom_Nion1e17 = equilibrate(par.hom_Nion1e17);
 JV.hom_Nion1e17 = doJV(soleq.hom_Nion1e17.el, 1e-3, 100, 1, 0, 0, 1.2, 2);
 JV.hom_Nion1e17_i = doJV(soleq.hom_Nion1e17.ion, 1e-3, 100, 1, 1, 0, 1.2, 2);
 
+%%
 par.ntype_Nion1e17 = pc('input_files/Nion1e17 ntype.csv');
 soleq.ntype_Nion1e17 = equilibrate(par.ntype_Nion1e17);
 JV.ntype_Nion1e17 = doJV(soleq.ntype_Nion1e17.el, 1e-3, 100, 1, 0, 0, 1.2, 2);
 JV.ntype_Nion1e17_i = doJV(soleq.ntype_Nion1e17.ion, 1e-3, 100, 1, 1, 0, 1.2, 2);
 
+%%
