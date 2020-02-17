@@ -1,13 +1,21 @@
 classdef pc
-    % Authors: Philip Calado, Piers Barnes, Ilario Gelmetti, Ben Hillman, 2018 Imperial College London
-    % PC (Parameters Class) defines all the required properties for your
-    % device. PC.BUILDDEV builds a structure PO.DEV (where PO is a Parameters Object)
-    % that defines the properties of the device at every spatial mesh point, including
-    % interfaces. Whenever PROPERTIES are overwritten in a protocol, the device should
-    % be rebuilt manually using PC.BUILDDEV. The spatial mesh is a linear piece-wise mesh
-    % and is built by the MESHGEN_X function. Details of how to define the mesh
-    % are given below in the SPATIAL MESH SUBSECTION.
-
+% PC (Parameters Class) defines all the required properties for your
+% device. PC.BUILDDEV builds a structure PO.DEV (where PO is a Parameters Object)
+% that defines the properties of the device at every spatial mesh point, including
+% interfaces. Whenever PROPERTIES are overwritten in a protocol, the device should
+% be rebuilt manually using PC.BUILDDEV. The spatial mesh is a linear piece-wise mesh
+% and is built by the MESHGEN_X function. Details of how to define the mesh
+% are given below in the SPATIAL MESH SUBSECTION.
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
     properties (Constant)
         %% Physical constants
         kB = 8.617330350e-5;     % Boltzmann constant [eV K^-1]

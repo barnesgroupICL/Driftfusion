@@ -9,7 +9,17 @@ function sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycl
 % SCAN_RATE = Scan rate (Vs-1)
 % CYCLES = No. of scan cycles
 % TPOINTS = No. of points in output time array
-% P. Calado, 2020, Imperial College London
+%
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 disp('Starting DOCV')
 
 par = sol_ini.par;

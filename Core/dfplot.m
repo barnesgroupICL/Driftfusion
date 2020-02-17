@@ -1,14 +1,23 @@
-classdef dfplot
-    % Plotting class - contains methods for plotting
-    % DFPLOT.ELX = Energy level diagrams and charge carrier densities
-    % DFPLOT.JT = Currents as a function of time
-    % DFPLOT.JX = Total currents as a function of position
-    % DFPLOT.JDDX = Drift and diffusion currents as a function of position
-    % Plotting functions that are a funciton of position can accept a time
-    % array as the second argument- the procedure will loop and plot the
-    % solution at multiple times.
-    % The third optional argument defines the x-range.
-    
+classdef dfplot   
+% DRIFTFUSION Plotting class - contains methods for plotting
+% DFPLOT.ELX = Energy level diagrams and charge carrier densities
+% DFPLOT.JT = Currents as a function of time
+% DFPLOT.JX = Total currents as a function of position
+% DFPLOT.JDDX = Drift and diffusion currents as a function of position
+% Plotting functions that are a funciton of position can accept a time
+% array as the second argument- the procedure will loop and plot the
+% solution at multiple times.
+% The third optional argument defines the x-range.
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
     methods (Static)
         
         function ELx(varargin)

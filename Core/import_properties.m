@@ -2,7 +2,16 @@ function par = import_properties(par, filepath)
 % A function to IMPORT_PROPERTIES from a text file LOCATED at FILEPATH. Each of the listed properties
 % is checked to see if it is available in the .CSV file. If it is available, the existing properties
 % are overwritten otherwise a warning is displayed.
-
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 T = readtable(filepath{1,1});   % Reads-in in the external .CSV file to a table T
 
 try

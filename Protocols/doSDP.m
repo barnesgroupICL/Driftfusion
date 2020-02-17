@@ -1,11 +1,21 @@
 function sdpsol = doSDP(sol_ini, tdwell_arr, Vjump, pulse_int, pulse_tmax, duty, tpoints, scalefactor)
-% tarr =  a time array containing the dwell times
-% Vjump = the jump to voltage. Vpre is defined by sol_ini which should be
+% TARR =  a time array containing the dwell times
+% VJUMP = the jump to voltage. Vpre is defined by sol_ini which should be
 % a solution at steady-state
-% pulse_tmax = capture length for transient
-% pulse_int = pulse intensity
+% PULSE_TMAX = capture length for transient
+% PULSE_INT = pulse intensity
 % Jtr_time = time at which is the J value is taken
 % scalefactor = accelerates ions in case of bad convergence. Set to
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 disp('Starting SDP protocol')
 
 % Get parameters
