@@ -28,11 +28,11 @@ par.g1_fun_arg = [0, int1, par.tmax];
 sol_ill1 = df(sol_ini, par);
 
 par.g1_fun_type = 'constant';
+par.g1_fun_arg = int1;
 par.tmesh_type = 2;
 par.tmax = 1e-6;
 par.t0 = par.tmax/1e6;
 par.tpoints = 10;
-par.JV = 0;
 
 if Rs >0
     par.Rs = Rs;

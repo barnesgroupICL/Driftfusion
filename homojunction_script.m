@@ -4,6 +4,20 @@ soleq.intrinsic = equilibrate(par.intrinsic);
 JV.intrinsic = doJV(soleq.intrinsic.el, 1e-3, 100, 1, 0, 0, -1.2, 2);
 JV.intrinsic_i = doJV(soleq.intrinsic.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
 
+%% intrinsic eppr = 5
+par.intrinsic_epp5 = pc('input_files/intrinsic_epp5.csv');
+soleq.intrinsic_epp5 = equilibrate(par.intrinsic_epp5);
+
+%% intrinsic eppr = 50
+par.intrinsic_epp50 = pc('input_files/intrinsic_epp50.csv');
+soleq.intrinsic_epp50 = equilibrate(par.intrinsic_epp50);
+
+%% Open circuit
+OC.intrinsic = lightonRs(soleq.intrinsic.el, 1, -1e-2, 0, 1e6, 200);
+OC.intrinsic_epp5 = lightonRs(soleq.intrinsic_epp5.el, 1, -1e-2, 0, 1e6, 200);
+OC.intrinsic_epp50 = lightonRs(soleq.intrinsic_epp50.el, 1, -1e-2, 0, 1e6, 200);
+OC.intrinsic_i = lightonRs(soleq.intrinsic.ion, 1, -1e-2, 1, 1e6, 200);
+
 %% n-type
 par.ntype = pc('input_files/n_type.csv');
 soleq.ntype = equilibrate(par.ntype);

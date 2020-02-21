@@ -583,6 +583,12 @@ classdef dfana
             rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - NAmat + NDmat;
         end
         
+        function Qt = calcQ(sol)
+           rho = dfana.calcrho_ihalf(sol);
+           x_ihalf = sol.par.x_ihalf;
+           Qt = trapz(x_ihalf, rho, 2);
+        end
+        
         function Vapp = calcVapp(sol)
             par = sol.par;
             switch par.V_fun_type
@@ -592,6 +598,68 @@ classdef dfana
                     Vapp_fun = fun_gen(par.V_fun_type);
                     Vapp = Vapp_fun(par.V_fun_arg, sol.t);
             end
+        end
+        
+        function R = calcR(sol)
+            % integrated recombination including surfaces
+            [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            % Bulk
+            r = dfana.calcU_ihalf(sol);
+            x = par.x_ihalf;
+               
+            % Surfaces
+            switch par.BC
+                case 2
+                    jn_l = par.sn_l*(n(:, 1) - par.nleft);
+                    jp_l = deltajp(:, end) + par.sp_r*(p(:, end) - par.pright);
+                    
+                    jn_r = deltajn(:, end) - par.sn_l*(n(:, 1) - par.nleft);
+                    jp_r = par.sp_r*(p(:, end) - par.pright);
+                case 3
+                    jn_l = par.sn_l*(n(:, 1) - par.nleft);
+                    jp_l = par.sp_l*(p(:, 1) - par.pleft);
+                    
+                    jn_r = par.sn_r*(n(:, end) - par.nright);
+                    jp_r = par.sp_r*(p(:, end) - par.pright);
+            end
+            
+            % At OC jn_l = jp_l and jn_r = jp_r
+            % Calculate total electron and hole currents from fluxes
+            % Use the minority carrier flux as the boundary condition
+            if par.pleft >= par.nleft && par.nright >= par.pright
+                % p-type left boundary, n-type right boundary
+                R = trapz(x, r.tot(end,:), 2) +  jn_l(end) + jp_r(end);
+            elseif par.nleft >= par.nright && par.pright >= par.nright
+                % n-type left boundary, p-type right boundary
+                R = trapz(x, r.tot(end,:), 2) + jn_r(end) + jp_l(end);
+            end
+             
+        end
+        
+        function G = calcG(sol)
+            par = sol.par;
+            g = par.int1*par.gx1;
+            x = par.x_ihalf;
+            
+            G = trapz(x, g, 2);
+        end
+        
+        function [kpfo_n, n_integrated] = calckpfo_n(sol)
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            R = dfana.calcR(sol);
+            n_integrated = trapz(x, n, 2);
+            n_integrated = n_integrated(end);
+            kpfo_n = R/n_integrated;
+        end
+        
+        function kpfo_p = calckpfo_p(sol)
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            R = dfana.calcR(sol);
+            p_integrated = trapz(x, p, 2);
+            p_integrated = p_integrated(end);
+            kpfo_p = R/p_integrated;
         end
         
         function stats = JVstats(JVsol)

@@ -42,6 +42,7 @@ end
 % Dependent properties: Prevents recalculation of dependent properties by pdepe defined in Methods
 % Can also use AbortSet in class def
 Vbi = par.Vbi;
+Eg = par.Eg(par.active_layer);   % Active layer band gap
 nleft = par.nleft;
 nright = par.nright;
 pleft = par.pleft;
@@ -55,6 +56,7 @@ dev = par.dev;
 kB = par.kB;
 T = par.T;
 q = par.q;
+e = par.e;
 epp0 = par.epp0;
 
 %% Switches and accelerator coefficients
@@ -328,12 +330,18 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 if par.Rs == 0
                     Vres = 0;
                 else
-                    Jr = par.e*sp_r*(ur(2) - pright) - par.e*sn_r*(ur(1) - nright);
+                    Jr = e*(sp_r*(ur(2) - pright) - sn_r*(ur(1) - nright));
                     if par.Rs_initial
-                        Vres = Jr*par.Rs*t/par.tmax;    % Initial linear sweep
+                        Vres = Jr*(par.Rs)*t/par.tmax;    % Initial linear sweep
                     else
                         Vres = Jr*par.Rs;
                     end
+                    % Maintain Vres within reasonable limits 
+%                     if Vres>Eg
+%                         Vres = Eg;
+%                     elseif Vres<-Eg
+%                         Vres = -Eg;
+%                     end
                 end
                 
                 pl = [mobset*(-sn_l*(ul(1) - nleft));

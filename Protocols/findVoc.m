@@ -81,17 +81,12 @@ fx0 = J.tot(end, end);
 
 xrun = x0;
 yrun = fx0;
-
 fx1 = 1;%                 % Set any initial vale > 0.01
-
 figure(111)
 
+i = 1;
 while abs(fx1) > tol
-    
-    i = 1;
-    
-    disp(['Newton-Raphson iteration', num2str(i)])
-    
+    disp(['Newton-Raphson iteration ', num2str(i)])
     %% Scan to new potential x1
     par.V_fun_type = 'sweep';
     par.V_fun_arg(1) = x0;
@@ -132,7 +127,6 @@ while abs(fx1) > tol
     
     plot(xrun, yrun, 'o', xplot, yplot);
     xlim([0.6, 1.2]);
-    %ylim([-2e-6, 2e-6])
     xlabel('x');
     ylabel('fx');
     grid on;
@@ -141,25 +135,19 @@ while abs(fx1) > tol
     % New initial guesses
     x0 = x1
     
-    if fgrad ~= 0
-        
-        x1 = x1 - (fx1/fgrad);
-        
+    if fgrad ~= 0    
+        x1 = x1 - (fx1/fgrad);    
     else
-        
         x1 = x1 + 0.1;
-        
     end
     
     fx0 = fx1
     %sol_V0 = sol_V1;
-    
     i = i+1;
     
 end
 
 sol_Voc = sol;
-
 Voc = x1;
 
 end
