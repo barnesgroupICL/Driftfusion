@@ -27,9 +27,31 @@ classdef dfplot
             subplot(3,1,2);
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1)
             
-            figure(1);
             subplot(3,1,3);
             dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
+        end
+        
+        function acnpFx(varargin)
+            % Energy Level diagram, and charge densities plotter
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            [FV, Frho] = dfana.calcF(sol);
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            
+            figure(26);
+            subplot(3,1,1);
+            dfplot.x2d(sol, x, {a, c}, {'NA', 'ND'}, {'-', '-', '--', '--'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
+            
+            subplot(3,1,2);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1)
+            
+            subplot(3,1,3);
+            dfplot.x2d(sol, x, {FV}, {''}, {'-'}, 'Electric field [Vcm-1]', tarr, xrange, 0, 0)
         end
         
         function Jt(sol, xpos)
@@ -89,7 +111,7 @@ classdef dfplot
                 Vapp.dk.r = dfana.calcVapp(JV.dk.r);
                 
                 figure(4)
-                plot(Vapp.dk.f, J.dk.f.tot(:,end), '--', Vapp.dk.r, J.dk.r.tot(:,end));
+                plot(-Vapp.dk.f, J.dk.f.tot(:,end), '--', -Vapp.dk.r, J.dk.r.tot(:,end));
                 hold on
             end
             
@@ -101,9 +123,9 @@ classdef dfplot
                 Vapp.ill.r = dfana.calcVapp(JV.ill.r);
                 
                 figure(4)
-                plot(Vapp.ill.f, J.ill.f.tot(:,end),'--')%, 'Color', [0, 0.4470, 0.7410]);
+                plot(-Vapp.ill.f, J.ill.f.tot(:,end),'--')%, 'Color', [0, 0.4470, 0.7410]);
                 hold on
-                plot(Vapp.ill.r, J.ill.r.tot(:,end));%,'Color', [0, 0.4470, 0.7410]);
+                plot(-Vapp.ill.r, J.ill.r.tot(:,end));%,'Color', [0, 0.4470, 0.7410]);
             end
             
             figure(4)
@@ -544,6 +566,21 @@ classdef dfplot
                 {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);
         end
         
+        function Vnpx(varargin)
+            % Potential and ionic charges as a function of position
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            figure(24)
+            subplot(2,1,1);
+            dfplot.x2d(sol, x, {V}, {'V'},...
+                {'-'}, 'Electro. potential [V]', tarr, xrange, 0, 0);
+            
+            subplot(2,1,2);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'},...
+                {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 1);
+        end
+        
         function Vionacx(varargin)
             % Electrostatic potential as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
@@ -594,10 +631,30 @@ classdef dfplot
             
             % Multicoloured
             % triplets = [1, 0.87, 0.87; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
-            % French flag
-            % triplets = [1, 0.87, 0.87; 1, 0.98, 0.7; 1, 1, 1; 1, 1, 0.98; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
-            % Cool Mint
-            triplets = [0.85, 0.95, 0.7; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
+            % French flag n-i-p
+            triplets = [0.8, 0.9, 1;...     HTL
+                1, 1, 1;...                     Active 1
+                1, 0.87, 0.87; ...                 ETL
+                0.9, 0.8, 1;...
+                0.9, 1, 0.8];
+            % French flag - 3 layer
+%             triplets = [0.8, 0.9, 1;...     HTL
+%                 1, 1, 0.7;...                 int1
+%                 1, 1, 1;...                     Active 1
+%                 1, 1, 0.7;...                 int 2
+%                 1, 0.87, 0.87; ...                 ETL
+%                 0.9, 0.8, 1;...
+%                 0.9, 1, 0.8];
+            % Homojunction
+%             triplets = [0.8, 0.9, 1;...     HTL
+%                 1, 1, 0.7;...                 int1
+%                 0.9, 1, 0.8;...                     Active 1
+%                 1, 1, 0.7;...                 int 2
+%                 1, 0.9, 0.7;...                 Active 2
+%                 1, 1, 0.7;...                 int 3
+%                 1, 0.87, 0.87; ...                 ETL
+%                 0.9, 0.8, 1;...
+%                 0.9, 1, 0.8];
             % pn
             % triplets = [1, 0.87, 0.87; 0.85, 0.92, 1];
             
