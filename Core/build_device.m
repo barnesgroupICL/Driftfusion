@@ -24,14 +24,14 @@ dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
 dev.krad = build_property(par.krad, xmesh, par, 'lin_graded', 0);
 dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
 dev.Et = build_property(par.Et, xmesh, par, 'lin_graded', 0);
+dev.Nani = build_property(par.Nani, xmesh, par, 'lin_graded', 0);
+dev.Ncat = build_property(par.Ncat, xmesh, par, 'lin_graded', 0);
 
 % Logarithmically graded properties
 dev.NA = build_property(par.NA, xmesh, par, 'log_graded', 0);
 dev.ND = build_property(par.ND, xmesh, par, 'log_graded', 0);
 dev.Nc = build_property(par.Nc, xmesh, par, 'log_graded', 0);
 dev.Nv = build_property(par.Nv, xmesh, par, 'log_graded', 0);
-dev.Nani = build_property(par.Nani, xmesh, par, 'lin_graded', 0);
-dev.Ncat = build_property(par.Ncat, xmesh, par, 'lin_graded', 0);
 dev.ni = build_property(par.ni, xmesh, par, 'log_graded', 0);
 dev.n0 = build_property(par.n0, xmesh, par, 'log_graded', 0);
 dev.p0 = build_property(par.p0, xmesh, par, 'log_graded', 0);
