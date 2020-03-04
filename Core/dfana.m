@@ -600,13 +600,18 @@ classdef dfana
             end
         end
         
-        function R = calcR(sol)
+        function R = calcR(sol,x1,x2)
             % integrated recombination including surfaces
             [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             % Bulk
             r = dfana.calcU_ihalf(sol);
             x = par.x_ihalf;
                
+            p1 = find(x<=x1);
+            p1 = p1(end);
+            p2 = find(x<=x2);
+            p2 = p2(end);
+            
             % Surfaces
             switch par.BC
                 case 2
@@ -628,10 +633,10 @@ classdef dfana
             % Use the minority carrier flux as the boundary condition
             if par.pleft >= par.nleft && par.nright >= par.pright
                 % p-type left boundary, n-type right boundary
-                R = trapz(x, r.tot(end,:), 2) +  jn_l(end) + jp_r(end);
+                R = trapz(x(p1:p2), r.tot(end,p1:p2), 2) +  jn_l(end) + jp_r(end);
             elseif par.nleft >= par.nright && par.pright >= par.nright
                 % n-type left boundary, p-type right boundary
-                R = trapz(x, r.tot(end,:), 2) + jn_r(end) + jp_l(end);
+                R = trapz(x(p1:p2), r.tot(end,p1:p2), 2) + jn_r(end) + jp_l(end);
             end
              
         end
@@ -644,20 +649,30 @@ classdef dfana
             G = trapz(x, g, 2);
         end
         
-        function [kpfo_n, n_integrated] = calckpfo_n(sol)
+        function [kpfo_n, n_integrated] = calckpfo_n(sol, x1, x2)
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            R = dfana.calcR(sol);
-            n_integrated = trapz(x, n, 2);
+            p1 = find(x<=x1);
+            p1 = p1(end);
+            p2 = find(x<=x2);
+            p2 = p2(end);
+            
+            R = dfana.calcR(sol, x1, x2);
+            n_integrated = trapz(x(p1:p2), n(:,p1:p2), 2);
             n_integrated = n_integrated(end);
             kpfo_n = R/n_integrated;
         end
         
-        function kpfo_p = calckpfo_p(sol)
+        function [kpfo_p, p_integrated] = calckpfo_p(sol, x1, x2)
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            R = dfana.calcR(sol);
-            p_integrated = trapz(x, p, 2);
+            p1 = find(x<=x1);
+            p1 = p1(end);
+            p2 = find(x<=x2);
+            p2 = p2(end);
+            
+            R = dfana.calcR(sol, x1, x2);
+            p_integrated = trapz(x(p1:p2), p(:,p1:p2), 2);
             p_integrated = p_integrated(end);
             kpfo_p = R/p_integrated;
         end
