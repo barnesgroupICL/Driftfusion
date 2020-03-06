@@ -45,6 +45,10 @@ classdef dfana
             Efn = zeros(size(n,1), size(n,2));
             Efp = zeros(size(n,1), size(n,2));
             
+            % Filter
+            n(n<1e-2) = nan;
+            p(p<1e-2) = nan;
+            
             if par.prob_distro_function == 'Fermi'
                 
                 for i = 1:size(n,1)           % time
@@ -560,6 +564,17 @@ classdef dfana
             
             % charge density
             rho = -n + p - a + c - NAmat + NDmat;
+        end
+        
+        function rho = calcrho_electronic(sol)
+            % Calculates the space charge density
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            
+            % charge density
+            rho = -n + p - NAmat + NDmat;
         end
         
         function rho = calcrho_ihalf(sol)

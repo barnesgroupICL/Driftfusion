@@ -40,20 +40,26 @@
 %% Simulation Voc readout
 VQFL.intrinsic = dfana.calcVQFL(OC.intrinsic);
 VQFL.intrinsic = abs(VQFL.intrinsic(end));
-VQFL.intrinsic_i = dfana.calcVQFL(OC.intrinsic_i);
-VQFL.intrinsic_i = abs(VQFL.intrinsic_i(end));
+VQFL.intrinsic_Nion1e19_i = dfana.calcVQFL(OC.intrinsic_i);
+VQFL.intrinsic_Nion1e19_i = abs(VQFL.intrinsic_Nion1e19_i(end));
+VQFL.intrinsic_Nion1e17_i = dfana.calcVQFL(OC.intrinsic_Nion1e17_i);
+VQFL.intrinsic_Nion1e17_i = abs(VQFL.intrinsic_Nion1e17_i(end));
 
 VQFL.hom = dfana.calcVQFL(OC.hom);
 VQFL.hom = abs(VQFL.hom(end));
-VQFL.hom_i = dfana.calcVQFL(OC.hom_i);
-VQFL.hom_i = abs(VQFL.hom_i(end));
+VQFL.hom_Nion1e19_i = dfana.calcVQFL(OC.hom_i);
+VQFL.hom_Nion1e19_i = abs(VQFL.hom_Nion1e19_i(end));
+VQFL.hom_Nion1e17_i = dfana.calcVQFL(OC.hom_Nion1e17_i);
+VQFL.hom_Nion1e17_i = abs(VQFL.hom_Nion1e17_i(end));
 
 VQFL.ntype = dfana.calcVQFL(OC.ntype);
 VQFL.ntype = abs(VQFL.ntype(end));
-VQFL.ntype_i = dfana.calcVQFL(OC.ntype_i);
-VQFL.ntype_i = abs(VQFL.ntype_i(end));
+VQFL.ntype_Nion1e19_i = dfana.calcVQFL(OC.ntype_i);
+VQFL.ntype_Nion1e19_i = abs(VQFL.ntype_Nion1e19_i(end));
+VQFL.ntype_Nion1e17_i = dfana.calcVQFL(OC.ntype_Nion1e17_i);
+VQFL.ntype_Nion1e17_i = abs(VQFL.ntype_Nion1e17_i(end));
 
 VQFL.mobile_dope = dfana.calcVQFL(OC.mobile_dope);
 VQFL.mobile_dope = abs(VQFL.mobile_dope(end));
-VQFL.mobile_dope_i = dfana.calcVQFL(OC.mobile_dope_i);
-VQFL.mobile_dope_i = abs(VQFL.mobile_dope_i(end));
+VQFL.mobile_dope_Nion1e19_i = dfana.calcVQFL(OC.mobile_dope_i);
+VQFL.mobile_dope_Nion1e19_i = abs(VQFL.mobile_dope_Nion1e19_i(end));

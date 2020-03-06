@@ -45,13 +45,120 @@ classdef dfplot
             
             figure(26);
             subplot(3,1,1);
-            dfplot.x2d(sol, x, {a, c}, {'NA', 'ND'}, {'-', '-', '--', '--'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
+            dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-.', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
             
             subplot(3,1,2);
-            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1)
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-.'}, 'Electronic carrier density [cm-3]', tarr, xrange, 0, 1)
             
             subplot(3,1,3);
             dfplot.x2d(sol, x, {FV}, {''}, {'-'}, 'Electric field [Vcm-1]', tarr, xrange, 0, 0)
+        end
+
+        function acNANDnpFx(varargin)
+            % Energy Level diagram, and charge densities plotter
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            [FV, Frho] = dfana.calcF(sol);
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            
+            figure(26);
+            subplot(3,1,1);
+            dfplot.x2d(sol, x, {a + NAmat, c + NDmat}, {'NA', 'ND'}, {'-', '-.'}, 'Dopant density [cm-3]', tarr, xrange, 0, 0)
+            
+            subplot(3,1,2);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-.'}, 'Electronic carrier density [cm-3]', tarr, xrange, 0, 1)
+            
+            subplot(3,1,3);
+            dfplot.x2d(sol, x, {FV}, {''}, {'-'}, 'Electric field [Vcm-1]', tarr, xrange, 0, 0)
+        end
+        
+        function acnpx(varargin)
+            % Energy Level diagram, and charge densities plotter
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            
+            figure(26);
+            subplot(2,1,1);
+            dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-', '-', '--', '--'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
+            
+            subplot(2,1,2);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'Electronic carrier density [cm-3]', tarr, xrange, 0, 1)
+        end
+
+        function rhoacnpx(varargin)
+            % Energy Level diagram, and charge densities plotter
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            
+            figure(26);
+            subplot(2,1,1);
+            dfplot.x2d(sol, x, {c-a+NDmat-NAmat}, {''}, {'-'}, 'Ionic space charge density [cm-3]', tarr, xrange, 0, 0)
+            
+            subplot(2,1,2);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'Electronic carrier density [cm-3]', tarr, xrange, 0, 1)
+        end
+        
+        function rhoacnpFx2(varargin)
+            % Energy Level diagram, and charge densities plotter
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            [FV, Frho] = dfana.calcF(sol);
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            
+            figure(261);
+            subplot(3,1,1);
+            dfplot.x2d(sol, x, {c-a, NDmat-NAmat}, {'Mobile ions', 'Static dopants'}, {'-', '-.'}, 'Ionic space charge density [cm-3]', tarr, xrange, 0, 0)
+            
+            subplot(3,1,2);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-.'}, 'Electronic carrier density [cm-3]', tarr, xrange, 0, 1)
+ 
+            subplot(3,1,3);
+            dfplot.x2d(sol, x, {FV}, {''}, {'-'}, 'Electric field [Vcm-1]', tarr, xrange, 0, 0)
+        end
+        
+        function rhoacnpVx(varargin)
+            % Energy Level diagram, and charge densities plotter
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            [FV, Frho] = dfana.calcF(sol);
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            
+            figure(261);
+            subplot(3,1,1);
+            dfplot.x2d(sol, x, {c-a, NDmat-NAmat}, {'Mobile ions', 'Static dopants'}, {'-', '-.'}, 'Ionic space charge density [cm-3]', tarr, xrange, 0, 0)
+            
+            subplot(3,1,2);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-.'}, 'Electronic carrier density [cm-3]', tarr, xrange, 0, 1)
+ 
+            subplot(3,1,3);
+            dfplot.x2d(sol, x, {V}, {''}, {'-'}, 'Electrostatic potential [V]', tarr, xrange, 0, 0)
         end
         
         function Jt(sol, xpos)
@@ -469,6 +576,17 @@ classdef dfplot
             dfplot.x2d(sol, x, {rho},{'\rho'},{'-'},'Charge density [cm-3]', tarr, xrange, 0, 0);
         end
         
+        function rho_electronic_x(varargin)
+            % Volumetric charge density (rho) as a funciton of position
+            % A time array can be used as a second input argument
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            rho = dfana.calcrho_electronic(sol);
+            
+            figure(19)
+            dfplot.x2d(sol, x, {rho},{'\rho'},{'-'},'Charge density [cm-3]', tarr, xrange, 0, 0);
+        end
+        
         function deltarhox(varargin)
             % The change in volumetric charge density (rho) as a funciton of position
             % A time array can be used as a second input argument
@@ -632,19 +750,19 @@ classdef dfplot
             % Multicoloured
             % triplets = [1, 0.87, 0.87; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
             % French flag n-i-p
-            triplets = [0.8, 0.9, 1;...     HTL
-                1, 1, 1;...                     Active 1
-                1, 0.87, 0.87; ...                 ETL
-                0.9, 0.8, 1;...
-                0.9, 1, 0.8];
-            % French flag - 3 layer
 %             triplets = [0.8, 0.9, 1;...     HTL
-%                 1, 1, 0.7;...                 int1
 %                 1, 1, 1;...                     Active 1
-%                 1, 1, 0.7;...                 int 2
 %                 1, 0.87, 0.87; ...                 ETL
 %                 0.9, 0.8, 1;...
 %                 0.9, 1, 0.8];
+            % French flag - 3 layer
+            triplets = [0.8, 0.9, 1;...     HTL
+                1, 1, 0.7;...                 int1
+                1, 1, 1;...                     Active 1
+                1, 1, 0.7;...                 int 2
+                1, 0.87, 0.87; ...                 ETL
+                0.9, 0.8, 1;...
+                0.9, 1, 0.8];
             % Homojunction
 %             triplets = [0.8, 0.9, 1;...     HTL
 %                 1, 1, 0.7;...                 int1
@@ -655,6 +773,18 @@ classdef dfplot
 %                 1, 0.87, 0.87; ...                 ETL
 %                 0.9, 0.8, 1;...
 %                 0.9, 1, 0.8];
+
+%             % Homojunction - white absorber
+%             triplets = [0.8, 0.9, 1;...     HTL
+%                 1, 1, 0.7;...                 int1
+%                 1, 1, 1;...                     Active 1
+%                 1, 1, 1;...                 int 2
+%                 1, 1, 1;...                 Active 2
+%                 1, 1, 0.7;...                 int 3
+%                 1, 0.87, 0.87; ...                 ETL
+%                 0.9, 0.8, 1;...
+%                 0.9, 1, 0.8];
+
             % pn
             % triplets = [1, 0.87, 0.87; 0.85, 0.92, 1];
             

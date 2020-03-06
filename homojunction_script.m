@@ -44,8 +44,8 @@ OC.intrinsic_Nion1e17_i = lightonRs(soleq.intrinsic_Nion1e17.ion, 1, -1, 1, 1e6,
 
 %% Homojunction, Nion= 1e17 cm-3
 par.hom_Nion1e17 = pc('input_files/homojunction.csv');
-par.hom_Nion1e17.Ncat = [1e17,1e17,1e17,1e17,1e17];
-par.hom_Nion1e17.Nani = [1e17,1e17,1e17,1e17,1e17];
+par.hom_Nion1e17.Ncat = [1e17,1e17,1e17,1e17,1e17,1e17,1e17];
+par.hom_Nion1e17.Nani = [1e17,1e17,1e17,1e17,1e17,1e17,1e17];
 par.hom_Nion1e17 = refresh_device(par.hom_Nion1e17);
 
 soleq.hom_Nion1e17 = equilibrate(par.hom_Nion1e17);
