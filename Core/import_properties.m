@@ -25,7 +25,8 @@ catch
     warning('No stack (stack) defined in .csv . Using default in PC')
 end
 try
-    par.dcell = T{:, 'thickness'}';
+    par.d = T{:, 'thickness'}';
+    par.d = T{:, 'd'}';
 catch
     warning('No thickness array (thickness) defined in .csv . Using default in PC')
 end

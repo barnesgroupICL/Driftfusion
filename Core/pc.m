@@ -34,7 +34,7 @@ classdef pc
         % MESHGEN_X function using 2 arrays DCELL and PCELL,
         % which define the thickness and number of points of each layer
         % respectively.
-        dcell = 400e-7;         % Layer and subsection thickness array
+        d = 400e-7;         % Layer and subsection thickness array
         layer_points = 400;            % Points array
 
         %% Layer description
@@ -232,7 +232,7 @@ classdef pc
     %%  Properties whose values depend on other properties (see 'get' methods).
     properties (Dependent)
         active_layer
-        d
+        dcell
         parr
         d_active
         dcum
@@ -458,10 +458,10 @@ classdef pc
            value = par.dcum(par.active_layer(1)-1) + par.d_active/2;
         end
         %% Layer thicknesses [cm]
-        function value = get.d(par)
+        function value = get.dcell(par)
             % For backwards comptibility. layer_points and parr arre the now the
             % same thing
-            value = par.dcell;
+            value = par.d;
         end
 
         %% Layer points
