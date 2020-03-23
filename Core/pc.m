@@ -308,11 +308,11 @@ classdef pc
                 end
             end
 
-            % Warn if DOSani is set to zero in any layers - leads to
+            % Warn if amax is set to zero in any layers - leads to
             % infinite diffusion rate
-            for i = 1:length(par.DOSani)
-                if par.DOSani(i) <= 0
-                    msg = 'ion DOS (DOSani) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
+            for i = 1:length(par.amax)
+                if par.amax(i) <= 0
+                    msg = 'ion DOS (amax) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
                     error(msg);
                 end
             end
@@ -365,8 +365,8 @@ classdef pc
             elseif length(par.Nani) ~= length(par.d)
                 msg = 'Background ion density (Nani) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.DOSani) ~= length(par.d)
-                msg = 'Ion density of states array (DOSani) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.amax) ~= length(par.d)
+                msg = 'Ion density of states array (amax) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.epp) ~= length(par.d)
                 msg = 'Relative dielectric constant array (epp) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
