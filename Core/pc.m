@@ -21,7 +21,7 @@ classdef pc
         kB = 8.617330350e-5;     % Boltzmann constant [eV K^-1]
         epp0 = 552434;           % Epsilon_0 [e^2 eV^-1 cm^-1] - Checked (02-11-15)
         q = 1;                   % Charge of the species in units of e.
-        e = 1.60217662e-19;         % Elementary charge in Coulombs.
+        e = 1.60217662e-19;      % Elementary charge in Coulombs.
     end
 
     properties
@@ -158,8 +158,8 @@ classdef pc
         Ncat = [1e19];
         % Approximate density of iodide sites [cm-3]
         % Limits the density of iodide vancancies
-        DOSani = [1.21e22];                 % P. Calado thesis
-        DOScat = [1.21e22];
+        amax = [1.21e22];                 % P. Calado thesis
+        cmax = [1.21e22];
         %% Mobilities   [cm2V-1s-1]
         mue = [1];         % electron mobility
         muh = [1];         % hole mobility

@@ -75,12 +75,12 @@ catch
     warning('No equilibrium cation density array (Ncat) defined in .csv . Using default in PC')
 end
 try
-    par.DOSani = T{:, 'DOSani'}';
+    par.amax = T{:, 'amax'}';
 catch
     warning('No maximum anion density array (DOSani) defined in .csv . Using default in PC')
 end
 try
-    par.DOScat = T{:, 'DOScat'}';
+    par.cmax = T{:, 'cmax'}';
 catch
     warning('No maximum cation density array (DOScat) defined in .csv . Using default in PC')
 end
@@ -196,7 +196,13 @@ try
     par.Nani = T{:, 'Nion'}';
 end
 try
-    par.DOSani = T{:, 'DOSion'}';
+    par.amax = T{:, 'DOSion'}';
+end
+try
+    par.amax = T{:, 'DOSani'}';
+end
+try
+    par.cmax = T{:, 'DOScat'}';
 end
 try
     par.muani = T{:, 'muion'}';

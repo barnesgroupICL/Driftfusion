@@ -44,8 +44,8 @@ dev.Ncat = build_property(par.Ncat, xmesh, par, 'log_graded', 0);
 dev.ni = build_property(par.ni, xmesh, par, 'log_graded', 0);
 dev.n0 = build_property(par.n0, xmesh, par, 'log_graded', 0);
 dev.p0 = build_property(par.p0, xmesh, par, 'log_graded', 0);
-dev.DOSani = build_property(par.DOSani, xmesh, par, 'log_graded', 0);
-dev.DOScat = build_property(par.DOScat, xmesh, par, 'log_graded', 0);
+dev.DOSani = build_property(par.amax, xmesh, par, 'log_graded', 0);
+dev.DOScat = build_property(par.cmax, xmesh, par, 'log_graded', 0);
 
 % Properties that are zeroed in the interfaces
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);
