@@ -244,7 +244,7 @@ classdef pc
         dNvdx
         Dn
         Eg
-        Eif
+        Efi
         NA
         ND
         Vbi
@@ -483,7 +483,7 @@ classdef pc
 
         %% Intrinsic Fermi Energies
         % Currently uses Boltzmann stats as approximation should always be
-        function value = get.Eif(par)
+        function value = get.Efi(par)
             value = 0.5.*(par.EA+par.IP)+par.kB*par.T*log(par.Nc./par.Nv);
         end
 
