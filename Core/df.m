@@ -3,9 +3,15 @@ function solstruct = df(varargin)
 % A routine to test solving the diffusion and drift equations using the
 % matlab pepde solver.
 %
-% Authors: Philip Calado, Piers RF Barnes, Ilario Gelmetti, Ben Hillman,
-% Imperial College London, 2019
-
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 % n = u(1) = electron density
 % p = u(2) = holes density
 % c = u(3) = cation density

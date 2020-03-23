@@ -1,13 +1,26 @@
 function dev = build_device(par, meshoption)
 % BUILD_DEVICE calls BUILD_PROPERTY for each device property. BUILD_PROPERTY then defines the
 % properties at each point on the grid defined by MESHOPTION
-
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 switch meshoption
     case 'iwhole'
         xmesh = par.xx;
     case 'ihalf'
         xmesh = getvarihalf(par.xx);
 end
+
+% Constant properties
+dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
+dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
 
 % Linearly graded properties
 dev.EA = build_property(par.EA, xmesh, par, 'lin_graded', 0);
@@ -20,8 +33,6 @@ dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
 dev.krad = build_property(par.krad, xmesh, par, 'lin_graded', 0);
 dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
 dev.Et = build_property(par.Et, xmesh, par, 'lin_graded', 0);
-dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
-dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
 
 % Logarithmically graded properties
 dev.NA = build_property(par.NA, xmesh, par, 'log_graded', 0);
@@ -33,8 +44,8 @@ dev.Ncat = build_property(par.Ncat, xmesh, par, 'log_graded', 0);
 dev.ni = build_property(par.ni, xmesh, par, 'log_graded', 0);
 dev.n0 = build_property(par.n0, xmesh, par, 'log_graded', 0);
 dev.p0 = build_property(par.p0, xmesh, par, 'log_graded', 0);
-dev.DOSani = build_property(par.DOSani, xmesh, par, 'log_graded', 0);
-dev.DOScat = build_property(par.DOScat, xmesh, par, 'log_graded', 0);
+dev.DOSani = build_property(par.amax, xmesh, par, 'log_graded', 0);
+dev.DOScat = build_property(par.cmax, xmesh, par, 'log_graded', 0);
 
 % Properties that are zeroed in the interfaces
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);

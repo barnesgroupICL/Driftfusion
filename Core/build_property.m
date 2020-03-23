@@ -9,7 +9,16 @@ function devprop = build_property(property, xmesh, par, interface_switch, gradie
 %                       'lin_graded' = graded property values in interfaces
 %                       'log_graded' = graded property values in interfaces
 % GRADIENT_PROPERTIES - 1 if the property is a gradient e.g. dEAdx, 0 otherwise
-
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 devprop = zeros(1, length(xmesh));
 
 for i=1:length(par.dcum)                % i is the layer index

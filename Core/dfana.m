@@ -1,7 +1,17 @@
 classdef dfana
-    % Analysis class
+% DRIFTFUSION analysis class- contains multiple methods for calculating
+% outputs using the solution obtained from DF.
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
     methods (Static)
-
         function [u,t,x,par,dev,n,p,a,c,V] = splitsol(sol)
             % splits solution into useful outputs
             u = sol.u;

@@ -9,12 +9,19 @@ function Gentot = beerlambert(par, x, source_type, laserlambda, figson)
 
 %% Output arguments
 % GENTOT - Generation rate integrated across the spectrum
-
-% Author: Philip Calado, Imperial College London, 2018
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 % n & k loader taken from McGeehee group Stanford Transfer Matrix Code
 % NOTE: In this version n & k change abruptly at interfaces
-
-% Constants
+%% Constants
 h = 6.626e-34;
 c = 2.998e8;
 
