@@ -31,7 +31,7 @@ elseif length(varargin) == 2
     if max(max(max(varargin{1, 1}.u))) == 0
         par = varargin{2};
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
-        
+
         input_solstruct = varargin{1, 1};
         par = input_solstruct.par;
         icsol = input_solstruct.u;
@@ -89,7 +89,7 @@ gradEA = device.gradEA;     % Electron Affinity gradient
 gradIP = device.gradIP;     % Ionisation Potential gradient
 epp = device.epp;           % Dielectric constant
 eppmax = max(par.epp);      % Maximum dielectric constant (for normalisation)
-krad = device.krad;         % Radiative recombination rate coefficient
+Bdir = device.Bdir;         % Radiative recombination rate coefficient
 ni = device.ni;             % Intrinsic carrier density
 n0 = device.n0;             % Intrinsic carrier density
 p0 = device.p0;             % Intrinsic carrier density
@@ -153,40 +153,40 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % C = Time-dependence prefactor
 % F = Flux terms
 % S = Source terms
-    function [C,F,S] = dfpde(x,t,u,dudx)   
+    function [C,F,S] = dfpde(x,t,u,dudx)
         % Get position point
         i = find(x_ihalf <= x);
         i = i(end);
-        
+
         switch g1_fun_type
             case 'constant'
                 gxt1 = int1*gx1(i);
             otherwise
                 gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
         end
-        
+
         switch g2_fun_type
             case 'constant'
                 gxt2 = int2*gx2(i);
             otherwise
                 gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
         end
-        
+
         g = gxt1 + gxt2;
-        
+
         %% Variables
         n = u(1); p = u(2); c = u(3); V = u(4);
-        
+
         if N_ionic_species == 2
             a = u(5);           % Include anion variable
             dadx = dudx(5);
         else
             a = Nani(i);        % Otherwise set anion density to be background
         end
-        
+
         %% Gradients
         dndx = dudx(1); dpdx = dudx(2); dcdx = dudx(3); dVdx = dudx(4);
-        
+
         %% Equation editor
         % Time-dependence prefactor term
         C_electron = 1;
@@ -194,41 +194,41 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         C_cation = 1;
         C_potential = 0;
         C = [C_electron; C_hole; C_cation; C_potential];
-          
+
         % Flux terms
         F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
         F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F_cation     = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));              
+        F_cation     = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
         F_potential  = (epp(i)/eppmax)*dVdx;
-        F = [mobset*F_electron; mobset*F_hole; K_cation*mobseti*F_cation; F_potential]; 
-            
+        F = [mobset*F_electron; mobset*F_hole; K_cation*mobseti*F_cation; F_potential];
+
         % Source terms - simplified first order recombination terms
         S_electron = g - SRHset*(((n-n0(i))/taun(i)) + ((p-p0(i))/taup(i))); %- SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
         S_hole     = g - SRHset*(((n-n0(i))/taun(i)) + ((p-p0(i))/taup(i)));%- SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
         S_cation   = 0;
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
         S = [S_electron; S_hole; S_cation; S_potential];
-        
+
         if N_ionic_species == 2     % Condition for anion terms
             C_anion = 1;
             C = [C; C_anion];
-                        
+
             F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
             F = [F; K_anion*mobseti*(F_anion)];
-            
+
             S_anion = 0;
             S = [S; S_anion];
-        end        
+        end
     end
 
 %% Define initial conditions.
     function u0 = dfic(x)
-        
+
         if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) == 0
-            
+
             i = find(xmesh <= x);
             i = i(end);
-            
+
             switch N_ionic_species
                 case 1
                     if length(par.dcell) == 1
@@ -286,22 +286,22 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % the difference in concentration from equilibrium and the extraction
 % coefficient.
     function [pl,ql,pr,qr] = dfbc(xl,ul,xr,ur,t)
-        
+
         switch par.V_fun_type
             case 'constant'
                 Vapp = par.V_fun_arg(1);
             otherwise
                 Vapp = Vapp_fun(par.V_fun_arg, t);
         end
-        
+
         % Easy variable names
         nl = ul(1); pl = ul(2); cl = ul(3); Vl = ul(4);
         nr = ur(1); pr = ur(2); cr = ur(3); Vr = ur(4);
-        
+
         if N_ionic_species == 2
             al = ul(5); ar = ur(5);
         end
-        
+
         switch par.BC
             case 2
                 % Non- selective contacts - fixed charge densities for majority carrier
@@ -311,16 +311,16 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     ul(2) - pleft;
                     0;
                     -ul(4);];
-                
+
                 ql = [1; 0;1; 0;];
-                
+
                 pr = [ur(1) - nright;
                     sp_r*(ur(2) - pright);
                     0;
                     -ur(4)+Vbi-Vapp;];
-                
+
                 qr = [0; 1; 1; 0;];
-                
+
                 if N_ionic_species == 2
                     % Second element are the boundary condition coefficients for anions
                     pl = [pl; 0];
@@ -331,7 +331,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
             case 3
                 % Flux boundary conditions for both carrier types.
-                
+
                 % Calculate series resistance voltage Vres
                 if par.Rs == 0
                     Vres = 0;
@@ -343,21 +343,21 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         Vres = Jr*par.Rs;
                     end
                 end
-                
+
                 pl = [mobset*(-sn_l*(ul(1) - nleft));
                     mobset*(-sp_l*(ul(2) - pleft));
                     0;
                     -ul(4);];
-                
+
                 ql = [1; 1; 1; 0;];
-                
+
                 pr = [mobset*(sn_r*(ur(1) - nright));
                     mobset*(sp_r*(ur(2) - pright));
                     0;
                     -ur(4)+Vbi-Vapp+Vres;];
-                
+
                 qr = [1; 1; 1; 0;];
-                
+
                 if N_ionic_species == 2
                     %% Second element are the boundary condition coefficients for anions
                     pl = [pl; 0];
@@ -365,7 +365,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     pr = [pr; 0];
                     qr = [qr; 1];
                 end
-                
+
         end
     end
 

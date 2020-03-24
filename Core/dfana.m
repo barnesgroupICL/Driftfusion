@@ -343,7 +343,7 @@ classdef dfana
             % Property matrices
             eppmat = repmat(dev.epp, length(t), 1);
             nimat = repmat(dev.ni, length(t), 1);
-            kradmat = repmat(dev.krad, length(t), 1);
+            Bdirmat = repmat(dev.Bdir, length(t), 1);
             taunmat = repmat(dev.taun, length(t), 1);
             taupmat = repmat(dev.taup, length(t), 1);
             n0mat = repmat(dev.n0, length(t), 1);
@@ -370,7 +370,7 @@ classdef dfana
             % Property matrices
             eppmat = repmat(devihalf.epp, length(t), 1);
             nimat = repmat(devihalf.ni, length(t), 1);
-            kradmat = repmat(devihalf.krad, length(t), 1);
+            Bdirmat = repmat(devihalf.Bdir, length(t), 1);
             taunmat = repmat(devihalf.taun, length(t), 1);
             taupmat = repmat(devihalf.taup, length(t), 1);
             n0mat = repmat(devihalf.n0, length(t), 1);
@@ -688,8 +688,8 @@ classdef dfana
         function value = PLt(sol)
                 [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-                kradmat = dev.krad;
-                value = trapz(x,(dev.krad.*(n.*p-dev.ni.^2)),2);
+                Bdirmat = dev.Bdir;
+                value = trapz(x,(dev.Bdir.*(n.*p-dev.ni.^2)),2);
         end
 
         function VQFL = calcVQFL(sol)
