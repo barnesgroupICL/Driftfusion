@@ -177,7 +177,7 @@ classdef pc
         %% Recombination
         % Radiative recombination, U = k(np - ni^2)
         % [cm3 s-1] Radiative Recombination coefficient
-        Bdir = [3.6e-12];
+        B = [3.6e-12];
 
         %% SRH time constants for each layer [s]
         taun = [1e6];           % [s] SRH time constant for electrons
@@ -371,8 +371,8 @@ classdef pc
             elseif length(par.epp) ~= length(par.d)
                 msg = 'Relative dielectric constant array (epp) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.Bdir) ~= length(par.d)
-                msg = 'Radiative recombination coefficient array (Bdir) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.B) ~= length(par.d)
+                msg = 'Radiative recombination coefficient array (B) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.E0) ~= length(par.d)
                 msg = 'Equilibrium Fermi level array (E0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
