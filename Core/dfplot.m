@@ -303,7 +303,7 @@ classdef dfplot
             zlabel('Generation rate [cm^{-3}s^{-1}]')
         end
         
-        function Ux(varargin)
+        function rx(varargin)
             % Recombination rates as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
