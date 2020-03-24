@@ -121,7 +121,6 @@ try
 catch
     warning('No radiative recombinaiton coefficient array (B) defined in .csv . Using default in PC')
 end
-
 try
     par.taun = T{:, 'taun'}';
 catch
@@ -230,5 +229,11 @@ try
 end
 try
     par.d = T{:, 'dcell'}';
+end
+try
+    par.B = T{:, 'krad'}';
+end
+try
+    par.B = T{:, 'Bdir'}';
 end
 end
