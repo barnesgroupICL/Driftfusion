@@ -117,9 +117,9 @@ catch
     warning('No uniform generation rate (g0) defined in .csv . Using default in PC')
 end
 try
-    par.krad = T{:, 'krad'}';
+    par.Bdir = T{:, 'Bdir'}';
 catch
-    warning('No radiative recombinaiton coefficient array (krad) defined in .csv . Using default in PC')
+    warning('No radiative recombinaiton coefficient array (Bdir) defined in .csv . Using default in PC')
 end
 
 try

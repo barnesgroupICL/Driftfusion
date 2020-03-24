@@ -456,18 +456,18 @@ classdef explore
                             p = squeeze(exsol.p_f(i,j,:));
                             n=n';
                             p=p';
-                            n = n(1:length(dev.krad));
-                            p = p(1:length(dev.krad));
+                            n = n(1:length(dev.Bdir));
+                            p = p(1:length(dev.Bdir));
                             
                             % Recombination
-                            rbtb = dev.krad.*(n.*p - dev.ni.^2);
+                            rbtb = dev.Bdir.*(n.*p - dev.ni.^2);
                             
                             rsrh = ((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
                             
                             r = rbtb + rsrh;
                             
                             xplot = squeeze(exsol.x(i, j, :).*1e7);
-                            xplot = xplot(1:length(dev.krad));
+                            xplot = xplot(1:length(dev.Bdir));
                             
                             rHTL(i,j) = trapz(xplot(par.pcum0(1):par.pcum0(2)), r(par.pcum0(1):par.pcum0(2)));
                             rHTLint(i,j) = trapz(xplot(par.pcum(1):par.pcum(2)), r(par.pcum(1):par.pcum(2)));                            rHTLint(i,j) = trapz(xplot(par.pcum(1):par.pcum(2)), r(par.pcum(1):par.pcum(2)));
