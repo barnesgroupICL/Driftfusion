@@ -28,9 +28,9 @@ for i = 1:length(sol_OC)
    
    
    %% Get the PL
-   U = dfana.calcU(sol_OC(i));
+   r = dfana.calcr(sol_OC(i));
         for j = 1:length(t)
-            PLt(i,j) = trapz(x, U.btb(j,:));
+            PLt(i,j) = trapz(x, r.btb(j,:));
         end
 end
 
