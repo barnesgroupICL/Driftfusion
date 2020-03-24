@@ -89,7 +89,7 @@ gradEA = device.gradEA;     % Electron Affinity gradient
 gradIP = device.gradIP;     % Ionisation Potential gradient
 epp = device.epp;           % Dielectric constant
 eppmax = max(par.epp);      % Maximum dielectric constant (for normalisation)
-B = device.B;         % Radiative recombination rate coefficient
+B = device.B;               % Radiative recombination rate coefficient
 ni = device.ni;             % Intrinsic carrier density
 n0 = device.n0;             % Intrinsic carrier density
 p0 = device.p0;             % Intrinsic carrier density
@@ -203,8 +203,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         F = [mobset*F_electron; mobset*F_hole; K_cation*mobseti*F_cation; F_potential];
 
         % Source terms - simplified first order recombination terms
-        S_electron = g - SRHset*(((n-n0(i))/taun(i)) + ((p-p0(i))/taup(i))); %- SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S_hole     = g - SRHset*(((n-n0(i))/taun(i)) + ((p-p0(i))/taup(i)));%- SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S_electron = g - SRHset*(((n-n0(i))/taun(i)) + ((p-p0(i))/taup(i)));    % First order recombination expressions
+        S_hole     = g - SRHset*(((n-n0(i))/taun(i)) + ((p-p0(i))/taup(i)));
         S_cation   = 0;
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
         S = [S_electron; S_hole; S_cation; S_potential];

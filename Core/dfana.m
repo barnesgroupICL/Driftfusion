@@ -350,7 +350,7 @@ classdef dfana
             p0mat = repmat(dev.p0, length(t), 1);
 
             % Recombination
-            r.btb = kradmat.*(n.*p - nimat.^2);
+            r.btb = Bmat.*(n.*p - nimat.^2);
             r.srh = (1./taunmat).*(n-n0mat) + (1./taupmat).*(p-p0mat);
             r.tot = r.btb + r.srh;
         end
@@ -377,7 +377,7 @@ classdef dfana
             p0mat = repmat(devihalf.p0, length(t), 1);
 
             % Recombination
-            r.btb = kradmat.*(n_ihalf.*p_ihalf - nimat.^2);
+            r.btb = Bmat.*(n_ihalf.*p_ihalf - nimat.^2);
             r.srh = (1./taunmat).*(n_ihalf-n0mat) + (1./taupmat).*(p_ihalf-p0mat);
             r.tot = r.srh;
         end
