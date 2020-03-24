@@ -1,7 +1,7 @@
 function spvsol = doSPV(sol_ini, Int, mobseti, tpoints, tmax, Rs, stabilise)
 % A function for switching the light on and off with a series
 % resistance Rs
-
+%
 %% Input argumanets
 % SOL_INI is the initial solution (usually equilibrium)
 % INT = Light intensity in Suns
@@ -12,7 +12,16 @@ function spvsol = doSPV(sol_ini, Int, mobseti, tpoints, tmax, Rs, stabilise)
 % RS = Series resistance. 1e6 Ohms will give you approximately open circuit
 % STABILISE = Choose whether to reach a steady-state or not. If STABILISE = 1 then the code
 % will loop until stable
-
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 disp('Starting SPV')
 
 % Get initial parameters

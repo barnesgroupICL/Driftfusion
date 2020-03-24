@@ -4,7 +4,16 @@ function VappSol = genVappStructs(solini, Vapp_arr, mobseti)
 % If MOBSETI = 1 ions are accelerated to obtain steady state
 % P Calado 2019, Imperial College London
 % Adapted from original code by I. Gelmetti
-
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+%% Start code
 % Store parameters
 par = solini.par;
 
@@ -35,6 +44,8 @@ for i = 1:length(Vapp_arr)-1
         par.mobseti = 1;           % Ions are accelerated to reach equilibrium
         par.K_anion = rat_anion;
         par.K_cation = rat_cation;
+    else
+        par.mobseti = 0;
     end
     
     par.tmesh_type = 1;
@@ -69,6 +80,9 @@ for i = 1:length(Vapp_arr)-1
     if mobseti
         sol.par.K_anion = 1;
         sol.par.K_cation = 1;
+        sol.par.mobseti = 1;
+    else
+        sol.par.mobseti = 1;
     end
     % if there's only one solution then duplicate sol structure
     if length(Vapp_arr)-1 == 1

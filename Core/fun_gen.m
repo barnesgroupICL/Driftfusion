@@ -13,8 +13,17 @@ function fun = fun_gen(fun_type)
 %% 'square'
 % COEFF = [A_low, A_high, time_period, duty_cycle]
 %% 'sin'
-% COEFF = [DC_offset, Delta_A, frequency, phase]
-
+% COEFF = [DC_offset, Delta_AC, frequency, phase]
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 switch fun_type
     case 'constant'
         fun = @(coeff, t) coeff(1);

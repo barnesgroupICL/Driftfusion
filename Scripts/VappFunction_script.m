@@ -1,5 +1,15 @@
 % Creates a single carrier device and then applies a 20 mV periodic
 % potential for 2 cycles
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+%% Start code
 par_singlecar = pc('Input_files/1_layer_single_carrier.csv');
 
 soleq_singlecar = equilibrate(par_singlecar);
@@ -13,11 +23,12 @@ par.t0 = 0;
 par.tmax = 1e-2;
 par.tpoints = 200;
 
-par.V_fun_type = 'sin';
-par.V_fun_arg(1) = 0;
-par.V_fun_arg(2) = 20e-3;
-par.V_fun_arg(3) = 1e3;
-par.V_fun_arg(4) = 0;
+%% Define the voltage function
+par.V_fun_type = 'sin';         % Voltage function type
+par.V_fun_arg(1) = 0;           % DC offset voltage (V)
+par.V_fun_arg(2) = 20e-3;       % AC voltage amplitude (V)
+par.V_fun_arg(3) = 1e3;         % Frequency (Hz)
+par.V_fun_arg(4) = 0;           % Phase (Rads)
 
 disp('Applying oscillating potential')
 sol_Vapp = df(soleq_singlecar.ion, par);

@@ -2,7 +2,16 @@ function par = import_properties(par, filepath)
 % A function to IMPORT_PROPERTIES from a text file LOCATED at FILEPATH. Each of the listed properties
 % is checked to see if it is available in the .CSV file. If it is available, the existing properties
 % are overwritten otherwise a warning is displayed.
-
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 T = readtable(filepath{1,1});   % Reads-in in the external .CSV file to a table T
 
 try
@@ -16,7 +25,7 @@ catch
     warning('No stack (stack) defined in .csv . Using default in PC')
 end
 try
-    par.dcell = T{:, 'thickness'}';
+    par.d = T{:, 'thickness'}';
 catch
     warning('No thickness array (thickness) defined in .csv . Using default in PC')
 end
@@ -66,12 +75,12 @@ catch
     warning('No equilibrium cation density array (Ncat) defined in .csv . Using default in PC')
 end
 try
-    par.DOSani = T{:, 'DOSani'}';
+    par.amax = T{:, 'amax'}';
 catch
     warning('No maximum anion density array (DOSani) defined in .csv . Using default in PC')
 end
 try
-    par.DOScat = T{:, 'DOScat'}';
+    par.cmax = T{:, 'cmax'}';
 catch
     warning('No maximum cation density array (DOScat) defined in .csv . Using default in PC')
 end
@@ -187,7 +196,13 @@ try
     par.Nani = T{:, 'Nion'}';
 end
 try
-    par.DOSani = T{:, 'DOSion'}';
+    par.amax = T{:, 'DOSion'}';
+end
+try
+    par.amax = T{:, 'DOSani'}';
+end
+try
+    par.cmax = T{:, 'DOScat'}';
 end
 try
     par.muani = T{:, 'muion'}';
@@ -211,6 +226,9 @@ try
     par.Phi_right = T{1, 'PhiC'}; 
 end
 try
-    par.layer_points = T{:, 'points'}';
+    par.d = T{:, 'd'}';
+end
+try
+    par.d = T{:, 'dcell'}';
 end
 end
