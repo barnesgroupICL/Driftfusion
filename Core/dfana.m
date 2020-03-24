@@ -350,14 +350,12 @@ classdef dfana
             p0mat = repmat(dev.p0, length(t), 1);
 
             % Recombination
-            U.btb = kradmat.*(n.*p - nimat.^2);
-
-            U.srh = (1./taunmat).*(n-n0mat) + (1./taupmat).*(p-p0mat);
-
-            U.tot = U.btb + U.srh;
+            r.btb = kradmat.*(n.*p - nimat.^2);
+            r.srh = (1./taunmat).*(n-n0mat) + (1./taupmat).*(p-p0mat);
+            r.tot = r.btb + r.srh;
         end
 
-        function U = calcU_ihalf(sol)
+        function r = calcr_ihalf(sol)
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             for ii = 1:length(t)
@@ -379,11 +377,9 @@ classdef dfana
             p0mat = repmat(devihalf.p0, length(t), 1);
 
             % Recombination
-            U.btb = 0;%kradmat.*(n_ihalf.*p_ihalf - nimat.^2);
-
-            U.srh = (1./taunmat).*(n_ihalf-n0mat) + (1./taupmat).*(p_ihalf-p0mat);
-
-            U.tot = U.srh;
+            r.btb = kradmat.*(n_ihalf.*p_ihalf - nimat.^2);
+            r.srh = (1./taunmat).*(n_ihalf-n0mat) + (1./taupmat).*(p_ihalf-p0mat);
+            r.tot = r.srh;
         end
 
         function [jdd, Jdd, xout] = Jddxt(sol)
