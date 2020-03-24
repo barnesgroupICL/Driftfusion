@@ -117,9 +117,9 @@ catch
     warning('No uniform generation rate (g0) defined in .csv . Using default in PC')
 end
 try
-    par.Bdir = T{:, 'Bdir'}';
+    par.B = T{:, 'B'}';
 catch
-    warning('No radiative recombinaiton coefficient array (Bdir) defined in .csv . Using default in PC')
+    warning('No radiative recombinaiton coefficient array (B) defined in .csv . Using default in PC')
 end
 
 try
