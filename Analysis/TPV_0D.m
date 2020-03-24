@@ -14,7 +14,7 @@ t_tot = [t1, t2+t1(end)];
 deltaG = pulse_int*par.g0(al);    % cm3s-1
 
 k1 = 0;           % First order rate constant
-k2 = par.krad(al);         % Second order rate constant
+k2 = par.B(al);         % Second order rate constant
 
 % Based on second order recombination only
 n0 = ((bias_int*par.g0(al)/k2)+par.ni(al)^2)^0.5;
