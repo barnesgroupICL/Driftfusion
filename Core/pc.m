@@ -1,19 +1,27 @@
 classdef pc
-    % Authors: Philip Calado, Piers Barnes, Ilario Gelmetti, Ben Hillman, 2018 Imperial College London
-    % PC (Parameters Class) defines all the required properties for your
-    % device. PC.BUILDDEV builds a structure PO.DEV (where PO is a Parameters Object)
-    % that defines the properties of the device at every spatial mesh point, including
-    % interfaces. Whenever PROPERTIES are overwritten in a protocol, the device should
-    % be rebuilt manually using PC.BUILDDEV. The spatial mesh is a linear piece-wise mesh
-    % and is built by the MESHGEN_X function. Details of how to define the mesh
-    % are given below in the SPATIAL MESH SUBSECTION.
-
+% PC (Parameters Class) defines all the required properties for your
+% device. PC.BUILDDEV builds a structure PO.DEV (where PO is a Parameters Object)
+% that defines the properties of the device at every spatial mesh point, including
+% interfaces. Whenever PROPERTIES are overwritten in a protocol, the device should
+% be rebuilt manually using PC.BUILDDEV. The spatial mesh is a linear piece-wise mesh
+% and is built by the MESHGEN_X function. Details of how to define the mesh
+% are given below in the SPATIAL MESH SUBSECTION.
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
     properties (Constant)
         %% Physical constants
         kB = 8.617330350e-5;     % Boltzmann constant [eV K^-1]
         epp0 = 552434;           % Epsilon_0 [e^2 eV^-1 cm^-1] - Checked (02-11-15)
         q = 1;                   % Charge of the species in units of e.
-        e = 1.60217662e-19;         % Elementary charge in Coulombs.
+        e = 1.60217662e-19;      % Elementary charge in Coulombs.
     end
 
     properties
@@ -26,7 +34,7 @@ classdef pc
         % MESHGEN_X function using 2 arrays DCELL and PCELL,
         % which define the thickness and number of points of each layer
         % respectively.
-        dcell = 400e-7;         % Layer and subsection thickness array
+        d = 400e-7;         % Layer and subsection thickness array
         layer_points = 400;            % Points array
 
         %% Layer description
@@ -150,8 +158,8 @@ classdef pc
         Ncat = [1e19];
         % Approximate density of iodide sites [cm-3]
         % Limits the density of iodide vancancies
-        DOSani = [1.21e22];                 % P. Calado thesis
-        DOScat = [1.21e22];
+        amax = [1.21e22];                 % P. Calado thesis
+        cmax = [1.21e22];
         %% Mobilities   [cm2V-1s-1]
         mue = [1];         % electron mobility
         muh = [1];         % hole mobility
@@ -224,7 +232,7 @@ classdef pc
     %%  Properties whose values depend on other properties (see 'get' methods).
     properties (Dependent)
         active_layer
-        d
+        dcell
         parr
         d_active
         dcum
@@ -236,7 +244,7 @@ classdef pc
         dNvdx
         Dn
         Eg
-        Eif
+        Efi
         NA
         ND
         Vbi
@@ -300,11 +308,11 @@ classdef pc
                 end
             end
 
-            % Warn if DOSani is set to zero in any layers - leads to
+            % Warn if amax is set to zero in any layers - leads to
             % infinite diffusion rate
-            for i = 1:length(par.DOSani)
-                if par.DOSani(i) <= 0
-                    msg = 'ion DOS (DOSani) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
+            for i = 1:length(par.amax)
+                if par.amax(i) <= 0
+                    msg = 'ion DOS (amax) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
                     error(msg);
                 end
             end
@@ -357,8 +365,8 @@ classdef pc
             elseif length(par.Nani) ~= length(par.d)
                 msg = 'Background ion density (Nani) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.DOSani) ~= length(par.d)
-                msg = 'Ion density of states array (DOSani) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.amax) ~= length(par.d)
+                msg = 'Ion density of states array (amax) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.epp) ~= length(par.d)
                 msg = 'Relative dielectric constant array (epp) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
@@ -450,10 +458,10 @@ classdef pc
            value = par.dcum(par.active_layer(1)-1) + par.d_active/2;
         end
         %% Layer thicknesses [cm]
-        function value = get.d(par)
+        function value = get.dcell(par)
             % For backwards comptibility. layer_points and parr arre the now the
             % same thing
-            value = par.dcell;
+            value = par.d;
         end
 
         %% Layer points
@@ -475,7 +483,7 @@ classdef pc
 
         %% Intrinsic Fermi Energies
         % Currently uses Boltzmann stats as approximation should always be
-        function value = get.Eif(par)
+        function value = get.Efi(par)
             value = 0.5.*(par.EA+par.IP)+par.kB*par.T*log(par.Nc./par.Nv);
         end
 

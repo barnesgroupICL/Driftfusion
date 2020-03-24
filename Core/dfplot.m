@@ -1,14 +1,23 @@
-classdef dfplot
-    % Plotting class - contains methods for plotting
-    % DFPLOT.ELX = Energy level diagrams and charge carrier densities
-    % DFPLOT.JT = Currents as a function of time
-    % DFPLOT.JX = Total currents as a function of position
-    % DFPLOT.JDDX = Drift and diffusion currents as a function of position
-    % Plotting functions that are a funciton of position can accept a time
-    % array as the second argument- the procedure will loop and plot the
-    % solution at multiple times.
-    % The third optional argument defines the x-range.
-    
+classdef dfplot   
+% DRIFTFUSION Plotting class - contains methods for plotting
+% DFPLOT.ELX = Energy level diagrams and charge carrier densities
+% DFPLOT.JT = Currents as a function of time
+% DFPLOT.JX = Total currents as a function of position
+% DFPLOT.JDDX = Drift and diffusion currents as a function of position
+% Plotting functions that are a funciton of position can accept a time
+% array as the second argument- the procedure will loop and plot the
+% solution at multiple times.
+% The third optional argument defines the x-range.
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
     methods (Static)
         
         function ELx(varargin)
@@ -294,14 +303,14 @@ classdef dfplot
             zlabel('Generation rate [cm^{-3}s^{-1}]')
         end
         
-        function Ux(varargin)
+        function rx(varargin)
             % Recombination rates as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            U = dfana.calcU(sol);
+            r = dfana.calcr(sol);
             
             figure(17)
-            dfplot.x2d(sol, x, {U.btb, U.srh, U.tot},{'Ubtb', 'Usrh', 'Utot'},...
+            dfplot.x2d(sol, x, {r.btb, r.srh, r.tot},{'rbtb', 'rsrh', 'rtot'},...
                 {'-','-','-'}, 'Recombination rate [cm-3s-1]', tarr, xrange, 0, 0);
         end
         
@@ -334,19 +343,19 @@ classdef dfplot
                 J.ill.r = dfana.calcJ(JV.ill.r);
                 Vapp.ill.r = dfana.calcVapp(JV.ill.r);
                 
-                U_f = dfana.calcU(JV.ill.f);
-                Jrec_btb_f = JV.ill.f.par.e*trapz(JV.ill.f.x, U_f.btb, 2);
-                Jrec_srhint_f = JV.ill.f.par.e*trapz(JV.ill.f.x(pcum0(2)+1:pcum0(3)), U_f.srh(:,pcum0(2)+1:pcum0(3)), 2)...
-                    +JV.ill.f.par.e*trapz(JV.ill.f.x(pcum0(4)+1:pcum0(5)), U_f.srh(:,pcum0(4)+1:pcum0(5)), 2);
-                Jrec_srhbulk_f = JV.ill.f.par.e*trapz(JV.ill.f.x(pcum0(3)+1:pcum0(4)), U_f.srh(:,pcum0(3)+1:pcum0(4)), 2);
-                Jrec_tot_f = JV.ill.f.par.e*trapz(JV.ill.f.x, U_f.tot, 2);
+                r_f = dfana.calcr(JV.ill.f);
+                Jrec_btb_f = JV.ill.f.par.e*trapz(JV.ill.f.x, r_f.btb, 2);
+                Jrec_srhint_f = JV.ill.f.par.e*trapz(JV.ill.f.x(pcum0(2)+1:pcum0(3)), r_f.srh(:,pcum0(2)+1:pcum0(3)), 2)...
+                    +JV.ill.f.par.e*trapz(JV.ill.f.x(pcum0(4)+1:pcum0(5)), r_f.srh(:,pcum0(4)+1:pcum0(5)), 2);
+                Jrec_srhbulk_f = JV.ill.f.par.e*trapz(JV.ill.f.x(pcum0(3)+1:pcum0(4)), r_f.srh(:,pcum0(3)+1:pcum0(4)), 2);
+                Jrec_tot_f = JV.ill.f.par.e*trapz(JV.ill.f.x, r_f.tot, 2);
                 
-                U_r = dfana.calcU(JV.ill.r);
-                Jrec_btb_r = JV.ill.f.par.e*trapz(JV.ill.r.x, U_r.btb, 2);
-                Jrec_srhint_r = JV.ill.r.par.e*trapz(JV.ill.r.x(pcum0(2)+1:pcum0(3)), U_r.srh(:,pcum0(2)+1:pcum0(3)), 2)...
-                    +JV.ill.r.par.e*trapz(JV.ill.r.x(pcum0(4)+1:pcum0(5)), U_r.srh(:,pcum0(4)+1:pcum0(5)), 2);
-                Jrec_srhbulk_r = JV.ill.r.par.e*trapz(JV.ill.r.x(pcum0(3)+1:pcum0(4)), U_r.srh(:,pcum0(3)+1:pcum0(4)), 2);
-                Jrec_tot_r = JV.ill.r.par.e*trapz(JV.ill.r.x, U_r.tot, 2);
+                r_rev = dfana.calcr(JV.ill.r);
+                Jrec_btb_r = JV.ill.f.par.e*trapz(JV.ill.r.x, r_rev.btb, 2);
+                Jrec_srhint_r = JV.ill.r.par.e*trapz(JV.ill.r.x(pcum0(2)+1:pcum0(3)), r_rev.srh(:,pcum0(2)+1:pcum0(3)), 2)...
+                    +JV.ill.r.par.e*trapz(JV.ill.r.x(pcum0(4)+1:pcum0(5)), r_rev.srh(:,pcum0(4)+1:pcum0(5)), 2);
+                Jrec_srhbulk_r = JV.ill.r.par.e*trapz(JV.ill.r.x(pcum0(3)+1:pcum0(4)), r_rev.srh(:,pcum0(3)+1:pcum0(4)), 2);
+                Jrec_tot_r = JV.ill.r.par.e*trapz(JV.ill.r.x, r_rev.tot, 2);
                 
                 cc=lines(4);
                 
@@ -581,10 +590,10 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            U = dfana.calcU(sol);
+            r = dfana.calcr(sol);
             
             figure(27)
-            dfplot.x2d(sol, x, {U.btb}, {'Ubtb'},...
+            dfplot.x2d(sol, x, {r.btb}, {'rbtb'},...
                 {'-'}, 'Radiatve recombination rate [cm-3s-1]', tarr, xrange , 0, 0);
         end
         

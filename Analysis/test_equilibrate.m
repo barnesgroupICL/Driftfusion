@@ -1,5 +1,14 @@
 function soleq = test_equilibrate(varargin)
 % Uses initial conditions defined in DF and runs to equilibrium
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
 if length(varargin) == 1
     par = varargin{1,1};
 else

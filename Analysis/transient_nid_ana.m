@@ -1,5 +1,14 @@
 function nidt = transient_nid_ana(sol_OC)
 % Takes an input from transient_nid and plots nid(t)
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
 par = sol_OC(1).par;
 % Incident photon flux density at 1 Sun across device
 % Get x_halfi
@@ -19,9 +28,9 @@ for i = 1:length(sol_OC)
    
    
    %% Get the PL
-   U = dfana.calcU(sol_OC(i));
+   r = dfana.calcr(sol_OC(i));
         for j = 1:length(t)
-            PLt(i,j) = trapz(x, U.btb(j,:));
+            PLt(i,j) = trapz(x, r.btb(j,:));
         end
 end
 

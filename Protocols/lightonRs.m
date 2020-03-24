@@ -10,7 +10,16 @@ function sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
 % RS = Series resistance - recommended to use Rs = 1e6 for approx open
 % circuit
 % PNTS = Number of time points in the solution
-
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+%% Start code
 disp(['Starting LIGHTON_RS, Intensity = ', num2str(int1), ' Rs = ', num2str(Rs)])
 par = sol_ini.par;
 par_origin = par;

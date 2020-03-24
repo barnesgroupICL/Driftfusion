@@ -1,5 +1,14 @@
 classdef explore
-    
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code  
     methods (Static)
         
         function exsol = explore2par(par_base, parnames, parvalues, JVpnts)
@@ -416,12 +425,12 @@ classdef explore
                 par2logical = par2logical(1:length(exsol.parval2));
             end
             
-            UHTL = zeros(length(par1logical),length(par2logical));
-            UHTLint = zeros(length(par1logical),length(par2logical));
-            Ubulk = zeros(length(par1logical),length(par2logical));
-            UETLint = zeros(length(par1logical),length(par2logical));
-            UETL = zeros(length(par1logical),length(par2logical));
-            Utotal = zeros(length(par1logical),length(par2logical));
+            rHTL = zeros(length(par1logical),length(par2logical));
+            rHTLint = zeros(length(par1logical),length(par2logical));
+            rbulk = zeros(length(par1logical),length(par2logical));
+            rETLint = zeros(length(par1logical),length(par2logical));
+            rETL = zeros(length(par1logical),length(par2logical));
+            rtotal = zeros(length(par1logical),length(par2logical));
             
             figure(107)
             par = exsol.par_base;
@@ -451,30 +460,30 @@ classdef explore
                             p = p(1:length(dev.krad));
                             
                             % Recombination
-                            Ubtb = dev.krad.*(n.*p - dev.ni.^2);
+                            rbtb = dev.krad.*(n.*p - dev.ni.^2);
                             
-                            Usrh = ((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
+                            rsrh = ((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
                             
-                            U = Ubtb + Usrh;
+                            r = rbtb + rsrh;
                             
                             xplot = squeeze(exsol.x(i, j, :).*1e7);
                             xplot = xplot(1:length(dev.krad));
                             
-                            UHTL(i,j) = trapz(xplot(par.pcum0(1):par.pcum0(2)), U(par.pcum0(1):par.pcum0(2)));
-                            UHTLint(i,j) = trapz(xplot(par.pcum(1):par.pcum(2)), U(par.pcum(1):par.pcum(2)));                            UHTLint(i,j) = trapz(xplot(par.pcum(1):par.pcum(2)), U(par.pcum(1):par.pcum(2)));
-                            Ubulk(i,j) = trapz(xplot(par.pcum(2):par.pcum(5)), U(par.pcum(2):par.pcum(5)));
-                            UETLint(i,j) = trapz(xplot(par.pcum(5):par.pcum(6)), U(par.pcum(5):par.pcum(6)));
-                            UETL(i,j) = trapz(xplot(par.pcum(6):par.pcum(7)), U(par.pcum(6):par.pcum(7)));
-                            Utotal(i,j) = trapz(xplot, U);
+                            rHTL(i,j) = trapz(xplot(par.pcum0(1):par.pcum0(2)), r(par.pcum0(1):par.pcum0(2)));
+                            rHTLint(i,j) = trapz(xplot(par.pcum(1):par.pcum(2)), r(par.pcum(1):par.pcum(2)));                            rHTLint(i,j) = trapz(xplot(par.pcum(1):par.pcum(2)), r(par.pcum(1):par.pcum(2)));
+                            rbulk(i,j) = trapz(xplot(par.pcum(2):par.pcum(5)), r(par.pcum(2):par.pcum(5)));
+                            rETLint(i,j) = trapz(xplot(par.pcum(5):par.pcum(6)), r(par.pcum(5):par.pcum(6)));
+                            rETL(i,j) = trapz(xplot(par.pcum(6):par.pcum(7)), r(par.pcum(6):par.pcum(7)));
+                            rtotal(i,j) = trapz(xplot, r);
                             
                             if logx
-                                semilogx(xplot, U);
+                                semilogx(xplot, r);
                             elseif logy
-                                semilogy(xplot, U);
+                                semilogy(xplot, r);
                             elseif logx ==1 && logy ==1
-                                loglog(xplot, U);
+                                loglog(xplot, r);
                             else
-                                plot(xplot, U);
+                                plot(xplot, r);
                             end
                             hold on
                         end
@@ -484,19 +493,19 @@ classdef explore
             end
             
             figure(108)
-            xlabel('Position [nm]')
-            ylabel('U [cm-3s-1]')
+            xlabel('Position, x [nm]')
+            ylabel('Recombination rate, r [cm-3s-1]')
             hold off
             
             for j=1:length(exsol.parval2)
                 if par2logical(j) == 1
                     figure(114)
-                    plot(exsol.parval1*1e7, UHTL(:,j),...
-                        exsol.parval1*1e7, UHTLint(:,j),...
-                        exsol.parval1*1e7, Ubulk(:,j),...
-                        exsol.parval1*1e7, UETLint(:,j),...
-                        exsol.parval1*1e7, UETL(:,j),...
-                        exsol.parval1*1e7, Utotal(:,j));
+                    plot(exsol.parval1*1e7, rHTL(:,j),...
+                        exsol.parval1*1e7, rHTLint(:,j),...
+                        exsol.parval1*1e7, rbulk(:,j),...
+                        exsol.parval1*1e7, rETLint(:,j),...
+                        exsol.parval1*1e7, rETL(:,j),...
+                        exsol.parval1*1e7, rtotal(:,j));
                     %hold on
                 end
             end

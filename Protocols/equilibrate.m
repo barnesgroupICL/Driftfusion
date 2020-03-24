@@ -1,12 +1,22 @@
 function soleq = equilibrate(varargin)
 % Uses initial conditions defined in DF and runs to equilibrium
+%
 %% Input arguments
 % VARARGIN{1,1} = PAR
 % VARARGIN{1,2} = ELECTRONIC_ONLY
 % ELECTRONIC_ONLY: 
 % 0 = runs full equilibrate protocol
 % 1 = skips ion equilibration
-
+%
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Start code
 if length(varargin) == 1
     par = varargin{1,1};
     electronic_only = 0;
