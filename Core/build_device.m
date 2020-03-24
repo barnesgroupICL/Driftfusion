@@ -30,7 +30,7 @@ dev.muh = build_property(par.muh, xmesh, par, 'lin_graded', 0);
 dev.mucat = build_property(par.mucat, xmesh, par, 'zeroed', 0);
 dev.muani = build_property(par.muani, xmesh, par, 'zeroed', 0);
 dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
-dev.krad = build_property(par.krad, xmesh, par, 'lin_graded', 0);
+dev.Bdir = build_property(par.Bdir, xmesh, par, 'lin_graded', 0);
 dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
 dev.Et = build_property(par.Et, xmesh, par, 'lin_graded', 0);
 
