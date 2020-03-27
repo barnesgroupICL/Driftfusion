@@ -209,8 +209,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S_electron = g - SRHset*(((n-n0(i))/taun(i)) + ((p-p0(i))/taup(i))); % First order simplified recombination
+        S_hole     = g - SRHset*(((n-n0(i))/taun(i)) + ((p-p0(i))/taup(i))); % First order simplified recombination
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
