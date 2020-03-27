@@ -14,8 +14,8 @@ function solstruct = df(varargin)
 %% Start code
 % n = u(1) = electron density
 % p = u(2) = holes density
-% c = u(3) = cation density
-% V = u(4) = electrostatic potential
+% V = u(3) = electrostatic potential
+% c = u(4) = cation density
 % a = u(5) = anion density
 
 %% Deal with input arguments
@@ -173,7 +173,14 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         g = gxt1 + gxt2;
         
         %% Variables
-        n = u(1); p = u(2); c = u(3); V = u(4);
+        n = u(1); p = u(2); V = u(3);
+
+        if N_ionic_species == 1
+            c = u(4);           % Include cation variable
+            dcdx = dudx(4);
+        else
+            c = Ncat(i);        % Otherwise set cation density to be background
+        end
         
         if N_ionic_species == 2
             a = u(5);           % Include anion variable
@@ -183,40 +190,48 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         end
         
         %% Gradients
-        dndx = dudx(1); dpdx = dudx(2); dcdx = dudx(3); dVdx = dudx(4);
+        dndx = dudx(1); dpdx = dudx(2); dVdx = dudx(3);
         
         %% Equation editor
         % Time-dependence prefactor term
         C_electron = 1;
         C_hole = 1;
-        C_cation = 1;
         C_potential = 0;
-        C = [C_electron; C_hole; C_cation; C_potential];
+        C = [C_electron; C_hole; C_potential];
           
         % Flux terms
         F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
-        F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F_cation     = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));              
+        F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));      
         F_potential  = (epp(i)/eppmax)*dVdx;
-        F = [mobset*F_electron; mobset*F_hole; K_cation*mobseti*F_cation; F_potential]; 
+        F = [mobset*F_electron; mobset*F_hole; F_potential]; 
             
         % Source terms
         S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
         S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S_cation   = 0;
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S = [S_electron; S_hole; S_cation; S_potential];
+        S = [S_electron; S_hole; S_potential];
         
-        if N_ionic_species == 2     % Condition for anion terms
-            C_anion = 1;
-            C = [C; C_anion];
-                        
-            F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
-            F = [F; K_anion*mobseti*(F_anion)];
+        if N_ionic_species == 1
+            C_cation = 1;
+            C = [C; C_cation];
             
-            S_anion = 0;
-            S = [S; S_anion];
-        end        
+            F_cation  = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c))))); 
+            F = [F; K_cation*mobseti*F_cation];
+            
+            S_cation = 0;
+            S = [S; S_cation];
+        
+            if N_ionic_species == 2     % Condition for anion terms
+                C_anion = 1;
+                C = [C; C_anion];
+                
+                F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
+                F = [F; K_anion*mobseti*F_anion];
+                
+                S_anion = 0;
+                S = [S; S_anion];
+            end
+        end
     end
 
 %% Define initial conditions.
@@ -228,39 +243,56 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             i = i(end);
             
             switch N_ionic_species
-                case 1
+                case 0
                     if length(par.dcell) == 1
                         % Single layer
                         u0 = [nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
                             pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
-                            dev.Ncat(i);
                             (x/xmesh(end))*Vbi;];
                     else
                         % Multi-layered
                         u0 = [dev.n0(i);
                             dev.p0(i);
-                            dev.Ncat(i);
                             (x/xmesh(end))*Vbi;];
+                    end
+                
+                case 1
+                    if length(par.dcell) == 1
+                        % Single layer
+                        u0 = [nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
+                            pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
+                            (x/xmesh(end))*Vbi;
+                            dev.Ncat(i);];
+                    else
+                        % Multi-layered
+                        u0 = [dev.n0(i);
+                            dev.p0(i);
+                            (x/xmesh(end))*Vbi;
+                            dev.Ncat(i);];
                     end
                 case 2
                     if length(par.dcell) == 1
                         % Single layer
                         u0 = [nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
                             pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
-                            dev.Ncat(i);
                             (x/xmesh(end))*Vbi;
+                            dev.Ncat(i);
                             dev.Nani(i);];
                     else
                         % Multi-layered
                         u0 = [dev.n0(i);
                             dev.p0(i);
-                            dev.Ncat(i);
                             (x/xmesh(end))*Vbi;
+                            dev.Ncat(i);
                             dev.Nani(i);];
                     end
             end
         elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
             switch par.N_ionic_species
+                case 0
+                    u0 = [interp1(icx,icsol(end,:,1),x);
+                        interp1(icx,icsol(end,:,2),x);
+                        interp1(icx,icsol(end,:,3),x);];
                 case 1
                     u0 = [interp1(icx,icsol(end,:,1),x);
                         interp1(icx,icsol(end,:,2),x);
@@ -293,8 +325,12 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         end
         
         % Easy variable names
-        nl = ul(1); pl = ul(2); cl = ul(3); Vl = ul(4);
-        nr = ur(1); pr = ur(2); cr = ur(3); Vr = ur(4);
+        nl = ul(1); pl = ul(2); Vl = ul(3);
+        nr = ur(1); pr = ur(2); Vr = ur(3);
+        
+        if N_ionic_species == 1
+            cl = ul(4); cr = ur(4);
+        end   
         
         if N_ionic_species == 2
             al = ul(5); ar = ur(5);
@@ -307,26 +343,33 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 % coefficients sn_l & sp_r to set the surface recombination velocity.
                 pl = [-sn_l*(ul(1) - nleft);
                     ul(2) - pleft;
-                    0;
-                    -ul(4);];
+                    -ul(3);];
                 
-                ql = [1; 0;1; 0;];
+                ql = [1; 0; 0;];
                 
                 pr = [ur(1) - nright;
                     sp_r*(ur(2) - pright);
-                    0;
-                    -ur(4)+Vbi-Vapp;];
+                    -ur(3)+Vbi-Vapp;];
                 
-                qr = [0; 1; 1; 0;];
+                qr = [0; 1; 0;];
                 
-                if N_ionic_species == 2
-                    % Second element are the boundary condition coefficients for anions
+                if N_ionic_species == 1
+                    % Second element are the boundary condition
+                    % coefficients for cations
                     pl = [pl; 0];
                     ql = [ql; 1];
                     pr = [pr; 0];
                     qr = [qr; 1];
+                    
+                    if N_ionic_species == 2
+                        % Second element are the boundary condition coefficients for anions
+                        pl = [pl; 0];
+                        ql = [ql; 1];
+                        pr = [pr; 0];
+                        qr = [qr; 1];
+                    end
                 end
-
+                
             case 3
                 % Flux boundary conditions for both carrier types.
                 
@@ -344,24 +387,31 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 
                 pl = [mobset*(-sn_l*(ul(1) - nleft));
                     mobset*(-sp_l*(ul(2) - pleft));
-                    0;
-                    -ul(4);];
+                    -ul(3);];
                 
-                ql = [1; 1; 1; 0;];
+                ql = [1; 1; 0;];
                 
                 pr = [mobset*(sn_r*(ur(1) - nright));
                     mobset*(sp_r*(ur(2) - pright));
-                    0;
-                    -ur(4)+Vbi-Vapp+Vres;];
+                    -ur(3)+Vbi-Vapp+Vres;];
                 
-                qr = [1; 1; 1; 0;];
+                qr = [1; 1; 0;];
                 
-                if N_ionic_species == 2
-                    %% Second element are the boundary condition coefficients for anions
+                if N_ionic_species == 1
+                    % Second element are the boundary condition
+                    % coefficients for cations
                     pl = [pl; 0];
                     ql = [ql; 1];
                     pr = [pr; 0];
                     qr = [qr; 1];
+                    
+                    if N_ionic_species == 2
+                        % Second element are the boundary condition coefficients for anions
+                        pl = [pl; 0];
+                        ql = [ql; 1];
+                        pr = [pr; 0];
+                        qr = [qr; 1];
+                    end
                 end
                 
         end
