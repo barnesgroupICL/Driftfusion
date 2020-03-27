@@ -21,14 +21,19 @@ classdef dfana
             dev = par.dev;
 
             % split the solution into its component parts (e.g. electrons, holes and efield)
-            n = u(:,:,1);
-            p = u(:,:,2);
-            c = u(:,:,3);
-            V = u(:,:,4);
-            if par.N_ionic_species == 2
+            V = u(:,:,1);
+            n = u(:,:,2);
+            p = u(:,:,3);
+                      
+            if par.N_ionic_species == 1
+                c = u(:,:,4);
+                a = repmat(dev.Nani, length(t), 1);
+            elseif par.N_ionic_species == 2
+                c = u(:,:,4);
                 a = u(:,:,5);
             else
-                a = repmat(dev.Ncat, length(t), 1);
+                c = repmat(dev.Ncat, length(t), 1);
+                a = repmat(dev.Nani, length(t), 1);
             end
         end
 

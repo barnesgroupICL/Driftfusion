@@ -27,7 +27,7 @@ Fion.ill = dfana.calcFion(spvsol.ill);
 Fiont.ill = Fion.ill(:,end);
 
 % Get illuminated potential
-V.ill = (spvsol.ill.u(:,:,4));
+V.ill = (spvsol.ill.u(:,:,1));
 % Direct readout of potential at x=d as a fucntion of time
 Vt.ill = V.ill(:,end);
 
@@ -50,7 +50,7 @@ Fion.dk = dfana.calcFion(spvsol.dk);
 Fiont.dk = Fion.dk(:,end);
 
 % Get dark potential
-V.dk = (spvsol.dk.u(:,:,4));
+V.dk = (spvsol.dk.u(:,:,1));
 % Direct readout of potential at x=d as a fucntion of time
 Vt.dk = V.dk(:,end);
 

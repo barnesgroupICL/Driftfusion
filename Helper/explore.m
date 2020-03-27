@@ -334,10 +334,11 @@ classdef explore
             for i=1:length(parval1)
                 for j = 1:length(parval2)
                     % Rebuild solutions
-                    sol.u(1,:,1) = exsol.nf(i, j, :);
-                    sol.u(1,:,2) = exsol.pf(i, j, :);
-                    sol.u(1,:,3) = exsol.af(i, j, :);
-                    sol.u(1,:,4) = exsol.Vf(i, j, :);
+                    sol.u(1,:,1) = exsol.Vf(i, j, :);
+                    sol.u(1,:,2) = exsol.nf(i, j, :);
+                    sol.u(1,:,3) = exsol.pf(i, j, :);
+                    sol.u(1,:,4) = exsol.cf(i, j, :);
+                    
                     sol.t = 0;
                     sol.x = exsol.x(i,j,:);
                     sol.par = exsol.par_base;

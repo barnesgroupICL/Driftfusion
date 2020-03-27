@@ -159,8 +159,10 @@ classdef dfplot
 
         function Vappt(sol)
             % Difference in potential between the left and right boundary
+            Vapp = dfana.calcVapp(sol);
+
             figure(8)
-            plot(sol.t, -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi));
+            plot(sol.t, Vapp);
             xlabel('Time [s]')
             ylabel('Vapp [V]')
         end
@@ -171,7 +173,7 @@ classdef dfplot
             ppos = getpointpos(xpos, xmesh);
 
             J = dfana.calcJ(sol);
-            Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
+            Vapp = dfana.calcVapp(sol);
 
             figure(9)
             plot(Vapp, J.n(:, ppos),Vapp, J.p(:, ppos),Vapp, J.a(:, ppos),Vapp, J.disp(:,ppos), Vapp, J.tot(:, ppos));
@@ -188,7 +190,7 @@ classdef dfplot
             ppos = getpointpos(xpos, xmesh);
 
             J = dfana.calcJ(sol);
-            Vapp = -(sol.u(:,end,4)-sol.u(:,1,4)-sol.par.Vbi);
+            Vapp = dfana.calcVapp(sol);
 
             figure(91)
             plot(Vapp, J.tot(:, ppos));

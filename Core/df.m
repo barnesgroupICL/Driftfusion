@@ -12,11 +12,11 @@ function solstruct = df(varargin)
 % (at your option) any later version.
 %
 %% Start code
-% n = u(1) = electron density
-% p = u(2) = holes density
-% c = u(3) = cation density
-% V = u(4) = electrostatic potential
-% a = u(5) = anion density
+% V = u(1) = electrostatic potential
+% n = u(2) = electron density
+% p = u(3) = holes density
+% c = u(4) = cation density (optional)
+% a = u(5) = anion density (optional)
 
 %% Deal with input arguments
 if length(varargin) == 0
@@ -175,50 +175,66 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         g = gxt1 + gxt2;
 
         %% Variables
-        n = u(1); p = u(2); c = u(3); V = u(4);
+        V = u(1); n = u(2); p = u(3);
 
-        if N_ionic_species == 2
+        if N_ionic_species == 1
+            c = u(4);           % Include cation variable
+            dcdx = dudx(4);
+            a = Nani(i);
+        elseif N_ionic_species == 2
+            c = u(4);           % Include cation variable
             a = u(5);           % Include anion variable
+            dcdx = dudx(4);
             dadx = dudx(5);
         else
-            a = Nani(i);        % Otherwise set anion density to be background
+            c = Ncat(i);
+            a = Nani(i);
         end
 
         %% Gradients
-        dndx = dudx(1); dpdx = dudx(2); dcdx = dudx(3); dVdx = dudx(4);
+        dVdx = dudx(1); dndx = dudx(2); dpdx = dudx(3);
 
         %% Equation editor
         % Time-dependence prefactor term
+        C_potential = 0;
         C_electron = 1;
         C_hole = 1;
-        C_cation = 1;
-        C_potential = 0;
-        C = [C_electron; C_hole; C_cation; C_potential];
+        C = [C_potential; C_electron; C_hole];
 
         % Flux terms
+        F_potential  = (epp(i)/eppmax)*dVdx;
         F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
         F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F_cation     = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
-        F_potential  = (epp(i)/eppmax)*dVdx;
-        F = [mobset*F_electron; mobset*F_hole; K_cation*mobseti*F_cation; F_potential];
+        F = [F_potential; mobset*F_electron; mobset*F_hole];
 
-        % Source terms - simplified first order recombination terms
-        S_electron = g - SRHset*(((n-n0(i))/taun(i)) + ((p-p0(i))/taup(i)));    % First order recombination expressions
-        S_hole     = g - SRHset*(((n-n0(i))/taun(i)) + ((p-p0(i))/taup(i)));
-        S_cation   = 0;
+        % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S = [S_electron; S_hole; S_cation; S_potential];
+        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S = [S_potential; S_electron; S_hole];
+
+        if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
+            C_cation = 1;
+            C = [C; C_cation];
+
+            F_cation = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
+            F = [F; K_cation*mobseti*F_cation];
+
+            S_cation = 0;
+            S = [S; S_cation];
+        end
 
         if N_ionic_species == 2     % Condition for anion terms
             C_anion = 1;
             C = [C; C_anion];
 
             F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
-            F = [F; K_anion*mobseti*(F_anion)];
+            F = [F; K_anion*mobseti*F_anion];
 
             S_anion = 0;
             S = [S; S_anion];
         end
+
     end
 
 %% Define initial conditions.
@@ -230,39 +246,56 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             i = i(end);
 
             switch N_ionic_species
+                case 0
+                    if length(par.dcell) == 1
+                        % Single layer
+                        u0 = [(x/xmesh(end))*Vbi;
+                            nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
+                            pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end))];
+                    else
+                        % Multi-layered
+                        u0 = [(x/xmesh(end))*Vbi;
+                            dev.n0(i);
+                            dev.p0(i)];
+                    end
+
                 case 1
                     if length(par.dcell) == 1
                         % Single layer
-                        u0 = [nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
+                        u0 = [(x/xmesh(end))*Vbi;
+                            nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
                             pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
-                            dev.Ncat(i);
-                            (x/xmesh(end))*Vbi;];
+                            dev.Ncat(i);];
                     else
                         % Multi-layered
-                        u0 = [dev.n0(i);
+                        u0 = [(x/xmesh(end))*Vbi;
+                            dev.n0(i);
                             dev.p0(i);
-                            dev.Ncat(i);
-                            (x/xmesh(end))*Vbi;];
+                            dev.Ncat(i);];
                     end
                 case 2
                     if length(par.dcell) == 1
                         % Single layer
-                        u0 = [nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
+                        u0 = [(x/xmesh(end))*Vbi;
+                            nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
                             pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
                             dev.Ncat(i);
-                            (x/xmesh(end))*Vbi;
                             dev.Nani(i);];
                     else
                         % Multi-layered
-                        u0 = [dev.n0(i);
+                        u0 = [(x/xmesh(end))*Vbi;
+                            dev.n0(i);
                             dev.p0(i);
                             dev.Ncat(i);
-                            (x/xmesh(end))*Vbi;
                             dev.Nani(i);];
                     end
             end
         elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
             switch par.N_ionic_species
+                case 0
+                    u0 = [interp1(icx,icsol(end,:,1),x);
+                        interp1(icx,icsol(end,:,2),x);
+                        interp1(icx,icsol(end,:,3),x);];
                 case 1
                     u0 = [interp1(icx,icsol(end,:,1),x);
                         interp1(icx,icsol(end,:,2),x);
@@ -285,7 +318,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % in this example I am controlling the flux through the boundaries using
 % the difference in concentration from equilibrium and the extraction
 % coefficient.
-    function [pl,ql,pr,qr] = dfbc(xl,ul,xr,ur,t)
+    function [Pl,Ql,Pr,Qr] = dfbc(xl,ul,xr,ur,t)
 
         switch par.V_fun_type
             case 'constant'
@@ -294,39 +327,38 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 Vapp = Vapp_fun(par.V_fun_arg, t);
         end
 
-        % Easy variable names
-        nl = ul(1); pl = ul(2); cl = ul(3); Vl = ul(4);
-        nr = ur(1); pr = ur(2); cr = ur(3); Vr = ur(4);
-
-        if N_ionic_species == 2
-            al = ul(5); ar = ur(5);
-        end
-
         switch par.BC
             case 2
                 % Non- selective contacts - fixed charge densities for majority carrier
                 % and flux for minority carriers- use recombination
                 % coefficients sn_l & sp_r to set the surface recombination velocity.
-                pl = [-sn_l*(ul(1) - nleft);
-                    ul(2) - pleft;
-                    0;
-                    -ul(4);];
+                Pl = [-ul(1);
+                    -sn_l*(ul(2) - nleft);
+                    ul(3) - pleft;];
 
-                ql = [1; 0;1; 0;];
+                Ql = [0; 1; 0;];
 
-                pr = [ur(1) - nright;
-                    sp_r*(ur(2) - pright);
-                    0;
-                    -ur(4)+Vbi-Vapp;];
+                Pr = [-ur(1)+Vbi-Vapp;
+                    ur(2) - nright;
+                    sp_r*(ur(3) - pright);];
 
-                qr = [0; 1; 1; 0;];
+                Qr = [0; 0; 1;];
+
+                if N_ionic_species == 1 || N_ionic_species == 2
+                    % Second element are the boundary condition
+                    % coefficients for cations
+                    Pl = [Pl; 0];
+                    Ql = [Ql; 1];
+                    Pr = [Pr; 0];
+                    Qr = [Qr; 1];
+                end
 
                 if N_ionic_species == 2
                     % Second element are the boundary condition coefficients for anions
-                    pl = [pl; 0];
-                    ql = [ql; 1];
-                    pr = [pr; 0];
-                    qr = [qr; 1];
+                    Pl = [Pl; 0];
+                    Ql = [Ql; 1];
+                    Pr = [Pr; 0];
+                    Qr = [Qr; 1];
                 end
 
             case 3
@@ -336,7 +368,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 if par.Rs == 0
                     Vres = 0;
                 else
-                    Jr = par.e*sp_r*(ur(2) - pright) - par.e*sn_r*(ur(1) - nright);
+                    Jr = par.e*sp_r*(ur(3) - pright) - par.e*sn_r*(ur(2) - nright);
                     if par.Rs_initial
                         Vres = Jr*par.Rs*t/par.tmax;    % Initial linear sweep
                     else
@@ -344,28 +376,35 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     end
                 end
 
-                pl = [mobset*(-sn_l*(ul(1) - nleft));
-                    mobset*(-sp_l*(ul(2) - pleft));
-                    0;
-                    -ul(4);];
+                Pl = [-ul(1);
+                    mobset*(-sn_l*(ul(2) - nleft));
+                    mobset*(-sp_l*(ul(3) - pleft));];
 
-                ql = [1; 1; 1; 0;];
+                Ql = [0; 1; 1;];
 
-                pr = [mobset*(sn_r*(ur(1) - nright));
-                    mobset*(sp_r*(ur(2) - pright));
-                    0;
-                    -ur(4)+Vbi-Vapp+Vres;];
+                Pr = [-ur(1)+Vbi-Vapp+Vres;
+                    mobset*(sn_r*(ur(2) - nright));
+                    mobset*(sp_r*(ur(3) - pright));];
 
-                qr = [1; 1; 1; 0;];
+                Qr = [0; 1; 1;];
 
-                if N_ionic_species == 2
-                    %% Second element are the boundary condition coefficients for anions
-                    pl = [pl; 0];
-                    ql = [ql; 1];
-                    pr = [pr; 0];
-                    qr = [qr; 1];
+                if N_ionic_species == 1 || N_ionic_species == 2
+                    % Final elements are the boundary condition
+                    % coefficients for CATIONS
+                    Pl = [Pl; 0];
+                    Ql = [Ql; 1];
+                    Pr = [Pr; 0];
+                    Qr = [Qr; 1];
                 end
 
+                if N_ionic_species == 2
+                    % Final elements are the boundary condition
+                    % coefficients for ANIONS
+                    Pl = [Pl; 0];
+                    Ql = [Ql; 1];
+                    Pr = [Pr; 0];
+                    Qr = [Qr; 1];
+                end
         end
     end
 
