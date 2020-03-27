@@ -15,8 +15,8 @@ function solstruct = df(varargin)
 % V = u(1) = electrostatic potential
 % n = u(2) = electron density
 % p = u(3) = holes density
-% c = u(4) = cation density
-% a = u(5) = anion density
+% c = u(4) = cation density (optional)
+% a = u(5) = anion density (optional)
 
 %% Deal with input arguments
 if length(varargin) == 0
@@ -211,7 +211,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
         S = [S_potential; S_electron; S_hole];
         
-        if N_ionic_species == 1 || N_ionic_species == 2
+        if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
             C_cation = 1;
             C = [C; C_cation];
             
@@ -220,17 +220,19 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             
             S_cation = 0;
             S = [S; S_cation];
-            if N_ionic_species == 2     % Condition for anion terms
-                C_anion = 1;
-                C = [C; C_anion];
-                
-                F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
-                F = [F; K_anion*mobseti*F_anion];
-                
-                S_anion = 0;
-                S = [S; S_anion];
-            end
         end
+        
+        if N_ionic_species == 2     % Condition for anion terms
+            C_anion = 1;
+            C = [C; C_anion];
+            
+            F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
+            F = [F; K_anion*mobseti*F_anion];
+            
+            S_anion = 0;
+            S = [S; S_anion];
+        end
+        
     end
 
 %% Define initial conditions.
@@ -314,7 +316,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % in this example I am controlling the flux through the boundaries using
 % the difference in concentration from equilibrium and the extraction
 % coefficient.
-    function [pl,ql,pr,qr] = dfbc(xl,ul,xr,ur,t)
+    function [Pl,Ql,Pr,Qr] = dfbc(xl,ul,xr,ur,t)
         
         switch par.V_fun_type
             case 'constant'
@@ -323,50 +325,38 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 Vapp = Vapp_fun(par.V_fun_arg, t);
         end
         
-        % Easy variable names
-%         Vl = ul(1); nl = ul(2); pl = ul(3); 
-%         Vr = ur(1); nr = ur(2); pr = ur(3); 
-        
-        if N_ionic_species == 1
-            cl = ul(4); cr = ur(4);
-        end   
-        
-        if N_ionic_species == 2
-            al = ul(5); ar = ur(5);
-        end
-        
         switch par.BC
             case 2
                 % Non- selective contacts - fixed charge densities for majority carrier
                 % and flux for minority carriers- use recombination
                 % coefficients sn_l & sp_r to set the surface recombination velocity.
-                pl = [-ul(1);
+                Pl = [-ul(1);
                     -sn_l*(ul(2) - nleft);
                     ul(3) - pleft;];
                 
-                ql = [0; 1; 0;];
+                Ql = [0; 1; 0;];
                 
-                pr = [-ur(1)+Vbi-Vapp;
+                Pr = [-ur(1)+Vbi-Vapp;
                     ur(2) - nright;
                     sp_r*(ur(3) - pright);];
                 
-                qr = [0; 0; 1;];
+                Qr = [0; 0; 1;];
                 
                 if N_ionic_species == 1 || N_ionic_species == 2
                     % Second element are the boundary condition
                     % coefficients for cations
-                    pl = [pl; 0];
-                    ql = [ql; 1];
-                    pr = [pr; 0];
-                    qr = [qr; 1];
-                    
-                    if N_ionic_species == 2
-                        % Second element are the boundary condition coefficients for anions
-                        pl = [pl; 0];
-                        ql = [ql; 1];
-                        pr = [pr; 0];
-                        qr = [qr; 1];
-                    end
+                    Pl = [Pl; 0];
+                    Ql = [Ql; 1];
+                    Pr = [Pr; 0];
+                    Qr = [Qr; 1];
+                end
+                
+                if N_ionic_species == 2
+                    % Second element are the boundary condition coefficients for anions
+                    Pl = [Pl; 0];
+                    Ql = [Ql; 1];
+                    Pr = [Pr; 0];
+                    Qr = [Qr; 1];
                 end
                 
             case 3
@@ -384,35 +374,35 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     end
                 end
                 
-                pl = [-ul(1);
+                Pl = [-ul(1);
                     mobset*(-sn_l*(ul(2) - nleft));
                     mobset*(-sp_l*(ul(3) - pleft));];
                 
-                ql = [0; 1; 1;];
+                Ql = [0; 1; 1;];
                 
-                pr = [-ur(1)+Vbi-Vapp+Vres;
+                Pr = [-ur(1)+Vbi-Vapp+Vres;
                     mobset*(sn_r*(ur(2) - nright));
                     mobset*(sp_r*(ur(3) - pright));];
                 
-                qr = [0; 1; 1;];
+                Qr = [0; 1; 1;];
                 
                 if N_ionic_species == 1 || N_ionic_species == 2
-                    % Second element are the boundary condition
-                    % coefficients for cations
-                    pl = [pl; 0];
-                    ql = [ql; 1];
-                    pr = [pr; 0];
-                    qr = [qr; 1];
-                    
-                    if N_ionic_species == 2
-                        % Second element are the boundary condition coefficients for anions
-                        pl = [pl; 0];
-                        ql = [ql; 1];
-                        pr = [pr; 0];
-                        qr = [qr; 1];
-                    end
+                    % Final elements are the boundary condition
+                    % coefficients for CATIONS
+                    Pl = [Pl; 0];
+                    Ql = [Ql; 1];
+                    Pr = [Pr; 0];
+                    Qr = [Qr; 1];  
                 end
                 
+                if N_ionic_species == 2
+                    % Final elements are the boundary condition 
+                    % coefficients for ANIONS
+                    Pl = [Pl; 0];
+                    Ql = [Ql; 1];
+                    Pr = [Pr; 0];
+                    Qr = [Qr; 1];
+                end
         end
     end
 
