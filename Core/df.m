@@ -180,10 +180,10 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             dcdx = dudx(4);
             a = Nani(i);
         elseif N_ionic_species == 2
-            c = u(4);  
+            c = u(4);           % Include cation variable
             a = u(5);           % Include anion variable
-            dadx = dudx(5);
             dcdx = dudx(4);
+            dadx = dudx(5);    
         else
             c = Ncat(i);
             a = Nani(i);
@@ -211,7 +211,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
         S = [S_potential; S_electron; S_hole];
         
-        if N_ionic_species == 1
+        if N_ionic_species == 1 || N_ionic_species == 2
             C_cation = 1;
             C = [C; C_cation];
             
@@ -220,7 +220,6 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             
             S_cation = 0;
             S = [S; S_cation];
-        
             if N_ionic_species == 2     % Condition for anion terms
                 C_anion = 1;
                 C = [C; C_anion];
@@ -353,7 +352,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 
                 qr = [0; 0; 1;];
                 
-                if N_ionic_species == 1
+                if N_ionic_species == 1 || N_ionic_species == 2
                     % Second element are the boundary condition
                     % coefficients for cations
                     pl = [pl; 0];
@@ -397,7 +396,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 
                 qr = [0; 1; 1;];
                 
-                if N_ionic_species == 1
+                if N_ionic_species == 1 || N_ionic_species == 2
                     % Second element are the boundary condition
                     % coefficients for cations
                     pl = [pl; 0];
