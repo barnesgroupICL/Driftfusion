@@ -1,4 +1,4 @@
-% Note the user- the equilibrium solutions take >150 s with an i7 chip.
+% Note the user- the equilibrium solutions take >50 s with an i7 chip.
 initialise_df
 
 %% Create parameters objects
