@@ -42,6 +42,8 @@ par_origin = par;
 par.SRHset = 0;
 % Radiative rec could initially be set to zero in addition if required
 par.radset = 1;
+% Start with no ionic carriers
+par.N_ionic_species = 0;
 
 %% General initial parameters
 par.tmesh_type = 2;
@@ -116,11 +118,24 @@ disp('Complete')
 
 if electronic_only == 0
     %% Equilibrium solutions with ion mobility switched on
+    par.N_ionic_species = par_origin.N_ionic_species;
+    
+    % CReate temporary solution for appending initial conditions to
+    sol = soleq_nosrh;
+    
+    % Write ionic initial conditions
+    switch par.N_ionic_species
+        case 1
+            sol.u(:,:,4) = repmat(par.dev.Nani, length(sol.t), 1);
+        case 2
+            sol.u(:,:,4) = repmat(par.dev.Nani, length(sol.t), 1);
+            sol.u(:,:,5) = repmat(par.dev.Nani, length(sol.t), 1);
+    end
     
     % Start without SRH or series resistance
     par.SRHset = 0;
     par.Rs = 0;
-    
+%     
     disp('Closed circuit equilibrium with ions')
     
     % Take ratio of electron and ion mobilities in the active layer
@@ -137,13 +152,14 @@ if electronic_only == 0
         rat_cation = 0;
     end
     
+    par.mobset = 1;
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
     par.K_anion = rat_anion;
     par.K_cation = rat_cation;
     par.tmax = 1e-12;
     par.t0 = par.tmax/1e3;
-    
-    sol = df(soleq_nosrh, par);
+      
+    sol = df(sol, par);
     
     % Longer second solution
     par.calcJ = 0;
