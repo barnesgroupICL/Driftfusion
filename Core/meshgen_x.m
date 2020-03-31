@@ -140,61 +140,45 @@ switch par.xmesh_type
     case 4
         d = par.dcell;
         p = par.layer_points;
-        dcum = cumsum(par.dcell);
-        dcum = [0, dcum];
-        pcum = cumsum(par.layer_points);
-        pcum = [0, pcum];
+        dcum0 = par.dcum0;
         
+        xcell = cell(1,length(p));
         for i=1:length(par.layer_points)
-            
-            linarr = linspace(dcum(i), dcum(i+1)-(d(i)/p(i)), p(i));
-            x(1, (pcum(i)+1):pcum(i+1)) = linarr;
-            
+            linarr = linspace(dcum0(i), dcum0(i+1)-(d(i)/p(i)), p(i));
+            xcell{i} = linarr;
         end
-        % To account for rounding errors
-        x(end) = dcum(end);
+        x = [xcell{:}];
+        x = [x, dcum0(end)];
         
     case 5
         % Error function for each layer
         d = par.dcell;
         p = par.layer_points;
-        
         dcum0 = par.dcum0;
-        pcum = cumsum(par.layer_points);
-        pcum0 = [0,par.pcum]+1;
-        dcell = par.dcell;
-        layer_points = par.layer_points;
         
         % For backwards compatibility
-        if length(par.xmesh_coeff) < length(layer_points)
-            xmesh_coeff = 0.7*ones(1, length(layer_points));     
+        if length(par.xmesh_coeff) < length(p)
+            xmesh_coeff = 0.7*ones(1, length(p));
         else
             xmesh_coeff = par.xmesh_coeff;
         end
         
-        x = zeros(1, pcum0(end)-1);
-        
-        for i = 2:length(dcum0)
-            if any(strcmp(par.layer_type{1,i-1}, {'layer', 'active'})) == 1
-                parr = 1:1:layer_points(i-1)+1;
-                darr = 0:dcell(i-1)/layer_points(i-1):dcum0(i);  
-                 p1 = pcum0(i-1);
-                     
-                x_layer = ((erf(2*pi*xmesh_coeff(i-1)*(parr-layer_points(i-1)/2)/layer_points(i-1))+1)/2);
-                % Subtract base to get zero
-                x_layer = x_layer-x_layer(1);
-                % Normalise the funciton
-                x_layer  = x_layer./max(x_layer);
-                % Scale by layer width
-                x_layer = x_layer*dcell(i-1);
-                % Write to x
-                x(pcum0(i-1):pcum0(i)) = x_layer + x(p1);
-                
-            elseif strcmp(par.layer_type{1,i-1}, 'junction') == 1
-                x_layer = linspace(dcum0(i-1), dcum0(i), layer_points(i-1)+1);
-                x(1, pcum0(i-1):pcum0(i)) = x_layer;
+        xcell = cell(1,length(p));
+        for i = 1:length(p)
+            if any(strcmp(par.layer_type{1,i}, {'layer', 'active'}))
+                parr = -0.5 : (1/p(i)) : 0.5;
+                x_layer = erf(2*pi*xmesh_coeff(i)*parr);
+                x_layer = normalize(x_layer,'range');
+                x_layer = dcum0(i) + x_layer * d(i);
+                xcell{i} = x_layer(1:end-1);
+            elseif strcmp(par.layer_type{1,i}, 'junction')
+                x_layer = linspace(dcum0(i), dcum0(i+1)-(d(i)/p(i)), p(i));
+                xcell{i} = x_layer;
             end
         end
+        x = [xcell{:}];
+        x = [x, dcum0(end)];
+
     otherwise
         error('DrIFtFUSION:xmesh_type', [mfilename ' - xmesh_type not recognized'])
 end
