@@ -408,17 +408,12 @@ classdef dfplot
             ylabel('sigma [C cm-2]')
         end
         
-        function Qt(sol, x1, x2)
+        function Qt(sol)
             % Plot the integrated space charge density in Coulombs [Ccm-2] as a function of time
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            
-            p1 = find(x<=x1);
-            p1 = p1(end);
-            p2 = find(x<=x2);
-            p2 = p2(end);
-            
+            [~,t,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
+
             sigma = dfana.calcsigma(sol);
-            Q = par.e*sigma(:, x1:x2);
+            Q = par.e*sigma;
             
             figure(17)
             plot(t, Q)
@@ -427,18 +422,13 @@ classdef dfplot
             xlim([t(1), t(end)])
         end
         
-        function QVapp(sol, x1, x2)
+        function QVapp(sol)
             % Integrated charge density as a function of applied voltage
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            
-            p1 = find(x<=x1);
-            p1 = p1(end);
-            p2 = find(x<=x2);
-            p2 = p2(end);
+            [~,~,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
             
             sigma = dfana.calcsigma(sol);
             Vapp = dfana.calcVapp(sol);
-            Q = par.e*sigma(:, x1:x2);
+            Q = par.e*sigma;
             
             figure(17)
             plot(Vapp, Q)
