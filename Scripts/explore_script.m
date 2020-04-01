@@ -16,7 +16,7 @@ par_ptpd = pc('input_files/ptpd_mapi_pcbm.csv');
 
 % For the first example we will run JV and steady-state Voc for 3 different
 % active layer thicknesses and light intensities 
-ptpd_parex_dactive_light_43 = explore.explore2par(par_ptpd, {'dcell(1,3)','Int'},...
+ptpd_parex_dactive_light_43 = explore.explore2par(par_ptpd, {'d(1,3)','Int'},...
     {[100e-7, 200e-7, 400e-7, 800e-7], logspace(-2,0,3)}, 200);
 
 %% Example plots
