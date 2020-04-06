@@ -150,6 +150,9 @@ x_ihalf_padded = [x_ihalf, nan(1,sampling_step-mod(x_ihalf_length,sampling_step)
 x_ihalf_padded_mat = reshape(x_ihalf_padded,sampling_step,[]);
 x_ihalf_sampled = x_ihalf_padded_mat(1,:);
 
+% normalise epp
+epp_norm = epp/eppmax;
+
 % prepare constant generation profiles
 int1gx1 = int1*gx1;
 int2gx2 = int2*gx2;
@@ -236,7 +239,7 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         dVdx = dudx(1); dndx = dudx(2); dpdx = dudx(3); 
         
         % Flux terms
-        F_potential  = (epp(i)/eppmax)*dVdx;
+        F_potential  = epp_norm(i)*dVdx;
         F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
         F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));      
         F = [F_potential; mobset*F_electron; mobset*F_hole]; 
