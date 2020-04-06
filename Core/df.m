@@ -260,12 +260,12 @@ function [C,F,S] = dfpde(x,t,u,dudx)
 
     % F_electron: Flux term for electrons
     % dudx(2) is dndx, gradient of electrons concentration
-    F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + Dn(i)*(dudx(2) - n*gradNc_over_Nc(i));
+    F_electron = mobset*(mue(i)*n*(-dVdx + gradEA(i)) + Dn(i)*(dudx(2) - n*gradNc_over_Nc(i)));
 
     % F_hole: Flux term for holes
     % dudx(3) is dpdx, gradient of holes concentration
-    F_hole       = muh(i)*p*(dVdx - gradIP(i)) + Dp(i)*(dudx(3) - p*gradNv_over_Nv(i));
-        F = [F_potential; mobset*F_electron; mobset*F_hole]; 
+    F_hole = mobset*(muh(i)*p*(dVdx - gradIP(i)) + Dp(i)*(dudx(3) - p*gradNv_over_Nv(i)));
+    F = [F_potential; F_electron; F_hole];
             
         % Source terms
         S_potential = q_over_eppmax_epp0*(-n+p-a+c+NANDNaniNcat(i));
@@ -275,16 +275,16 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         
     if N_ionic_species % Condition for cation and anion terms
             
-            F_cation = mucat(i)*(c*dVdx + kBT*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
+        F_cation = K_cation*mobseti*mucat(i)*(c*dVdx + kBT*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
 
-            F = [F; K_cation*mobseti*F_cation];
+        F = [F; F_cation];
             
             S_cation = 0;
             S = [S; S_cation];
         if N_ionic_species_two % Condition for anion terms
             
-            F_anion = muani(i)*(a*-dVdx + kBT*(dadx+(a*(dadx/(DOSani(i)-a)))));
-            F = [F; K_anion*mobseti*F_anion];
+            F_anion = K_anion*mobseti*muani(i)*(a*-dVdx + kBT*(dadx+(a*(dadx/(DOSani(i)-a)))));
+            F = [F; F_anion];
             
             S_anion = 0;
             S = [S; S_anion];
