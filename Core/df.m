@@ -150,6 +150,10 @@ x_ihalf_padded = [x_ihalf, nan(1,sampling_step-mod(x_ihalf_length,sampling_step)
 x_ihalf_padded_mat = reshape(x_ihalf_padded,sampling_step,[]);
 x_ihalf_sampled = x_ihalf_padded_mat(1,:);
 
+% convert to boolean for faster check in dfode
+g1_fun_type_constant = g1_fun_type == "constant";
+g2_fun_type_constant = g2_fun_type == "constant";
+
 % C: Time-dependence prefactor term
 switch N_ionic_species
     case 1
@@ -191,20 +195,19 @@ function [C,F,S] = dfpde(x,t,u,dudx)
     sampled_i = find(x_ihalf_sampled <= x);
     sampled_i = sampled_i(end);
     i = (sampled_i-1)*sampling_step + find(x == x_ihalf_padded_mat(:,sampled_i));
-        
-        switch g1_fun_type
-            case 'constant'
-                gxt1 = int1*gx1(i);
-            otherwise
-                gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
-        end
-        
-        switch g2_fun_type
-            case 'constant'
-                gxt2 = int2*gx2(i);
-            otherwise
-                gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
-        end
+
+    % g: Generation terms
+    if g1_fun_type_constant
+        gxt1 = int1*gx1(i);
+    else
+        gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
+    end
+
+    if g2_fun_type_constant
+        gxt2 = int2*gx2(i);
+    else
+        gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
+    end
         
         g = gxt1 + gxt2;
         
