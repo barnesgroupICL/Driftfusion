@@ -163,6 +163,9 @@ q_over_eppmax_epp0 = q/(eppmax*epp0);
 % pre-calculation S_potential static charge
 NANDNaniNcat = -NA+ND+Nani-Ncat;
 
+% pre-calculate kB*T
+kBT = kB*T;
+
 % convert to boolean for faster check in dfode
 g1_fun_type_constant = g1_fun_type == "constant";
 g2_fun_type_constant = g2_fun_type == "constant";
@@ -258,7 +261,8 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
             
-            F_cation = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c))))); 
+            F_cation = mucat(i)*(c*dVdx + kBT*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
+
             F = [F; K_cation*mobseti*F_cation];
             
             S_cation = 0;
@@ -267,7 +271,7 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         
         if N_ionic_species == 2     % Condition for anion terms
             
-            F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
+            F_anion = muani(i)*(a*-dVdx + kBT*(dadx+(a*(dadx/(DOSani(i)-a)))));
             F = [F; K_anion*mobseti*F_anion];
             
             S_anion = 0;
