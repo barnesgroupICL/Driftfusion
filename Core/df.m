@@ -237,6 +237,8 @@ function [C,F,S] = dfpde(x,t,u,dudx)
 
     % Variables
     n = u(2); p = u(3);
+    % gradient of electrostatic potential, electric field
+    dVdx = dudx(1);
 
     if N_ionic_species
             c = u(4);           % Include cation variable
@@ -252,14 +254,17 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         c = Ncat(i);
         a = Nani(i);
     end
-        
-        %% Gradients
-        dVdx = dudx(1); dndx = dudx(2); dpdx = dudx(3); 
-        
+
         % Flux terms
         F_potential  = epp_norm(i)*dVdx;
-        F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + Dn(i)*(dndx - n*gradNc_over_Nc(i));
-        F_hole       = muh(i)*p*(dVdx - gradIP(i)) + Dp(i)*(dpdx - p*gradNv_over_Nv(i));
+
+    % F_electron: Flux term for electrons
+    % dudx(2) is dndx, gradient of electrons concentration
+    F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + Dn(i)*(dudx(2) - n*gradNc_over_Nc(i));
+
+    % F_hole: Flux term for holes
+    % dudx(3) is dpdx, gradient of holes concentration
+    F_hole       = muh(i)*p*(dVdx - gradIP(i)) + Dp(i)*(dudx(3) - p*gradNv_over_Nv(i));
         F = [F_potential; mobset*F_electron; mobset*F_hole]; 
             
         % Source terms
