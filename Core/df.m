@@ -255,8 +255,10 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         a = Nani(i);
     end
 
-        % Flux terms
-        F_potential  = epp_norm(i)*dVdx;
+    %% Equation editor
+
+    % F_potential: Flux term for potential
+    F_potential = epp_norm(i)*dVdx;
 
     % F_electron: Flux term for electrons
     % dudx(2) is dndx, gradient of electrons concentration
@@ -265,8 +267,7 @@ function [C,F,S] = dfpde(x,t,u,dudx)
     % F_hole: Flux term for holes
     % dudx(3) is dpdx, gradient of holes concentration
     F_hole = mobset*(muh(i)*p*(dVdx - gradIP(i)) + Dp(i)*(dudx(3) - p*gradNv_over_Nv(i)));
-    F = [F_potential; F_electron; F_hole];
-            
+
         % Source terms
         S_potential = q_over_eppmax_epp0*(-n+p-a+c+NANDNaniNcat(i));
     % S_electron_hole: Source term for electrons and for holes
@@ -275,21 +276,31 @@ function [C,F,S] = dfpde(x,t,u,dudx)
     S = [S_potential; S_electron_hole; S_electron_hole];
         
     if N_ionic_species % Condition for cation and anion terms
-            
-        F_cation = K_cation*mobseti*mucat(i)*(c*dVdx + kBT*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
 
-        F = [F; F_cation];
+        % F_cation: Flux term for cations
+        % dudx(4) is dcdx, gradient of mobile cation concentration
+        F_cation = K_cation*mobseti*mucat(i)*(c*dVdx + kBT*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
             
             S_cation = 0;
             S = [S; S_cation];
         if N_ionic_species_two % Condition for anion terms
-            
+
+            % F_anion: Flux term for anions
+            % dudx(5) is dadx, gradient of mobile anion concentration
             F_anion = K_anion*mobseti*muani(i)*(a*-dVdx + kBT*(dadx+(a*(dadx/(DOSani(i)-a)))));
-            F = [F; F_anion];
+
+            % F: Flux terms
+            F = [F_potential; F_electron; F_hole; F_cation; F_anion];
             
             S_anion = 0;
             S = [S; S_anion];
+        else
+            % F: Flux terms
+            F = [F_potential; F_electron; F_hole; F_cation];
         end
+    else
+        % F: Flux terms
+        F = [F_potential; F_electron; F_hole];
     end
 end
 
