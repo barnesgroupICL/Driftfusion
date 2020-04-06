@@ -166,6 +166,9 @@ NANDNaniNcat = -NA+ND+Nani-Ncat;
 % pre-calculate kB*T
 kBT = kB*T;
 
+% pre-calculate the squared values of ni
+ni_squared = ni.^2;
+
 % convert to boolean for faster check in dfode
 g1_fun_type_constant = g1_fun_type == "constant";
 g2_fun_type_constant = g2_fun_type == "constant";
@@ -255,8 +258,8 @@ function [C,F,S] = dfpde(x,t,u,dudx)
             
         % Source terms
         S_potential = q_over_eppmax_epp0*(-n+p-a+c+NANDNaniNcat(i));
-        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S_electron = g - radset*B(i)*((n*p)-(ni_squared(i))) - SRHset*(((n*p)-ni_squared(i))/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S_hole     = g - radset*B(i)*((n*p)-(ni_squared(i))) - SRHset*(((n*p)-ni_squared(i))/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
         S = [S_potential; S_electron; S_hole];
         
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
