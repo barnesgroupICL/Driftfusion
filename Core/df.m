@@ -22,25 +22,30 @@ function solstruct = df(varargin)
 if length(varargin) == 0
     % If no input parameter set then call pc directly
     par = pc;
+    dficAnalytical = true;
 elseif length(varargin) == 1
     % If one input argument then assume it is the Initial Conditions (IC) solution
     icsol = varargin{1, 1}.u;
     icx = varargin{1, 1}.x;
     par = pc;
+    dficAnalytical = false;
 elseif length(varargin) == 2
     if max(max(max(varargin{1, 1}.u))) == 0
         par = varargin{2};
+        dficAnalytical = true;
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
         
         input_solstruct = varargin{1, 1};
         par = input_solstruct.par;
         icsol = input_solstruct.u;
         icx = input_solstruct.x;
+        dficAnalytical = false;
     else
         input_solstruct = varargin{1, 1};
         icsol = input_solstruct.u;
         icx = input_solstruct.x;
         par = varargin{2};
+        dficAnalytical = false;
     end
 end
 
@@ -238,7 +243,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 %% Define initial conditions.
     function u0 = dfic(x)
         
-        if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) == 0
+        if dficAnalytical
             
             i = find(xmesh <= x);
             i = i(end);
@@ -288,7 +293,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                             dev.Nani(i);];
                     end
             end
-        elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
+        else
             switch par.N_ionic_species
                 case 0
                     u0 = [interp1(icx,icsol(end,:,1),x);
