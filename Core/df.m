@@ -185,6 +185,7 @@ switch N_ionic_species
         C_hole = 1;
         C_cation = 1;
         Cpre = [C_potential; C_electron; C_hole; C_cation];
+        N_ionic_species_two = false;
     case 2
         C_potential = 0;
         C_electron = 1;
@@ -192,11 +193,13 @@ switch N_ionic_species
         C_cation = 1;
         C_anion = 1;
         Cpre = [C_potential; C_electron; C_hole; C_cation; C_anion];
+        N_ionic_species_two = true;
     otherwise
         C_potential = 0;
         C_electron = 1;
         C_hole = 1;
         Cpre = [C_potential; C_electron; C_hole];
+        N_ionic_species_two = false;
 end
 
 %% Call solver
@@ -239,15 +242,16 @@ function [C,F,S] = dfpde(x,t,u,dudx)
             c = u(4);           % Include cation variable
             dcdx = dudx(4);
             a = Nani(i);
-        elseif N_ionic_species == 2
+        if N_ionic_species_two
             c = u(4);           % Include cation variable
             a = u(5);           % Include anion variable
             dcdx = dudx(4);
-            dadx = dudx(5);    
-        else
-            c = Ncat(i);
-            a = Nani(i);
+            dadx = dudx(5);
         end
+    else
+        c = Ncat(i);
+        a = Nani(i);
+    end
         
         %% Gradients
         dVdx = dudx(1); dndx = dudx(2); dpdx = dudx(3); 
@@ -272,9 +276,7 @@ function [C,F,S] = dfpde(x,t,u,dudx)
             
             S_cation = 0;
             S = [S; S_cation];
-        end
-        
-        if N_ionic_species == 2     % Condition for anion terms
+        if N_ionic_species_two % Condition for anion terms
             
             F_anion = muani(i)*(a*-dVdx + kBT*(dadx+(a*(dadx/(DOSani(i)-a)))));
             F = [F; K_anion*mobseti*F_anion];
@@ -282,8 +284,8 @@ function [C,F,S] = dfpde(x,t,u,dudx)
             S_anion = 0;
             S = [S; S_anion];
         end
-        
     end
+end
 
 %% Define initial conditions.
     function u0 = dfic(x)
