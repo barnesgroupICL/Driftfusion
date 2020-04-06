@@ -235,7 +235,7 @@ function [C,F,S] = dfpde(x,t,u,dudx)
     % Variables
     n = u(2); p = u(3);
 
-        if N_ionic_species == 1
+    if N_ionic_species
             c = u(4);           % Include cation variable
             dcdx = dudx(4);
             a = Nani(i);
@@ -264,7 +264,7 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         S_hole     = gxt1 + gxt2 - radset*B(i)*((n*p)-(ni_squared(i))) - SRHset*(((n*p)-ni_squared(i))/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
         S = [S_potential; S_electron; S_hole];
         
-        if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
+    if N_ionic_species % Condition for cation and anion terms
             
             F_cation = mucat(i)*(c*dVdx + kBT*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
 
