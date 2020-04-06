@@ -232,8 +232,8 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
     end
 
-        %% Variables
-        V = u(1); n = u(2); p = u(3); 
+    % Variables
+    n = u(2); p = u(3);
 
         if N_ionic_species == 1
             c = u(4);           % Include cation variable
