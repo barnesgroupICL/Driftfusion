@@ -269,9 +269,10 @@ function [C,F,S] = dfpde(x,t,u,dudx)
             
         % Source terms
         S_potential = q_over_eppmax_epp0*(-n+p-a+c+NANDNaniNcat(i));
-        S_electron = gxt1 + gxt2 - radset*B(i)*((n*p)-(ni_squared(i))) - SRHset*(((n*p)-ni_squared(i))/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S_hole     = gxt1 + gxt2 - radset*B(i)*((n*p)-(ni_squared(i))) - SRHset*(((n*p)-ni_squared(i))/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S = [S_potential; S_electron; S_hole];
+    % S_electron_hole: Source term for electrons and for holes
+    S_electron_hole = gxt1 + gxt2 - radset*B(i)*((n*p)-(ni_squared(i))) - SRHset*(((n*p)-ni_squared(i))/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+
+    S = [S_potential; S_electron_hole; S_electron_hole];
         
     if N_ionic_species % Condition for cation and anion terms
             
