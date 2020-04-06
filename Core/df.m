@@ -277,13 +277,13 @@ function [C,F,S] = dfpde(x,t,u,dudx)
 
         % F_cation: Flux term for cations
         % dudx(4) is dcdx, gradient of mobile cation concentration
-        F_cation = K_cation*mobseti*mucat(i)*(c*dVdx + kBT*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
+        F_cation = K_cation*mobseti*mucat(i)*(c*dVdx + kBT*dcdx*(1 + c/(DOScat(i)-c)));
 
         if N_ionic_species_two % Condition for anion terms
 
             % F_anion: Flux term for anions
             % dudx(5) is dadx, gradient of mobile anion concentration
-            F_anion = K_anion*mobseti*muani(i)*(a*-dVdx + kBT*(dadx+(a*(dadx/(DOSani(i)-a)))));
+            F_anion = K_anion*mobseti*muani(i)*(a*-dVdx + kBT*dadx*(1 + a/(DOSani(i)-a)));
 
             % F: Flux terms
             F = [F_potential; F_electron; F_hole; F_cation; F_anion];
