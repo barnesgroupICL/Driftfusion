@@ -150,6 +150,28 @@ x_ihalf_padded = [x_ihalf, nan(1,sampling_step-mod(x_ihalf_length,sampling_step)
 x_ihalf_padded_mat = reshape(x_ihalf_padded,sampling_step,[]);
 x_ihalf_sampled = x_ihalf_padded_mat(1,:);
 
+% C: Time-dependence prefactor term
+switch N_ionic_species
+    case 1
+        C_potential = 0;
+        C_electron = 1;
+        C_hole = 1;
+        C_cation = 1;
+        Cpre = [C_potential; C_electron; C_hole; C_cation];
+    case 2
+        C_potential = 0;
+        C_electron = 1;
+        C_hole = 1;
+        C_cation = 1;
+        C_anion = 1;
+        Cpre = [C_potential; C_electron; C_hole; C_cation; C_anion];
+    otherwise
+        C_potential = 0;
+        C_electron = 1;
+        C_hole = 1;
+        Cpre = [C_potential; C_electron; C_hole];
+end
+
 %% Call solver
 % inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
@@ -161,6 +183,10 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % F = Flux terms
 % S = Source terms
 function [C,F,S] = dfpde(x,t,u,dudx)   
+    
+    % C: Time-dependence prefactor term
+    C = Cpre;
+
     % Get position point
     sampled_i = find(x_ihalf_sampled <= x);
     sampled_i = sampled_i(end);
@@ -202,13 +228,6 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         %% Gradients
         dVdx = dudx(1); dndx = dudx(2); dpdx = dudx(3); 
         
-        %% Equation editor
-        % Time-dependence prefactor term
-        C_potential = 0;
-        C_electron = 1;
-        C_hole = 1;
-        C = [C_potential; C_electron; C_hole];
-          
         % Flux terms
         F_potential  = (epp(i)/eppmax)*dVdx;
         F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
@@ -222,8 +241,6 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         S = [S_potential; S_electron; S_hole];
         
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
-            C_cation = 1;
-            C = [C; C_cation];
             
             F_cation = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c))))); 
             F = [F; K_cation*mobseti*F_cation];
@@ -233,8 +250,6 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         end
         
         if N_ionic_species == 2     % Condition for anion terms
-            C_anion = 1;
-            C = [C; C_anion];
             
             F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
             F = [F; K_anion*mobseti*F_anion];
