@@ -296,21 +296,12 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         else
             switch par.N_ionic_species
                 case 0
-                    u0 = [interp1(icx,icsol(end,:,1),x);
-                        interp1(icx,icsol(end,:,2),x);
-                        interp1(icx,icsol(end,:,3),x);];
+                    u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';   
                 case 1
-                    u0 = [interp1(icx,icsol(end,:,1),x);
-                        interp1(icx,icsol(end,:,2),x);
-                        interp1(icx,icsol(end,:,3),x);
-                        interp1(icx,icsol(end,:,4),x);];
+                    u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
                 case 2
                     % insert previous solution and interpolate the x points
-                    u0 = [interp1(icx,icsol(end,:,1),x);
-                        interp1(icx,icsol(end,:,2),x);
-                        interp1(icx,icsol(end,:,3),x);
-                        interp1(icx,icsol(end,:,4),x);
-                        interp1(icx,icsol(end,:,5),x);];
+                    u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
             end
         end
     end
