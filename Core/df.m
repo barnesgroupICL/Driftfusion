@@ -150,6 +150,10 @@ x_ihalf_padded = [x_ihalf, nan(1,sampling_step-mod(x_ihalf_length,sampling_step)
 x_ihalf_padded_mat = reshape(x_ihalf_padded,sampling_step,[]);
 x_ihalf_sampled = x_ihalf_padded_mat(1,:);
 
+% prepare constant generation profiles
+int1gx1 = int1*gx1;
+int2gx2 = int2*gx2;
+
 % convert to boolean for faster check in dfode
 g1_fun_type_constant = g1_fun_type == "constant";
 g2_fun_type_constant = g2_fun_type == "constant";
@@ -198,13 +202,13 @@ function [C,F,S] = dfpde(x,t,u,dudx)
 
     % g: Generation terms
     if g1_fun_type_constant
-        gxt1 = int1*gx1(i);
+        gxt1 = int1gx1(i);
     else
         gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
     end
 
     if g2_fun_type_constant
-        gxt2 = int2*gx2(i);
+        gxt2 = int2gx2(i);
     else
         gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
     end
