@@ -160,6 +160,9 @@ int2gx2 = int2*gx2;
 % S_potential prefactor
 q_over_eppmax_epp0 = q/(eppmax*epp0);
 
+% pre-calculation S_potential static charge
+NANDNaniNcat = -NA+ND+Nani-Ncat;
+
 % convert to boolean for faster check in dfode
 g1_fun_type_constant = g1_fun_type == "constant";
 g2_fun_type_constant = g2_fun_type == "constant";
@@ -248,7 +251,7 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         F = [F_potential; mobset*F_electron; mobset*F_hole]; 
             
         % Source terms
-        S_potential = q_over_eppmax_epp0*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
+        S_potential = q_over_eppmax_epp0*(-n+p-a+c+NANDNaniNcat(i));
         S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
         S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
         S = [S_potential; S_electron; S_hole];
