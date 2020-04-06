@@ -169,6 +169,10 @@ kBT = kB*T;
 % pre-calculate the squared values of ni
 ni_squared = ni.^2;
 
+% pre-calculate
+gradNc_over_Nc = gradNc./Nc;
+gradNv_over_Nv = gradNv./Nv;
+
 % convert to boolean for faster check in dfode
 g1_fun_type_constant = g1_fun_type == "constant";
 g2_fun_type_constant = g2_fun_type == "constant";
@@ -252,8 +256,8 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         
         % Flux terms
         F_potential  = epp_norm(i)*dVdx;
-        F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
-        F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));      
+        F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + Dn(i)*(dndx - n*gradNc_over_Nc(i));
+        F_hole       = muh(i)*p*(dVdx - gradIP(i)) + Dp(i)*(dpdx - p*gradNv_over_Nv(i));
         F = [F_potential; mobset*F_electron; mobset*F_hole]; 
             
         % Source terms
