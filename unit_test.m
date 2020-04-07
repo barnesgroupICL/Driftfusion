@@ -260,72 +260,69 @@ assert(all([tarr == test_tarr, xrange == test_xrange]))
 %% dfplot x2d(sol, xmesh, variables, legstr, linestyle, ylab, tarr, xrange, logx, logy)
 
 dfplot.x2d(solJV.ill.f, solJV.ill.f.x, {solJV.ill.f.u(:,:,1)}, {'test'}, ['-','.'], 'ylab', solJV.ill.f.t, [150,250], false, false)
-for i=1:10
-   a=[a,0]; 
-end
 
-%% Helper calcJsc and calcR0
+%% Helper calcJsc, calcR0 and Eg_vs_Voc
 % [EgArr, Jsc_vs_Eg] = calcJsc
 [EgArr, Jsc_vs_Eg] = calcJsc;
 
 % [JV_ana, r0, k_rad, Voc, g0] = calcR0(EgArr, Jsc_vs_Eg, par)
 [JV_ana, r0, k_rad, Voc, g0] = calcR0(EgArr, Jsc_vs_Eg, par);
 
-%% Helper Eg_vs_Voc
 % [G0_Arr, k_rad_Arr, R0_Arr, Eg, VocArr, DeltaVoc] = Eg_vs_Voc(EgArr, Jsc_vs_Eg)
-Eg_vs_Voc
+%[G0_Arr, k_rad_Arr, R0_Arr, Eg, VocArr, DeltaVoc] = Eg_vs_Voc(EgArr, Jsc_vs_Eg);
 
-%% Helper explore explore2par
+%% Helper explore explore2par and plotPL
 % exsol = explore2par(par_base, parnames, parvalues, JVpnts)
-explore.explore2par
+% example taken from Scripts/explore_script
+exsol = explore.explore2par(par, {'d(1,3)','Int'},...
+    {[400e-7, 800e-7], logspace(-2,0,2)}, 20);
+
+% plotPL(exsol)
+explore.plotPL(exsol);
+
+% plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
+explore.plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
 
 %% Helper explore getJtot
 % Jtot = getJtot(sol)
-getJtot
+Jtot = explore.getJtot(soleq.ion);
 
 %% Helper explore writevar
 % var = writevar(var, i, j, xx, arr)
-writevar
+x=0;
+x = explore.writevar(x, 1, 1, par.xx, soleq.ion.x);
 
 %% Helper explore helper
 % par = helper(par, parname, parvalue)
-helper
-
-%% Helper explore plotPL
-% plotPL(exsol)
-plotPL
-
-%% Helper explore plotsurf
-% plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
-plotsurf
+par2 = explore.helper(par, "Rs", 1);
 
 %% Helper explore plotstat_2D_parval1
 % plotstat_2D_parval1(exsol, yproperty, logx, logy)
-plotstat_2D_parval1
+explore.plotstat_2D_parval1
 
 %% Helper explore plotstat_2D_parval2
 % plotstat_2D_parval2(exsol, yproperty, logx, logy)
-plotstat_2D_parval2
+explore.plotstat_2D_parval2
 
 %% Helper explore plotfinalELx
 % plotfinalELx(exsol)
-plotfinalELx
+explore.plotfinalELx
 
 %% Helper explore plotprof_2D
 % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
-plotprof_2D
+explore.plotprof_2D
 
 %% Helper explore plotU
 % plotU(exsol, par1logical, par2logical,logx,logy)
-plotU
+explore.plotU
 
 %% Helper explore plotCE
 % plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
-plotCE
+explore.plotCE
 
 %% Helper explore plotJV
 % plotJV(exsol, par1logical, par2logical)
-plotJV        
+explore.plotJV        
             
 %% Helper getpointpos
 % ppos = getpointpos(xpos, xmesh)
