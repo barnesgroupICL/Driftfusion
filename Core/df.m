@@ -240,18 +240,6 @@ function [C,F,S] = dfpde(x,t,u,dudx)
     % gradient of electrostatic potential, electric field
     dVdx = dudx(1);
 
-    if N_ionic_species
-            c = u(4);           % Include cation variable
-            a = Nani(i);
-        if N_ionic_species_two
-            c = u(4);           % Include cation variable
-            a = u(5);           % Include anion variable
-        end
-    else
-        c = Ncat(i);
-        a = Nani(i);
-    end
-
     %% Equation editor
 
     % F_potential: Flux term for potential
@@ -265,18 +253,18 @@ function [C,F,S] = dfpde(x,t,u,dudx)
     % dudx(3) is dpdx, gradient of holes concentration
     F_hole = mobset*(muh(i)*p*(dVdx - gradIP(i)) + Dp(i)*(dudx(3) - p*gradNv_over_Nv(i)));
 
-        % Source terms
-        S_potential = q_over_eppmax_epp0*(-n+p-a+c+NANDNaniNcat(i));
     % S_electron_hole: Source term for electrons and for holes
     S_electron_hole = gxt1 + gxt2 - radset*B(i)*(n*p-ni_squared(i)) - SRHset*(n*p-ni_squared(i))/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i)));
 
     if N_ionic_species % Condition for cation and anion terms
+        c = u(4);           % Include cation variable
 
         % F_cation: Flux term for cations
         % dudx(4) is dcdx, gradient of mobile cation concentration
         F_cation = K_cation*mobseti*mucat(i)*(c*dVdx + kBT*dudx(4)*(1 + c/(DOScat(i)-c)));
 
         if N_ionic_species_two % Condition for anion terms
+            a = u(5);           % Include anion variable
 
             % F_anion: Flux term for anions
             % dudx(5) is dadx, gradient of mobile anion concentration
@@ -285,11 +273,19 @@ function [C,F,S] = dfpde(x,t,u,dudx)
             % F: Flux terms
             F = [F_potential; F_electron; F_hole; F_cation; F_anion];
             
+            % S_potential: Source term for potential
+            % NANDNaniNcat is -NA+ND+Nani-Ncat
+            S_potential = q_over_eppmax_epp0*(-n+p-a+c+NANDNaniNcat(i));
+
             % S: Source terms
             S = [S_potential; S_electron_hole; S_electron_hole; 0; 0];
         else
             % F: Flux terms
             F = [F_potential; F_electron; F_hole; F_cation];
+
+            % S_potential: Source term for potential
+            % Nani(i) is fixed anion, NANDNaniNcat is -NA+ND+Nani-Ncat
+            S_potential = q_over_eppmax_epp0*(-n+p-Nani(i)+c+NANDNaniNcat(i));
 
             % S: Source terms
             S = [S_potential; S_electron_hole; S_electron_hole; 0];
@@ -297,6 +293,11 @@ function [C,F,S] = dfpde(x,t,u,dudx)
     else
         % F: Flux terms
         F = [F_potential; F_electron; F_hole];
+
+        % S_potential: Source term for potential
+        % Ncat(i) is fixed cation, Nani(i) is fixed anion
+        % NANDNaniNcat is -NA+ND+Nani-Ncat
+        S_potential = q_over_eppmax_epp0*(-n+p-Nani(i)+Ncat(i)+NANDNaniNcat(i));
 
         % S: Source terms
         S = [S_potential;S_electron_hole;S_electron_hole];
