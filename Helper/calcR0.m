@@ -40,7 +40,11 @@ q = 1.60217662e-19;         % Elementary charge [C]
 % ylabel('r0(E)')
 
 for i =1:length(par.Eg)
-
+    
+    if isnan(par.Eg(i))
+        continue
+    end
+    
     % Find maximum Jsc based on step function absorption and 100% EQE
     p = find(EgArr <= par.Eg(i));
     p = p(end);
