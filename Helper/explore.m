@@ -217,10 +217,10 @@ classdef explore
         
         function plotPL(exsol)
             figure(100)
-            s1 = surf(exsol.parval1, exsol.parval2, exsol.stats.PLint);
+            surf(exsol.parval1, exsol.parval2, exsol.stats.PLint(:,:,end));
             ylabel(exsol.parnames(1))
             xlabel(exsol.parnames(2))
-            set(s1,'YScale','log');
+            set(gca,'YScale','log');
             zlabel('PL intensity [cm-2s-1]')
             shading interp
             colorbar
