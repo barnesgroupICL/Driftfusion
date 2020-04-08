@@ -24,9 +24,12 @@
 % prepare solutions and indirectly test equilibrate and genIntStructs
 % functions
 initialise_df
-par = pc('Input_files/spiro_mapi_tio2.csv');
+par = pc('Input_files/ptpd_mapi_pcbm.csv');
 soleq = equilibrate(par);
 solJV = doJV(soleq.ion, 1e-2, 100, 1, 1, 0, 1.4, 3);
+% example taken from Scripts/explore_script
+exsol = explore.explore2par(par, {'d(1,3)','Int'},...
+    {[400e-7, 800e-7], logspace(-2,0,2)}, 20);
 % structs_oc = genIntStructs(ssol_i_eq_SR, 1, 1e-3, 2, true);
 % structs_sc = genIntStructs(sol_i_eq_SR, 1, 1e-3, 2, true);
 % structs_vapp = genVappStructs(sol_i_eq_SR, [0.4, 0.95]);
@@ -105,6 +108,8 @@ end
 %% dfplot ELx(varargin)
 
 dfplot.ELx(soleq.ion)
+dfplot.ELx(JVsol.ill.f,[0,100])
+
 
 %% dfplot Jt(sol, xpos)
 
@@ -113,10 +118,12 @@ dfplot.Jt(solJV.ill.f, 2e-5)
 %% dfplot Jx(varargin)
 
 dfplot.Jx(soleq.ion)
+dfplot.Jx(JVsol.ill.f,[0,100])
 
 %% dfplot jx(varargin)
 
 dfplot.jx(soleq.ion)
+dfplot.jx(JVsol.ill.f,[0,100])
 
 %% dfplot JV(JV, option)
 
@@ -125,6 +132,7 @@ dfplot.JV(solJV, 3)
 %% dfplot Jddx(varargin)
 
 dfplot.Jddx(soleq.ion)
+dfplot.Jddx(JVsol.ill.f,[0,100])
 
 %% dfplot Voct(sol)
 
@@ -161,18 +169,22 @@ dfplot.xmesh(soleq.ion)
 %% dfplot Vx(varargin)
 
 dfplot.Vx(soleq.ion)
+dfplot.Vx(JVsol.ill.f,[0,100])
 
 %% dfplot npx(varargin)
 
 dfplot.npx(soleq.ion)
+dfplot.npx(JVsol.ill.f,[0,100])
 
 %% dfplot acx(varargin)
 
 dfplot.acx(soleq.ion)
+dfplot.acx(JVsol.ill.f,[0,100])
 
 %% dfplot gx(varargin)
 
 dfplot.gx(solJV.ill.f)
+dfplot.gx(JVsol.ill.f,[0,100])
 
 %% dfplot gxt(sol)
 
@@ -181,6 +193,7 @@ dfplot.gxt(solJV.ill.f)
 %% dfplot rx(varargin)
 
 dfplot.rx(solJV.ill.f)
+dfplot.rx(JVsol.ill.f,[0,100])
 
 %% dfplot JVrec(JV, option)
 
@@ -205,35 +218,42 @@ dfplot.QVapp(solJV.ill.f)
 %% dfplot rhox(varargin)
 
 dfplot.rhox(soleq.ion)
+dfplot.rhox(JVsol.ill.f,[0,100])
 
 %% dfplot deltarhox(varargin)
 
 dfplot.deltarhox(solJV.ill.f)
+dfplot.deltarhox(JVsol.ill.f,[0,100])
 
 %% dfplot rhoxFxVx(varargin)
 
 dfplot.rhoxFxVx(soleq.ion)
-
+dfplot.rhoxFxVx(JVsol.ill.f,[0,100])
 
 %% dfplot rhoxVx(varargin)
 
 dfplot.rhoxVx(soleq.ion)
+dfplot.rhoxVx(JVsol.ill.f,[0,100])
 
 %% dfplot ELx_single(varargin)
 
 dfplot.ELx_single(soleq.ion)
+dfplot.ELx_single(JVsol.ill.f,[0,100])
 
 %% dfplot ELnpx(varargin)
 
 dfplot.ELnpx(soleq.ion)
+dfplot.ELnpx(JVsol.ill.f,[0,100])
 
 %% dfplot Vacx(varargin)
 
 dfplot.Vacx(soleq.ion)
+dfplot.Vacx(JVsol.ill.f,[0,100])
 
 %% dfplot Vionacx(varargin)
 
 dfplot.Vionacx(soleq.ion)
+dfplot.Vionacx(JVsol.ill.f,[0,100])
 
 %% dfplot Fiont(sol, xpos)
 
@@ -242,6 +262,7 @@ dfplot.Fiont(solJV.ill.f, 2e-5)
 %% dfplot PLx(varargin)
 
 dfplot.PLx(solJV.ill.f)
+dfplot.PLx(JVsol.ill.f,[0,100])
 
 %% dfplot colourblocks(sol, yrange)
 
@@ -269,19 +290,15 @@ dfplot.x2d(solJV.ill.f, solJV.ill.f.x, {solJV.ill.f.u(:,:,1)}, {'test'}, ['-','.
 [JV_ana, r0, k_rad, Voc, g0] = calcR0(EgArr, Jsc_vs_Eg, par);
 
 % [G0_Arr, k_rad_Arr, R0_Arr, Eg, VocArr, DeltaVoc] = Eg_vs_Voc(EgArr, Jsc_vs_Eg)
-%[G0_Arr, k_rad_Arr, R0_Arr, Eg, VocArr, DeltaVoc] = Eg_vs_Voc(EgArr, Jsc_vs_Eg);
+[G0_Arr, k_rad_Arr, R0_Arr, Eg, VocArr, DeltaVoc] = Eg_vs_Voc(EgArr, Jsc_vs_Eg);
 
-%% Helper explore explore2par and plotPL
-% exsol = explore2par(par_base, parnames, parvalues, JVpnts)
-% example taken from Scripts/explore_script
-exsol = explore.explore2par(par, {'d(1,3)','Int'},...
-    {[400e-7, 800e-7], logspace(-2,0,2)}, 20);
-
+%% Helper explore plotPL
 % plotPL(exsol)
 explore.plotPL(exsol);
 
+%% Helper explore plotsurf
 % plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
-explore.plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
+explore.plotsurf(exsol, 'Voc_r', true, false, false)
 
 %% Helper explore getJtot
 % Jtot = getJtot(sol)
@@ -298,47 +315,47 @@ par2 = explore.helper(par, "Rs", 1);
 
 %% Helper explore plotstat_2D_parval1
 % plotstat_2D_parval1(exsol, yproperty, logx, logy)
-explore.plotstat_2D_parval1
+explore.plotstat_2D_parval1(exsol, 'Voc_r', true, false)
 
 %% Helper explore plotstat_2D_parval2
 % plotstat_2D_parval2(exsol, yproperty, logx, logy)
-explore.plotstat_2D_parval2
+explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
 
 %% Helper explore plotfinalELx
 % plotfinalELx(exsol)
-explore.plotfinalELx
+explore.plotfinalELx(exsol)
 
 %% Helper explore plotprof_2D
 % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
-explore.plotprof_2D
+explore.plotprof_2D(exsol, 'Voc_r', true, false)
 
 %% Helper explore plotU
 % plotU(exsol, par1logical, par2logical,logx,logy)
-explore.plotU
+explore.plotU(exsol, [true,true], [true,true],false,false)
 
 %% Helper explore plotCE
 % plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
-explore.plotCE
+explore.plotCE(exsol, exsol, false, false, false, "ciaomamma")
 
 %% Helper explore plotJV
 % plotJV(exsol, par1logical, par2logical)
-explore.plotJV        
-            
+explore.plotJV(exsol, [true,true], [true,true])
+
 %% Helper getpointpos
 % ppos = getpointpos(xpos, xmesh)
-getpointpos
+ppos = getpointpos(1e-6, soleq.ion.x);
 
 %% Helper importsolcoresol
 % solstruct = importsolcoresol(varargin)
-importsolcoresol
+solstruct = importsolcoresol();
 
 %% Helper makemovie
 % Framefile = makemovie(sol, plotfun, xrange, yrange, movie_name, Vcounter, tcounter)
-makemovie
+Framefile = makemovie(JVsol.ill.f, @dfplot.PLx, [0,100e-7], 0, 'test_makemovie_delete_me', true, true);
 
 %% Helper verifyStabilization
 % all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
-verifyStabilization
+all_stable = verifyStabilization(soleq.ion.u, soleq.ion.t, 0.1);
 
 %------------- END OF CODE --------------
 
