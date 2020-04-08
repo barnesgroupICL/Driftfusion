@@ -26,7 +26,7 @@
 initialise_df
 par = pc('Input_files/ptpd_mapi_pcbm.csv');
 soleq = equilibrate(par);
-solJV = doJV(soleq.ion, 1e-2, 100, 1, 1, 0, 1.4, 3);
+solJV = doJV(soleq.ion, 1e-2, 50, 1, 1, 0, 1.2, 3);
 % example taken from Scripts/explore_script
 exsol = explore.explore2par(par, {'d(1,3)','Int'},...
     {[400e-7, 800e-7], logspace(-2,0,2)}, 20);
@@ -311,7 +311,7 @@ x = explore.writevar(x, 1, 1, par.xx, soleq.ion.x);
 
 %% Helper explore helper
 % par = helper(par, parname, parvalue)
-par2 = explore.helper(par, "Rs", 1);
+par2 = explore.helper(par, 'Rs', 1);
 
 %% Helper explore plotstat_2D_parval1
 % plotstat_2D_parval1(exsol, yproperty, logx, logy)
@@ -351,11 +351,86 @@ solstruct = importsolcoresol();
 
 %% Helper makemovie
 % Framefile = makemovie(sol, plotfun, xrange, yrange, movie_name, Vcounter, tcounter)
-Framefile = makemovie(JVsol.ill.f, @dfplot.PLx, [0,100e-7], 0, 'test_makemovie_delete_me', true, true);
+Framefile = makemovie(solJV.ill.f, @dfplot.PLx, [0,100e-7], 0, 'test_makemovie_delete_me', true, true);
 
 %% Helper verifyStabilization
 % all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
 all_stable = verifyStabilization(soleq.ion.u, soleq.ion.t, 0.1);
+
+%% Protocols changeLight.m
+% sol_int = changeLight(sol, newInt, tmax)
+sol_int1 = changeLight(soleq.ion, 1, 2);
+
+%% Protocols doCV.m
+% sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
+sol_CV = doCV(soleq.ion, 0.1, 0, 0.5, -0.5, 0.1, 1, 50);
+
+%% Protocols doIMPS.m
+% sol_IMPS = doIMPS(sol_ini, int_base, int_delta, frequency, tmax, tpoints)
+sol_IMPS = doIMPS(soleq.ion, 0.2, 0.2, 1, 10, 50);
+
+%% Protocols doIMVS.m
+% sol_IMVS = doIMVS(sol_ini, int_base, int_delta, frequency, tmax, tpoints)
+sol_IMVS = doIMVS(soleq.ion, 0.2, 0.2, 1, 10, 50);
+
+%% Protocols doLightPulse.m
+% [sol_pulse] = doLightPulse(sol_ini, pulse_int, tmax, tpoints, duty, mobseti, log_timemesh)
+sol_pulse = doLightPulse(soleq.ion, 0.1, 1, 20, 5, true, true);
+sol_pulse2 = doLightPulse(soleq.ion, 0.1, 1, 20, 5, true, false);
+
+%% Protocols doSDP.m and Analysis anasdp
+% sdpsol = doSDP(sol_ini, tdwell_arr, Vjump, pulse_int, pulse_tmax, duty, tpoints, scalefactor)
+sdpsol = doSDP(soleq.ion, [1e-3,1], 0.9, 1, 1, 5, 50, 1);
+
+% anasdp(sdpsol, Jtr_time)
+anasdp(sdpsol, 1);
+
+%% Protocols doSPV.m and Analysis spvana
+% spvsol = doSPV(sol_ini, Int, mobseti, tpoints, tmax, Rs, stabilise)
+spvsol = doSPV(soleq.ion, 1, true, 20, 1, 1e3, true);
+
+% spvdat = spvana(spvsol)
+spvdat = spvana(spvsol);
+
+%% Protocols doTPV.m
+% [sol_TPV, sol_ill] = doTPV(sol_ini, bias_int, stab_time, mobseti, Rs, pulse_int, tmax, tpoints, duty)
+[sol_TPV, sol_ill] = doTPV(soleq.ion, 1, 10, true, 1e-2, 0.1, 1, 20, 5);
+
+%% Protocols equilibrate.m
+% soleq = equilibrate(varargin)
+
+%% Protocols findVocDirect.m
+% [sol_Voc, Voc] = findVocDirect(sol_ini, light_intensity, mobseti)
+
+%% Protocols findVoc.m
+% [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol)
+
+%% Protocols genIntStructs.m
+% [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
+
+%% Protocols genIntStructsRealVoc.m
+% [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startInt, endInt, points, include_dark)
+
+%% Protocols genVappStructs.m
+% VappSol = genVappStructs(solini, Vapp_arr, mobseti)
+
+%% Protocols jumptoV.m
+% sol_relax = jumptoV(sol_ini, Vjump, tdwell, mobseti, Int, stabilise, accelerate)
+
+%% Protocols lightonRs.m
+% sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
+
+%% Protocols stabilize.m
+% steadystate_struct = stabilize(struct)
+
+%% Protocols sweeplight.m
+% sol_sweep = sweepLight(sol_ini, tmax, tpoints, end_int)
+
+%% Protocols transient_nid.m
+% sol_OC = transient_nid(sol_ini, int_arr, stab_time, mobseti, Rs, pnts)
+
+%% Protocols VappFunction.m
+% sol = VappFunction(sol_ini, Vapp_func, Vapp_coeff, tmax, tpoints, logtime)
 
 %------------- END OF CODE --------------
 
