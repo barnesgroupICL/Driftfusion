@@ -396,35 +396,41 @@ spvdat = spvana(spvsol);
 % [sol_TPV, sol_ill] = doTPV(sol_ini, bias_int, stab_time, mobseti, Rs, pulse_int, tmax, tpoints, duty)
 [sol_TPV, sol_ill] = doTPV(soleq.ion, 1, 10, true, 1e-2, 0.1, 1, 20, 5);
 
-%% Protocols equilibrate.m
-% soleq = equilibrate(varargin)
-
 %% Protocols findVocDirect.m
 % [sol_Voc, Voc] = findVocDirect(sol_ini, light_intensity, mobseti)
+[sol_Voc, Voc] = findVocDirect(soleq.ion, 1, true);
 
 %% Protocols findVoc.m
 % [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol)
+[sol_Voc, Voc] = findVoc(soleq.ion, 1, true, 0.9, 1.3, 1e-5)
 
 %% Protocols genIntStructs.m
 % [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
+[structCell, V_array, J_array] = genIntStructs(soleq.ion, 1e-4, 1, 5, true);
 
 %% Protocols genIntStructsRealVoc.m
 % [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startInt, endInt, points, include_dark)
+[goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(soleq.ion, 1e-4, 1e-3, 2, false);
 
 %% Protocols genVappStructs.m
 % VappSol = genVappStructs(solini, Vapp_arr, mobseti)
+VappSol = genVappStructs(soleq.ion, [0.9,1.1,1.3], true);
 
 %% Protocols jumptoV.m
 % sol_relax = jumptoV(sol_ini, Vjump, tdwell, mobseti, Int, stabilise, accelerate)
+sol_relax = jumptoV(soleq.ion, 1.2, 1, true, 1, true, true);
 
 %% Protocols lightonRs.m
 % sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
+sol_ill = lightonRs(soleq.ion, 1, 10, true, 1e6, 50);
 
 %% Protocols stabilize.m
 % steadystate_struct = stabilize(struct)
+steadystate_struct = stabilize(struct);
 
 %% Protocols sweeplight.m
-% sol_sweep = sweepLight(sol_ini, tmax, tpoints, end_int)
+% sol_sweep = sweeplight(sol_ini, tmax, tpoints, end_int)
+sol_sweep = sweeplight(soleq.ion, 1, 50, 1);
 
 %% Protocols transient_nid.m
 % sol_OC = transient_nid(sol_ini, int_arr, stab_time, mobseti, Rs, pnts)
