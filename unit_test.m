@@ -282,137 +282,137 @@ dev2 = build_device(par, 'ihalf');
 %% Core build_property
 % devprop = build_property(property, xmesh, par, interface_switch, gradient_property)
 
-dev.taun = build_property(par.taun, par.xx, par, 'constant', 0);
-dev.EA = build_property(par.EA, par.xx, par, 'lin_graded', 0);
-dev.NA = build_property(par.NA, par.xx, par, 'log_graded', 0);
-dev.g0 = build_property(par.g0, par.xx, par, 'zeroed', 0);
-dev.gradEA = build_property(par.EA, par.xx, par, 'lin_graded', 1);
-dev.gradNc = build_property(par.Nc, par.xx, par, 'log_graded', 1);
+build_property(par.taun, par.xx, par, 'constant', 0);
+build_property(par.EA, par.xx, par, 'lin_graded', 0);
+build_property(par.NA, par.xx, par, 'log_graded', 0);
+build_property(par.g0, par.xx, par, 'zeroed', 0);
+build_property(par.EA, par.xx, par, 'lin_graded', 1);
+build_property(par.Nc, par.xx, par, 'log_graded', 1);
 
 %% Core dfana splitsol
 % [u,t,x,par,dev,n,p,a,c,V] = splitsol(sol)
 
-[u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(soleq.ion);
+dfana.splitsol(soleq.ion);
 
 %% Core dfana QFLs
 % [Ecb, Evb, Efn, Efp] = QFLs(sol)
 
-[Ecb, Evb, Efn, Efp] = dfana.QFLs(soleq.ion);
+dfana.QFLs(soleq.ion);
 
 %% Core dfana QFL_ihalf
 % [Ecb, Evb, Efn, Efp] = QFL_ihalf(sol)
 
-[Ecb, Evb, Efn, Efp] = dfana.QFL_ihalf(soleq.ion);
+dfana.QFL_ihalf(soleq.ion);
 
 %% Core dfana QFL_J
 % [Ecb, Evb, Efn, Efp] = QFL_J(sol)
 
-[Ecb, Evb, Efn, Efp] = dfana.QFL_J(soleq.ion);
+dfana.QFL_J(soleq.ion);
 
 %% Core dfana calcJ
 % [J, j, x] = calcJ(sol)
 
-[J, j, x] = dfana.calcJ(soleq.ion);
+dfana.calcJ(soleq.ion);
 
 %% Core dfana calcg
 % [g1, g2, g] = calcg(sol)
 
-[g1, g2, g] = dfana.calcg(soleq.ion);
+dfana.calcg(soleq.ion);
 
 %% Core dfana calcr
 % r = calcr(sol)
 
-r = dfana.calcr(soleq.ion);
+dfana.calcr(soleq.ion);
 
 %% Core dfana calcr_ihalf
 % r = calcr_ihalf(sol)
 
-r = dfana.calcr_ihalf(soleq.ion);
+dfana.calcr_ihalf(soleq.ion);
 
 %% Core dfana Jddxt
 % [jdd, Jdd, xout] = Jddxt(sol)
 
-[jdd, Jdd, xout] = dfana.Jddxt(soleq.ion);
+dfana.Jddxt(soleq.ion);
 
 %% Core dfana calcF
 % [FV, Frho] = calcF(sol)
 
-[FV, Frho] = dfana.calcF(soleq.ion);
+dfana.calcF(soleq.ion);
 
 %% Core dfana calcF_ihalf
 % [FV, Frho] = calcF_ihalf(sol)
 
-[FV, Frho] = dfana.calcF_ihalf(soleq.ion);
+dfana.calcF_ihalf(soleq.ion);
 
 %% Core dfana calcrho
 % rho = calcrho(sol)
 
-rho = dfana.calcrho(soleq.ion);
+dfana.calcrho(soleq.ion);
 
 %% Core dfana calcrho_ihalf
 % rho = calcrho_ihalf(sol)
 
-rho2 = dfana.calcrho_ihalf(soleq.ion);
+dfana.calcrho_ihalf(soleq.ion);
 
 %% Core dfana calcVapp
 % Vapp = calcVapp(sol)
 
-Vapp = dfana.calcVapp(soleq.ion);
+dfana.calcVapp(soleq.ion);
 
 %% Core dfana JVstats
 % stats = JVstats(JVsol)
 
-stats = dfana.JVstats(JVsol);
+dfana.JVstats(JVsol);
 
 %% Core dfana PLt
 % value = PLt(sol)
 
-value = dfana.PLt(soleq.ion);
+dfana.PLt(soleq.ion);
 
 %% Core dfana calcVQFL
 % VQFL = calcVQFL(sol)
 
-VQFL = dfana.calcVQFL(soleq.ion);
+dfana.calcVQFL(soleq.ion);
 
 %% Core dfana deltaVt
 % deltaV = deltaVt(sol, p1, p2)
 
-deltaV = dfana.deltaVt(soleq.ion, 1, 123);
+dfana.deltaVt(soleq.ion, 1, 123);
 
 %% Core dfana calcsigma
 % sigma = calcsigma(sol)
 
-sigma = dfana.calcsigma(soleq.ion);
+dfana.calcsigma(soleq.ion);
 
 %% Core dfana calcsigma_ion
 % sigma_ion = calcsigma_ion(sol)
 
-sigma_ion = dfana.calcsigma_ion(soleq.ion);
+dfana.calcsigma_ion(soleq.ion);
 
 %% Core dfana calcFion
 % Fion = calcFion(sol)
 
-Fion = dfana.calcFion(soleq.ion);
+dfana.calcFion(soleq.ion);
 
 %% Core dfana calcVion
 % Vion = calcVion(sol)
 
-Vion = dfana.calcVion(soleq.ion);
+dfana.calcVion(soleq.ion);
 
 %% Core dfana pdentrp
 % [U,Ux] = pdentrp(singular,m,xL,uL,xR,uR,xout)
 
-[Vloc,dVdx] = dfana.pdentrp(false,false,par.xx(123),V(1,123),par.xx(124),V(1,124),1e-6);
+dfana.pdentrp(false,false,par.xx(123),V(1,123),par.xx(124),V(1,124),1e-6);
 
 %% Core ditro_fun nfun
 % n = nfun(Nc, Ec, Efn, T, prob_distro_function)
 
-n = distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.Et, par.T, par.prob_distro_function);
+distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.Et, par.T, par.prob_distro_function);
 
 %% Core ditro_fun pfun
 % p = pfun(Nv, Ev, Efp, T, prob_distro_function)
 
-p = distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.Et, par.T, par.prob_distro_function);
+distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.Et, par.T, par.prob_distro_function);
 
 %% Core ditro_fun Dn_fd_fun and Dnlook and Efn_fd_fun
 % Dnfd = Dn_fd_fun(Nc, Ec, Efn, mue, T)
@@ -423,11 +423,11 @@ Dnfd = distro_fun.Dn_fd_fun(par.dev.Nc(end), Ec, Efn, par.mue(end), par.T);
 
 % Dsol = Dnlook(n, Dnfun, n_fd)
 
-Dsol = distro_fun.Dnlook(soleq.ion.u(2,1,end), Dnfd.Dnfun, Dnfd.n_fd);
+distro_fun.Dnlook(soleq.ion.u(2,1,end), Dnfd.Dnfun, Dnfd.n_fd);
 
 % Efn_fd = Efn_fd_fun(n, Efn, n_fd)
 
-Efn_fd = distro_fun.Efn_fd_fun(soleq.ion.u(2,1,end), Efn, Dnfd.n_fd);
+distro_fun.Efn_fd_fun(soleq.ion.u(2,1,end), Efn, Dnfd.n_fd);
 
 %% Core ditro_fun Dp_fd_fun and Dplook and Efp_fd_fun
 % Dpfd = Dp_fd_fun(Nv, Ev, Efp, muh, T)
@@ -436,16 +436,22 @@ Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.IP(1), Efp, par.muh(1), par.T);
 
 % Dsol = Dplook(p, Dpfun, p_fd)
 
-Dsol = distro_fun.Dplook(soleq.ion.u(3,1,1), Dpfd.Dpfun, Dpfd.p_fd);
+distro_fun.Dplook(soleq.ion.u(3,1,1), Dpfd.Dpfun, Dpfd.p_fd);
 
 % Efp_fd = Efp_fd_fun(p, Efp, p_fd)
 
-Efp_fd = distro_fun.Efp_fd_fun(soleq.ion.u(3,1,1), Efp, Dpfd.p_fd);
+distro_fun.Efp_fd_fun(soleq.ion.u(3,1,1), Efp, Dpfd.p_fd);
 
 %% Core fun_gen
 % fun = fun_gen(fun_type)
 
-fun = fun_gen(fun_type);
+fun_gen('constant');
+fun_gen('sweep');
+fun_gen('square');
+fun_gen('sin');
+fun_gen('sweep2');
+fun_gen('tri');
+
 
 %% Core generation
 % gx = generation(par, source_type, laserlambda)
@@ -764,10 +770,23 @@ nidt = transient_nid_ana(sol_OC);
 
 %% Protocols VappFunction
 % sol = VappFunction(sol_ini, Vapp_func, Vapp_coeff, tmax, tpoints, logtime)
-sol = VappFunction(soleq.ion, 'constant', 0.2, 10, 30, false);
-sol2 = VappFunction(soleq.ion, 'sweep', [0,1,5], 10, 30, false);
-sol3 = VappFunction(soleq.ion, 'square', [0,1,5,30], 10, 30, false);
-sol4 = VappFunction(soleq.ion, 'sin', [0, 1e-2, 1, 0], 10, 30, false);
+
+% coeff(1);
+VappFunction(soleq.ion, 'constant', 0.2, 10, 30, false);
+
+% coeff(1) + (coeff(2)-coeff(1))*t/coeff(3);
+VappFunction(soleq.ion, 'sweep', [0.1, 1, 5], 10, 30, false);
+
+% coeff(1) + (coeff(2)-coeff(1))*lt(mod(t,coeff(3))*1/coeff(3),coeff(4)/100);
+VappFunction(soleq.ion, 'square', [0, 1, 5, 30], 10, 30, false);
+
+% coeff(1) + coeff(2)*(sin(2*pi*coeff(3)*t + coeff(4)));
+VappFunction(soleq.ion, 'sin', [0.1, 1e-2, 1, 0], 10, 30, false);
+
+% COEFF = [OFFSET, V1, V2, periods, tperiod]
+% triangle_fun(coeff, t);
+VappFunction(soleq.ion, 'tri', [0.1, 0.2, 1, 3, 5], 10, 30, false);
+
 
 %% Optical beerlambert
 % Gentot = beerlambert(par, x, source_type, laserlambda, figson)
