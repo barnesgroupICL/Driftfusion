@@ -449,9 +449,7 @@ fun_gen('constant');
 fun_gen('sweep');
 fun_gen('square');
 fun_gen('sin');
-fun_gen('sweep2');
 fun_gen('tri');
-
 
 %% Core generation
 % gx = generation(par, source_type, laserlambda)
