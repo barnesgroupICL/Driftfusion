@@ -24,7 +24,12 @@
 % prepare solutions and indirectly test equilibrate and genIntStructs
 % functions
 initialise_df
-input_csv = 'Input_files/ptpd_mapi_pcbm.csv';
+
+% for testing a real structure
+%input_csv = 'Input_files/ptpd_mapi_pcbm.csv';
+% a structure written for testing puroposes
+input_csv = 'Input_files/unit_test_ptpd_mapi_pcbm.csv';
+
 par = pc(input_csv);
 soleq = equilibrate(par);
 JVsol = doJV(soleq.ion, 1e-2, 50, 1, 1, 0, 1.2, 3);
