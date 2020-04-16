@@ -30,11 +30,15 @@ initialise_df
 % a structure written for testing puroposes
 input_csv = 'Input_files/unit_test_ptpd_mapi_pcbm.csv';
 
+% par = pc(varargin)
 par = pc(input_csv);
+% soleq = equilibrate(varargin)
 soleq = equilibrate(par);
-JVsol = doJV(soleq.ion, 1e-2, 50, 1, 1, 0, 1.2, 3);
+% JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
+JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.2, 3);
 
 % example taken from Scripts/explore_script
+% exsol = explore2par(par_base, parnames, parvalues, JVpnts)
 exsol = explore.explore2par(par, {'d(1,3)','Int'},...
     {[400e-7, 800e-7], logspace(-2,0,2)}, 20);
 
@@ -595,14 +599,14 @@ for i=1:length(inputs)
         el_s = size(el.u);
 
         exp_el_s = [el.par.tpoints, xpoints, 3];
-        assert(all(el_s == exp_el_s), 'Expected size: %d, %d, %d. Obtained size: %d, %d, %d.', el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
+        assert(all(el_s == exp_el_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
         assert(~any(isnan(el.u(:))))
         
         ion = soleq.ion;
         ion_s = size(ion.u);
         
         exp_ion_s = [ion.par.tpoints, xpoints, round(3+par.N_ionic_species)];
-        assert(all(ion_s == exp_ion_s), 'Expected size: %d, %d, %d. Obtained size: %d, %d, %d.', el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
+        assert(all(ion_s == exp_ion_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
         assert(~any(isnan(ion.u(:))))
     end
 end
@@ -674,7 +678,7 @@ explore.plotfinalELx(exsol)
 %% Helper explore plotprof_2D
 
 % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
-explore.plotprof_2D(exsol, 'Voc_r', true, false)
+explore.plotprof_2D(exsol, 'J_f', [true,true], [true,true], true, true)
 
 %% Helper explore plotU
 
