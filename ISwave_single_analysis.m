@@ -163,6 +163,10 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
     Jn_inphase = s.p.J_E_func([n_coeff(1)*abs(cos(n_coeff(3))), n_coeff(2)*cos(n_coeff(3)), 0], s.t);
     % out of phase electronic current
     Jn_quadrature = s.p.J_E_func([n_coeff(1)*abs(sin(n_coeff(3))), n_coeff(2)*sin(n_coeff(3)), pi/2], s.t);
+    % in phase recombination current
+    U_inphase = s.p.J_E_func([U_coeff(1)*abs(cos(U_coeff(3))), U_coeff(2)*cos(U_coeff(3)), 0], s.t);
+    % out of phase electronic current
+    U_quadrature = s.p.J_E_func([U_coeff(1)*abs(sin(U_coeff(3))), U_coeff(2)*sin(U_coeff(3)), pi/2], s.t);
 
     if s.p.mui
         fit_Jn_noionic = Jn_noionic(fit_t_index:end);
@@ -212,8 +216,13 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         legend_array = [legend_array, "In phase J"];
         i=i+1; h(i) = plot(s.t, Jn_quadrature*1000, 'm-', 'LineWidth', 1, 'Marker', 'x', 'MarkerSize', 7); % mA
         legend_array = [legend_array, "Out of phase J"];
+        i=i+1; h(i) = plot(s.t, U_inphase*1000, 'y-', 'LineWidth', 1, 'Marker', 'o', 'MarkerSize', 7); % mA
+        legend_array = [legend_array, "In phase recombination"];
+        i=i+1; h(i) = plot(s.t, U_quadrature*1000, 'y-', 'LineWidth', 1, 'Marker', 'x', 'MarkerSize', 7); % mA
+        legend_array = [legend_array, "Out of phase recombination"];
         if s.p.mui % if there was ion mobility, current due to ions have been calculated, plot stuff
-            i_normalization_factor = 10^round(log10(max(fitted_Jn)/max(Ji_disp)));
+            %i_normalization_factor = 10^round(log10(max(fitted_Jn)/max(Ji_disp)));
+            i_normalization_factor=1
             i=i+1; h(i) = plot(s.t, Ji_disp * 1000 * i_normalization_factor, 'g--', 'LineWidth', 2); % mA
             legend_array = [legend_array, strcat("Ionic displacement current x ", num2str(i_normalization_factor))];
             i=i+1; h(i) = plot(s.t, Jn_noionic * 1000, 'c-.', 'LineWidth', 2); % mA
