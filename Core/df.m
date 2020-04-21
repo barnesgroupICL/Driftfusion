@@ -217,15 +217,15 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % C = Time-dependence prefactor
 % F = Flux terms
 % S = Source terms
-function [C,F,S] = dfpde(x,t,u,dudx)   
+function [C,F,S] = dfpde(x,t,u,dudx,i)
     
     % C: Time-dependence prefactor term
     C = Cpre;
 
     % Get position point
-    sampled_i = find(x_ihalf_sampled <= x);
-    sampled_i = sampled_i(end);
-    i = (sampled_i-1)*sampling_step + find(x == x_ihalf_padded_mat(:,sampled_i));
+   % sampled_i = find(x_ihalf_sampled <= x);
+   % sampled_i = sampled_i(end);
+   % i = (sampled_i-1)*sampling_step + find(x == x_ihalf_padded_mat(:,sampled_i));
 
     % g: Generation terms
     if g1_fun_type_constant
