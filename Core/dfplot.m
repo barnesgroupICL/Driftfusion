@@ -44,7 +44,7 @@ classdef dfplot
         function Jt(sol, xpos)
             % Currents as a function of time
             % POS = the readout position
-            t = sol.t;
+            [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
             [J, j, xmesh] = dfana.calcJ(sol);
             ppos = getpointpos(xpos, xmesh);
             
@@ -138,27 +138,30 @@ classdef dfplot
         end
         
         function Voct(sol)
+            [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
             Voc = dfana.calcVQFL(sol);
             figure(6)
-            plot(sol.t, Voc)
+            plot(t, Voc)
             xlabel('Time [s]')
             ylabel('Voc [V]')
         end
         
         function PLt(sol)
+            [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
             PL = dfana.PLt(sol);
             figure(7)
-            plot(sol.t, PL)
+            plot(t, PL)
             xlabel('Time [s]')
             ylabel('PL [cm-2s-1]')
         end
         
         function Vappt(sol)
+            [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
             % Difference in potential between the left and right boundary
             Vapp = dfana.calcVapp(sol);
             
             figure(8)
-            plot(sol.t, Vapp);
+            plot(t, Vapp);
             xlabel('Time [s]')
             ylabel('Vapp [V]')
         end
@@ -294,12 +297,12 @@ classdef dfplot
         function gxt(sol)
             % Carrier densities as a function of position
             par = sol.par;
-            t = sol.t;
+            [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
             [~, ~, g] = dfana.calcg(sol);
             xnm = par.x_ihalf*1e7;
             
             figure(16)
-            surf(xnm, sol.t, g)
+            surf(xnm, t, g)
             xlabel('Position [cm]')
             ylabel('Time [s]')
             zlabel('Generation rate [cm^{-3}s^{-1}]')
@@ -386,13 +389,13 @@ classdef dfplot
         function Ft(sol, xpos)
             % Absolute field strength F as a function of time at point
             % position XPOS
-            xmesh = sol.x;
+            [~,t,xmesh,~,~,~,~,~,~,~] = dfana.splitsol(sol);
             ppos = getpointpos(xpos, xmesh);
             
             F = dfana.calcF(sol);
             
             figure(14)
-            plot(sol.t, F(:,ppos))
+            plot(t, F(:,ppos))
             xlabel('Time [s]')
             ylabel(['Electric Field at pos x = ', num2str(round(xpos*1e7)), 'nm [Vcm-1]'])
         end
@@ -400,7 +403,7 @@ classdef dfplot
         function sigmat(sol)
             % Plot the integrated space charge density [cm-2] as a function of time
             sigma = dfana.calcsigma(sol);
-            t = sol.t;
+            [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
             
             figure(15)
             plot(t, sigma)
@@ -564,11 +567,10 @@ classdef dfplot
         
         function Fiont(sol, xpos)
             % Field contribution from ionic charge FION as a function of time at position XPOS
-            xmesh = sol.x;
+            [~,t,xmesh,~,~,~,~,~,~,~] = dfana.splitsol(sol);
             ppos = getpointpos(xpos, xmesh);
             
             Fion = dfana.calcFion(sol);
-            t = sol.t;
             
             figure(26)
             plot(t, Fion(:,ppos))
@@ -617,7 +619,7 @@ classdef dfplot
             
             if length(args) == 1
                 sol = args{1};
-                tarr = sol.t(end);
+                tarr = sol.t(size(sol.u,1));
                 pointtype = 't';
                 xrange = [sol.x(1), sol.x(end)]*1e7;    % converts to nm
             elseif length(args) == 2
