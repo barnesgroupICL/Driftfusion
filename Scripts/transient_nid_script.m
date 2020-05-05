@@ -20,7 +20,7 @@ par_nid = pc('Input_files/3_layer_test.csv');
 soleq_nid = equilibrate(par_nid);
 
 %% Preconditioning at Vbi+0.2 V until stable- change the second argument for a different precondition
-%           jumptoV(sol_ini, Vjump, tdwell, mobseti, Int, stabilise, accelerate)
+% jumptoV(sol_ini, Vjump, tdwell, mobseti, Int, stabilise, accelerate)
 sol_jump = jumptoV(soleq_nid.ion, par_nid.Vbi+0.2, 1e-3, 1, 0, 1, 1);
 
 %% Get open circuit solutions
