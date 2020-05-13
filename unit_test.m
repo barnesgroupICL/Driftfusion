@@ -616,7 +616,8 @@ end
 inputs = dir('Scripts');
 for i=1:length(inputs)
     input = inputs(i).name;
-    if ~any(regexp(input,'^\.|^test'))
+    % IS and EA scripts require arguments and will be tested separately
+    if ~any(regexp(input,'^\.|^test|^IS_|^EA_'))
         
         disp(['### running script ' input]);
         run(input);
