@@ -49,7 +49,7 @@ function all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
 %------------- BEGIN CODE --------------
 
 % name of the variables
-names = ["electrons", "holes", "anions", "cations", "potential"];
+names = ["potential", "electrons", "holes", "cations", "anions"];
 % which values have to be considered in a linear or in a log10 scale
 compare_log = [false, true, true, false, false];
 all_stable = true;
