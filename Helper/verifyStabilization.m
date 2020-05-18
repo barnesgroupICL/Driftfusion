@@ -51,11 +51,18 @@ function all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
 %
 %------------- BEGIN CODE --------------
 
+all_stable = true;
+
+if time_fraction >= 1 || time_fraction < 0 || ~isnumeric(time_fraction)
+    warning('Driftfusion:verifyStabilizationSkip', [mfilename...
+        ' - time_fraction is out of [0,1) range: skipping stabilization check']);
+    return
+end
+
 % name of the variables
 names = ["potential", "electrons", "holes", "cations", "anions"];
 % which values have to be considered in a linear or in a log10 scale
 compare_log = [false, true, true, false, false];
-all_stable = true;
 
 % no need to calculate end_time for each of the 4 solutions: if they
 % break they break at the same time
