@@ -573,7 +573,7 @@ classdef dfana
             NDmat = repmat(dev.ND, length(t), 1);
             
             % charge density
-            rho = -n + p - a + c - NAmat + NDmat;
+            rho = -n + p - a + c - NAmat + NDmat + dev.Nani - dev.Ncat;
         end
         
         function rho = calcrho_ihalf(sol)
@@ -594,7 +594,7 @@ classdef dfana
             NDmat = repmat(dev_ihalf.ND, length(t), 1);
             
             % charge density
-            rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - NAmat + NDmat;
+            rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - NAmat + NDmat + dev_ihalf.Nani - dev_ihalf.Ncat;
         end
         
         function Vapp = calcVapp(sol)
