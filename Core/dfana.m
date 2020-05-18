@@ -571,11 +571,8 @@ classdef dfana
             % Calculates the space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            NAmat = repmat(dev.NA, length(t), 1);
-            NDmat = repmat(dev.ND, length(t), 1);
-            
             % charge density
-            rho = -n + p - a + c - NAmat + NDmat + dev.Nani - dev.Ncat;
+            rho = -n + p - a + c - dev.NA + dev.ND + dev.Nani - dev.Ncat;
         end
         
         function rho = calcrho_ihalf(sol)
@@ -592,11 +589,8 @@ classdef dfana
             
             dev_ihalf = getdevihalf(par);
             
-            NAmat = repmat(dev_ihalf.NA, length(t), 1);
-            NDmat = repmat(dev_ihalf.ND, length(t), 1);
-            
             % charge density
-            rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - NAmat + NDmat + dev_ihalf.Nani - dev_ihalf.Ncat;
+            rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - dev_ihalf.NA + dev_ihalf.ND + dev_ihalf.Nani - dev_ihalf.Ncat;
         end
         
         function Vapp = calcVapp(sol)
