@@ -214,12 +214,10 @@ classdef dfana
             x = par.x_ihalf;
             [~,~,g] = dfana.calcg(sol);
             
-            for i = 1:length(x)
-                dndt(:,i) = gradient(n_ihalf(:,i), t);
-                dpdt(:,i) = gradient(p_ihalf(:,i), t);
-                dadt(:,i) = gradient(a_ihalf(:,i), t);
-                dcdt(:,i) = gradient(c_ihalf(:,i), t);
-            end
+            [~, dndt] = gradient(n_ihalf, x, t);
+            [~, dpdt] = gradient(p_ihalf, x, t);
+            [~, dadt] = gradient(a_ihalf, x, t);
+            [~, dcdt] = gradient(c_ihalf, x, t);
             
             % Recombination
             r = dfana.calcr_ihalf(sol);
@@ -300,9 +298,8 @@ classdef dfana
             dev_ihalf = getdevihalf(par);
             eppmat = repmat(dev_ihalf.epp, length(t), 1);
             
-            for i = 1:length(x)
-                j.disp(:,i) = -par.epp0.*eppmat(:,i).*(gradient(FV_ihalf(:,i), t));
-            end
+            [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
+            j.disp = -par.epp0.*eppmat.*FV_ihalf_dt;
             
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
@@ -501,9 +498,8 @@ classdef dfana
             jdd.c = jdd.cdrift + jdd.cdiff;
             
             % Displacement current
-            for i = 1:length(xout)
-                j.disp(:,i) = par.epp0.*eppmat(:,i).*(gradient(-dVdx(:,i), t));
-            end
+            [~, dVdxdt] = gradient(-dVdx, xout, t);
+            j.disp = par.epp0.*eppmat.*dVdxdt;
             
             jdd.disp = j.disp;
             jdd.tot = jdd.n + jdd.p + jdd.a + jdd.c + jdd.disp;
@@ -533,9 +529,8 @@ classdef dfana
             rho = dfana.calcrho(sol);
             eppmat = repmat(dev.epp, length(t), 1);
             
-            for i=1:length(t)
-                FV(i,:) = -gradient(V(i, :), x);                      % Electric field calculated from V
-            end
+            FV = -gradient(V, x, t);                      % Electric field calculated from V
+
             Frho = cumtrapz(x, rho, 2)./(eppmat.*par.epp0) + FV(:,1);
         end
         
@@ -555,9 +550,8 @@ classdef dfana
 
             V_ihalf = getvarihalf(V);
 
-            for i=1:length(t)
-                FV(i,:) = -gradient(V_ihalf(i, :), x);                      % Electric field calculated from V
-            end
+            FV = -gradient(V_ihalf, x, t);                      % Electric field calculated from V
+
             Frho = cumtrapz(x, rho, 2)./(eppmat.*par.epp0) + FV(:,1);
         end
         
