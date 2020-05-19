@@ -10,6 +10,10 @@ function varihalf = getvarihalf(var)
 % (at your option) any later version.
 %
 %% Start code
+
+assert(isnumeric(var) && size(var,2) > 1, [mfilename ' - The input ' inputname(1)...
+    ' has to be provided as a row vector or as a matrix'])
+
 varihalf = zeros(1, length(var)-1);
 for i = 1:length(var)-1
     varihalf(1,i) = var(1,i)+((var(1,i+1)-var(1,i))/2);
