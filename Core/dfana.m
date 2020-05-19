@@ -249,7 +249,6 @@ classdef dfana
             j.a = 0 + deltaja;
             j.c = 0 + deltajc;
             % displacement flux
-            j.disp = zeros(length(t), length(x));
             [FV, ~] = dfana.calcF(sol);
             FV_ihalf = interp2(xmesh, t', FV, x, t');
             % Property matrices
