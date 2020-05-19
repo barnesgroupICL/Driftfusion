@@ -291,9 +291,7 @@ classdef dfana
             % displacement flux
             j.disp = zeros(length(t), length(x));
             [FV, ~] = dfana.calcF(sol);
-            for i = 1:length(t)
-                FV_ihalf(i,:) = interp1(xmesh, FV(i,:), x);
-            end
+            FV_ihalf = interp2(xmesh, t', FV, x, t');
             % Property matrices
             dev_ihalf = getdevihalf(par);
             eppmat = repmat(dev_ihalf.epp, length(t), 1);
