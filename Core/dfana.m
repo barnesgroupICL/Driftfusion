@@ -161,8 +161,7 @@ classdef dfana
          
         function [J, j, x] = calcJ(sol)
             % Current, J and flux, j calculation from continuity equations
-            % Calculated on the i+0.5 grid
-            option = 2;
+
             % obtain SOL components for easy referencing
             [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
@@ -187,25 +186,10 @@ classdef dfana
             djadx = dadt;
             djcdx = dcdt;
             
-            switch option
-                case 1
-                        % Fluxes on half grid
-                    djndx_ihalf = getvarihalf(djndx);
-                    djpdx_ihalf = getvarihalf(djpdx);
-                    djadx_ihalf = getvarihalf(djadx);
-                    djcdx_ihalf = getvarihalf(djcdx);
-                    x = getvarihalf(x);
-                    
-                    deltajn = cumtrapz(x, djndx_ihalf, 2);
-                    deltajp = cumtrapz(x, djpdx_ihalf, 2);
-                    deltaja = cumtrapz(x, djadx_ihalf, 2);
-                    deltajc = cumtrapz(x, djcdx_ihalf, 2);
-                case 2
-                    deltajn = cumtrapz(x, djndx, 2);
-                    deltajp = cumtrapz(x, djpdx, 2);
-                    deltaja = cumtrapz(x, djadx, 2);
-                    deltajc = cumtrapz(x, djcdx, 2);
-            end
+            deltajn = cumtrapz(x, djndx, 2);
+            deltajp = cumtrapz(x, djpdx, 2);
+            deltaja = cumtrapz(x, djadx, 2);
+            deltajc = cumtrapz(x, djcdx, 2);
             
             %% Currents from the boundaries
             switch par.BC
