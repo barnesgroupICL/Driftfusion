@@ -42,20 +42,8 @@ classdef dfana
             % Simple structure names
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            % Create 2D matrices for multiplication with solutions
-            EAmat = repmat(dev.EA, length(t), 1);
-            IPmat = repmat(dev.IP, length(t), 1);
-            NAmat = repmat(dev.NA, length(t), 1);
-            NDmat = repmat(dev.ND, length(t), 1);
-            Ncmat = repmat(dev.Nc, length(t), 1);
-            Nvmat = repmat(dev.Nv, length(t), 1);
-            Nanimat = repmat(dev.Nani, length(t), 1);
-            Ncatmat = repmat(dev.Ncat, length(t), 1);
-            eppmat = repmat(dev.epp, length(t), 1);
-            nimat = repmat(dev.ni, length(t), 1);
-            
-            Ecb = EAmat-V;                                 % Conduction band potential
-            Evb = IPmat-V;                                 % Valence band potential
+            Ecb = dev.EA-V;                                 % Conduction band potential
+            Evb = dev.IP-V;                                 % Valence band potential
             
             Efn = zeros(size(n,1), size(n,2));
             Efp = zeros(size(n,1), size(n,2));
@@ -72,8 +60,8 @@ classdef dfana
                 Efp = Efp-V;
                 
             elseif par.prob_distro_function == 'Boltz'
-                Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./Ncmat));        % Electron quasi-Fermi level
-                Efp = real(Evb-(par.kB*par.T/par.q)*log(p./Nvmat));        % Hole quasi-Fermi level
+                Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./dev.Nc));        % Electron quasi-Fermi level
+                Efp = real(Evb-(par.kB*par.T/par.q)*log(p./dev.Nv));        % Hole quasi-Fermi level
             end
             
         end
@@ -92,22 +80,8 @@ classdef dfana
             V = getvarihalf(V0);
             dev_ihalf = par.dev_ihalf;
             
-            % Create 2D matrices for multiplication with solutions
-            EAmat = repmat(dev_ihalf.EA, length(t), 1);
-            IPmat = repmat(dev_ihalf.IP, length(t), 1);
-            NAmat = repmat(dev_ihalf.NA, length(t), 1);
-            NDmat = repmat(dev_ihalf.ND, length(t), 1);
-            Ncmat = repmat(dev_ihalf.Nc, length(t), 1);
-            Nvmat = repmat(dev_ihalf.Nv, length(t), 1);
-            Nanimat = repmat(dev_ihalf.Nani, length(t), 1);
-            Ncatmat = repmat(dev_ihalf.Ncat, length(t), 1);
-            eppmat = repmat(dev_ihalf.epp, length(t), 1);
-            nimat = repmat(dev_ihalf.ni, length(t), 1);
-            mue_mat = repmat(dev_ihalf.mue, length(t), 1);
-            muh_mat = repmat(dev_ihalf.muh, length(t), 1);
-            
-            Ecb_ihalf = EAmat-V;                                 % Conduction band potential
-            Evb_ihalf = IPmat-V;                                 % Valence band potential
+            Ecb_ihalf = dev_ihalf.EA-V;                                 % Conduction band potential
+            Evb_ihalf = dev_ihalf.IP-V;                                 % Valence band potential
             
             if par.prob_distro_function == 'Fermi'
                 
@@ -121,8 +95,8 @@ classdef dfana
                 Efp_ihalf = Efp_ihalf-V;
                 
             elseif par.prob_distro_function == 'Boltz'
-                Efn_ihalf = real(Ecb_ihalf+(par.kB*par.T/par.q)*log(n./Ncmat));        % Electron quasi-Fermi level
-                Efp_ihalf = real(Evb_ihalf-(par.kB*par.T/par.q)*log(p./Nvmat));        % Hole quasi-Fermi level
+                Efn_ihalf = real(Ecb_ihalf+(par.kB*par.T/par.q)*log(n./dev_ihalf.Nc));        % Electron quasi-Fermi level
+                Efp_ihalf = real(Evb_ihalf-(par.kB*par.T/par.q)*log(p./dev_ihalf.Nv));        % Hole quasi-Fermi level
             end
             
             Efn = Efn_ihalf;% zeros(length(t), length(xmesh));
@@ -149,23 +123,10 @@ classdef dfana
             V = getvarihalf(V0);
             
             dev_ihalf = par.dev_ihalf;
-            % Create 2D matrices for multiplication with solutions
-            EAmat = repmat(dev_ihalf.EA, length(t), 1);
-            IPmat = repmat(dev_ihalf.IP, length(t), 1);
-            NAmat = repmat(dev_ihalf.NA, length(t), 1);
-            NDmat = repmat(dev_ihalf.ND, length(t), 1);
-            Ncmat = repmat(dev_ihalf.Nc, length(t), 1);
-            Nvmat = repmat(dev_ihalf.Nv, length(t), 1);
-            Nanimat = repmat(dev_ihalf.Nani, length(t), 1);
-            Ncatmat = repmat(dev_ihalf.Ncat, length(t), 1);
-            eppmat = repmat(dev_ihalf.epp, length(t), 1);
-            nimat = repmat(dev_ihalf.ni, length(t), 1);
-            mue_mat = repmat(dev_ihalf.mue, length(t), 1);
-            muh_mat = repmat(dev_ihalf.muh, length(t), 1);
             
             [J, j, x] = dfana.calcJ(sol);
-            deltaEfn = cumtrapz(x, J.n./(par.e.*mue_mat.*n), 2);
-            deltaEfp = cumtrapz(x, J.p./(par.e.*muh_mat.*p), 2);
+            deltaEfn = cumtrapz(x, J.n./(par.e.*dev_ihalf.mue.*n), 2);
+            deltaEfp = cumtrapz(x, J.p./(par.e.*dev_ihalf.muh.*p), 2);
 
             % Boundary values - electrostatic potential is assumed to be
             % zero at left-hand boundary
@@ -182,8 +143,8 @@ classdef dfana
                 end
                 
             elseif par.prob_distro_function == 'Boltz'
-                Efn_l = real(par.EA(1)+(par.kB*par.T/par.q)*log(n(:,1)./Ncmat(:,1)));        % Electron quasi-Fermi level
-                Efp_l = real(par.IP(1)-(par.kB*par.T/par.q)*log(p(:,1)./Nvmat(:,1)));        % Hole quasi-Fermi level
+                Efn_l = real(par.EA(1)+(par.kB*par.T/par.q)*log(n(:,1)./dev_ihalf.Nc(1)));        % Electron quasi-Fermi level
+                Efp_l = real(par.IP(1)-(par.kB*par.T/par.q)*log(p(:,1)./dev_ihalf.Nv(1)));        % Hole quasi-Fermi level
             end
             
             Efn = Efn_l + deltaEfn;
@@ -194,8 +155,8 @@ classdef dfana
 %                 Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
 %             end
             
-            Ecb = EAmat-V;                                 % Conduction band potential
-            Evb = IPmat-V;                                 % Valence band potential
+            Ecb = dev_ihalf.EA-V;                                 % Conduction band potential
+            Evb = dev_ihalf.IP-V;                                 % Valence band potential
         end
          
         function [J, j, x] = calcJ(sol)
@@ -293,10 +254,9 @@ classdef dfana
             FV_ihalf = interp2(xmesh, t', FV, x, t');
             % Property matrices
             dev_ihalf = getdevihalf(par);
-            eppmat = repmat(dev_ihalf.epp, length(t), 1);
             
             [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
-            j.disp = -par.epp0.*eppmat.*FV_ihalf_dt;
+            j.disp = -par.epp0.*dev_ihalf.epp.*FV_ihalf_dt;
             
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
@@ -334,19 +294,11 @@ classdef dfana
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            % Property matrices
-            eppmat = repmat(dev.epp, length(t), 1);
-            nimat = repmat(dev.ni, length(t), 1);
-            Bmat = repmat(dev.B, length(t), 1);
-            taunmat = repmat(dev.taun, length(t), 1);
-            taupmat = repmat(dev.taup, length(t), 1);
-            ntmat = repmat(dev.nt, length(t), 1);
-            ptmat = repmat(dev.pt, length(t), 1);
-            
             % Recombination
-            r.btb = Bmat.*(n.*p - nimat.^2);
+            r.btb = dev.B.*(n.*p - dev.ni.^2);
             
-            r.srh = ((n.*p - nimat.^2)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
+            r.srh = (n.*p - dev.ni.^2)./(dev.taun.*(p+dev.pt)...
+                + dev.taup.*(n+dev.nt));
             
             r.tot = r.btb + r.srh;
         end
@@ -364,19 +316,12 @@ classdef dfana
            
             devihalf = getdevihalf(par);
             
-            % Property matrices
-            eppmat = repmat(devihalf.epp, length(t), 1);
-            nimat = repmat(devihalf.ni, length(t), 1);
-            Bmat = repmat(devihalf.B, length(t), 1);
-            taunmat = repmat(devihalf.taun, length(t), 1);
-            taupmat = repmat(devihalf.taup, length(t), 1);
-            ntmat = repmat(devihalf.nt, length(t), 1);
-            ptmat = repmat(devihalf.pt, length(t), 1);
-            
             % Recombination
-            r.btb = Bmat.*(n_ihalf.*p_ihalf - nimat.^2);
+            r.btb = devihalf.B.*(n_ihalf.*p_ihalf - devihalf.ni.^2);
             
-            r.srh = ((n_ihalf.*p_ihalf - nimat.^2)./((taunmat.*(p_ihalf+ptmat)) + (taupmat.*(n_ihalf+ntmat))));
+            r.srh = (n_ihalf.*p_ihalf - devihalf.ni.^2)...
+                ./ (devihalf.taun.*(p_ihalf+devihalf.pt)...
+                + devihalf.taup.*(n_ihalf+devihalf.nt));
             
             r.tot = r.btb + r.srh;
         end
@@ -524,11 +469,10 @@ classdef dfana
             % Frho = Field calculated from integrated space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             rho = dfana.calcrho(sol);
-            eppmat = repmat(dev.epp, length(t), 1);
             
             FV = -gradient(V, x, t);                      % Electric field calculated from V
 
-            Frho = cumtrapz(x, rho, 2)./(eppmat.*par.epp0) + FV(:,1);
+            Frho = cumtrapz(x, rho, 2)./(dev.epp.*par.epp0) + FV(:,1);
         end
         
         function [FV, Frho] = calcF_ihalf(sol)
@@ -543,13 +487,11 @@ classdef dfana
             
             rho = dfana.calcrho_ihalf(sol);
             
-            eppmat = repmat(devi_ihalf.epp, length(t), 1);
-
             V_ihalf = getvarihalf(V);
 
             FV = -gradient(V_ihalf, x, t);                      % Electric field calculated from V
 
-            Frho = cumtrapz(x, rho, 2)./(eppmat.*par.epp0) + FV(:,1);
+            Frho = cumtrapz(x, rho, 2)./(devi_ihalf.epp.*par.epp0) + FV(:,1);
         end
         
         function rho = calcrho(sol)
@@ -720,13 +662,10 @@ classdef dfana
         end
         
         function Fion = calcFion(sol)
-           [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol); 
-           Ncatmat = repmat(dev.Ncat, length(t), 1);
-           Nanimat = repmat(dev.Nani, length(t), 1);
-           eppmat = repmat(dev.epp, length(t), 1);
+           [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
            
-           rhoion = c - Ncatmat - a + Nanimat;
-           Fion = cumtrapz(x, rhoion, 2)./(eppmat*par.epp0);
+           rhoion = c - dev.Ncat - a + dev.Nani;
+           Fion = cumtrapz(x, rhoion, 2)./(dev.epp*par.epp0);
         end
         
         function Vion = calcVion(sol)
