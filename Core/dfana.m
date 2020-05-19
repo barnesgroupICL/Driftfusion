@@ -188,12 +188,6 @@ classdef dfana
             djcdx = dcdt;
             
             switch option
-                case 0
-                    % Integrate across the device to get delta fluxes at all positions
-                    deltajn = cumtrapz(x, djndx, 2);
-                    deltajp = cumtrapz(x, djpdx, 2);
-                    deltaja = cumtrapz(x, djadx, 2);
-                    deltajc = cumtrapz(x, djcdx, 2);
                 case 1
                         % Fluxes on half grid
                     djndx_ihalf = getvarihalf(djndx);
