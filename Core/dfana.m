@@ -164,10 +164,9 @@ classdef dfana
             muh_mat = repmat(dev_ihalf.muh, length(t), 1);
             
             [J, j, x] = dfana.calcJ(sol);
-            for i = 1:length(t)
-                deltaEfn(i,:) = cumtrapz(x, J.n(i,:)./(par.e.*mue_mat(i,:).*n(i,:)), 2);
-                deltaEfp(i,:) = cumtrapz(x, J.p(i,:)./(par.e.*muh_mat(i,:).*p(i,:)), 2);
-            end
+            deltaEfn = cumtrapz(x, J.n./(par.e.*mue_mat.*n), 2);
+            deltaEfp = cumtrapz(x, J.p./(par.e.*muh_mat.*p), 2);
+
             % Boundary values - electrostatic potential is assumed to be
             % zero at left-hand boundary
             %             Efn = zeros(size(n,1), size(n,2));
