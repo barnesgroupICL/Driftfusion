@@ -85,13 +85,11 @@ classdef dfana
             [u,t,xmesh,par,dev,n0,p0,a0,c0,V0] = dfana.splitsol(sol);
             
             x = getvarihalf(xmesh);
-            for ii = 1:length(t)
-                n(ii,:) = getvarihalf(n0(ii,:));
-                p(ii,:) = getvarihalf(p0(ii,:));
-                a(ii,:) = getvarihalf(a0(ii,:));
-                c(ii,:) = getvarihalf(c0(ii,:));
-                V(ii,:) = getvarihalf(V0(ii,:));
-            end
+            n = getvarihalf(n0);
+            p = getvarihalf(p0);
+            a = getvarihalf(a0);
+            c = getvarihalf(c0);
+            V = getvarihalf(V0);
             dev_ihalf = par.dev_ihalf;
             
             % Create 2D matrices for multiplication with solutions
@@ -143,13 +141,12 @@ classdef dfana
             % u is the solution structure
             % Simple structure names
             [u,t,xmesh,par,dev,n0,p0,a0,c0,V0] = dfana.splitsol(sol);
-            for ii = 1:length(t)
-                n(ii,:) = getvarihalf(n0(ii,:));
-                p(ii,:) = getvarihalf(p0(ii,:));
-                a(ii,:) = getvarihalf(a0(ii,:));
-                c(ii,:) = getvarihalf(c0(ii,:));
-                V(ii,:) = getvarihalf(V0(ii,:));
-            end
+
+            n = getvarihalf(n0);
+            p = getvarihalf(p0);
+            a = getvarihalf(a0);
+            c = getvarihalf(c0);
+            V = getvarihalf(V0);
             
             dev_ihalf = par.dev_ihalf;
             % Create 2D matrices for multiplication with solutions
@@ -209,12 +206,11 @@ classdef dfana
             % obtain SOL components for easy referencing
             [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            for ii = 1:length(t)
-                n_ihalf(ii,:) = getvarihalf(n(ii,:));
-                p_ihalf(ii,:) = getvarihalf(p(ii,:));
-                a_ihalf(ii,:) = getvarihalf(a(ii,:));
-                c_ihalf(ii,:) = getvarihalf(c(ii,:));
-            end
+            n_ihalf = getvarihalf(n);
+            p_ihalf = getvarihalf(p);
+            a_ihalf = getvarihalf(a);
+            c_ihalf = getvarihalf(c);
+
             x = par.x_ihalf;
             [~,~,g] = dfana.calcg(sol);
             
@@ -241,13 +237,11 @@ classdef dfana
                     deltaja = cumtrapz(x, djadx, 2);
                     deltajc = cumtrapz(x, djcdx, 2);
                 case 1
-                    for ii = 1:length(t)
                         % Fluxes on half grid
-                        djndx_ihalf(ii,:) = getvarihalf(djndx(ii,:));
-                        djpdx_ihalf(ii,:) = getvarihalf(djpdx(ii,:));
-                        djadx_ihalf(ii,:) = getvarihalf(djadx(ii,:));
-                        djcdx_ihalf(ii,:) = getvarihalf(djcdx(ii,:));
-                    end
+                    djndx_ihalf = getvarihalf(djndx);
+                    djpdx_ihalf = getvarihalf(djpdx);
+                    djadx_ihalf = getvarihalf(djadx);
+                    djcdx_ihalf = getvarihalf(djcdx);
                     x = getvarihalf(x);
                     
                     deltajn = cumtrapz(x, djndx_ihalf, 2);
@@ -367,12 +361,11 @@ classdef dfana
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            for ii = 1:length(t)
-                n_ihalf(ii,:) = getvarihalf(n(ii,:));
-                p_ihalf(ii,:) = getvarihalf(p(ii,:));
-                a_ihalf(ii,:) = getvarihalf(a(ii,:));
-                c_ihalf(ii,:) = getvarihalf(c(ii,:));
-            end
+            n_ihalf = getvarihalf(n);
+            p_ihalf = getvarihalf(p);
+            a_ihalf = getvarihalf(a);
+            c_ihalf = getvarihalf(c);
+
             x = getvarihalf(x);
            
             devihalf = getdevihalf(par);
@@ -559,9 +552,10 @@ classdef dfana
             rho = dfana.calcrho_ihalf(sol);
             
             eppmat = repmat(devi_ihalf.epp, length(t), 1);
-            
+
+            V_ihalf = getvarihalf(V);
+
             for i=1:length(t)
-                V_ihalf(i,:) = getvarihalf(V(i,:));
                 FV(i,:) = -gradient(V_ihalf(i, :), x);                      % Electric field calculated from V
             end
             Frho = cumtrapz(x, rho, 2)./(eppmat.*par.epp0) + FV(:,1);
@@ -579,12 +573,11 @@ classdef dfana
             % Calculates the space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            for ii = 1:length(t)
-                n_ihalf(ii,:) = getvarihalf(n(ii,:));
-                p_ihalf(ii,:) = getvarihalf(p(ii,:));
-                a_ihalf(ii,:) = getvarihalf(a(ii,:));
-                c_ihalf(ii,:) = getvarihalf(c(ii,:));
-            end
+            n_ihalf = getvarihalf(n);
+            p_ihalf = getvarihalf(p);
+            a_ihalf = getvarihalf(a);
+            c_ihalf = getvarihalf(c);
+
             x = getvarihalf(x);
             
             dev_ihalf = getdevihalf(par);
