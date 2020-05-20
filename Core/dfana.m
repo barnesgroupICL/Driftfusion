@@ -229,11 +229,9 @@ classdef dfana
             % displacement flux
             [FV, ~] = dfana.calcF(sol);
             FV_ihalf = interp2(xmesh, t', FV, x, t');
-            % Property matrices
-            dev_ihalf = getdevihalf(par);
             
             [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
-            j.disp = -par.epp0.*dev_ihalf.epp.*FV_ihalf_dt;
+            j.disp = -par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
             
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
@@ -291,14 +289,12 @@ classdef dfana
 
             x = getvarihalf(x);
            
-            devihalf = getdevihalf(par);
-            
             % Recombination
-            r.btb = devihalf.B.*(n_ihalf.*p_ihalf - devihalf.ni.^2);
+            r.btb = par.dev_ihalf.B.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni.^2);
             
-            r.srh = (n_ihalf.*p_ihalf - devihalf.ni.^2)...
-                ./ (devihalf.taun.*(p_ihalf+devihalf.pt)...
-                + devihalf.taup.*(n_ihalf+devihalf.nt));
+            r.srh = (n_ihalf.*p_ihalf - par.dev_ihalf.ni.^2)...
+                ./ (par.dev_ihalf.taun.*(p_ihalf+par.dev_ihalf.pt)...
+                + par.dev_ihalf.taup.*(n_ihalf+par.dev_ihalf.nt));
             
             r.tot = r.btb + r.srh;
         end
@@ -458,8 +454,6 @@ classdef dfana
             % Frho = Field calculated from integrated space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            devi_ihalf = getdevihalf(par);
-            
             x = getvarihalf(x);
             
             rho = dfana.calcrho_ihalf(sol);
@@ -468,7 +462,7 @@ classdef dfana
 
             FV = -gradient(V_ihalf, x, t);                      % Electric field calculated from V
 
-            Frho = cumtrapz(x, rho, 2)./(devi_ihalf.epp.*par.epp0) + FV(:,1);
+            Frho = cumtrapz(x, rho, 2)./(par.dev_ihalf.epp.*par.epp0) + FV(:,1);
         end
         
         function rho = calcrho(sol)
@@ -490,10 +484,8 @@ classdef dfana
 
             x = getvarihalf(x);
             
-            dev_ihalf = getdevihalf(par);
-            
             % charge density
-            rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - dev_ihalf.NA + dev_ihalf.ND + dev_ihalf.Nani - dev_ihalf.Ncat;
+            rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - par.dev_ihalf.NA + par.dev_ihalf.ND + par.dev_ihalf.Nani - par.dev_ihalf.Ncat;
         end
         
         function Vapp = calcVapp(sol)
