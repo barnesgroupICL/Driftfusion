@@ -227,7 +227,7 @@ classdef dfana
             j.a = 0 + deltaja;
             j.c = 0 + deltajc;
             % displacement flux
-            [FV, ~] = dfana.calcF(sol);
+            FV = dfana.calcF(sol);
             FV_ihalf = interp2(xmesh, t', FV, x, t');
             
             [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
