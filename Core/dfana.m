@@ -72,11 +72,8 @@ classdef dfana
             % Simple structure names
             [u,t,xmesh,par,dev,n0,p0,a0,c0,V0] = dfana.splitsol(sol);
             
-            x = getvarihalf(xmesh);
             n = getvarihalf(n0);
             p = getvarihalf(p0);
-            a = getvarihalf(a0);
-            c = getvarihalf(c0);
             V = getvarihalf(V0);
             dev_ihalf = par.dev_ihalf;
             
@@ -118,8 +115,6 @@ classdef dfana
 
             n = getvarihalf(n0);
             p = getvarihalf(p0);
-            a = getvarihalf(a0);
-            c = getvarihalf(c0);
             V = getvarihalf(V0);
             
             dev_ihalf = par.dev_ihalf;
@@ -284,10 +279,6 @@ classdef dfana
             
             n_ihalf = getvarihalf(n);
             p_ihalf = getvarihalf(p);
-            a_ihalf = getvarihalf(a);
-            c_ihalf = getvarihalf(c);
-
-            x = getvarihalf(x);
            
             % Recombination
             r.btb = par.dev_ihalf.B.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni.^2);
@@ -456,14 +447,13 @@ classdef dfana
             % Frho = Field calculated from integrated space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             
-            x = getvarihalf(x);
             V_ihalf = getvarihalf(V);
 
-            FV = -gradient(V_ihalf, x, t);                      % Electric field calculated from V
+            FV = -gradient(V_ihalf, par.x_ihalf, t);                      % Electric field calculated from V
 
             if nargout > 1
                 rho = dfana.calcrho_ihalf(sol);
-                Frho = cumtrapz(x, rho, 2)./(par.dev_ihalf.epp.*par.epp0) + FV(:,1);
+                Frho = cumtrapz(par.x_ihalf, rho, 2)./(par.dev_ihalf.epp.*par.epp0) + FV(:,1);
             end
         end
         
@@ -483,8 +473,6 @@ classdef dfana
             p_ihalf = getvarihalf(p);
             a_ihalf = getvarihalf(a);
             c_ihalf = getvarihalf(c);
-
-            x = getvarihalf(x);
             
             % charge density
             rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - par.dev_ihalf.NA + par.dev_ihalf.ND + par.dev_ihalf.Nani - par.dev_ihalf.Ncat;
