@@ -260,6 +260,7 @@ classdef dfana
                     deltaja = cumtrapz(x, djadx, 2);
                     deltajc = cumtrapz(x, djcdx, 2);
             end
+            
             %% Currents from the boundaries
             switch par.BC
                 case 2

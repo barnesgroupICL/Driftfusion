@@ -63,7 +63,7 @@ spvdat = spvana(spvsol);
 % CORE folder). Some of these may not work but the main ones should.  By way of example 
 % if you wanted to plot the final Energy level diagram, carrier densities and 
 % ionic charge densities for the illumated step of the SPV then type:
-dfplot.ELx(spvsol.ill);
+dfplot.ELxnpxacx(spvsol.ill);
 
 % For plots that are a function of position you can use a second argument 
 % to overlay the plots for different times. In this example I plot the 

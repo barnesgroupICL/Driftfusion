@@ -39,7 +39,7 @@ hold off
 
 %% plot the energy level diagram and carrier densities for the tio2 device at
 % 1 V (t= 20s) during the illuminated forward scan
-dfplot.ELx(JV_tio2.ill.f, 20)
+dfplot.ELxnpxacx(JV_tio2.ill.f, 20)
 
 % plot the currents as a function of position in the PCBM device at 0.5 V
 % (t = 10 s) during the illuminated forward scan
