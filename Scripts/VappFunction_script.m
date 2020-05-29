@@ -41,7 +41,7 @@ dfplot.Jt(sol_Vapp, par_singlecar.dcum(end)/2);
 % JV plot
 dfplot.JVapp(sol_Vapp, par_singlecar.dcum(end)/2);
 % Energy level diagrams at t=0 and max amplitude
-dfplot.ELx(sol_Vapp, 0);
+dfplot.ELxnpxacx(sol_Vapp, 0);
 
 % Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in
