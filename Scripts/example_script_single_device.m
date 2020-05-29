@@ -28,7 +28,7 @@ dfplot.JV(JVsol_tio2,3)
 
 % plot the energy level diagram and carrier densities for the tio2 device at
 % 1 V (t= 20s) during the illuminated forward scan
-dfplot.ELx(JVsol_tio2.ill.f, 20)
+dfplot.ELxnpxacx(JVsol_tio2.ill.f, 20)
 
 % Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in
