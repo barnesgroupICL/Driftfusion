@@ -7,6 +7,9 @@ function [sol_TPV, sol_ill] = doTPV(sol_ini, bias_int, stab_time, mobseti, Rs, p
 % MOBSETI = Ion mobility switch
 % RS = Series resistance - recommended to use Rs = 1e6 for approx open
 % circuit
+% PULSE_INT = Pulse light intensity
+% TMAX = Total length of the capture including pulse and decay
+% DUTY = Duty cycle: Percentage of TMAX for which the pulse light is on
 %
 %% LICENSE
 % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes

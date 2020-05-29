@@ -75,9 +75,9 @@ dfplot.Voct(Voc_transient_tc);
 hold off
 
 % Plot the EL diagrams at 1 ms and 1 sec
-dfplot.ELx(Voc_transient_bc, [1e-3, 1])
+dfplot.ELxnpxacx(Voc_transient_bc, [1e-3, 1])
 % Uncomment to plot EL and carrier density diagrams for Top Cathode device
-%dfplot.ELx(Voc_transient.tc, [1e-3, 1])
+%dfplot.ELxnpxacx(Voc_transient.tc, [1e-3, 1])
 
 % Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in

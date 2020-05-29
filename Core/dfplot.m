@@ -1,14 +1,63 @@
 classdef dfplot   
 % DRIFTFUSION Plotting class - contains methods for plotting
-% DFPLOT.ELX = Energy level diagrams and charge carrier densities
+%
+% List of available plots:
 % DFPLOT.JT = Currents as a function of time
 % DFPLOT.JX = Total currents as a function of position
+% DFPLOT.jx = Carrier fluxes as a function of position
+% DFPLOT.JV = Current-voltage curve using a solution from DOJV-
+% now outdated - preferrable to use DOCV and DFPLOT.JTOTVAPP
 % DFPLOT.JDDX = Drift and diffusion currents as a function of position
-% Plotting functions that are a funciton of position can accept a time
+% DFPLOT.VOCT = Open circuit voltage as a function of time
+% DFPLOT.PLT = Integrated radiative recombination rate as a function of
+% time
+% DFPLOT.VAPPT = Applied voltage as a function of time
+% DFPLOT.JVAPP = Current components as a function of the applied voltage at
+% position defined by XPOS
+% DFPLOT.JTOTVAPP = Total current as a function of the applied voltage at
+% position defined by XPOS
+% DFPLOT.LOGJVAPP = Current components as a function of the applied voltage
+% using log y-axis at position defined by XPOS
+% DFPLOT.XMESH = Plots the xmesh position vs point number
+% DFPLOT.VX = Electrostatic potential as a function of position
+% DFPLOT.NPX = Electron and hole densities as a function of position
+% DFPLOT.ACX = Anion and cation densities as a function of position
+% DFPLOT.GX = Generation rate as a function of position
+% DFPLOT.GXT = Generation rate as a function of position and time
+% DFPLOT.RX = Recombination rate components as a function of position
+% DFPLOT.JRECVAPP = Recomonbination components as a function of the applied
+% voltage
+% DFPLOT.FT = Electric field as a function of time
+% DFPLOT.SIGMAT = Integrated charge density in cm-2 as a function of time
+% DFPLOT.QT = Charge density in Coulombs cm-2 integrated between within the
+% range [X1, X2] as a function of time
+% DFPLOT.QVAPP = Charge density in Coulombs cm-2 integrated between within the
+% range [X1, X2] as a function of applied voltage
+% DFPLOT.RHOX = Volumetric charge density as a function of position
+% DFPLOT.DELTARHOX = Change in volumetric charge density as a function of position
+% DFPLOT.RHOXFXVX = Volumetric charge density, Electric field and Electrostatic potential
+% as a function of position- stacked plot
+% DFPLOT.RHOXVX = Volumetric charge density and Electrostatic potential as a function
+% of position- stacked plot
+% DFPLOT.ELX = Energy level diagram as a function of position
+% DFPLOT.ELXNPX = Energy level diagram, electron and hole densities
+% DFPLOT.ELXNPXACX = Energy level diagram, electron and hole densities,
+% and anion and cation densities, 3 panel, stacked
+% DFPLOT.VXACX = Electrostatic potential and anion and cation densities, 2
+% panel, stacked
+% DFPLOT.VIONXACX = Electrostatic potential due to ionic charge and anion and cation densities, 2
+% panel, stacked
+% DFPLOT.FIONT = Electric field due to the ionic charge as a function of
+% time
+
+% Plotting functions that are a function of position can accept a time
 % array as the second argument- the procedure will loop and plot the
 % solution at multiple times.
 % The third optional argument defines the x-range.
-%
+% For plotting functions that are a function of time, the second argument
+% is generally the position at which the value is taken- see the comments
+% of individual methods below for further details
+
 %% LICENSE
 % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
@@ -43,7 +92,8 @@ classdef dfplot
 
         function Jt(sol, xpos)
             % Currents as a function of time
-            % POS = the readout position
+            % SOL = solution structure
+            % XPOS = the readout position
             t = sol.t;
             [J, j, xmesh] = dfana.calcJ(sol);
             ppos = getpointpos(xpos, xmesh);
@@ -58,10 +108,11 @@ classdef dfplot
         end
 
         function Jx(varargin)
-            % Plots the currents
-            % SOL = the solution structure
+            % Plots the current components
+            % VARARGIN = [SOL, TARR, XRANGE]
+            % SOL = Solution structure
             % TARR = An array containing the times that you wish to plot
-            % XRANGE = 2 element array with [xmin, xmax]
+            % XRANGE = 2 element array with [XMIN, XMAX]
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [J, j, x] = dfana.calcJ(sol);
@@ -74,9 +125,10 @@ classdef dfplot
 
         function jx(varargin)
             % Plots the carrier fluxes
-            % SOL = the solution structure
+            % VARARGIN = [SOL, TARR, XRANGE]
+            % SOL = Solution structure
             % TARR = An array containing the times that you wish to plot
-            % XRANGE = 2 element array with [xmin, xmax]
+            % XRANGE = 2 element array with [XMIN, XMAX]
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [J, j, x] = dfana.calcJ(sol);
@@ -128,8 +180,11 @@ classdef dfplot
         end
 
         function Jddx(varargin)
-            % figure(5)
-            % drift and diffusion currents as a function of position
+            % Drift and diffusion currents as a function of position
+            % VARARGIN = [SOL, TARR, XRANGE]
+            % SOL = Solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [XMIN, XMAX]
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [~, Jdd, x] = dfana.Jddxt(sol);
@@ -158,7 +213,7 @@ classdef dfplot
         end
 
         function Vappt(sol)
-            % Difference in potential between the left and right boundary
+            % Applied voltage as a function of position
             Vapp = dfana.calcVapp(sol);
 
             figure(8)
@@ -413,7 +468,7 @@ classdef dfplot
         end
 
         function Qt(sol, x1, x2)
-            % Plot the integrated space charge density in Coulombs [Ccm-2] as a function of time
+        % Plot the integrated space charge density in Coulombs [Ccm-2] as a function of time
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
             p1 = find(x<=x1);
