@@ -307,7 +307,7 @@ classdef dfana
             eppmat = repmat(dev_ihalf.epp, length(t), 1);
 
             for i = 1:length(x)
-                j.disp(:,i) = par.epp0.*eppmat(:,i).*(gradient(FV_ihalf(:,i), t));
+                j.disp(:,i) = -par.epp0.*eppmat(:,i).*(gradient(FV_ihalf(:,i), t));
             end
 
             J.n = j.n*-par.e;
