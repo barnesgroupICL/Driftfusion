@@ -14,6 +14,8 @@ function fun = fun_gen(fun_type)
 % COEFF = [A_low, A_high, time_period, duty_cycle]
 %% 'sin'
 % COEFF = [DC_offset, Delta_AC, frequency, phase]
+%% 'sweepAndStill'
+% COEFF = [A_start, A_end, sweep_duration]
 %
 %% LICENSE
 % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
@@ -40,4 +42,9 @@ switch fun_type
     case 'tri'
         % COEFF = [OFFSET, V1, V2, periods, tperiod]  tmax is defined by the input
         fun = @(coeff, t) triangle_fun(coeff, t);
+    case 'sweepAndStill'
+        % COEFF = [A_start, A_end, sweep_duration]
+        % do a sweep from coeff(1) to coeff(2) with the duration of
+        % coeff(3), then stay stable at coeff(2)
+        fun = @(coeff, t) coeff(2) + (coeff(1)-coeff(2))*max(0,1-t/coeff(3));
 end
