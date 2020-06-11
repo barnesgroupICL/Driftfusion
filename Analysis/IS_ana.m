@@ -181,7 +181,6 @@ if s.par.mobseti && any(s.par.mucat) % if there was ion mobility, current due to
 
 else % if no ionic mobility is present, report NaNs
     coeff.ion_disp = [NaN, NaN, NaN];
-    Ji_disp = NaN;
 %     Jn_noionic = NaN;
 end
 
@@ -233,7 +232,7 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         hold on
         i=i+1; h(i) = plot(s.t, r_time_profile * 1000, 'k--'); % mA
         legend_array = [legend_array, "Recombination current"];
-        i=i+1; h(i) = plot(s.t, dQ_t * 1000, 'b:', 'LineWidth', 2); % mA
+        i=i+1; h(i) = plot(s.t, np_dt * 1000, 'b:', 'LineWidth', 2); % mA
         legend_array = [legend_array, "Accumulating current"];
         i=i+1; h(i) = plot(fit_t, func_fixedfreq(coeff.Jtot, fit_t) * 1000, 'kx-'); % mA
         legend_array = [legend_array, "Fit of Current"];
@@ -242,7 +241,7 @@ if ~minimal_mode % disable all this stuff if under parallelization or if explici
         i=i+1; h(i) = plot(s.t, Jn_quadrature*1000, 'm-', 'LineWidth', 1, 'Marker', 'x', 'MarkerSize', 7); % mA
         legend_array = [legend_array, "Out of phase J"];
         if s.par.mobseti && any(s.par.mucat) % if there was ion mobility, current due to ions have been calculated, plot stuff
-            i=i+1; h(i) = plot(s.t, Ji_disp * 1000, 'g--', 'LineWidth', 2); % mA
+            i=i+1; h(i) = plot(s.t, ion_disp * 1000, 'g--', 'LineWidth', 2); % mA
             legend_array = [legend_array, "Ionic displacement current"];
         end
         ylabel('Current [mA/cm^2]');
