@@ -1,11 +1,8 @@
-function [goodVocAsymStructCell, VOCs] = genIntStructsVoc(struct_eq, startInt, endInt, points, include_dark)
-% GENINTSTRUCTSREALVOC - Generates a cell containing structures of solutions at various light intensities at an accurate VOC
-% This script just uses other three scripts: genIntStructs, findOptimVoc
-% and asymmetricize. Both symmetric and asymmetric solutions are supported
-% in input, but the usage of symmetric solutions is strongly encouraged as
-% the findOptimVoc will start from a condition closer to the Voc.
+function [structs_oc, VOCs] = genIntStructsVoc(struct_eq, startInt, endInt, points, include_dark)
+% GENINTSTRUCTSVOC - Generates a cell containing structures of solutions at various light intensities at an accurate VOC
+% This script just uses other two scripts: genIntStructs, findVocOptim.
 %
-% Syntax:  [structCell, VOCs] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
+% Syntax:  [structs_oc, VOCs] = genIntStructsVoc(struct_eq, startInt, endInt, points, include_dark)
 %
 % Inputs:
 %   STRUCT_EQ - a solution struct as created by DRIFTFUSION in dark
@@ -17,20 +14,19 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsVoc(struct_eq, startInt, e
 %     structure
 %
 % Outputs:
-%   GOODVOCASYMSTRUCTCELL - a cell containing structs of asymmetric solutions at various light
+%   STRUCTS_OC - a cell containing structs of asymmetric solutions at various light
 %     intensities with an applied voltage equal to the VOC
-%   VOCS - an array with the VOC, getting populated just if the input structures were at open circuit
+%   VOCS - an array with the calculated VOC
 %
 % Example:
-%   [structs_voc, VOCs] = genIntStructsRealVoc(ssol_i_eq_SR, 1, 1e-3, 7, true)
-%     prepare solutions at 100, 10, 1, 0.1 and 0 illumination intensities
+%   [structs_oc, VOCs] = genIntStructsVoc(soleq.ion, 10, 1e-3, 5, true)
+%     prepare solutions at 10, 1, 0.1, 0.01, 0.001 and 0 illumination intensities
 %
-% Other m-files required: changeLight, pindrift, genIntStructs,
-%   asymmetricize, findOptimVoc
+% Other m-files required: df, genIntStructs, findVocOptim
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also genVappStructs, changeLight, pindrift, genIntStructs, findOptimVoc.
+% See also genVappStructs, changeLight, df, genIntStructs, findVocOptim.
 %
 %% LICENSE
 % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
@@ -50,45 +46,49 @@ function [goodVocAsymStructCell, VOCs] = genIntStructsVoc(struct_eq, startInt, e
 
 %------------- BEGIN CODE --------------
 
-if ~struct_eq.par.OC
-    disp([mfilename ' - the input solution is in short circuit! ' mfilename ' runs much faster when starting from OC conditions!']);
-end
-
 % use the normal genIntStructs for obtaining a cell with structs at various
 % light intensities
-[badVocStructCell, ~, ~] = genIntStructs(struct_eq, startInt, endInt, points, include_dark);
+[structs_sc, ~, ~] = genIntStructs(struct_eq, startInt, endInt, points, include_dark);
 
 % how many solutions have been obtained
-nsolutions = length(badVocStructCell(1,:));
+nsolutions = length(structs_sc(1,:));
 
 % preallocate
 VOCs = NaN(1, nsolutions);
 % the second row of this cell, containing the solutions names, will not be
 % changed
-goodVocAsymStructCell = badVocStructCell;
+structs_oc = structs_sc;
 
 %% generate solutions
 for i = 1:nsolutions
     
     % decrease annoiance by figures popping up
-    badVocStructCell{1, i}.par.figson = 0;
+    %SCStructCell{1, i}.par.figson = 0;
     
-    asymstruct_Int = badVocStructCell{1, i};
+    struct_Int = structs_sc{1, i};
     % the asymmetricized solution could require some stabilization after
     % breaking
-    asymstruct_Int = stabilize(asymstruct_Int);
+    %struct_Int = stabilize(struct_Int);
     
-    % use findOptimVoc for finding the applied voltage that minimizes the
+    % use findVocOptim for finding the applied voltage that minimizes the
     % residual current
-    disp([mfilename ' - finding real Voc for illumination intensity ' num2str(badVocStructCell{1, i}.par.int1)])
-    light_intensity = asymstruct_Int.par.int1;
-    [~, VOC_Rs] = findVocDirect(asymstruct_Int, light_intensity, 1);
-    [asymstruct_Int_Voc, VOC] = findVoc(asymstruct_Int, light_intensity, asymstruct_Int.par.mobseti, VOC_Rs*0.95, VOC_Rs*1.05, 1e-5);
+    disp([mfilename ' - finding real Voc for illumination intensity ' num2str(structs_sc{1, i}.par.int1)])
 
-    % restore figson before saving
-    asymstruct_Int_Voc.par.figson = 1;
+    % if solution seems at short circuit, estimate a voltage based on int1
+    % illumination
+    if abs(struct_Int.par.Vapp) < 0.1
+        % findVocDirect could be used but it's slow
+        %[~, guessVoc] = findVocDirect(struct_Int, struct_Int.par.int1, 1);
+
+        % very rough estimation of guessVoc
+        guessVoc = 1.6 * log(struct_Int.par.int1 + 1);
+        [struct_Int_Voc, VOC] = findVocOptim(struct_Int, guessVoc);
+    else
+        [struct_Int_Voc, VOC] = findVocOptim(struct_Int);
+    end
+
     % replace the solution at the bad VOC with the new one
-    goodVocAsymStructCell{1, i} = asymstruct_Int_Voc;
+    structs_oc{1, i} = struct_Int_Voc;
     % populate the array containing VOCs
     VOCs(i) = VOC;
 end
