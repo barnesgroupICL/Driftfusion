@@ -69,5 +69,5 @@ OC.ntype_Nion1e17_i = lightonRs(soleq.ntype_Nion1e17.ion, 1, -1, 1, 1e6, 200);
 %% J turn ons
 sol_relax.intrinsic_el = jumptoV(soleq.intrinsic.el, -0.85, 10, 0, 1, 0, 0);
 sol_relax.intrinsic_ion = jumptoV(soleq.intrinsic.ion, -0.92, 10, 1, 1, 0, 0);
-sol_relax.hom_el = jumptoV(soleq.hom.el, -0.92, 10, 0, 1, 0, 0);
-sol_relax.hom_ion = jumptoV(soleq.hom.ion, -0.92, 10, 1, 1, 0, 0);
+sol_relax.hom_el = jumptoV(soleq.hom.el, -0.93, 10, 0, 1, 0, 0);
+sol_relax.hom_ion = jumptoV(soleq.hom.ion, -0.95, 10, 1, 1, 0, 0);

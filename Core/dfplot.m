@@ -781,23 +781,23 @@ classdef dfplot
 %                 0.9, 0.8, 1;...
 %                 0.9, 1, 0.8];
             % French flag - 3 layer
-%             triplets = [0.8, 0.9, 1;...     HTL
-%                 1, 1, 0.7;...                 int1
-%                 1, 1, 1;...                     Active 1
-%                 1, 1, 0.7;...                 int 2
-%                 1, 0.87, 0.87; ...                 ETL
-%                 0.9, 0.8, 1;...
-%                 0.9, 1, 0.8];
-            % Homojunction
             triplets = [0.8, 0.9, 1;...     HTL
                 1, 1, 0.7;...                 int1
-                0.9, 1, 0.8;...                     Active 1
+                1, 1, 1;...                     Active 1
                 1, 1, 0.7;...                 int 2
-                1, 0.9, 0.7;...                 Active 2
-                1, 1, 0.7;...                 int 3
                 1, 0.87, 0.87; ...                 ETL
                 0.9, 0.8, 1;...
                 0.9, 1, 0.8];
+            % Homojunction
+%             triplets = [0.8, 0.9, 1;...     HTL
+%                 1, 1, 0.7;...                 int1
+%                 0.9, 1, 0.8;...                     Active 1
+%                 1, 1, 0.7;...                 int 2
+%                 1, 0.9, 0.7;...                 Active 2
+%                 1, 1, 0.7;...                 int 3
+%                 1, 0.87, 0.87; ...                 ETL
+%                 0.9, 0.8, 1;...
+%                 0.9, 1, 0.8];
 
 %             % Homojunction - white absorber
 %             triplets = [0.8, 0.9, 1;...     HTL
