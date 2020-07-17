@@ -379,6 +379,15 @@ classdef dfplot
             dfplot.x2d(sol, x, {V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
         
+        function Fx(varargin)
+            % Electrostatic potential as a function of position
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            F = dfana.calcF(sol);
+            
+            figure(12);
+            dfplot.x2d(sol, x, {F},{'F'},{'-'},'Electric Field [Vcm-1]', tarr, xrange, 0, 0);
+        end
         function npx(varargin)
             % Carrier densities as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
@@ -750,19 +759,19 @@ classdef dfplot
             % Multicoloured
             % triplets = [1, 0.87, 0.87; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
             % French flag n-i-p
-%             triplets = [0.8, 0.9, 1;...     HTL
-%                 1, 1, 1;...                     Active 1
-%                 1, 0.87, 0.87; ...                 ETL
-%                 0.9, 0.8, 1;...
-%                 0.9, 1, 0.8];
-            % French flag - 3 layer
             triplets = [0.8, 0.9, 1;...     HTL
-                1, 1, 0.7;...                 int1
                 1, 1, 1;...                     Active 1
-                1, 1, 0.7;...                 int 2
                 1, 0.87, 0.87; ...                 ETL
                 0.9, 0.8, 1;...
                 0.9, 1, 0.8];
+            % French flag - 3 layer
+%             triplets = [0.8, 0.9, 1;...     HTL
+%                 1, 1, 0.7;...                 int1
+%                 1, 1, 1;...                     Active 1
+%                 1, 1, 0.7;...                 int 2
+%                 1, 0.87, 0.87; ...                 ETL
+%                 0.9, 0.8, 1;...
+%                 0.9, 1, 0.8];
             % Homojunction
 %             triplets = [0.8, 0.9, 1;...     HTL
 %                 1, 1, 0.7;...                 int1
