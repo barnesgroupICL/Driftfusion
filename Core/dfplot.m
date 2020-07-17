@@ -171,7 +171,23 @@ classdef dfplot
             figure(2);
             plot(t, J.n(:, ppos),t, J.p(:, ppos),t, J.a(:, ppos),t, J.c(:, ppos), t, J.disp(:,ppos), t, J.tot(:, ppos));
             legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal')
-            xlabel('time [s]');
+            xlabel('Time [s]');
+            ylabel('J [A cm^{-2}]');
+            set(legend,'FontSize',16);
+            set(legend,'EdgeColor',[1 1 1]);
+        end
+
+        function Jtott(sol, xpos)
+            % Currents as a function of time
+            % POS = the readout position
+            t = sol.t;
+            [J, j, xmesh] = dfana.calcJ(sol);
+            ppos = getpointpos(xpos, xmesh);
+            
+            figure(2);
+            plot(t, J.tot(:, ppos));
+            %legend('Jn', 'Jp', 'Ja', 'Jc', 'Jdisp', 'Jtotal')
+            xlabel('Time [s]');
             ylabel('J [A cm^{-2}]');
             set(legend,'FontSize',16);
             set(legend,'EdgeColor',[1 1 1]);
