@@ -424,6 +424,21 @@ classdef dfplot
                 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
         end
         
+        function rhoacxNAxNDx(varargin)
+            % Ionic carrier densities as a function of position
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
+            
+            % charge density
+            rho_ion = - a + c;
+            
+            figure(14)
+            dfplot.x2d(sol, x, {rho_ion, NAmat, NDmat},{'Cations', 'NA', 'ND'}, {'-','--','--'},...
+                'Charge Density [cm-3]', tarr, xrange, 0, 0);
+        end      
+        
         function gx(varargin)
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
