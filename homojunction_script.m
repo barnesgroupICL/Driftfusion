@@ -37,7 +37,7 @@ par.intrinsic_Nion1e17.Nani = [1e17,1e17,1e17,1e17,1e17];
 par.intrinsic_Nion1e17 = refresh_device(par.intrinsic_Nion1e17);
 
 soleq.intrinsic_Nion1e17 = equilibrate(par.intrinsic_Nion1e17);
-JV.intrinsic_Nion1e17 = doJV(soleq.intrinsic_Nion1e17.el, 1e-3, 100, 1, 0, 0, 1.2, 2);
+JV.intrinsic_Nion1e17 = doJV(soleq.[Jturnonsweep, sol_turnon] = Jturnon(sol_ini, tmax, tpoints, Vapp, Int)intrinsic_Nion1e17.el, 1e-3, 100, 1, 0, 0, 1.2, 2);
 JV.intrinsic_Nion1e17_i = doJV(soleq.intrinsic_Nion1e17.ion, 1e-3, 100, 1, 1, 0, 1.2, 2);
 OC.intrinsic_Nion1e17 = lightonRs(soleq.intrinsic_Nion1e17.el, 1, 1, 0, 1e6, 200);
 OC.intrinsic_Nion1e17_i = lightonRs(soleq.intrinsic_Nion1e17.ion, 1, -1, 1, 1e6, 200);
@@ -65,3 +65,6 @@ JV.ntype_Nion1e17 = doJV(soleq.ntype_Nion1e17.el, 1e-3, 100, 1, 0, 0, 1.2, 2);
 JV.ntype_Nion1e17_i = doJV(soleq.ntype_Nion1e17.ion, 1e-3, 100, 1, 1, 0, 1.2, 2);
 OC.ntype_Nion1e17 = lightonRs(soleq.ntype_Nion1e17.el, 1, 1, 0, 1e6, 200);
 OC.ntype_Nion1e17_i = lightonRs(soleq.ntype_Nion1e17.ion, 1, -1, 1, 1e6, 200);
+
+%% J turn ons
+[Jturnonsweep, sol_turnon] = Jturnon(soleq., tmax, tpoints, Vapp, Int)
