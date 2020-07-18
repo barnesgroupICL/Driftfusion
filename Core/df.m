@@ -141,6 +141,67 @@ Jr = 0;
 % MaxStep = limit maximum time step size during integration
 options = odeset('MaxStep', par.MaxStepFactor*0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
 
+%% Prepare variables for solver
+
+% prepare search for x in x_ihalf
+x_ihalf_length = length(x_ihalf);
+sampling_step = round(sqrt(x_ihalf_length));
+x_ihalf_padded = [x_ihalf, nan(1,sampling_step-mod(x_ihalf_length,sampling_step))];
+x_ihalf_padded_mat = reshape(x_ihalf_padded,sampling_step,[]);
+x_ihalf_sampled = x_ihalf_padded_mat(1,:);
+
+% normalise epp
+epp_norm = epp/eppmax;
+
+% prepare constant generation profiles
+int1gx1 = int1*gx1;
+int2gx2 = int2*gx2;
+
+% S_potential prefactor
+q_over_eppmax_epp0 = q/(eppmax*epp0);
+
+% pre-calculation S_potential static charge
+NANDNaniNcat = -NA+ND+Nani-Ncat;
+
+% pre-calculate kB*T
+kBT = kB*T;
+
+% pre-calculate the squared values of ni
+ni_squared = ni.^2;
+
+% pre-calculate
+gradNc_over_Nc = gradNc./Nc;
+gradNv_over_Nv = gradNv./Nv;
+
+% convert to boolean for faster check in dfode
+g1_fun_type_constant = g1_fun_type == "constant";
+g2_fun_type_constant = g2_fun_type == "constant";
+
+% C: Time-dependence prefactor term
+switch N_ionic_species
+    case 1
+        C_potential = 0;
+        C_electron = 1;
+        C_hole = 1;
+        C_cation = 1;
+        Cpre = [C_potential; C_electron; C_hole; C_cation];
+        N_ionic_species_two = false;
+    case 2
+        C_potential = 0;
+        C_electron = 1;
+        C_hole = 1;
+        C_cation = 1;
+        C_anion = 1;
+        Cpre = [C_potential; C_electron; C_hole; C_cation; C_anion];
+        N_ionic_species_two = true;
+    otherwise
+        C_potential = 0;
+        C_electron = 1;
+        C_hole = 1;
+        Cpre = [C_potential; C_electron; C_hole];
+        N_ionic_species_two = false;
+end
+
 %% Call solver
 % inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
@@ -151,89 +212,102 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % C = Time-dependence prefactor
 % F = Flux terms
 % S = Source terms
-    function [C,F,S] = dfpde(x,t,u,dudx)   
-        % Get position point
-        i = find(x_ihalf <= x);
-        i = i(end);
-        
-        switch g1_fun_type
-            case 'constant'
-                gxt1 = int1*gx1(i);
-            otherwise
-                gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
-        end
-        
-        switch g2_fun_type
-            case 'constant'
-                gxt2 = int2*gx2(i);
-            otherwise
-                gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
-        end
-        
-        g = gxt1 + gxt2;
-        
-        %% Variables
-        V = u(1); n = u(2); p = u(3); 
+function [C,F,S] = dfpde(x,t,u,dudx)   
+    
+    % C: Time-dependence prefactor term
+    C = Cpre;
 
-        if N_ionic_species == 1
-            c = u(4);           % Include cation variable
-            dcdx = dudx(4);
-            a = Nani(i);
-        elseif N_ionic_species == 2
-            c = u(4);           % Include cation variable
-            a = u(5);           % Include anion variable
-            dcdx = dudx(4);
-            dadx = dudx(5);    
-        else
-            c = Ncat(i);
-            a = Nani(i);
-        end
-        
-        %% Gradients
-        dVdx = dudx(1); dndx = dudx(2); dpdx = dudx(3); 
-        
-        %% Equation editor
-        % Time-dependence prefactor term
-        C_potential = 0;
-        C_electron = 1;
-        C_hole = 1;
-        C = [C_potential; C_electron; C_hole];
-          
-        % Flux terms
-        F_potential  = (epp(i)/eppmax)*dVdx;
-        F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
-        F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));      
-        F = [F_potential; mobset*F_electron; mobset*F_hole]; 
-            
-        % Source terms
-        S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S = [S_potential; S_electron; S_hole];
-        
-        if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
-            C_cation = 1;
-            C = [C; C_cation];
-            
-            F_cation = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c))))); 
-            F = [F; K_cation*mobseti*F_cation];
-            
-            S_cation = 0;
-            S = [S; S_cation];
-        end
-        
-        if N_ionic_species == 2     % Condition for anion terms
-            C_anion = 1;
-            C = [C; C_anion];
-            
-            F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
-            F = [F; K_anion*mobseti*F_anion];
-            
-            S_anion = 0;
-            S = [S; S_anion];
-        end
-        
+    % Get position point
+    sampled_i = find(x_ihalf_sampled <= x);
+    sampled_i = sampled_i(end);
+    i = (sampled_i-1)*sampling_step + find(x == x_ihalf_padded_mat(:,sampled_i));
+
+    % g: Generation terms
+    if g1_fun_type_constant
+        gxt1 = int1gx1(i);
+    else
+        gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
     end
+
+    if g2_fun_type_constant
+        gxt2 = int2gx2(i);
+    else
+        gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
+    end
+
+    %% Equation editor
+
+    % F_potential: Flux term for potential
+    % dudx(1) is dVdx gradient of electrostatic potential, electric field
+    F_potential = epp_norm(i)*dudx(1);
+
+    % F_electron: Flux term for electrons
+    % u(2) is n, electron concentration
+    % dudx(1) is dVdx gradient of electrostatic potential, electric field
+    % dudx(2) is dndx, gradient of electrons concentration
+    F_electron = mobset*(mue(i)*u(2)*(-dudx(1) + gradEA(i)) + Dn(i)*(dudx(2) - u(2)*gradNc_over_Nc(i)));
+
+    % F_hole: Flux term for holes
+    % u(3) is p, holes concentration
+    % dudx(1) is dVdx gradient of electrostatic potential, electric field
+    % dudx(3) is dpdx, gradient of holes concentration
+    F_hole = mobset*(muh(i)*u(3)*(dudx(1) - gradIP(i)) + Dp(i)*(dudx(3) - u(3)*gradNv_over_Nv(i)));
+
+    % S_electron_hole: Source term for electrons and for holes
+    % u(2) is n, electron concentration; u(3) is p, holes concentration
+    S_electron_hole = gxt1 + gxt2 - radset*B(i)*(u(2)*u(3)-ni_squared(i)) - SRHset*(u(2)*u(3)-ni_squared(i))/(taun(i)*(u(3)+pt(i)) + taup(i)*(u(2)+nt(i)));
+
+    if N_ionic_species % Condition for cation and anion terms
+        % F_cation: Flux term for cations
+        % u(4) is mobile cation concentration
+        % dudx(1) is dVdx gradient of electrostatic potential, electric field
+        % dudx(4) is dcdx, gradient of mobile cation concentration
+        F_cation = K_cation*mobseti*mucat(i)*(u(4)*dudx(1) + kBT*dudx(4)*(1 + u(4)/(DOScat(i)-u(4))));
+
+        if N_ionic_species_two % Condition for anion terms
+            % F_anion: Flux term for anions
+            % u(5) is anion concentration
+            % dudx(1) is dVdx gradient of electrostatic potential, electric field
+            % dudx(5) is dadx, gradient of mobile anion concentration
+            F_anion = K_anion*mobseti*muani(i)*(u(5)*-dudx(1) + kBT*dudx(5)*(1 + u(5)/(DOSani(i)-u(5))));
+
+            % F: Flux terms
+            F = [F_potential; F_electron; F_hole; F_cation; F_anion];
+            
+            % S_potential: Source term for potential
+            % u(2) is n, electron concentration; u(3) is p, holes concentration
+            % u(4) is mobile cation concentration; u(5) is mobile anion concentration
+            % NANDNaniNcat is -NA+ND+Nani-Ncat
+            S_potential = q_over_eppmax_epp0*(-u(2)+u(3)-u(5)+u(4)+NANDNaniNcat(i));
+
+            % S: Source terms
+            S = [S_potential; S_electron_hole; S_electron_hole; 0; 0];
+        else
+            % F: Flux terms
+            F = [F_potential; F_electron; F_hole; F_cation];
+
+            % S_potential: Source term for potential
+            % u(2) is n, electron concentration; u(3) is p, holes concentration
+            % u(4) is mobile cation concentration; Nani is fixed anion concentration
+            % Nani(i) is fixed anion, NANDNaniNcat is -NA+ND+Nani-Ncat
+            S_potential = q_over_eppmax_epp0*(-u(2)+u(3)-Nani(i)+u(4)+NANDNaniNcat(i));
+
+            % S: Source terms
+            S = [S_potential; S_electron_hole; S_electron_hole; 0];
+        end
+    else
+        % F: Flux terms
+        F = [F_potential; F_electron; F_hole];
+
+        % S_potential: Source term for potential
+        % Ncat(i) is fixed cation concentration, Nani(i) is fixed anion concentration
+        % NANDNaniNcat is -NA+ND+Nani-Ncat
+        S_potential = q_over_eppmax_epp0*(-u(2)+u(3)-Nani(i)+Ncat(i)+NANDNaniNcat(i));
+
+        % S: Source terms
+        S = [S_potential;S_electron_hole;S_electron_hole];
+    end
+end
 
 %% Define initial conditions.
     function u0 = dfic(x)
