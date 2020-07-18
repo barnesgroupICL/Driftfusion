@@ -10,6 +10,7 @@
 % (at your option) any later version.
 % 
 %% Start code
+tic
 initialise_df
 
 % Create parameters objects for Spiro/MAPI/TiO2 and PEDOT/MAPI/PCBM devices
@@ -50,3 +51,4 @@ dfplot.Jx(JV_pcbm.ill.f, 10)
 % the Github repository as they will be cached even when deleted leading to
 % a large folder sizes
 % save('/Users/Username/Data/temp.mat')
+toc

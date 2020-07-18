@@ -283,7 +283,7 @@ classdef pc
             end
 
             % Warn if tmesh_type is not correct
-            if ~ any([1 4] == par.tmesh_type)
+            if ~ any([1 2 3 4] == par.tmesh_type)
                 warning('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
             end
 
