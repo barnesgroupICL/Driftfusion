@@ -1,4 +1,4 @@
-function EA_script_ana_phase(EA_results)
+function EA_script_ana_phase(EA_results, savefig_dir)
 %EA_SCRIPT_ANA_PHASE - Plot phase Bode plots from ElectroAbsorbance (EA)
 % in a range of background light intensities or applied DC voltages
 % This script is very similar to IS_script_ana_phase
@@ -9,6 +9,8 @@ function EA_script_ana_phase(EA_results)
 %
 % Inputs:
 %   EA_RESULTS - a struct containing the most important results of the EA simulation
+%   SAVEFIG_DIR - optional string, if provided the figures will be saved in
+%     at that path
 %
 % Example:
 %   EA_script_ana_phase(EA_results)
@@ -59,6 +61,14 @@ legend_flip(legend_flip=="0 sun") = "dark";
 % preallocate figures handles
 h = zeros(length(legend_text), 1);
 
+if nargin > 1
+    [~, legend_prepend, ~] = fileparts(savefig_dir);
+    legend_prepend = regexprep(legend_prepend,'_',' ');
+    % ridiculously enough I didn't find a way to add a space separator, so
+    % I use a colon
+    legend_flip = strcat(legend_prepend, ':', legend_flip);
+end
+
 % in case just a single frequency was simulated, min and max are
 % coincident, so they are modified by a small percentage
 xlim_array = [min(min(EA_results.Freq))*0.99, max(max(EA_results.Freq)*1.01)];
@@ -67,7 +77,7 @@ xlim_array = [min(min(EA_results.Freq))*0.99, max(max(EA_results.Freq)*1.01)];
 
 phase_n_deg = rad2deg(wrapTo2Pi(EA_results.AC_ExDC_E_phase));
 phase_i_deg = rad2deg(wrapTo2Pi(EA_results.AC_ExDC_E_i_phase));
-figure('Name', 'Phase plot of EA first harmonic', 'NumberTitle', 'off')
+fig_1h = figure('Name', 'Phase plot of EA first harmonic', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
     hold off
     for i = 1:length(legend_text)
         h(i) = plot(EA_results.Freq(i, :), phase_n_deg(i, :)',...
@@ -85,9 +95,9 @@ figure('Name', 'Phase plot of EA first harmonic', 'NumberTitle', 'off')
     legend(flipud(h), legend_flip)
     legend boxoff
 
-phase_2h_deg = rad2deg(wrapTo2Pi(EA_results.AC_Efield2_phase));
+phase_2h_deg = rad2deg(wrapToPi(EA_results.AC_Efield2_phase));
 phase_2h_i_deg = rad2deg(wrapTo2Pi(EA_results.AC_Efield2_i_phase));
-figure('Name', 'Phase plot of EA second harmonic', 'NumberTitle', 'off')
+fig_2h = figure('Name', 'Phase plot of EA second harmonic', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
     hold off
     for i = 1:length(legend_text)
         h(i) = plot(EA_results.Freq(i, :), phase_2h_deg(i, :)',...
@@ -104,5 +114,16 @@ figure('Name', 'Phase plot of EA second harmonic', 'NumberTitle', 'off')
     ylabel('Phase [deg]');
     legend(flipud(h), legend_flip)
     legend boxoff
+
+if nargin > 1
+    if 7~=exist(savefig_dir,'dir')
+        mkdir(savefig_dir)
+    end
+    pathname = [char(savefig_dir) filesep char(inputname(1))];
+    saveas(fig_1h, [pathname '-phase-1h.fig'])
+    saveas(fig_2h, [pathname '-phase-2h.fig'])
+    saveas(fig_1h, [pathname '-phase-1h.png'])
+    saveas(fig_2h, [pathname '-phase-2h.png'])
+end
 
 %------------- END OF CODE --------------
