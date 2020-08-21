@@ -284,7 +284,7 @@ classdef pc
 
             % Warn if tmesh_type is not correct
             if ~ any([1 2 3 4] == par.tmesh_type)
-                warning('PARAMS.tmesh_type should be an integer from 1 to 3 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
+                warning('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
             end
 
             % Warn if xmesh_type is not correct
@@ -312,11 +312,20 @@ classdef pc
             % infinite diffusion rate
             for i = 1:length(par.amax)
                 if par.amax(i) <= 0
-                    msg = 'ion DOS (amax) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
+                    msg = 'Maximum cation density (amax) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
                     error(msg);
                 end
             end
 
+            % Warn if cmax is set to zero in any layers - leads to
+            % infinite diffusion rate
+            for i = 1:length(par.cmax)
+                if par.cmax(i) <= 0
+                    msg = 'Maximum cation density (cmax) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
+                    error(msg);
+                end
+            end
+            
             % Warn if electrode workfunctions are outside of boundary layer
             % bandgap
             if par.Phi_left < par.IP(1) || par.Phi_left > par.EA(1)
