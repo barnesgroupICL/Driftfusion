@@ -1,74 +1,74 @@
-classdef dfplot   
-% DRIFTFUSION Plotting class - contains methods for plotting
-%
-% List of available plots:
-% DFPLOT.JT = Currents as a function of time
-% DFPLOT.JX = Total currents as a function of position
-% DFPLOT.jx = Carrier fluxes as a function of position
-% DFPLOT.JV = Current-voltage curve using a solution from DOJV-
-% now outdated - preferrable to use DOCV and DFPLOT.JTOTVAPP
-% DFPLOT.JDDX = Drift and diffusion currents as a function of position
-% DFPLOT.VOCT = Open circuit voltage as a function of time
-% DFPLOT.PLT = Integrated radiative recombination rate as a function of
-% time
-% DFPLOT.VAPPT = Applied voltage as a function of time
-% DFPLOT.JVAPP = Current components as a function of the applied voltage at
-% position defined by XPOS
-% DFPLOT.JTOTVAPP = Total current as a function of the applied voltage at
-% position defined by XPOS
-% DFPLOT.LOGJVAPP = Current components as a function of the applied voltage
-% using log y-axis at position defined by XPOS
-% DFPLOT.XMESH = Plots the xmesh position vs point number
-% DFPLOT.VX = Electrostatic potential as a function of position
-% DFPLOT.NPX = Electron and hole densities as a function of position
-% DFPLOT.ACX = Anion and cation densities as a function of position
-% DFPLOT.GX = Generation rate as a function of position
-% DFPLOT.GXT = Generation rate as a function of position and time
-% DFPLOT.RX = Recombination rate components as a function of position
-% DFPLOT.JRECVAPP = Recomonbination components as a function of the applied
-% voltage
-% DFPLOT.FT = Electric field as a function of time
-% DFPLOT.SIGMAT = Integrated charge density in cm-2 as a function of time
-% DFPLOT.QT = Charge density in Coulombs cm-2 integrated between within the
-% range [X1, X2] as a function of time
-% DFPLOT.QVAPP = Charge density in Coulombs cm-2 integrated between within the
-% range [X1, X2] as a function of applied voltage
-% DFPLOT.RHOX = Volumetric charge density as a function of position
-% DFPLOT.DELTARHOX = Change in volumetric charge density as a function of position
-% DFPLOT.RHOXFXVX = Volumetric charge density, Electric field and Electrostatic potential
-% as a function of position- stacked plot
-% DFPLOT.RHOXVX = Volumetric charge density and Electrostatic potential as a function 
-% of position- stacked plot
-% DFPLOT.ELX = Energy level diagram as a function of position
-% DFPLOT.ELXNPX = Energy level diagram, electron and hole densities
-% DFPLOT.ELXNPXACX = Energy level diagram, electron and hole densities, 
-% and anion and cation densities, 3 panel, stacked
-% DFPLOT.VXACX = Electrostatic potential and anion and cation densities, 2
-% panel, stacked
-% DFPLOT.VIONXACX = Electrostatic potential due to ionic charge and anion and cation densities, 2
-% panel, stacked
-% DFPLOT.FIONT = Electric field due to the ionic charge as a function of
-% time
-
-% Plotting functions that are a function of position can accept a time
-% array as the second argument- the procedure will loop and plot the
-% solution at multiple times.
-% The third optional argument defines the x-range.
-% For plotting functions that are a function of time, the second argument
-% is generally the position at which the value is taken- see the comments
-% of individual methods below for further details
-
-%% LICENSE
-% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
-% Imperial College London
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Affero General Public License as published
-% by the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-%
-%% Start code
+classdef dfplot
+    % DRIFTFUSION Plotting class - contains methods for plotting
+    %
+    % List of available plots:
+    % DFPLOT.JT = Currents as a function of time
+    % DFPLOT.JX = Total currents as a function of position
+    % DFPLOT.jx = Carrier fluxes as a function of position
+    % DFPLOT.JV = Current-voltage curve using a solution from DOJV-
+    % now outdated - preferrable to use DOCV and DFPLOT.JTOTVAPP
+    % DFPLOT.JDDX = Drift and diffusion currents as a function of position
+    % DFPLOT.VOCT = Open circuit voltage as a function of time
+    % DFPLOT.PLT = Integrated radiative recombination rate as a function of
+    % time
+    % DFPLOT.VAPPT = Applied voltage as a function of time
+    % DFPLOT.JVAPP = Current components as a function of the applied voltage at
+    % position defined by XPOS
+    % DFPLOT.JTOTVAPP = Total current as a function of the applied voltage at
+    % position defined by XPOS
+    % DFPLOT.LOGJVAPP = Current components as a function of the applied voltage
+    % using log y-axis at position defined by XPOS
+    % DFPLOT.XMESH = Plots the xmesh position vs point number
+    % DFPLOT.VX = Electrostatic potential as a function of position
+    % DFPLOT.NPX = Electron and hole densities as a function of position
+    % DFPLOT.ACX = Anion and cation densities as a function of position
+    % DFPLOT.GX = Generation rate as a function of position
+    % DFPLOT.GXT = Generation rate as a function of position and time
+    % DFPLOT.RX = Recombination rate components as a function of position
+    % DFPLOT.JRECVAPP = Recomonbination components as a function of the applied
+    % voltage
+    % DFPLOT.FT = Electric field as a function of time
+    % DFPLOT.SIGMAT = Integrated charge density in cm-2 as a function of time
+    % DFPLOT.QT = Charge density in Coulombs cm-2 integrated between within the
+    % range [X1, X2] as a function of time
+    % DFPLOT.QVAPP = Charge density in Coulombs cm-2 integrated between within the
+    % range [X1, X2] as a function of applied voltage
+    % DFPLOT.RHOX = Volumetric charge density as a function of position
+    % DFPLOT.DELTARHOX = Change in volumetric charge density as a function of position
+    % DFPLOT.RHOXFXVX = Volumetric charge density, Electric field and Electrostatic potential
+    % as a function of position- stacked plot
+    % DFPLOT.RHOXVX = Volumetric charge density and Electrostatic potential as a function
+    % of position- stacked plot
+    % DFPLOT.ELX = Energy level diagram as a function of position
+    % DFPLOT.ELXNPX = Energy level diagram, electron and hole densities
+    % DFPLOT.ELXNPXACX = Energy level diagram, electron and hole densities,
+    % and anion and cation densities, 3 panel, stacked
+    % DFPLOT.VXACX = Electrostatic potential and anion and cation densities, 2
+    % panel, stacked
+    % DFPLOT.VIONXACX = Electrostatic potential due to ionic charge and anion and cation densities, 2
+    % panel, stacked
+    % DFPLOT.FIONT = Electric field due to the ionic charge as a function of
+    % time
+    
+    % Plotting functions that are a function of position can accept a time
+    % array as the second argument- the procedure will loop and plot the
+    % solution at multiple times.
+    % The third optional argument defines the x-range.
+    % For plotting functions that are a function of time, the second argument
+    % is generally the position at which the value is taken- see the comments
+    % of individual methods below for further details
+    
+    %% LICENSE
+    % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+    % Imperial College London
+    % This program is free software: you can redistribute it and/or modify
+    % it under the terms of the GNU Affero General Public License as published
+    % by the Free Software Foundation, either version 3 of the License, or
+    % (at your option) any later version.
+    %
+    %% Start code
     methods (Static)
-         
+        
         function Jt(sol, xpos)
             % Currents as a function of time
             % SOL = solution structure
@@ -143,15 +143,6 @@ classdef dfplot
             ylabel('Voc [V]')
         end
         
-        function PLt(sol)
-            [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
-            PL = dfana.PLt(sol);
-            figure(7)
-            plot(t, PL)
-            xlabel('Time [s]')
-            ylabel('PL [cm-2s-1]')
-        end
-        
         function Vappt(sol)
             % Applied voltage as a function of position
             [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
@@ -163,7 +154,15 @@ classdef dfplot
             ylabel('Vapp [V]')
         end
         
-                function JV(JV, option)
+        function PLt(sol)
+            PL = dfana.PLt(sol);
+            figure(7)
+            plot(sol.t, PL)
+            xlabel('Time [s]')
+            ylabel('PL [cm-2s-1]')
+        end
+        
+        function JV(JV, option)
             % JV - a solution from doJV
             % OPTION - 1 = dark only, 2 = light only, 3 = dark & light
             % JV is a structure containing dark and illuminated JVs
