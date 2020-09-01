@@ -228,10 +228,10 @@ classdef dfana
             % Recombination
             r = dfana.calcr_ihalf(sol);
 
-            djndx = dndt + g - r.tot;    % Not certain about the sign here
-            djpdx = dpdt + g - r.tot;
-            djadx = dadt;
-            djcdx = dcdt;
+            djndx = - dndt + g - r.tot;
+            djpdx = - dpdt + g - r.tot;
+            djadx = - dadt;
+            djcdx = - dcdt;
             
             switch option
                 case 0
