@@ -18,18 +18,17 @@ par = pc('Input_files/pn_junction.csv');
 % Find the equilibrium solutions
 soleq = equilibrate(par);
 
-% Perform dark and light current-voltage scan at 50 mVs-1 from 0 V to 1.2 V
+%% Perform dark and light current-voltage scan at 50 mVs-1 from 0 V to 1.2 V
 % Input arguments: 
-% 
-CVsol = doCV(soleq.ion, 50e-3, 100, 1, 1, 0, 1.2, 3);
+% sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
+CVsol_dk = doCV(soleq.ion, 0, 0, 0.6, -0.4, 1, 2, 400);
+CVsol_1sun = doCV(soleq.ion, 1, 0, 0.6, -0.4, 1, 2, 400);
 
-% plot the current voltage curve
-dfplot.JV(JVsol,3)
-
-% plot the energy level diagram and carrier densities for the tio2 device at
-% 1 V (t= 20s) during the illuminated forward scan
-dfplot.ELxnpxacx(JVsol.ill.f, 20)
-
+%% plot the current voltage curve
+dfplot.JtotVapp(CVsol_dk, 0)
+hold on
+dfplot.JtotVapp(CVsol_1sun, 0)
+ylim([-6e-3, 2e-3])
 % Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in
 % the Github repository as they will be cached even when deleted leading to
