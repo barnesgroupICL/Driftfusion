@@ -22,4 +22,4 @@ dfplot.Fx(OC.hom)
 legend('HTL','int1','n-type','int2','p-type','int3','ETL','Homojunction, N_{cat} = 10^{17} cm{-3}','Homojunction, N_{cat} = 10^{18} cm{-3}',...
    'Homojunction, N_{cat} = 10^{19} cm{-3}', 'Homojunction, N_{cat} = 0 cm{-3}')
 hold off
-ylim([-1e5,1e5])
+ylim([-0.5e5,2e5])
