@@ -1,16 +1,16 @@
 classdef dfana
-% DRIFTFUSION analysis class- contains multiple methods for calculating
-% outputs using the solution obtained from DF.
-%
-%% LICENSE
-% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
-% Imperial College London
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Affero General Public License as published
-% by the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-%
-%% Start code
+    % DRIFTFUSION analysis class- contains multiple methods for calculating
+    % outputs using the solution obtained from DF.
+    %
+    %% LICENSE
+    % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+    % Imperial College London
+    % This program is free software: you can redistribute it and/or modify
+    % it under the terms of the GNU Affero General Public License as published
+    % by the Free Software Foundation, either version 3 of the License, or
+    % (at your option) any later version.
+    %
+    %% Start code
     methods (Static)
         function [u,t,x,par,dev,n,p,a,c,V] = splitsol(sol)
             % splits solution into useful outputs
@@ -24,7 +24,7 @@ classdef dfana
             n = u(:,:,1);
             p = u(:,:,2);
             V = u(:,:,4);
-                      
+
             if par.N_ionic_species == 1
                 c = u(:,:,3);
                 a = repmat(dev.Nani, length(t), 1);
@@ -131,12 +131,12 @@ classdef dfana
             Efp = Efp_ihalf;% zeros(length(t), length(xmesh));
             Ecb = Ecb_ihalf;
             Evb = Evb_ihalf;
-%             for ii = 1:length(t)
-%                 Efn(ii,:) = interp1(x, Efn_ihalf(ii,:), xmesh);
-%                 Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
-%                 Ecb(ii,:) = interp1(x, Ecb_ihalf(ii,:), xmesh);
-%                 Evb(ii,:) = interp1(x, Evb_ihalf(ii,:), xmesh);
-%             end
+            %             for ii = 1:length(t)
+            %                 Efn(ii,:) = interp1(x, Efn_ihalf(ii,:), xmesh);
+            %                 Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
+            %                 Ecb(ii,:) = interp1(x, Ecb_ihalf(ii,:), xmesh);
+            %                 Evb(ii,:) = interp1(x, Evb_ihalf(ii,:), xmesh);
+            %             end
         end
 
         function [Ecb, Evb, Efn, Efp] = QFL_J(sol)
@@ -228,10 +228,10 @@ classdef dfana
             % Recombination
             r = dfana.calcr_ihalf(sol);
 
-            djndx = dndt + g - r.tot;    % Not certain about the sign here
-            djpdx = dpdt + g - r.tot;
-            djadx = dadt;
-            djcdx = dcdt;
+            djndx = - dndt + g - r.tot;
+            djpdx = - dpdt + g - r.tot;
+            djadx = - dadt;
+            djcdx = - dcdt;
 
             switch option
                 case 0
@@ -260,7 +260,7 @@ classdef dfana
                     deltaja = cumtrapz(x, djadx, 2);
                     deltajc = cumtrapz(x, djcdx, 2);
             end
-            
+
             %% Currents from the boundaries
             switch par.BC
                 case 2
@@ -357,9 +357,7 @@ classdef dfana
 
             % Recombination
             r.btb = Bmat.*(n.*p - nimat.^2);
-
             r.srh = ((n.*p - nimat.^2)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
-
             r.tot = r.btb + r.srh;
         end
 
@@ -487,19 +485,25 @@ classdef dfana
             % Particle fluxes
             jdd.ndiff = par.mobset*-(-Dn_mat.*(dndx-((nloc./Nc_mat).*gradNc_mat)));
             jdd.ndrift = par.mobset*-(mue_mat.*nloc.*(dVdx-gradEA_mat));
-
             jdd.pdiff = par.mobset*(-Dp_mat.*(dpdx-((ploc./Nv_mat).*gradNv_mat)));
             jdd.pdrift = par.mobset*(muh_mat.*ploc.*(-dVdx+gradIP_mat));
 
-            jdd.cdiff = par.mobseti*(-mu_cat.*par.kB*par.T.*dcdx);
-            jdd.cdrift = par.mobseti*(mu_cat.*cloc.*-dVdx);
-
-            if par.N_ionic_species == 1
-                jdd.adiff = zeros(length(t), length(xout));
-                jdd.adrift = zeros(length(t), length(xout));
-            elseif par.N_ionic_species == 2
-                jdd.adiff = par.mobseti*-(-mu_ani.*par.kB*par.T.*dadx);
-                jdd.adrift = par.mobseti*-(mu_ani.*aloc.*dVdx);
+            switch par.N_ionic_species
+                case 0
+                    jdd.cdiff = zeros(length(t), length(xout));
+                    jdd.cdrift = zeros(length(t), length(xout));
+                    jdd.adiff = zeros(length(t), length(xout));
+                    jdd.adrift = zeros(length(t), length(xout));
+                case 1
+                    jdd.cdiff = par.mobseti*(-mu_cat.*par.kB*par.T.*dcdx);
+                    jdd.cdrift = par.mobseti*(mu_cat.*cloc.*-dVdx);
+                    jdd.adiff = zeros(length(t), length(xout));
+                    jdd.adrift = zeros(length(t), length(xout));
+                case 2
+                    jdd.cdiff = par.mobseti*(-mu_cat.*par.kB*par.T.*dcdx);
+                    jdd.cdrift = par.mobseti*(mu_cat.*cloc.*-dVdx);
+                    jdd.adiff = par.mobseti*-(-mu_ani.*par.kB*par.T.*dadx);
+                    jdd.adrift = par.mobseti*-(mu_ani.*aloc.*dVdx);
             end
 
             jdd.n = jdd.ndrift + jdd.ndiff;
@@ -698,10 +702,10 @@ classdef dfana
         end
 
         function value = PLt(sol)
-                [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-                Bmat = dev.B;
-                value = trapz(x,(dev.B.*(n.*p-dev.ni.^2)),2);
+            Bmat = dev.B;
+            value = trapz(x,(dev.B.*(n.*p-dev.ni.^2)),2);
         end
 
         function VQFL = calcVQFL(sol)
@@ -742,13 +746,13 @@ classdef dfana
         end
 
         function Fion = calcFion(sol)
-           [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-           Ncatmat = repmat(dev.Ncat, length(t), 1);
-           Nanimat = repmat(dev.Nani, length(t), 1);
-           eppmat = repmat(dev.epp, length(t), 1);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            Ncatmat = repmat(dev.Ncat, length(t), 1);
+            Nanimat = repmat(dev.Nani, length(t), 1);
+            eppmat = repmat(dev.epp, length(t), 1);
 
-           rhoion = c - Ncatmat - a + Nanimat;
-           Fion = cumtrapz(x, rhoion, 2)./(eppmat*par.epp0);
+            rhoion = c - Ncatmat - a + Nanimat;
+            Fion = cumtrapz(x, rhoion, 2)./(eppmat*par.epp0);
         end
 
         function Vion = calcVion(sol)
