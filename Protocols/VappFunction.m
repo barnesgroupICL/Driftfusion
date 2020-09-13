@@ -35,4 +35,19 @@ end
 
 sol = df(sol_ini, par);
 
+i = 0;
+while size(sol.u,1) ~= par.tpoints
+    warning('Driftfusion:VappFunction',...
+        'VappFunction the solver did not succeed, increasing time points')
+    par.tpoints = par.tpoints * 2;
+    sol = df(sol_ini, par);
+    i = i+1;
+    % in case 10 repetitions were not enough, stop
+    if i > 4
+        warning('Driftfusion:VappFunction',...
+            'VappFunction increased the time points but the simulation broke anyway')
+        break
+    end
+end
+
 end
