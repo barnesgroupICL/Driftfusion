@@ -147,7 +147,7 @@ options = odeset('MaxStep', par.MaxStepFactor*0.1*abs(par.tmax - par.t0), 'RelTo
 x_ihalf_length = length(x_ihalf);
 sampling_step = round(sqrt(x_ihalf_length));
 x_ihalf_padded = [x_ihalf, nan(1,sampling_step-mod(x_ihalf_length,sampling_step))];
-x_ihalf_padded_mat = reshape(x_ihalf_padded,sampling_step,[]);
+x_ihalf_padded_mat = single(reshape(x_ihalf_padded,sampling_step,[]));
 x_ihalf_sampled = x_ihalf_padded_mat(1,:);
 
 % normalise epp
@@ -218,9 +218,10 @@ function [C,F,S] = dfpde(x,t,u,dudx)
     C = Cpre;
 
     % Get position point
-    sampled_i = find(x_ihalf_sampled <= x);
+    xsingle = single(x);
+    sampled_i = find(x_ihalf_sampled <= xsingle);
     sampled_i = sampled_i(end);
-    i = (sampled_i-1)*sampling_step + find(x == x_ihalf_padded_mat(:,sampled_i));
+    i = (sampled_i-1)*sampling_step + find(xsingle == x_ihalf_padded_mat(:,sampled_i));
 
     % g: Generation terms
     if g1_fun_type_constant
