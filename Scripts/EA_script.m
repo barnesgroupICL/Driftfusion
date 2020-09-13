@@ -137,7 +137,6 @@ for i = 1:length(structs(1, :))
         % as the number of periods is fixed, there's no need for tmax to be
         % a matrix, but this could change, so it's a matrix
         tmax_matrix(i,j) = struct_EA.par.tmax;
-        tpoints_matrix(i,j) = length(struct_EA.t);
     end
 end
 
@@ -158,7 +157,7 @@ EA_results.sol_name = structs{2, 1};
 EA_results.Vdc = Vdc_array;
 EA_results.periods = periods;
 EA_results.Freq = Freq_matrix;
-EA_results.tpoints = tpoints_matrix;
+EA_results.tpoints = 1 + tpoints_per_period * periods;
 EA_results.tmax = tmax_matrix;
 EA_results.Int = Int_array;
 EA_results.deltaV = deltaV;
