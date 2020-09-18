@@ -76,6 +76,8 @@ par.BC = par_origin.BC;
 par.mobset = 1;
 par.radset = 1;
 
+% Obtain field in centre of device
+dfana.calcF(
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e6;
 
