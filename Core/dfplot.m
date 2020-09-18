@@ -636,20 +636,11 @@ classdef dfplot
             par = sol.par;
             dcum0 = par.dcum0*1e7;   % Convert to nm
             
-            % Multicoloured
-            % triplets = [1, 0.87, 0.87; 1, 0.9, 0.7; 0.8, 0.9, 1; 1, 0.8, 0.9; 0.8, 1, 0.9; 0.9, 0.8, 1;0.9, 1, 0.8];
-            % French flag
-            % triplets = [1, 0.87, 0.87; 1, 0.98, 0.7; 1, 1, 1; 1, 1, 0.98; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
-            % Cool Mint
-            triplets = [0.85, 0.95, 0.7; 1, 0.9, 0.7; 1, 1, 1; 1, 0.9, 0.7; 0.8, 0.9, 1; 0.9, 0.8, 1;0.9, 1, 0.8];
-            % pn
-            % triplets = [1, 0.87, 0.87; 0.85, 0.92, 1];
-            
             for i =1:length(dcum0)-1
                 v = [dcum0(i) yrange(2); dcum0(i+1) yrange(2); dcum0(i+1) yrange(1); dcum0(i) yrange(1)];   % vertices position
                 f = [1 2 3 4];    % Faces
-                j = i - ((length(triplets)-1)*floor(i/length(triplets)));
-                colour = triplets(j,:);
+                j = i - ((length(par.layer_colour)-1)*floor(i/length(par.layer_colour)));
+                colour = par.layer_colour(j,:);
                 patch('Faces',f,'Vertices',v,'FaceColor',colour, 'EdgeColor','none');%,'HandleVisibility','off')
             end
             

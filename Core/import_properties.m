@@ -273,5 +273,11 @@ try
 catch
     warning('No of ionic species (N_ionic_species) undefined in .csv. Using default in PC')
 end
+% Layer colours
+try
+    par.layer_colour = T{1, 'layer_colour'};
+catch
+    warning('Layer colours (layer_colour) undefined in .csv. Using default in PC')
+end
 
 end
