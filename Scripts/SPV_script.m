@@ -26,7 +26,7 @@ initialise_df
 % open it in Excel and then edit the parameters. Save it as a different
 % name and then use that as the file in the path of the input argument to
 % PC (the parameters class):
-par_tio2_2l = pc('Input_files/SPV_TiO2_MAPI_bilayer.csv');
+par_tio2_2l = pc('Input_files/tio2_mapi_bilayer.csv');
 
 %% Get equilibrium solutions
 % You will find that with the default parameters, contained in the above
