@@ -275,7 +275,10 @@ catch
 end
 % Layer colours
 try
-    par.layer_colour = T{1, 'layer_colour'};
+    Red = T{:, 'Red'};
+    Green = T{:, 'Green'};
+    Blue = T{:, 'Blue'};
+    par.layer_colour = [Red,Green,Blue];
 catch
     warning('Layer colours (layer_colour) undefined in .csv. Using default in PC')
 end

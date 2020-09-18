@@ -647,7 +647,11 @@ classdef dfplot
             for i =1:length(dcum0)-1
                 v = [dcum0(i) yrange(2); dcum0(i+1) yrange(2); dcum0(i+1) yrange(1); dcum0(i) yrange(1)];   % vertices position
                 f = [1 2 3 4];    % Faces
-                j = i - ((length(par.layer_colour)-1)*floor(i/length(par.layer_colour)));
+                if length(par.layer_colour) == length(dcum0)-1
+                    j = i;
+                else
+                    j = i - ((length(par.layer_colour)-1)*floor(i/length(par.layer_colour)));
+                end
                 colour = par.layer_colour(j,:);
                 patch('Faces',f,'Vertices',v,'FaceColor',colour, 'EdgeColor','none');%,'HandleVisibility','off')
             end
