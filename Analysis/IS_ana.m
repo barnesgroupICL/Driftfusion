@@ -1,10 +1,10 @@
-function coeff = IS_ana(struct_IS, minimal_mode, demodulation)
+function coeff = IS_ana(s, minimal_mode, demodulation)
 %IS_ANA - Calculate impedance (reactance and resistance) and phase by Impedance Spectroscopy (IS) with oscillating voltage
 %
-% Syntax:  IS_ana(struct_IS, minimal_mode, demodulation)
+% Syntax:  IS_ana(s, minimal_mode, demodulation)
 %
 % Inputs:
-%   STRUCT_IS - a struct with a solution being perturbed by an
+%   S - a struct with a solution being perturbed by an
 %     oscillating voltage, as generated from doIS_EA
 %   MINIMAL_MODE - logical, when true graphics does not get created and
 %     IS_subtracting_analysis does not get launched, useful when
@@ -42,9 +42,6 @@ function coeff = IS_ana(struct_IS, minimal_mode, demodulation)
 % October 2017; Last revision: May 2020
 
 %------------- BEGIN CODE --------------
-
-% shortcut
-s = struct_IS;
 
 % verify if the simulation broke, in that case return just NaNs
 if size(s.u, 1) < s.par.tpoints
