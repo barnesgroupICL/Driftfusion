@@ -155,9 +155,10 @@ classdef dfplot
         end
         
         function PLt(sol)
+            [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
             PL = dfana.PLt(sol);
             figure(7)
-            plot(sol.t, PL)
+            plot(t, PL)
             xlabel('Time [s]')
             ylabel('PL [cm-2s-1]')
         end
