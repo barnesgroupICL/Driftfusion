@@ -83,7 +83,7 @@ fig_1h = figure('Name', 'Amplitude of EA first harmonic E AC x E DC', 'NumberTit
         hold on
         if ~isnan(EA_results.AC_ExDC_E_i_amp(1))
             % due to ions
-            plot(EA_results.Freq(i, :), EA_results.AC_ExDC_E_i_amp(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            %plot(EA_results.Freq(i, :), EA_results.AC_ExDC_E_i_amp(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
         end
     end
     ax = gca;
@@ -107,7 +107,7 @@ fig_2h = figure('Name', 'Amplitude of EA second harmonic E_{AC}^2', 'NumberTitle
        %     'Color', Int_colors(i, :), 'LineStyle', '-.');
         if ~isnan(EA_results.AC_Efield2_i_amp(1))
             % due to ions
-            plot(EA_results.Freq(i, :), EA_results.AC_Efield2_i_amp(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+            %plot(EA_results.Freq(i, :), EA_results.AC_Efield2_i_amp(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
         end
     end
     ax = gca;
