@@ -39,7 +39,7 @@ if V0 ~= par.Vapp
 end
 
 %% Calculate tmax from scan rate and absolute change in voltage, deltaV
-deltaV = abs(Vmax-Vmin)+abs(Vmin-Vmax)+abs(V0-Vmin);
+deltaV = abs(Vmax-V0)+abs(Vmin-Vmax)+abs(V0-Vmin);
 tmax = deltaV/scan_rate;
 
 disp('Performing cyclic voltamagram')
