@@ -563,7 +563,7 @@ classdef dfplot
                 {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0);
             
             subplot(2,1,2);
-            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 0);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1);
         end
         
         function ELxnpxacx(varargin)
