@@ -76,7 +76,7 @@ par.radset = 1;
 
 % Characteristic diffusion time
 t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
-par.tmax = t_diff;
+par.tmax = 10*t_diff;
 par.t0 = par.tmax/1e6;
 
 %% Solution with mobility switched on
@@ -110,7 +110,7 @@ soleq_nosrh = sol;
 disp('Switching on interfacial recombination')
 par.SRHset = 1;
 
-par.tmax = t_diff;
+par.tmax = 10*t_diff;
 par.t0 = par.tmax/1e3;
 
 soleq.el = df(soleq_nosrh, par);
@@ -156,14 +156,14 @@ if electronic_only == 0
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
     par.K_anion = rat_anion;
     par.K_cation = rat_cation;
-    par.tmax = t_diff;
+    par.tmax = 10*t_diff;
     par.t0 = par.tmax/1e3;
       
     sol = df(sol, par);
     
 %     % Longer second solution
 %     par.calcJ = 0;
-%     par.tmax = t_diff;
+%     par.tmax = 10*t_diff;
 %     par.t0 = par.tmax/1e3;
     
 %     sol = df(sol, par);
