@@ -1,7 +1,7 @@
 function plot_sigma_light(sol_CVs, light_intensities, sigma)
 
 % plot sigma vs Vapp
-figure(100)
+figure(102)
 hold on
 % initialise legend
 leg = [];
@@ -18,8 +18,8 @@ hold off
 
 %% Plot sigma(Vapp=0) vs light intensity
 figure(101)
-plot(light_intensities, sigma(:,1))
+plot(light_intensities, sigma(:,1), '-o')
 xlabel('Light intensity [suns]')
-ylabel('Inferred conductivity at Vapp=0 V [S cm-1]')
+ylabel('Inferred conductivity at Vapp = 0 V [S cm-1]')
 
 end

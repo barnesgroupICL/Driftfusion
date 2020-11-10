@@ -1,4 +1,4 @@
-function plot_CVs(sol_CVs, light_intensities, xlimits)
+function plot_CVs(sol_CVs, light_intensities, xlimits, ylimits)
 
 % initialise legend
 leg = [];
@@ -9,6 +9,7 @@ for i=1:length(light_intensities)
 end
 legend(leg)
 xlim(xlimits)
+ylim(ylimits)
 hold off
 
 end

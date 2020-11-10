@@ -3,41 +3,55 @@
 % Authors: P.R.F. Barnes, P. Calado 2020
 % Department of Physics, Imperial College London
 
-%% Intrinsic device with Ohmic contacts
-params_filepath = './Input_files/intrinsic_ohmic.csv';
-light_intensities = [0, 1, 2, 3, 4, 5, 6];      % List the light intensities here
-Vmax = 1;                                       % Maximum voltage for cyclic voltammogram
-Vmin = -1;                                      % Minimum voltage for cyclic voltammogram
-output_file_name = 'intrinsic_ohmic.txt';           % Filename for output file
+%% Input parameters
+params_filepath = './CPE_workshop_Input_files/doped_ohmic.csv';  % Filepath to the appropriate parameters file
+output_file_name = 'doped_ohmic';           % Filename for output file
 
-%% Get equilibrium (eq) and cyclic voltammogram (CV) solutions
-[sol_eq, sol_CVs, light_intensities, sigma] = sigma_light(params_filepath, light_intensities, Vmax, Vmin);
+light_intensities = [0, 1, 2, 3];      % List the light intensities here
+Vmax = 2;                                       % Maximum voltage for cyclic voltammogram
+Vmin = -2;                                      % Minimum voltage for cyclic voltammogram
 
-%% Export solutions to text file
-headers = "Voltage";
+%% Load in parameters
+par = pc(params_filepath);
+
+%% Obtain and plot equilibrium solution
+sol_eq = equilibrate(par);
+
+%% Obtain cyclic voltammogram (CV) solutions and conductivity vs voltage (sigma)
+[sol_CVs, light_intensities, sigma] = sigma_light(sol_eq, light_intensities, Vmax, Vmin);
+
+%% Export solutions to tab delimited text file
+headers = cell(1, length(light_intensities) + 1);
+headers{1,1} = "Voltage";
 for i=1:length(light_intensities)
     current_intensity ="Current, "+ num2str(light_intensities(i))+ " suns";
-    headers = [headers, current_intensity];
+    headers{1,i+1} = current_intensity;
 end
+%headers = cellstr(headers);
 
-%% Extract voltage and current arrays from the solution
+% Extract voltage and current arrays from the solution
 V = dfana.calcVapp(sol_CVs(1));
-Js = zeros(length(light_intensities), length(V)); 
-JV = zeros(length(light_intensities)+1, length(V));    % Eventually V and Js will  be transposed
-JV(1,:) = V;   % Write the voltage array to first column
+Js = zeros(length(V), length(light_intensities)); 
+JV = zeros(length(V), length(light_intensities)+1);    % Eventually V and Js will  be transposed
+JV(:,1) = V';   % Write the voltage array to first column
 
 for i = 1:length(light_intensities)
    J = dfana.calcJ(sol_CVs(i));     % J is structure containing all the current density elements
-   JV(i+1,:) = J.tot(:,1);
-end
+   JV(:, i+1) = J.tot(:, 1)';
+end 
 
-T = table(JV, 'varnames', headers);
+% Create the table and write to file
+output_cell = [headers; num2cell(JV)];
+T = cell2table(output_cell);
+writetable(T, ['./Output_files/', output_file_name, '.txt'], 'Delimiter', 'tab', 'WriteVariableNames', 0);
 
-%writetable(headers, JV)
+%% Plot equilibrium band diagram
+dfplot.ELx(sol_eq.el)
 
-%% plot CVs
-xlimits = [-0.1, 0.1];
-plot_CVs(sol_CVs, light_intensities, xlimits);
+%% Plot cyclic voltammograms
+xlimits = [-1, 1];      % Sets the limits for the plot x-axis
+ylimits = [-0.1, 0.1];  % Sets the limits for the plot y-axis
+plot_CVs(sol_CVs, light_intensities, xlimits, ylimits);
 
-%% plot conductivity (sigma) vs light intensity
+%% Plot conductivity (sigma) vs light intensity
 plot_sigma_light(sol_CVs, light_intensities, sigma);
