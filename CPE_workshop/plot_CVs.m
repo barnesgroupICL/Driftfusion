@@ -8,8 +8,15 @@ for i=1:length(light_intensities)
     hold on
 end
 legend(leg)
-xlim(xlimits)
-ylim(ylimits)
+
+if xlimits ~= [0, 0]
+    xlim(xlimits)
+end
+
+if ylimits ~= [0, 0] 
+    ylim(ylimits)
+end
+
 hold off
 
 end
