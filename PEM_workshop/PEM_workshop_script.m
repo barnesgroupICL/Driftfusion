@@ -7,8 +7,8 @@
 initialise_df
 
 %% Input parameters
-params_filepath = './PEM_workshop_Input_files/2_layer_device.csv';     % Filepath to the parameters file
-output_filename = '2_layer_device';                                    % Filename for output file
+params_filepath = './PEM_workshop_Input_files/3_layer_device.csv';     % Filepath to the parameters file
+output_filename = '3_layer_device';                                    % Filename for output file
 
 light_intensities = 0;          % List the light intensities here
 Vmax = 1.2;                     % Maximum voltage for cyclic voltammogram
