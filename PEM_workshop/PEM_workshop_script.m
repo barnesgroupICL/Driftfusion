@@ -7,8 +7,8 @@
 initialise_df
 
 %% Input parameters
-params_filepath = './PEM_workshop_Input_files/intrinsic_ohmic.csv';     % Filepath to the parameters file
-output_filename = 'intrinsic_ohmic';                                    % Filename for output file
+params_filepath = './PEM_workshop_Input_files/3_layer_intrinsic.csv';     % Filepath to the parameters file
+output_filename = '3_layer_intrinsic';                                    % Filename for output file
 
 light_intensities = 0;          % List the light intensities here
 Vmax = 1.2;                     % Maximum voltage for cyclic voltammogram
@@ -26,8 +26,9 @@ sol_eq = equilibrate(par, 1);
 dfplot.ELx(sol_eq.el);
 % Plot carrier densities at equilbrium
 dfplot.npx(sol_eq.el);
-% Export equilibrium band daigram
+% Export equilibrium electron, hole and electrostatic potential densities
 export_solution(['Equilibrium_solution_', output_filename], sol_eq.el, 0)
+% Export equilibrium band diagram
 export_ELx(['Equilibrium_energy_levels_', output_filename], sol_eq.el, 0)
 
 %% Call function to obtain equilibrium and cyclic voltammogram solutions
@@ -44,7 +45,7 @@ eval(['sol_CVs_',output_filename, '= sol_CVs;'])
 
 %% Export the solution for the first light intensity at specified voltage
 Vapp = 0.6;
-export_solution(['Solution at Vapp =', num2str(Vapp), output_filename], sol_CVs.sol(1), Vapp)
+export_solution(['Solution at Vapp =', num2str(Vapp), ' V ', output_filename], sol_CVs.sol(1), Vapp)
 
 %% Plot cyclic voltammograms
 plot_CVs(sol_CVs, light_intensities, xlimits, ylimits);
