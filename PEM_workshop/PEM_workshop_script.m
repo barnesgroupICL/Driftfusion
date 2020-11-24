@@ -7,8 +7,8 @@
 initialise_df
 
 %% Input parameters
-params_filepath = './PEM_workshop_Input_files/3_layer_intrinsic.csv';     % Filepath to the parameters file
-output_filename = '3_layer_intrinsic';                                    % Filename for output file
+params_filepath = './PEM_workshop_Input_files/2_layer_device.csv';     % Filepath to the parameters file
+output_filename = '2_layer_device';                                    % Filename for output file
 
 light_intensities = 0;          % List the light intensities here
 Vmax = 1.2;                     % Maximum voltage for cyclic voltammogram
@@ -32,23 +32,20 @@ export_solution(['Equilibrium_solution_', output_filename], sol_eq.el, 0)
 export_ELx(['Equilibrium_energy_levels_', output_filename], sol_eq.el, 0)
 
 %% Call function to obtain equilibrium and cyclic voltammogram solutions
-sol_CVs = get_CVs(sol_eq.el, light_intensities, Vmax, Vmin, output_filename);
+sol_CV = get_CVs(sol_eq.el, light_intensities, Vmax, Vmin, output_filename);
 
 %% Output current and voltage for first light intensity (usually 0)
-Vapp = dfana.calcVapp(sol_CVs.sol(1));  % Applied voltage
-Jstruct = dfana.calcJ(sol_CVs.sol(1));
+Vapp = dfana.calcVapp(sol_CV.sol(1));  % Applied voltage
+Jstruct = dfana.calcJ(sol_CV.sol(1));
 J = Jstruct.tot(:,1);                   % Total current at left-hand boundary
 
 %% Rename solution
 eval(['sol_eq_', output_filename, '= sol_eq;'])
-eval(['sol_CVs_',output_filename, '= sol_CVs;'])
+eval(['sol_CV_',output_filename, '= sol_CV;'])
 
 %% Export the solution for the first light intensity at specified voltage
 Vapp = 0.6;
-export_solution(['Solution at Vapp =', num2str(Vapp), ' V ', output_filename], sol_CVs.sol(1), Vapp)
+export_solution(['Solution at Vapp =', num2str(Vapp), ' V ', output_filename], sol_CV.sol(1), Vapp)
 
 %% Plot cyclic voltammograms
-plot_CVs(sol_CVs, light_intensities, xlimits, ylimits);
-
-%% Plot conductivity (sigma) vs light intensity
-plot_sigma_light(sol_CVs, light_intensities);
+plot_CVs(sol_CV, light_intensities, xlimits, ylimits);
