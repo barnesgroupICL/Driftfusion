@@ -1,4 +1,4 @@
-function sol_CVs = get_CVs(sol_CVs_in, light_intensities, Vmax, Vmin, output_filename)
+function sol_CVs = get_CVs(sol_CVs_in, light_intensities, Vmax, Vmin, scan_rate, output_filename)
 % Created for the Centre for Processable Electronics (CPE) MRes course
 % on semiconductor physics
 % Authors: P.R.F. Barnes, P. Calado 2020
@@ -9,7 +9,6 @@ function sol_CVs = get_CVs(sol_CVs_in, light_intensities, Vmax, Vmin, output_fil
 
 %% Cyclic-voltammogram initial parameters
 V0 = 0;         % Start scan voltage [V]
-scan_rate = 1e-3;  % [Vs-1]
 cycles = 1;
 Vpoints = 401;  % Number of voltage points in output sol_CVsution
 
