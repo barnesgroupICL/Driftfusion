@@ -344,58 +344,113 @@ classdef pc
             if length(par.parr) ~= length(par.d)
                 msg = 'Points array (parr) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.EA) ~= length(par.d)
+            end
+            
+            if length(par.EA) ~= length(par.d)
                 msg = 'Electron Affinity array (EA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.IP) ~= length(par.d)
+            end
+            
+            if length(par.IP) ~= length(par.d)
                 msg = 'Ionisation Potential array (IP) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.mue) ~= length(par.d)
+            end
+            
+            if length(par.mue) ~= length(par.d)
                 msg = 'Electron mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.muh) ~= length(par.d)
+            end
+            
+            if length(par.muh) ~= length(par.d)
                 msg = 'Hole mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.muani) ~= length(par.d)
-                msg = 'Ion mobility array (muh) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                error(msg);
-            elseif length(par.NA) ~= length(par.d)
+            end
+            
+            if length(par.muani) ~= length(par.d)
+                par.muani = ones(1, length(par.d))*par.muani(1);
+            end
+            
+            if length(par.mucat) ~= length(par.d)
+                par.mucat = ones(1, length(par.d))*par.mucat(1);
+                %msg = 'Ion mobility array (muh) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                %error(msg);
+            end
+            
+            if length(par.NA) ~= length(par.d)
                 msg = 'Acceptor density array (NA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.ND) ~= length(par.d)
+            end
+            
+            if length(par.ND) ~= length(par.d)
                 msg = 'Donor density array (ND) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.Nc) ~= length(par.d)
+            end
+            
+            if length(par.Nc) ~= length(par.d)
                 msg = 'Effective density of states array (Nc) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.Nv) ~= length(par.d)
+            end
+            
+            if length(par.Nv) ~= length(par.d)
                 msg = 'Effective density of states array (Nv) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.Nani) ~= length(par.d)
-                msg = 'Background ion density (Nani) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                error(msg);
-            elseif length(par.amax) ~= length(par.d)
-                msg = 'Ion density of states array (amax) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
-                error(msg);
-            elseif length(par.epp) ~= length(par.d)
+            end
+            
+            if length(par.Nani) ~= length(par.d)
+                par.Nani = ones(1, length(par.d))*par.Nani(1);
+                %msg = 'Background ion density (Nani) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                %warning(msg);
+            end
+            
+            if length(par.Ncat) ~= length(par.d)
+                par.Ncat = ones(1, length(par.d))*par.Ncat(1);
+                %msg = 'Background ion density (Nani) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                %warning(msg);
+            end
+            
+            if length(par.amax) ~= length(par.d)
+                par.amax = ones(1, length(par.d))*par.amax(1);
+                %msg = 'Ion density of states array (amax) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                %error(msg);
+            end
+            
+            if length(par.cmax) ~= length(par.d)
+                par.cmax = ones(1, length(par.d))*par.cmax(1);
+                %msg = 'Ion density of states array (amax) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+                %error(msg);
+            end
+            
+            if length(par.epp) ~= length(par.d)
                 msg = 'Relative dielectric constant array (epp) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.B) ~= length(par.d)
+            end
+            
+            if length(par.B) ~= length(par.d)
                 msg = 'Radiative recombination coefficient array (B) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.E0) ~= length(par.d)
+            end
+            
+            if length(par.E0) ~= length(par.d)
                 msg = 'Equilibrium Fermi level array (E0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.g0) ~= length(par.d)
+            end
+            
+            if length(par.g0) ~= length(par.d)
                 msg = 'Uniform generation array (g0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.taun) ~= length(par.d)
+            end
+            
+            if length(par.taun) ~= length(par.d)
                 msg = 'Bulk SRH electron time constants array (taun_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.taup) ~= length(par.d)
+            end
+                
+            if length(par.taup) ~= length(par.d)
                 msg = 'Bulk SRH hole time constants array (taup_bulk) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.Et) ~= length(par.d)
+            end
+            
+            if length(par.Et) ~= length(par.d)
                 msg = 'Bulk SRH trap energy array (Et) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             end
@@ -466,6 +521,7 @@ classdef pc
         function value = get.d_midactive(par)
            value = par.dcum(par.active_layer(1)-1) + par.d_active/2;
         end
+        
         %% Layer thicknesses [cm]
         function value = get.dcell(par)
             % For backwards comptibility. layer_points and parr arre the now the

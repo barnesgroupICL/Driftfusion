@@ -89,13 +89,13 @@ end
 try
     par.Nani = T{:, 'Nani'}';
 catch
-    warning('No equilibrium anion density array (Nani) defined in .csv . Using default in PC')
+  %  warning('No equilibrium anion density array (Nani) defined in .csv . Using default in PC')
 end
 % Intrinsic cation density
 try
     par.Ncat = T{:, 'Ncat'}';
 catch
-    warning('No equilibrium cation density array (Ncat) defined in .csv . Using default in PC')
+   % warning('No equilibrium cation density array (Ncat) defined in .csv . Using default in PC')
 end
 % Limiting density of anion states
 try
@@ -107,7 +107,7 @@ catch
         try
             par.amax = T{:, 'Nion'}';
         catch
-            warning('No maximum anion density array (DOSani) defined in .csv . Using default in PC')
+            %warning('No maximum anion density array (DOSani) defined in .csv . Using default in PC')
         end
     end
 end
@@ -118,7 +118,7 @@ catch
     try
         par.cmax = T{:, 'DOScat'}';
     catch
-        warning('No maximum cation density array (DOScat) defined in .csv . Using default in PC')
+        %warning('No maximum cation density array (DOScat) defined in .csv . Using default in PC')
     end
 end
 % Electron mobility
@@ -140,14 +140,14 @@ catch
     try
         par.muani = T{:, 'muion'}';
     catch
-        warning('No anion mobility (muani) defined in .csv . Using default in PC')
+       % warning('No anion mobility (muani) defined in .csv . Using default in PC')
     end
 end
 % Cation mobility
 try
     par.mucat = T{:, 'mucat'}';
 catch
-    warning('No cation mobility (mucat) defined in .csv . Using default in PC')
+   % warning('No cation mobility (mucat) defined in .csv . Using default in PC')
 end
 % Relative dielectric constant
 try

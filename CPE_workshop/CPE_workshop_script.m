@@ -7,12 +7,12 @@
 initialise_df
 
 %% Input parameters
-params_filepath = './CPE_workshop_Input_files/intrinsic_ohmic.csv';   % Filepath to the parameters file
-output_filename = 'intrinsic_ohmic';      % Filename for output file
+params_filepath = './CPE_workshop_Input_files/blocking_contacts_3_layer.csv';   % Filepath to the parameters file
+output_filename = 'blocking_contacts_3_layer';      % Filename for output file
 
 light_intensities = [0, 1, 2, 3];          % List the light intensities here
-Vmax = 1.2;                                         % Maximum voltage for cyclic voltammogram
-Vmin = -1.2;                                        % Minimum voltage for cyclic voltammogram
+Vmax = 1.3;                                         % Maximum voltage for cyclic voltammogram
+Vmin = -1.3;                                        % Minimum voltage for cyclic voltammogram
 
 xlimits = [0, 0];   % Sets the limits for the CV plot x-axis. Set to [0 ,0] for autoscaling
 ylimits = [0, 0];   % Sets the limits for the CV plot y-axis. Set to [0 ,0] for autoscaling
@@ -21,10 +21,13 @@ ylimits = [0, 0];   % Sets the limits for the CV plot y-axis. Set to [0 ,0] for 
 par = pc(params_filepath);
 
 %% Obtain and plot equilibrium solution
-sol_eq = equilibrate(par);
+sol_eq = equilibrate(par, 1);
 
 % Plot equilibrium band diagram
 dfplot.ELx(sol_eq.el)
+
+% Export equilibrium band daigram
+export_ELx(['Equilibrium_energy_levels_', output_filename], sol_eq.el, sol_eq.el.t(end))
 
 %% Call function to obtain equilibrium and cyclic voltammogram solutions
 sol_CVs = get_CVs(sol_eq.el, light_intensities, Vmax, Vmin, output_filename);
