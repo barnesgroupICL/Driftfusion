@@ -1,4 +1,4 @@
-function [sol_eq, sol_CVs, light_intensities, sigma] = get_sigmas(params_filepath, light_intensities)
+function [sol_eq, sol_CVs, light_intensities, sigma] = PEM_workshop_fun(params_filepath, light_intensities)
 % Test script for the Centre for Processable Electronics (CPE) MRes course
 % on semiconductor physics
 % Authors: P.R.F. Barnes, P. Calado 2020

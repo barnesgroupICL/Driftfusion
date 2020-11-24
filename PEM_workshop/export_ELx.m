@@ -1,4 +1,4 @@
-function export_ELx(output_filename, sol, t)
+function export_solution(output_filename, sol, t)
 
 %% Export Energy level diagram
 % sol is a Driftfusion solution structure
