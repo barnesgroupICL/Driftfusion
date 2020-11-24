@@ -1,7 +1,8 @@
-% Created for the Centre for Processable Electronics (CPE) MRes course
-% on semiconductor physics
-% Authors: P.R.F. Barnes, P. Calado 2020
+% Semiconductor device physics computation simulation workshop
+% Created for the Centre for Processable Electronics (CPE) MRes PEM course
 % Department of Physics, Imperial College London
+% Authors: P. R. F. Barnes, P. Calado
+% Nov 2020
 
 %% Initialise the code. Only needs to be run once at the start of each session
 initialise_df
@@ -9,12 +10,10 @@ initialise_df
 %% Input parameters
 params_filepath = './PEM_workshop_Input_files/intrinsic_ohmic.csv';     % Filepath to the parameters file
 output_filename = 'intrinsic_ohmic';                                    % Filename for output file
-light_intensities = [0];        % List the light intensities here in square brackets e.g. [0, 1, 2]
+light_intensities = 0;          % List the light intensities here
 Vmax = 1.2;                     % Maximum voltage for cyclic voltammogram
 Vmin = -1.2;                    % Minimum voltage for cyclic voltammogram
 scan_rate = 1e-3;               % Current-voltage scan rate [Vs-1] 
-xlimits = [0, 0];   % Sets the limits for the CV plot x-axis. Set to [0 ,0] for autoscaling
-ylimits = [0, 0];   % Sets the limits for the CV plot y-axis. Set to [0 ,0] for autoscaling
 
 %% Load in parameters
 par = pc(params_filepath);
@@ -30,11 +29,9 @@ Vapp = dfana.calcVapp(sol_CV.sol(1));  % Applied voltage
 Jstruct = dfana.calcJ(sol_CV.sol(1));
 J = Jstruct.tot(:,1);                   % Total current at left-hand boundary
 
-%% Rename solution
-eval(['sol_eq_', output_filename, '= sol_eq;'])
-eval(['sol_CV_',output_filename, '= sol_CV;'])
-
 %% Plot cyclic voltammograms
+xlimits = [0, 0];   % Sets the limits for the CV plot x-axis. Set to [0 ,0] for autoscaling
+ylimits = [0, 0];   % Sets the limits for the CV plot y-axis. Set to [0 ,0] for autoscaling
 plot_CVs(sol_CV, light_intensities, xlimits, ylimits);
 
 %% Plot energy level diagram at applied bias Vapp for first light intensity
@@ -50,10 +47,11 @@ dfplot.ELx(sol_CV.sol(1), tplot);
 % PLot the carrier densities at time TPLOT
 dfplot.npx(sol_CV.sol(1), tplot);
 
-%% Exporting the solutions
-% Export equilibrium electron, hole and electrostatic potential densities
-export_solution(['Equilibrium_solution_', output_filename], sol_eq.el, 0)
+%% Rename solution
+eval(['sol_eq_', output_filename, '= sol_eq;'])
+eval(['sol_CV_',output_filename, '= sol_CV;'])
 
-% Export the solution for the first light intensity at specified voltage
-Vexport = 0.6;
-export_solution(['Solution at Vapp =', num2str(Vexport), ' V ', output_filename], sol_CV.sol(1), Vexport)
+%% Exporting the solutions
+% Export the solution for the first light intensity at voltage VPLOT
+export_solution(['Solution at Vapp =', num2str(Vplot), ' V ', output_filename], sol_CV.sol(1), tplot)
+export_ELx(['Energy levels at Vapp =', num2str(Vplot), ' V ', output_filename], sol_CV.sol(1), tplot)

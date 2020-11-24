@@ -1,4 +1,4 @@
-function export_solution(output_filename, sol, t)
+function export_solution(output_filename, sol, tplot)
 
 %% Export Energy level diagram
 % sol is a Driftfusion solution structure
@@ -8,7 +8,7 @@ function export_solution(output_filename, sol, t)
 [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
 
 % find the time point
-p1 = find(sol.t <= t);
+p1 = find(sol.t <= tplot);
 p1 = p1(end);
 
 % Extract the row for time t

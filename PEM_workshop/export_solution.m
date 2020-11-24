@@ -1,12 +1,11 @@
-function export_solution(output_filename, sol, Vapp)
+function export_solution(output_filename, sol, tplot)
 
 %% Export Energy level diagram
 % sol is a Driftfusion solution structure
 % Vapp is the voltage for the desired output
 
 % find the time point
-Vappt = dfana.calcVapp(sol); % Applied voltage as a function of time
-p1 = find(Vappt <= Vapp);
+p1 = find(sol.t <= tplot);
 p1 = p1(end);
 
 % Get the solution at desired time point
