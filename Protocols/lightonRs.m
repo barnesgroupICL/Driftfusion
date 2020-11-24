@@ -62,11 +62,13 @@ else
 end
 
 par.mobseti = mobseti;
-% If STABLE_TIME is  is entered as zero set to default value
-if stable_time >= 0
+% If STABLE_TIME is entered as zero set to default value
+if stable_time > 0
     par.tmax = stable_time;
 else
-    par.tmax = -stable_time;
+    % Characteristic diffusion time
+    t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
+    par.tmax = 10*t_diff;
 end
 par.t0 = par.tmax/1e6;
 par.tpoints = pnts;
