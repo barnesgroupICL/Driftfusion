@@ -1,4 +1,4 @@
-function plot_sigma_light(sol_CVs, light_intensities)
+function plot_sigma_light(sol_CV, light_intensities)
 
 % initialise legend
 leg = [];

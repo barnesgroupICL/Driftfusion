@@ -1,4 +1,4 @@
-function sigma_sol = get_CVs(soleq, light_intensities, Vmax, Vmin, output_filename)
+function sigma_sol = sigma_light(soleq, light_intensities, Vmax, Vmin, output_filename)
 % Created for the Centre for Processable Electronics (CPE) MRes course
 % on semiconductor physics
 % Authors: P.R.F. Barnes, P. Calado 2020
