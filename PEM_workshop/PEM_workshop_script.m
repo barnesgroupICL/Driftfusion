@@ -29,7 +29,7 @@ J = Jstruct.tot(:,1);                   % Total current at left-hand boundary
 %% Plot cyclic voltammograms
 xlimits = [0, 0];   % Sets the limits for the CV plot x-axis. Set to [0 ,0] for autoscaling
 ylimits = [0, 0];   % Sets the limits for the CV plot y-axis. Set to [0 ,0] for autoscaling
-plot_CVs(sol_CV, light_intensities, xlimits, ylimits);
+plot_CVs(sol_CV, light_intensity, xlimits, ylimits);
 
 %% Plot energy level diagram at applied bias Vapp for first light intensity
 Vplot = 0;
