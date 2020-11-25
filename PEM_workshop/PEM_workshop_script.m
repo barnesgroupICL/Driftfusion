@@ -4,9 +4,6 @@
 % Authors: P. R. F. Barnes, P. Calado
 % Nov 2020
 
-%% Initialise the code. Only needs to be run once at the start of each session
-initialise_df
-
 %% Input parameters
 params_filepath = './PEM_workshop_Input_files/intrinsic_ohmic.csv';     % Filepath to the parameters file
 output_filename = 'intrinsic_ohmic';                                    % Filename for output file
