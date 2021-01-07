@@ -573,6 +573,14 @@ classdef dfplot
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1);
         end
         
+        function rsrhx(varargin)
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            r = dfana.calcr(sol);
+            
+            dfplot.x2d(sol, x, {r.srh}, {''}, {'-'}, 'SRH rec rate [cm-3s-1]', tarr, xrange, 0, 1);
+        end
+        
         function ELxnpxacx(varargin)
             % Energy Level diagram, and charge densities plotter
             % SOL = the solution structure

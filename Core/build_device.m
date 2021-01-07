@@ -19,8 +19,8 @@ switch meshoption
 end
 
 % Constant properties
-dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
-dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
+dev.taun = build_property(par.taun, xmesh, par, 'surface_rec_n', 0);
+dev.taup = build_property(par.taup, xmesh, par, 'surface_rec_p', 0);
 
 % Linearly graded properties
 dev.EA = build_property(par.EA, xmesh, par, 'lin_graded', 0);
@@ -30,7 +30,6 @@ dev.muh = build_property(par.muh, xmesh, par, 'lin_graded', 0);
 dev.mucat = build_property(par.mucat, xmesh, par, 'zeroed', 0);
 dev.muani = build_property(par.muani, xmesh, par, 'zeroed', 0);
 dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
-dev.B = build_property(par.B, xmesh, par, 'lin_graded', 0);
 dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
 dev.Et = build_property(par.Et, xmesh, par, 'lin_graded', 0);
 
@@ -48,6 +47,7 @@ dev.DOSani = build_property(par.amax, xmesh, par, 'log_graded', 0);
 dev.DOScat = build_property(par.cmax, xmesh, par, 'log_graded', 0);
 
 % Properties that are zeroed in the interfaces
+dev.B = build_property(par.B, xmesh, par, 'zeroed', 0);
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);
 
 % Gradient properties
