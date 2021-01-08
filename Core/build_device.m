@@ -25,13 +25,13 @@ dev.taup = build_property(par.taup, xmesh, par, 'surface_rec_p', 0);
 % Linearly graded properties
 dev.EA = build_property(par.EA, xmesh, par, 'lin_graded', 0);
 dev.IP = build_property(par.IP, xmesh, par, 'lin_graded', 0);
-dev.mue = build_property(par.mue, xmesh, par, 'lin_graded', 0);
-dev.muh = build_property(par.muh, xmesh, par, 'lin_graded', 0);
+dev.mue = build_property(par.mue, xmesh, par, 'constant', 0);
+dev.muh = build_property(par.muh, xmesh, par, 'constant', 0);
 dev.mucat = build_property(par.mucat, xmesh, par, 'zeroed', 0);
 dev.muani = build_property(par.muani, xmesh, par, 'zeroed', 0);
-dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
+dev.epp = build_property(par.epp, xmesh, par, 'constant', 0);
 dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
-dev.Et = build_property(par.Et, xmesh, par, 'lin_graded', 0);
+dev.Et = build_property(par.Et, xmesh, par, 'constant', 0);
 
 % Logarithmically graded properties
 dev.NA = build_property(par.NA, xmesh, par, 'log_graded', 0);
