@@ -55,12 +55,18 @@ for i=1:length(par.dcum)                % i is the layer index
                             else
                                 devprop(j) = property(i-1)*exp(log_gradient*xprime);
                             end
-                        case 'surface_rec_n'
+                        case 'surface_rec_taun'
                             alpha = (par.EA(i+1) - par.EA(i-1) - par.kB*par.T*(log(par.Nc(i+1))-log(par.Nc(i-1))))/(deff*par.kB*par.T);                                                                                                                                   
                             devprop(j) = (deff/par.sn(i))*exp(-alpha*xprime);
-                        case 'surface_rec_p'
+                        case 'surface_rec_taup'
                             beta = (par.IP(i+1) - par.IP(i-1) + par.kB*par.T*(log(par.Nv(i+1))-log(par.Nv(i-1))))/(deff*par.kB*par.T);  
                             devprop(j) = (deff/par.sp(i))*exp(-beta*(deff - xprime));
+                        case 'surface_rec_nt'
+                            alpha = (par.EA(i+1) - par.EA(i-1) - par.kB*par.T*(log(par.Nc(i+1))-log(par.Nc(i-1))))/(deff*par.kB*par.T);
+                            devprop(j) = par.nt(i)*exp(-alpha*xprime);
+                        case 'surface_rec_pt'
+                            beta = (par.IP(i+1) - par.IP(i-1) + par.kB*par.T*(log(par.Nv(i+1))-log(par.Nv(i-1))))/(deff*par.kB*par.T);
+                            devprop(j) = par.pt(i)*exp(-beta*(deff - xprime));
                     end
                 end
             end
