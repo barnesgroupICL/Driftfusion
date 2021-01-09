@@ -182,7 +182,9 @@ classdef pc
         %% SRH time constants for each layer [s]
         taun = [1e6];           % [s] SRH time constant for electrons
         taup = [1e6];           % [s] SRH time constant for holes
-
+        
+        sn = [0];
+        sp = [0];
         %% Surface recombination and extraction coefficients [cm s-1]
         % Descriptions given in the comments considering that holes are
         % extracted at left boundary, electrons at right boundary
@@ -252,14 +254,14 @@ classdef pc
         nleft
         nright
         ni
-        nt_bulk         % Density of CB electrons when Fermi level at trap state energy
+        nt              % Density of CB electrons when Fermi level at trap state energy
         nt_inter
         p0
         pcum
         pcum0           % Includes first entry as zero
         pleft
         pright
-        pt_bulk         % Density of VB holes when Fermi level at trap state energy
+        pt              % Density of VB holes when Fermi level at trap state energy
         pt_inter
         wn
         wp
@@ -545,7 +547,19 @@ classdef pc
         function value = get.pright(par)
             value = distro_fun.pfun(par.Nv(end), par.IP(end), par.Phi_right, par.T, par.prob_distro_function);
         end
-
+       
+        %% SRH trap energy coefficients
+        function value = get.nt(par)
+            value = zeros(1, length(par.stack));
+            value = distro_fun.nfun(par.Nc, par.EA, par.Et, par.T, par.prob_distro_function);
+        end
+        
+        function value = get.pt(par)
+            value = zeros(1, length(par.stack));
+            value = distro_fun.pfun(par.Nv, par.IP, par.Et, par.T, par.prob_distro_function);
+        end
+        
+        %% Thickness and point arrays
         function value = get.dcum(par)
             value = cumsum(par.dcell);
         end

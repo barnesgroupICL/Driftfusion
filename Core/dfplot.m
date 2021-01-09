@@ -167,9 +167,9 @@ classdef dfplot
             
             if option == 1 || option == 3
                 J.dk.f = dfana.calcJ(JV.dk.f);
-                Vapp.dk.f = dfana.calcVapp(JV.dk.f);
+                Vapp.dk.f = -dfana.calcVapp(JV.dk.f);
                 J.dk.r = dfana.calcJ(JV.dk.r);
-                Vapp.dk.r = dfana.calcVapp(JV.dk.r);
+                Vapp.dk.r = -dfana.calcVapp(JV.dk.r);
                 
                 figure(4)
                 plot(Vapp.dk.f, J.dk.f.tot(:,end), '--', Vapp.dk.r, J.dk.r.tot(:,end));
@@ -179,9 +179,9 @@ classdef dfplot
             if option == 2 || option == 3
                 
                 J.ill.f = dfana.calcJ(JV.ill.f);
-                Vapp.ill.f = dfana.calcVapp(JV.ill.f);
+                Vapp.ill.f = -dfana.calcVapp(JV.ill.f);
                 J.ill.r = dfana.calcJ(JV.ill.r);
-                Vapp.ill.r = dfana.calcVapp(JV.ill.r);
+                Vapp.ill.r = -dfana.calcVapp(JV.ill.r);
                 
                 figure(4)
                 plot(Vapp.ill.f, J.ill.f.tot(:,end),'--')%, 'Color', [0, 0.4470, 0.7410]);
@@ -219,7 +219,7 @@ classdef dfplot
             ppos = getpointpos(xpos, xmesh);
             
             J = dfana.calcJ(sol);
-            Vapp = dfana.calcVapp(sol);
+            Vapp = -dfana.calcVapp(sol);
             
             figure(91)
             plot(Vapp, J.tot(:, ppos));
@@ -571,6 +571,14 @@ classdef dfplot
             
             subplot(2,1,2);
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1);
+        end
+        
+        function rsrhx(varargin)
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            r = dfana.calcr(sol);
+            
+            dfplot.x2d(sol, x, {r.srh}, {''}, {'-'}, 'SRH rec rate [cm-3s-1]', tarr, xrange, 0, 1);
         end
         
         function ELxnpxacx(varargin)

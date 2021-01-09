@@ -19,20 +19,19 @@ switch meshoption
 end
 
 % Constant properties
-dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
-dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
+dev.taun = build_property(par.taun, xmesh, par, 'surface_rec_taun', 0);
+dev.taup = build_property(par.taup, xmesh, par, 'surface_rec_taup', 0);
 
 % Linearly graded properties
 dev.EA = build_property(par.EA, xmesh, par, 'lin_graded', 0);
 dev.IP = build_property(par.IP, xmesh, par, 'lin_graded', 0);
-dev.mue = build_property(par.mue, xmesh, par, 'lin_graded', 0);
-dev.muh = build_property(par.muh, xmesh, par, 'lin_graded', 0);
+dev.mue = build_property(par.mue, xmesh, par, 'constant', 0);
+dev.muh = build_property(par.muh, xmesh, par, 'constant', 0);
 dev.mucat = build_property(par.mucat, xmesh, par, 'zeroed', 0);
 dev.muani = build_property(par.muani, xmesh, par, 'zeroed', 0);
-dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
-dev.B = build_property(par.B, xmesh, par, 'lin_graded', 0);
+dev.epp = build_property(par.epp, xmesh, par, 'constant', 0);
 dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
-dev.Et = build_property(par.Et, xmesh, par, 'lin_graded', 0);
+dev.Et = build_property(par.Et, xmesh, par, 'constant', 0);
 
 % Logarithmically graded properties
 dev.NA = build_property(par.NA, xmesh, par, 'log_graded', 0);
@@ -48,6 +47,7 @@ dev.DOSani = build_property(par.amax, xmesh, par, 'log_graded', 0);
 dev.DOScat = build_property(par.cmax, xmesh, par, 'log_graded', 0);
 
 % Properties that are zeroed in the interfaces
+dev.B = build_property(par.B, xmesh, par, 'zeroed', 0);
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);
 
 % Gradient properties
@@ -56,7 +56,7 @@ dev.gradIP = build_property(par.IP, xmesh, par, 'lin_graded', 1);
 dev.gradNc = build_property(par.Nc, xmesh, par, 'log_graded', 1);
 dev.gradNv = build_property(par.Nv, xmesh, par, 'log_graded', 1);
 
-dev.nt = distro_fun.nfun(dev.Nc, dev.EA, dev.Et, par.T, par.prob_distro_function);
-dev.pt = distro_fun.pfun(dev.Nv, dev.IP, dev.Et, par.T, par.prob_distro_function);
+dev.nt = build_property(par.nt, xmesh, par, 'surface_rec_nt', 1);
+dev.pt = build_property(par.pt, xmesh, par, 'surface_rec_pt', 1);
 
 end
