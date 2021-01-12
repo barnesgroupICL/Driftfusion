@@ -23,5 +23,3 @@ ylim([-10e-3,25e-3])
 xlim([0, 1.1])
 legend('50 mVs-1', '100 mVs-1', '200 mVs-1') 
 hold off
-
-

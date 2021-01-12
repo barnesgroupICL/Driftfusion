@@ -41,6 +41,7 @@ dev.Nv = build_property(par.Nv, xmesh, par, 'log_graded', 0);
 dev.Nani = build_property(par.Nani, xmesh, par, 'log_graded', 0);
 dev.Ncat = build_property(par.Ncat, xmesh, par, 'log_graded', 0);
 dev.ni = build_property(par.ni, xmesh, par, 'log_graded', 0);
+dev.nieff = build_property(par.ni, xmesh, par, 'surface_rec_nieff', 0);
 dev.n0 = build_property(par.n0, xmesh, par, 'log_graded', 0);
 dev.p0 = build_property(par.p0, xmesh, par, 'log_graded', 0);
 dev.DOSani = build_property(par.amax, xmesh, par, 'log_graded', 0);

@@ -82,7 +82,19 @@ for i=1:length(par.dcum)                % i is the layer index
                                 devprop(j) = par.pt(i)*exp(beta*xprime/deff);
                             elseif beta > 0
                                 devprop(j) = par.pt(i)*exp(beta*(xprime-deff)/deff);
-                            end 
+                            end
+                        case 'surface_rec_nieff'
+                            alpha = (par.EA(i-1) - par.EA(i+1))/(par.kB*par.T) + log(par.Nc(i+1))-log(par.Nc(i-1));
+                            beta = (par.IP(i+1) - par.IP(i-1))/(par.kB*par.T) + log(par.Nv(i+1))-log(par.Nv(i-1)); 
+                            if alpha <= 0 && beta <= 0
+                                devprop(j) = par.ni(i).*abs((exp(alpha*xprime/deff).*exp(beta*xprime/deff)).^0.5);
+                            elseif alpha <= 0 && beta > 0
+                                devprop(j) = par.ni(i).*abs((exp(alpha*xprime/deff).*exp(beta*(xprime-deff)/deff)).^0.5);
+                            elseif alpha > 0 && beta <= 0
+                                devprop(j) = par.ni(i).*abs((exp(alpha*(xprime-deff)/deff).*exp(beta*xprime/deff)).^0.5);
+                            elseif alpha > 0 && beta > 0
+                                devprop(j) = par.ni(i).*abs((exp(alpha*(xprime-deff)/deff).*exp(beta*(xprime-deff)/deff)).^0.5); 
+                            end
                     end
                 end
             end

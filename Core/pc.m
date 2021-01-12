@@ -134,7 +134,8 @@ classdef pc
         % and define the variables PT and NT in the expression:
         % U = (np-ni^2)/(taun(p+pt) +taup(n+nt))
         Et =[-0.5];
-
+        ni_eff = 0;     % Effective intrinsic carrier density used for surface recombination equivalence
+        
         %% Electrode Fermi energies [eV]
         % Fermi energies of the metal electrode. These define the built-in voltage, Vbi
         % and the boundary carrier concentrations nleft, pleft, nright, and
@@ -267,7 +268,6 @@ classdef pc
         wp
         wscr            % Space charge region width
         x0              % Initial spatial mesh value
-
     end
 
     methods
