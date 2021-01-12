@@ -348,7 +348,8 @@ classdef dfana
 
             % Property matrices
             eppmat = repmat(dev.epp, length(t), 1);
-            nimat = repmat(dev.ni, length(t), 1);
+            nimat = repmat(devihalf.ni, length(t), 1);
+            nieffmat = repmat(dev.nieff, length(t), 1);
             Bmat = repmat(dev.B, length(t), 1);
             taunmat = repmat(dev.taun, length(t), 1);
             taupmat = repmat(dev.taup, length(t), 1);
@@ -357,7 +358,7 @@ classdef dfana
 
             % Recombination
             r.btb = Bmat.*(n.*p - nimat.^2);
-            r.srh = ((n.*p - nimat.^2)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
+            r.srh = ((n.*p - nieffmat.^2)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
             r.tot = r.btb + r.srh;
         end
 
@@ -378,6 +379,7 @@ classdef dfana
             % Property matrices
             eppmat = repmat(devihalf.epp, length(t), 1);
             nimat = repmat(devihalf.ni, length(t), 1);
+            nieffmat = repmat(devihalf.nieff, length(t), 1);
             Bmat = repmat(devihalf.B, length(t), 1);
             taunmat = repmat(devihalf.taun, length(t), 1);
             taupmat = repmat(devihalf.taup, length(t), 1);
@@ -387,7 +389,7 @@ classdef dfana
             % Recombination
             r.btb = Bmat.*(n_ihalf.*p_ihalf - nimat.^2);
 
-            r.srh = ((n_ihalf.*p_ihalf - nimat.^2)./((taunmat.*(p_ihalf+ptmat)) + (taupmat.*(n_ihalf+ntmat))));
+            r.srh = ((n_ihalf.*p_ihalf - nieffmat.^2)./((taunmat.*(p_ihalf+ptmat)) + (taupmat.*(n_ihalf+ntmat))));
 
             r.tot = r.btb + r.srh;
         end
