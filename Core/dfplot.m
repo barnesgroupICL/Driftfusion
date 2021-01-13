@@ -357,7 +357,7 @@ classdef dfplot
 
             figure(171)
             dfplot.x2d(sol, x, {r.srh},{''},...
-                {'-'}, 'SRH recombination rate [cm-3s-1]', tarr, xrange, 0, 0);
+                {'-'}, 'SRH recombination rate [cm-3s-1]', tarr, xrange, 0, 1);
         end
         
         function JrecVapp(JV, option)

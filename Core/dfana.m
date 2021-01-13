@@ -348,7 +348,7 @@ classdef dfana
 
             % Property matrices
             eppmat = repmat(dev.epp, length(t), 1);
-            nimat = repmat(devihalf.ni, length(t), 1);
+            nimat = repmat(dev.ni, length(t), 1);
             nieffmat = repmat(dev.nieff, length(t), 1);
             Bmat = repmat(dev.B, length(t), 1);
             taunmat = repmat(dev.taun, length(t), 1);
