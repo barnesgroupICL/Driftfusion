@@ -167,9 +167,9 @@ classdef dfplot
 
             if option == 1 || option == 3
                 J.dk.f = dfana.calcJ(JV.dk.f);
-                Vapp.dk.f = -dfana.calcVapp(JV.dk.f);
+                Vapp.dk.f = dfana.calcVapp(JV.dk.f);
                 J.dk.r = dfana.calcJ(JV.dk.r);
-                Vapp.dk.r = -dfana.calcVapp(JV.dk.r);
+                Vapp.dk.r = dfana.calcVapp(JV.dk.r);
 
                 figure(4)
                 plot(Vapp.dk.f, J.dk.f.tot(:,end), '--', Vapp.dk.r, J.dk.r.tot(:,end));
@@ -219,7 +219,7 @@ classdef dfplot
             ppos = getpointpos(xpos, xmesh);
 
             J = dfana.calcJ(sol);
-            Vapp = -dfana.calcVapp(sol);
+            Vapp = dfana.calcVapp(sol);
 
             figure(91)
             plot(Vapp, J.tot(:, ppos));
@@ -289,11 +289,22 @@ classdef dfplot
             % Electrostatic potential as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             figure(12);
             dfplot.x2d(sol, x, {V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
 
+        function Fx(varargin)
+            % Electrostatic potential as a function of position
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            F = dfana.calcF(sol);
+            
+            figure(12);
+            dfplot.x2d(sol, x, {F},{'F'},{'-'},'Electric field [Vcm-1]', tarr, xrange, 0, 0);
+        end
+        
         function npx(varargin)
             % Carrier densities as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
