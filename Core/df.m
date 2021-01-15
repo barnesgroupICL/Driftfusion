@@ -208,8 +208,14 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-nieff(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-nieff(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2))... 
+            - SRHset*(((n*p)-nieff(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));
+            %- SRHset*(((n*p)-nieff(i)^2)/...
+            %((exp(-dVdx/(par.kB*par.T))*taun(i)*(p+exp(dVdx/(par.kB*par.T))*pt(i))) + exp(dVdx/(par.kB*par.T))*taup(i)*(n+(exp(-dVdx/(par.kB*par.T))*nt(i)))));
+        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2))...
+            - SRHset*(((n*p)-nieff(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));
+            %- SRHset*(((n*p)-nieff(i)^2)/...
+            %((exp(-dVdx/(par.kB*par.T))*taun(i)*(p+exp(dVdx/(par.kB*par.T))*pt(i))) + exp(dVdx/(par.kB*par.T))*taup(i)*(n+(exp(-dVdx/(par.kB*par.T))*nt(i)))));
         S = [S_potential; S_electron; S_hole];
         
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
