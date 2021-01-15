@@ -388,9 +388,7 @@ classdef dfana
 
             % Recombination
             r.btb = Bmat.*(n_ihalf.*p_ihalf - nimat.^2);
-
             r.srh = ((n_ihalf.*p_ihalf - nieffmat.^2)./((taunmat.*(p_ihalf+ptmat)) + (taupmat.*(n_ihalf+ntmat))));
-
             r.tot = r.btb + r.srh;
         end
 
