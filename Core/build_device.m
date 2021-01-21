@@ -21,8 +21,8 @@ end
 % Constant properties
 dev.mucat = build_property(par.mucat, xmesh, par, 'constant', 0);
 dev.muani = build_property(par.muani, xmesh, par, 'constant', 0);
-dev.mue = build_property(par.mue, xmesh, par, 'surface_rec_mue', 0);
-dev.muh = build_property(par.muh, xmesh, par, 'surface_rec_muh', 0);
+dev.mue = build_property(par.mue, xmesh, par, 'mue_interface', 0);
+dev.muh = build_property(par.muh, xmesh, par, 'muh_interface', 0);
 dev.epp = build_property(par.epp, xmesh, par, 'constant', 0);
 dev.B = build_property(par.B, xmesh, par, 'constant', 0);
 
