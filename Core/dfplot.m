@@ -179,9 +179,9 @@ classdef dfplot
             if option == 2 || option == 3
 
                 J.ill.f = dfana.calcJ(JV.ill.f);
-                Vapp.ill.f = -dfana.calcVapp(JV.ill.f);
+                Vapp.ill.f = dfana.calcVapp(JV.ill.f);
                 J.ill.r = dfana.calcJ(JV.ill.r);
-                Vapp.ill.r = -dfana.calcVapp(JV.ill.r);
+                Vapp.ill.r = dfana.calcVapp(JV.ill.r);
 
                 figure(4)
                 plot(Vapp.ill.f, J.ill.f.tot(:,end),'--')%, 'Color', [0, 0.4470, 0.7410]);
