@@ -14,7 +14,7 @@
 % close all
 
 %% Insert the appropriate file path here
-par_nid = pc('Input_files/3_layer_test.csv');
+par_nid = pc('Input_files/3_layer_test_IR.csv');
 
 %% Get equilibrium
 soleq_nid = equilibrate(par_nid);

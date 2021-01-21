@@ -12,8 +12,6 @@
 %% Start code
 tic;
 
-evidence_for_ion_script;
-
 example_script;
 
 single_layer_test_script;
@@ -24,7 +22,7 @@ transient_nid_script;
 
 VappFunction_script;
 
-VTROTTR;
+%VTROTTR;
 
 IMVS_IMPS_script;
 
