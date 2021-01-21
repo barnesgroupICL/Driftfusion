@@ -72,10 +72,10 @@ for i=1:length(par.dcum)                % i is the layer index
                         case 'surface_rec_nt'
                             alpha = ((par.EA(i-1) - par.EA(i+1))/(par.kB*par.T) + (log(par.Nc(i+1))-log(par.Nc(i-1))))/deff;
                             if alpha <= 0
-                                 devprop(j) = par.nt(i)*exp(alpha*xprime);
+                                devprop(j) = par.nt(i)*exp(alpha*xprime);
                             elseif alpha > 0
-                                 devprop(j) = par.nt(i)*exp(alpha*(xprime-deff));
-                            end      
+                                devprop(j) = par.nt(i)*exp(alpha*(xprime-deff));
+                            end
                         case 'surface_rec_pt'
                             beta = ((par.IP(i+1) - par.IP(i-1))/(par.kB*par.T) + (log(par.Nv(i+1))-log(par.Nv(i-1))))/deff;
                             if beta < 0
@@ -93,7 +93,21 @@ for i=1:length(par.dcum)                % i is the layer index
                             elseif alpha > 0 && beta <= 0
                                 devprop(j) = par.ni(i).*abs((exp(alpha*(xprime-deff)).*exp(beta*xprime/deff)).^0.5);
                             elseif alpha > 0 && beta > 0
-                                devprop(j) = par.ni(i).*abs((exp(alpha*(xprime-deff)).*exp(beta*(xprime-deff))).^0.5); 
+                                devprop(j) = par.ni(i).*abs((exp(alpha*(xprime-deff)).*exp(beta*(xprime-deff))).^0.5);
+                            end
+                        case 'mue_interface'
+                            alpha = ((par.EA(i-1) - par.EA(i+1))/(par.kB*par.T) + (log(par.Nc(i+1))-log(par.Nc(i-1))))/deff;
+                            if alpha <= 0
+                                  devprop(j) = par.mue(i-1)/exp(alpha*(xprime));
+                            elseif alpha > 0
+                                  devprop(j) = par.mue(i+1)/exp(alpha*(xprime-deff));
+                            end
+                        case 'muh_interface'
+                            beta = ((par.IP(i+1) - par.IP(i-1))/(par.kB*par.T) + (log(par.Nv(i+1))-log(par.Nv(i-1))))/deff;
+                            if beta <= 0
+                                  devprop(j) = par.muh(i-1)/exp(beta*xprime);
+                            elseif beta > 0
+                                  devprop(j) = par.muh(i+1)/exp(beta*(xprime-deff));
                             end
                     end
                 end
