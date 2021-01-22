@@ -59,5 +59,5 @@ dev.taup_eff = build_property(par.taup, xmesh, par, 'surface_rec_taup', 0);
 dev.nt_eff = build_property(par.nt, xmesh, par, 'surface_rec_nt', 1);
 dev.pt_eff = build_property(par.pt, xmesh, par, 'surface_rec_pt', 1);
 dev.ni_eff = build_property(par.ni, xmesh, par, 'surface_rec_nieff', 0);
-
+dev.int_switch = build_property(par.int_switch, xmesh, par, 'int_switch', 0);
 end
