@@ -245,6 +245,7 @@ classdef pc
         dIPdx
         dNcdx
         dNvdx
+        int_switch
         Dn
         Eg
         Efi
@@ -574,6 +575,11 @@ classdef pc
 
         function value = get.dcum0(par)
             value = [0, cumsum(par.dcell)];
+        end
+        
+        % interface switch for zeroing field in interfaces
+        function value = get.int_switch(par)
+            value = ones(1, length(par.stack));
         end
     end
 

@@ -100,6 +100,7 @@ NA = device.NA;             % Acceptor doping density
 ND = device.ND;             % Donor doping density
 Ncat = device.Ncat;         % Uniform cation density
 Nani = device.Nani;         % Uniform anion density
+int_switch = device.int_switch;
 N_ionic_species = par.N_ionic_species;      % Number of ionic species
 nleft = par.nleft;
 nright = par.nright;

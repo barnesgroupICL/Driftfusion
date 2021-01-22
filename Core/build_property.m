@@ -94,6 +94,8 @@ for i=1:length(par.dcum)                % i is the layer index
                             elseif beta >= 0
                                   devprop(j) = par.muh(i+1)*exp(abs(beta)*xprime_p);
                             end
+                        case 'int_switch'
+                            devprop(j) = 0;
                     end
                 end
             end
