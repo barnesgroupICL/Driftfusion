@@ -717,7 +717,7 @@ classdef dfana
                 VQFL = Efn(:, end) - Efp(:, 1);
             elseif par.nleft >= par.nright && par.pright >= par.nright
                 % n-type left boundary, p-type right boundary
-                VQFL = Efp(:, end) - Efn(:, 1);
+                VQFL = Efn(:, 1) - Efp(:, end);
             else
                 % If all equal the choose arbitrary boundaries
                 VQFL = Efn(:, end) - Efp(:, 1);
