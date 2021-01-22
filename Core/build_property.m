@@ -83,16 +83,16 @@ for i=1:length(par.dcum)                % i is the layer index
                         case 'surface_rec_nieff'
                                 devprop(j) = par.ni(i)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5); 
                         case 'mue_interface'
-                            if alpha >= 0
-                                  devprop(j) = par.mue(i-1)*exp(abs(alpha)*xprime);
-                            elseif alpha < 0
-                                  devprop(j) = par.mue(i+1)*exp(abs(alpha)*(deff-xprime_n));
+                            if alpha < 0
+                                  devprop(j) = par.mue(i-1)*exp(abs(alpha)*xprime_n);
+                            elseif alpha >= 0
+                                  devprop(j) = par.mue(i+1)*exp(abs(alpha)*xprime_n);
                             end
                         case 'muh_interface'
-                            if beta >= 0
-                                  devprop(j) = par.muh(i-1)*exp(abs(beta)*xprime);
-                            elseif beta < 0
-                                  devprop(j) = par.muh(i+1)*exp(abs(beta)*(deff-xprime));
+                            if beta < 0
+                                  devprop(j) = par.muh(i-1)*exp(abs(beta)*xprime_p);
+                            elseif beta >= 0
+                                  devprop(j) = par.muh(i+1)*exp(abs(beta)*xprime_p);
                             end
                     end
                 end
