@@ -22,7 +22,7 @@ transient_nid_script;
 
 VappFunction_script;
 
-%VTROTTR;
+VTROTTR;
 
 IMVS_IMPS_script;
 
