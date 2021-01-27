@@ -17,6 +17,18 @@ function par = import_properties(par, filepath)
 %% Start code
 T = readtable(filepath{1,1});   % Reads-in in the external .CSV file to a table T
 
+try
+    par.sn = T{:,'sn'}';
+catch
+    warning('No sn value defined in .csv . Using default in PC')
+end
+
+try
+    par.sp = T{:,'sp'}';
+catch
+    warning('No sp value defined in .csv . Using default in PC')
+end
+
 % Layer tyoe array
 try
     par.layer_type = T{:,'layer_type'}';

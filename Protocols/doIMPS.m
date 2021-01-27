@@ -33,8 +33,6 @@ par.g1_fun_arg(4) = 0;          % phase
 disp('Applying oscillating optical bias')
 sol_IMPS = df(sol_ini, par);
 
-
-
 disp('IMPS complete')
 end
 
