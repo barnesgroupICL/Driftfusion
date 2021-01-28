@@ -472,8 +472,8 @@ classdef dfplot
             p2 = find(x<=x2);
             p2 = p2(end);
 
-            sigma = dfana.calcsigma(sol);
-            Q = par.e*sigma(:, x1:x2);
+            rho = dfana.calcrho(sol);
+            Q = par.e*trapz(x(p1:p2), rho(:, p1:p2), 2);
 
             figure(17)
             plot(t, Q)
@@ -491,15 +491,17 @@ classdef dfplot
             p2 = find(x<=x2);
             p2 = p2(end);
 
-            sigma = dfana.calcsigma(sol);
+            rho = dfana.calcrho(sol);
             Vapp = dfana.calcVapp(sol);
-            Q = par.e*sigma(:, x1:x2);
+            Q = par.e*trapz(x(p1:p2), rho(:, p1:p2), 2);
 
             figure(17)
             plot(Vapp, Q)
             xlabel('Vapp [V]')
             ylabel('Charge [C cm-2]')
-            xlim([Vapp(1), Vapp(end)])
+            if Vapp(1) ~= Vapp(end)
+                xlim([Vapp(1), Vapp(end)])
+            end
         end
 
         function rhox(varargin)
