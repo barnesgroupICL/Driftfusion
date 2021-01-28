@@ -28,7 +28,7 @@ initialise_df
 % for testing a real structure
 %input_csv = 'Input_files/ptpd_mapi_pcbm.csv';
 % a structure written for testing puroposes
-input_csv = 'Input_files/unit_test_ptpd_mapi_pcbm.csv';
+input_csv = 'Input_files/3_layer_unit_test.csv';
 
 % par = pc(varargin)
 par = pc(input_csv);
@@ -51,13 +51,6 @@ df();
 
 % solstruct = df(varargin)
 df(soleq.ion);
-
-%% Core df two inputs zero u
-
-% solstruct = df(varargin)
-sol = struct();
-sol.u = 0;
-df(sol, par);
 
 %% Core df two inputs char
 
