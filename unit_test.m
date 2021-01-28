@@ -404,12 +404,12 @@ dfana.pdentrp(false,false,par.xx(123),soleq.ion.u(1,123,1),par.xx(124),soleq.ion
 %% Core ditro_fun nfun
 
 % n = nfun(Nc, Ec, Efn, T, prob_distro_function)
-distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.Et, par.T, par.prob_distro_function);
+distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.E0, par.T, par.prob_distro_function);
 
 %% Core ditro_fun pfun
 
 % p = pfun(Nv, Ev, Efp, T, prob_distro_function)
-distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.Et, par.T, par.prob_distro_function);
+distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.E0, par.T, par.prob_distro_function);
 
 %% Core ditro_fun Dn_fd_fun and Dnlook and Efn_fd_fun
 
@@ -504,14 +504,6 @@ meshgen_t(part);
 part = par;
 part.mesht_figon = true;
 part.tmesh_type = 3;
-meshgen_t(part);
-
-%% Core meshgen_t 4
-
-% [t] = meshgen_t(par)
-part = par;
-part.mesht_figon = true;
-part.tmesh_type = 4;
 meshgen_t(part);
 
 %% Core meshgen_x default
