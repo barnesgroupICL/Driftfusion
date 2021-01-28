@@ -34,7 +34,6 @@ elseif length(varargin) == 2
         par = varargin{2};
         dficAnalytical = true;
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
-        
         input_solstruct = varargin{1, 1};
         par = input_solstruct.par;
         icsol = input_solstruct.u;
@@ -301,15 +300,15 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     end
             end
         else
-            switch par.N_ionic_species
-                case 0
-                    u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';   
-                case 1
-                    u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
-                case 2
+%             switch par.N_ionic_species
+%                 case 0
+%                     u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';   
+%                 case 1
+%                     u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
+%                 case 2
                     % insert previous solution and interpolate the x points
                     u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
-            end
+            %end
         end
     end
 
