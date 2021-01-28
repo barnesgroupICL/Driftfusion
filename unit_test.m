@@ -232,28 +232,22 @@ dfplot.ELx(JVsol.ill.f,[0,100])
 dfplot.ELnpx(soleq.ion)
 dfplot.ELnpx(JVsol.ill.f,[0,100])
 
-%% Core dfplot Vacx
+%% Core dfplot Vxacx
 
 % Vacx(varargin)
-dfplot.Vacx(soleq.ion)
-dfplot.Vacx(JVsol.ill.f,[0,100])
+dfplot.Vxacx(soleq.ion)
+dfplot.Vxacx(JVsol.ill.f,[0,100])
 
 %% Core dfplot Vionacx
 
 % Vionacx(varargin)
-dfplot.Vionacx(soleq.ion)
-dfplot.Vionacx(JVsol.ill.f,[0,100])
+dfplot.Vionxacx(soleq.ion)
+dfplot.Vionxacx(JVsol.ill.f,[0,100])
 
 %% Core dfplot Fiont
 
 % Fiont(sol, xpos)
 dfplot.Fiont(JVsol.ill.f, 2e-5)
-
-%% Core dfplot PLx
-
-% PLx(varargin)
-dfplot.PLx(JVsol.ill.f)
-dfplot.PLx(JVsol.ill.f,[0,100])
 
 %% Core dfplot colourblocks
 
