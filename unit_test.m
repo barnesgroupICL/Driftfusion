@@ -174,7 +174,7 @@ dfplot.rx(JVsol.ill.f,[0,100])
 %% Core dfplot JVrec
 
 % JVrec(JV, option)
-dfplot.JVrec(JVsol, 3)
+dfplot.JrecVapp(JVsol, 3)
 
 %% Core dfplot Ft
 
@@ -189,12 +189,12 @@ dfplot.sigmat(JVsol.ill.f)
 %% Core dfplot Qt
 
 % Qt(sol, x1, x2)
-dfplot.Qt(JVsol.ill.f)
+dfplot.Qt(JVsol.ill.f, JVsol.ill.f.x(1), JVsol.ill.f.x(end))
 
 %% Core dfplot QVapp
 
 % QVapp(sol, x1, x2)
-dfplot.QVapp(JVsol.ill.f)
+dfplot.QVapp(JVsol.ill.f, JVsol.ill.f.x(1), JVsol.ill.f.x(end))
 
 %% Core dfplot rhox
 
@@ -223,8 +223,8 @@ dfplot.rhoxVx(JVsol.ill.f,[0,100])
 %% Core dfplot ELx_single
 
 % ELx_single(varargin)
-dfplot.ELx_single(soleq.ion)
-dfplot.ELx_single(JVsol.ill.f,[0,100])
+dfplot.ELx(soleq.ion)
+dfplot.ELx(JVsol.ill.f,[0,100])
 
 %% Core dfplot ELnpx
 
