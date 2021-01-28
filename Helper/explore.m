@@ -69,9 +69,9 @@ classdef explore
             
                 Voc_stable = zeros(length(parval2), JVpnts);
                 PLint = zeros(length(parval2), JVpnts);
-                Vapp_f = zeros(1, JVpnts);
+                Vapp_f = zeros(length(parval2), JVpnts);
                 J_f = zeros(length(parval2), JVpnts);
-                Vapp_r = zeros(1, JVpnts);
+                Vapp_r = zeros(length(parval2), JVpnts);
                 J_r = zeros(length(parval2), JVpnts);
                 
                 for j = 1:length(parval2)
