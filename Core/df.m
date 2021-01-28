@@ -27,7 +27,7 @@ elseif length(varargin) == 1
     % If one input argument then assume it is the Initial Conditions (IC) solution
     icsol = varargin{1, 1}.u;
     icx = varargin{1, 1}.x;
-    par = pc;
+    par = varargin{1, 1}.par;
     dficAnalytical = false;
 elseif length(varargin) == 2
     if max(max(max(varargin{1, 1}.u))) == 0
