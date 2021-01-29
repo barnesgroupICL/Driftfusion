@@ -455,15 +455,10 @@ generation(par, 'laser', 470);
 generation(par2, 'AM15', 470);
 generation(par2, 'laser', 470);
 
-%% Core getdevihalf
-
-% devihalf = getdevihalf(par)
-getdevihalf(par);
-
 %% Core getvarihalf
 
 % varihalf = getvarihalf(var)
-getvarihalf(par);
+getvarihalf(par.dev.EA);
 
 %% Core getxihalf
 

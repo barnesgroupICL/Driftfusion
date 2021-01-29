@@ -116,33 +116,8 @@ classdef dfplot
             figure(301);
             dfplot.x2d(sol, par.x_ihalf, {j.n, j.p, j.a, j.c, j.disp},{'jn', 'jp', 'ja', 'jc', 'jdisp'},...
                 {'-','-','-','-','-'}, 'Current density [Acm-2]', tarr, xrange, 0, 0);
-        end
-
-        function Jddx(varargin)
-            % Drift and diffusion currents as a function of position
-            % VARARGIN = [SOL, TARR, XRANGE]
-            % SOL = Solution structure
-            % TARR = An array containing the times that you wish to plot
-            % XRANGE = 2 element array with [XMIN, XMAX]
-            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [~, Jdd, x] = dfana.Jddxt(sol);
-
-            figure(301);
-            dfplot.x2d(sol, x, {Jdd.ndiff, Jdd.ndrift, Jdd.pdiff, Jdd.pdrift,...
-                Jdd.adiff, Jdd.adrift, Jdd.cdiff, Jdd.cdrift},...
-                {'Jn,diff', 'Jn,drift', 'Jp,diff', 'Jp,drift', 'Ja,diff', 'Ja,drift', 'Jc,diff', 'Jc,drift'},...
-                {'.','-','.','-','.','-','.','-'},'Current density [Acm-2]', tarr, xrange, 0, 0);
-        end
-
-        function Voct(sol)
-            Voc = dfana.calcVQFL(sol);
-            figure(6)
-            plot(sol.t, Voc)
-            xlabel('Time [s]')
-            ylabel('Voc [V]')
-        end
-
+        end       
+     
         function JV(JV, option)
             % JV - a solution from doJV
             % OPTION - 1 = dark only, 2 = light only, 3 = dark & light
