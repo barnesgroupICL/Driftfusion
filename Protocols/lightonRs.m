@@ -89,24 +89,7 @@ par.Vapp = 0;
 
 % Stable time is enetered as negative then run to stable solution
 if stable_time < 0
-    warning('off', 'Driftfusion:verifyStabilization');
-    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-    
-    % loop to check ions have reached stable config- if not accelerate ions by
-    % order of mag
-    j = 1; 
-    while any(all_stable) == 0
-        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-        
-        par.tmax = par.tmax*10;
-        par.t0 = par.tmax/1e6;
-        
-        sol = df(sol_Rs, par);
-        
-        all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-        
-    end
-    warning('on', 'Driftfusion:verifyStabilization');
+    sol = stabilize(sol);
 end
 
 sol_ill = sol;
