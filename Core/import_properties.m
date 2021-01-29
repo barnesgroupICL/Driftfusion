@@ -17,6 +17,18 @@ function par = import_properties(par, filepath)
 %% Start code
 T = readtable(filepath{1,1});   % Reads-in in the external .CSV file to a table T
 
+try
+    par.sn = T{:,'sn'}';
+catch
+    warning('No sn value defined in .csv . Using default in PC')
+end
+
+try
+    par.sp = T{:,'sp'}';
+catch
+    warning('No sp value defined in .csv . Using default in PC')
+end
+
 % Layer tyoe array
 try
     par.layer_type = T{:,'layer_type'}';
@@ -272,6 +284,15 @@ try
     par.N_ionic_species = T{1, 'N_ionic_species'};
 catch
     warning('No of ionic species (N_ionic_species) undefined in .csv. Using default in PC')
+end
+% Layer colours
+try
+    Red = T{:, 'Red'};
+    Green = T{:, 'Green'};
+    Blue = T{:, 'Blue'};
+    par.layer_colour = [Red,Green,Blue];
+catch
+    warning('Layer colours (layer_colour) undefined in .csv. Using default in PC')
 end
 
 end

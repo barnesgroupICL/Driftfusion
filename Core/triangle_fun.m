@@ -14,6 +14,9 @@ function y = triangle_fun(coeff, t)
 y0 = coeff(1);
 y1 = coeff(2);
 y2 = coeff(3);
+if y0 == y2     % artificially insert point to avoid NaN calculation
+    y2 = y1+((y0-y1)/2);
+end
 periods = coeff(4);
 tperiod = coeff(5);
 tmax = tperiod*periods;

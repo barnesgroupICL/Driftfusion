@@ -42,11 +42,10 @@ end
 
 nidt_mean = mean(nidt,1);
 
-
 figure(400)
-hold on
 for i = 1:length(sol_OC)
     plot(t, Voct)
+    hold on
 end
 hold off
 xlabel('Time [s]')
@@ -60,9 +59,9 @@ xlim([t(1), t(end)])
 ylim([-1,3])
 
 figure(402)
-hold on
 for i = 1:length(sol_OC)
     semilogy(t, PLt(i,:))
+    hold on
 end
 hold off
 xlabel('Time [s]')
