@@ -81,8 +81,6 @@ for i = 1:length(Vapp_arr)-1
         sol.par.K_anion = 1;
         sol.par.K_cation = 1;
         sol.par.mobseti = 1;
-    else
-        sol.par.mobseti = 1;
     end
     % if there's only one solution then duplicate sol structure
     if length(Vapp_arr)-1 == 1
