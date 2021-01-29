@@ -80,7 +80,7 @@ for i=1:length(par.dcum)                % i is the layer index
                                 devprop(j) = par.nt(i)*exp(-abs(alpha)*xprime_n);
                         case 'surface_rec_pt'
                                 devprop(j) = par.pt(i)*exp(-abs(beta)*xprime_p);
-                        case 'surface_rec_nieff'
+                        case 'surface_rec_ni_srh'
                                 devprop(j) = par.ni(i)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5); 
                         case 'mue_interface'
                             if alpha < 0

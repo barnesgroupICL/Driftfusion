@@ -257,7 +257,7 @@ classdef dfana
 
             % Recombination
             r.btb = dev.B.*(n.*p - dev.ni.^2);
-            r.srh = ((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
+            r.srh = ((n.*p - dev.ni_srh.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
             r.tot = r.btb + r.srh;
         end
 
@@ -270,7 +270,7 @@ classdef dfana
             % Recombination
             r.btb = par.dev_ihalf.B.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni.^2);
 
-            r.srh = (n_ihalf.*p_ihalf - par.dev_ihalf.ni.^2)...
+            r.srh = (n_ihalf.*p_ihalf - par.dev_ihalf.ni_srh.^2)...
                 ./ (par.dev_ihalf.taun.*(p_ihalf+par.dev_ihalf.pt)...
                 + par.dev_ihalf.taup.*(n_ihalf+par.dev_ihalf.nt));
             r.tot = r.btb + r.srh;

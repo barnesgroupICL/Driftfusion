@@ -96,6 +96,7 @@ epp = device.epp;           % Dielectric constant
 eppmax = max(par.epp);      % Maximum dielectric constant (for normalisation)
 B = device.B;               % Radiative recombination rate coefficient
 ni = device.ni;             % Intrinsic carrier density
+ni_srh = device.ni_srh;             % Intrinsic carrier density
 taun = device.taun;         % Electron SRH time constant
 taup = device.taup;         % Electron SRH time constant
 nt = device.nt;             % SRH electron trap constant
@@ -218,8 +219,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));   
-        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));
+        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni_srh(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));   
+        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni_srh(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));
         S = [S_potential; S_electron; S_hole];
         
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
@@ -300,15 +301,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                     end
             end
         else
-%             switch par.N_ionic_species
-%                 case 0
-%                     u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';   
-%                 case 1
-%                     u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
-%                 case 2
-                    % insert previous solution and interpolate the x points
                     u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
-            %end
         end
     end
 

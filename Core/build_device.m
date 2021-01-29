@@ -21,10 +21,7 @@ end
 % Constant properties
 dev.mucat = build_property(par.mucat, xmesh, par, 'constant', 0);
 dev.muani = build_property(par.muani, xmesh, par, 'constant', 0);
-dev.mue = build_property(par.mue, xmesh, par, 'mue_interface', 0);
-dev.muh = build_property(par.muh, xmesh, par, 'muh_interface', 0);
 dev.epp = build_property(par.epp, xmesh, par, 'constant', 0);
-dev.B = build_property(par.B, xmesh, par, 'constant', 0);
 
 % Linearly graded properties
 dev.EA = build_property(par.EA, xmesh, par, 'lin_graded', 0);
@@ -46,6 +43,7 @@ dev.DOScat = build_property(par.cmax, xmesh, par, 'log_graded', 0);
 
 % Properties that are zeroed in the interfaces
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);
+dev.B = build_property(par.B, xmesh, par, 'zeroed', 0);
 
 % Gradient properties
 dev.gradEA = build_property(par.EA, xmesh, par, 'lin_graded', 1);
@@ -54,10 +52,12 @@ dev.gradNc = build_property(par.Nc, xmesh, par, 'log_graded', 1);
 dev.gradNv = build_property(par.Nv, xmesh, par, 'log_graded', 1);
 
 % Surface recombination velocity equivalence schemes
+dev.mue = build_property(par.mue, xmesh, par, 'mue_interface', 0);
+dev.muh = build_property(par.muh, xmesh, par, 'muh_interface', 0);
 dev.taun = build_property(par.taun, xmesh, par, 'surface_rec_taun', 0);
 dev.taup = build_property(par.taup, xmesh, par, 'surface_rec_taup', 0);
 dev.nt = build_property(par.nt, xmesh, par, 'surface_rec_nt', 1);
 dev.pt = build_property(par.pt, xmesh, par, 'surface_rec_pt', 1);
-dev.ni = build_property(par.ni, xmesh, par, 'surface_rec_nieff', 0);
+dev.ni_srh = build_property(par.ni, xmesh, par, 'surface_rec_ni_srh', 0);
 dev.int_switch = build_property(par.int_switch, xmesh, par, 'int_switch', 0);
 end
