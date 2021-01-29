@@ -369,7 +369,11 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                         Vres = -J*Rs;
                     end
                 end
-                                                               
+                
+                if abs(Vres) > abs(maxEg)
+                    Vres = sign(Vres)*abs(maxEg);   % Limit the voltage drop across resistor to max cell VOC
+                end
+              
                 Pl = [-ul(1);
                     mobset*(-sn_l*(ul(2) - nleft));
                     mobset*(-sp_l*(ul(3) - pleft));];
