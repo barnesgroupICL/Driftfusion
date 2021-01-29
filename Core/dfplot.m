@@ -75,7 +75,6 @@ classdef dfplot
             % XPOS = the readout position
             [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
 
-
             [J, j, xmesh] = dfana.calcJ(sol);
             ppos = getpointpos(xpos, xmesh);
 
@@ -142,24 +141,6 @@ classdef dfplot
             plot(sol.t, Voc)
             xlabel('Time [s]')
             ylabel('Voc [V]')
-        end
-
-        function Vappt(sol)
-            % Applied voltage as a function of position
-            Vapp = dfana.calcVapp(sol);
-
-            figure(8)
-            plot(sol.t, Vapp);
-            xlabel('Time [s]')
-            ylabel('Vapp [V]')
-        end
-
-        function PLt(sol)
-            PL = dfana.PLt(sol);
-            figure(7)
-            plot(sol.t, PL)
-            xlabel('Time [s]')
-            ylabel('PL [cm-2s-1]')
         end
 
         function JV(JV, option)
