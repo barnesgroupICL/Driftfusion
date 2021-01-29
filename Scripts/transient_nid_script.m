@@ -14,7 +14,7 @@
 % close all
 
 %% Insert the appropriate file path here
-par_nid = pc('Input_files/3_layer_test.csv');
+par_nid = pc('Input_files/3_layer_test_IR.csv');
 
 %% Get equilibrium
 soleq_nid = equilibrate(par_nid);
@@ -24,10 +24,10 @@ soleq_nid = equilibrate(par_nid);
 sol_jump = jumptoV(soleq_nid.ion, par_nid.Vbi+0.2, 1e-3, 1, 0, 1, 1);
 
 %% Get open circuit solutions
-sol_OC = transient_nid(sol_jump, logspace(-3,2,6), 10, 1, 1e6, 200);
+sol_OC_transnid = transient_nid(sol_jump, logspace(-3,2,6), 10, 1, 1e6, 200);
 
 %% Analyse the solution
-nidt_mean = transient_nid_ana(sol_OC);
+nidt_mean = transient_nid_ana(sol_OC_transnid);
 
 % Plot initial OC EL diagram at 1 Sun
-dfplot.ELxnpxacx(sol_OC(5),0);
+dfplot.ELxnpxacx(sol_OC_transnid(5),0);

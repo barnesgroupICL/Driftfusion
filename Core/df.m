@@ -22,25 +22,29 @@ function solstruct = df(varargin)
 if length(varargin) == 0
     % If no input parameter set then call pc directly
     par = pc;
+    dficAnalytical = true;
 elseif length(varargin) == 1
     % If one input argument then assume it is the Initial Conditions (IC) solution
     icsol = varargin{1, 1}.u;
     icx = varargin{1, 1}.x;
-    par = pc;
+    par = varargin{1, 1}.par;
+    dficAnalytical = false;
 elseif length(varargin) == 2
     if max(max(max(varargin{1, 1}.u))) == 0
         par = varargin{2};
+        dficAnalytical = true;
     elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
-        
         input_solstruct = varargin{1, 1};
         par = input_solstruct.par;
         icsol = input_solstruct.u;
         icx = input_solstruct.x;
+        dficAnalytical = false;
     else
         input_solstruct = varargin{1, 1};
         icsol = input_solstruct.u;
         icx = input_solstruct.x;
         par = varargin{2};
+        dficAnalytical = false;
     end
 end
 
@@ -89,7 +93,7 @@ gradEA = device.gradEA;     % Electron Affinity gradient
 gradIP = device.gradIP;     % Ionisation Potential gradient
 epp = device.epp;           % Dielectric constant
 eppmax = max(par.epp);      % Maximum dielectric constant (for normalisation)
-B = device.B;         % Radiative recombination rate coefficient
+B = device.B;               % Radiative recombination rate coefficient
 ni = device.ni;             % Intrinsic carrier density
 taun = device.taun;         % Electron SRH time constant
 taup = device.taup;         % Electron SRH time constant
@@ -99,6 +103,7 @@ NA = device.NA;             % Acceptor doping density
 ND = device.ND;             % Donor doping density
 Ncat = device.Ncat;         % Uniform cation density
 Nani = device.Nani;         % Uniform anion density
+int_switch = device.int_switch;
 N_ionic_species = par.N_ionic_species;      % Number of ionic species
 nleft = par.nleft;
 nright = par.nright;
@@ -108,6 +113,9 @@ sn_l = par.sn_l;
 sp_l = par.sp_l;
 sn_r = par.sn_r;
 sp_r = par.sp_r;
+maxEg = max(par.Eg);
+Rs = par.Rs;
+Rs_initial = par.Rs_initial;
 
 %% Spatial mesh
 x = xmesh;
@@ -190,7 +198,9 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         end
         
         %% Gradients
-        dVdx = dudx(1); dndx = dudx(2); dpdx = dudx(3); 
+        dVdx = dudx(1);
+        dndx = dudx(2);
+        dpdx = dudx(3); 
         
         %% Equation editor
         % Time-dependence prefactor term
@@ -207,8 +217,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
-        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/((taun(i)*(p+pt(i)))+(taup(i)*(n+nt(i)))));
+        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));   
+        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));
         S = [S_potential; S_electron; S_hole];
         
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
@@ -238,7 +248,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 %% Define initial conditions.
     function u0 = dfic(x)
         
-        if isempty(varargin) || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) == 0
+        if dficAnalytical
             
             i = find(xmesh <= x);
             i = i(end);
@@ -288,25 +298,16 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                             dev.Nani(i);];
                     end
             end
-        elseif length(varargin) == 1 || length(varargin) >= 1 && max(max(max(varargin{1, 1}.u))) ~= 0
-            switch par.N_ionic_species
-                case 0
-                    u0 = [interp1(icx,icsol(end,:,1),x);
-                        interp1(icx,icsol(end,:,2),x);
-                        interp1(icx,icsol(end,:,3),x);];
-                case 1
-                    u0 = [interp1(icx,icsol(end,:,1),x);
-                        interp1(icx,icsol(end,:,2),x);
-                        interp1(icx,icsol(end,:,3),x);
-                        interp1(icx,icsol(end,:,4),x);];
-                case 2
+        else
+%             switch par.N_ionic_species
+%                 case 0
+%                     u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';   
+%                 case 1
+%                     u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
+%                 case 2
                     % insert previous solution and interpolate the x points
-                    u0 = [interp1(icx,icsol(end,:,1),x);
-                        interp1(icx,icsol(end,:,2),x);
-                        interp1(icx,icsol(end,:,3),x);
-                        interp1(icx,icsol(end,:,4),x);
-                        interp1(icx,icsol(end,:,5),x);];
-            end
+                    u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
+            %end
         end
     end
 
@@ -363,24 +364,29 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 % Flux boundary conditions for both carrier types.
                 
                 % Calculate series resistance voltage Vres
-                if par.Rs == 0
+                if Rs == 0
                     Vres = 0;
                 else
                     Jr = par.e*sp_r*(ur(3) - pright) - par.e*sn_r*(ur(2) - nright);
-                    if par.Rs_initial
-                        Vres = Jr*par.Rs*t/par.tmax;    % Initial linear sweep
+                    J = Jr;
+                    if Rs_initial
+                        Vres = -J*Rs*t/par.tmax;    % Initial linear sweep
                     else
-                        Vres = Jr*par.Rs;
+                        Vres = -J*Rs;
                     end
                 end
                 
+%                 if abs(Vres) > abs(maxEg)
+%                     Vres = sign(Vres)*maxEg;   % Limit the voltage drop across resistor to max cell VOC
+%                 end
+                                               
                 Pl = [-ul(1);
                     mobset*(-sn_l*(ul(2) - nleft));
                     mobset*(-sp_l*(ul(3) - pleft));];
                 
                 Ql = [0; 1; 1;];
                 
-                Pr = [-ur(1)+Vbi-Vapp+Vres;
+                Pr = [-ur(1)+Vbi-Vapp-Vres;
                     mobset*(sn_r*(ur(2) - nright));
                     mobset*(sp_r*(ur(3) - pright));];
                 

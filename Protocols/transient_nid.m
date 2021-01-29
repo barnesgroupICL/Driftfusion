@@ -20,7 +20,6 @@ function sol_OC = transient_nid(sol_ini, int_arr, stab_time, mobseti, Rs, pnts)
 % (at your option) any later version.
 % 
 %% Start code
-
 for i = 1:length(int_arr)
     sol_OC(i) = lightonRs(sol_ini, int_arr(i), stab_time, mobseti, Rs, pnts);
 end

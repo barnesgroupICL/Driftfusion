@@ -57,8 +57,6 @@ par.g1_fun_type = 'constant';
 par.g2_fun_type = 'constant';
 par.OC = 0;
 par.tmesh_type = 2;
-par.tmax = 1e-9;
-par.t0 = par.tmax/1e4;
 par.Rs = 0;
 par.BC = 3;     % To enable boundary fluxes to be switched off
 
@@ -76,21 +74,23 @@ par.BC = par_origin.BC;
 par.mobset = 1;
 par.radset = 1;
 
-par.tmax = 1e-9;
+% Characteristic diffusion time
+t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
+par.tmax = 10*t_diff;
 par.t0 = par.tmax/1e6;
 
 %% Solution with mobility switched on
 disp('Solution with mobility switched on')
 sol = df(sol, par);
 
-par.tmax = 1e-3;
+par.tmax = t_diff;
 par.t0 = par.tmax/1e6;
 
 sol = df(sol, par);
 
 all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
-% loop to check ions have reached stable config- if not accelerate ions by
+% loop to check electrons have reached stable config- if not accelerate ions by
 % order of mag
 j = 1;
 
@@ -110,7 +110,7 @@ soleq_nosrh = sol;
 disp('Switching on interfacial recombination')
 par.SRHset = 1;
 
-par.tmax = 1e-6;
+par.tmax = 10*t_diff;
 par.t0 = par.tmax/1e3;
 
 soleq.el = df(soleq_nosrh, par);
@@ -126,9 +126,9 @@ if electronic_only == 0
     % Write ionic initial conditions
     switch par.N_ionic_species
         case 1
-            sol.u(:,:,4) = repmat(par.dev.Nani, length(sol.t), 1);
+            sol.u(:,:,4) = repmat(par.dev.Ncat, length(sol.t), 1);
         case 2
-            sol.u(:,:,4) = repmat(par.dev.Nani, length(sol.t), 1);
+            sol.u(:,:,4) = repmat(par.dev.Ncat, length(sol.t), 1);
             sol.u(:,:,5) = repmat(par.dev.Nani, length(sol.t), 1);
     end
     
@@ -156,17 +156,17 @@ if electronic_only == 0
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
     par.K_anion = rat_anion;
     par.K_cation = rat_cation;
-    par.tmax = 1e-12;
+    par.tmax = 10*t_diff;
     par.t0 = par.tmax/1e3;
       
     sol = df(sol, par);
     
-    % Longer second solution
-    par.calcJ = 0;
-    par.tmax = 1e-3;
-    par.t0 = par.tmax/1e3;
+%     % Longer second solution
+%     par.calcJ = 0;
+%     par.tmax = 10*t_diff;
+%     par.t0 = par.tmax/1e3;
     
-    sol = df(sol, par);
+%     sol = df(sol, par);
     
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     

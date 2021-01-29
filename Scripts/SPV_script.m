@@ -26,7 +26,7 @@ initialise_df
 % open it in Excel and then edit the parameters. Save it as a different
 % name and then use that as the file in the path of the input argument to
 % PC (the parameters class):
-par_tio2_2l = pc('input_files/spv_tio2_mapi_bilayer.csv');
+par_tio2_2l = pc('input_files/tio2_mapi_bilayer.csv');
 
 %% Get equilibrium solutions
 % You will find that with the default parameters, contained in the above
@@ -69,5 +69,3 @@ dfplot.ELxnpxacx(spvsol.ill);
 % to overlay the plots for different times. In this example I plot the 
 % electrostatic potential as a function of position for 5 different times
 dfplot.Vx(spvsol.ill, [0,1,2,4,8]);
-
-dfplot.PLt(spvsol.ill);
