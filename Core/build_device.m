@@ -54,10 +54,10 @@ dev.gradNc = build_property(par.Nc, xmesh, par, 'log_graded', 1);
 dev.gradNv = build_property(par.Nv, xmesh, par, 'log_graded', 1);
 
 % Surface recombination velocity equivalence schemes
-dev.taun_eff = build_property(par.taun, xmesh, par, 'surface_rec_taun', 0);
-dev.taup_eff = build_property(par.taup, xmesh, par, 'surface_rec_taup', 0);
-dev.nt_eff = build_property(par.nt, xmesh, par, 'surface_rec_nt', 1);
-dev.pt_eff = build_property(par.pt, xmesh, par, 'surface_rec_pt', 1);
-dev.ni_eff = build_property(par.ni, xmesh, par, 'surface_rec_nieff', 0);
+dev.taun = build_property(par.taun, xmesh, par, 'surface_rec_taun', 0);
+dev.taup = build_property(par.taup, xmesh, par, 'surface_rec_taup', 0);
+dev.nt = build_property(par.nt, xmesh, par, 'surface_rec_nt', 0);
+dev.pt = build_property(par.pt, xmesh, par, 'surface_rec_pt', 0);
+dev.ni_srh = build_property(par.ni, xmesh, par, 'surface_rec_nieff', 0);
 dev.int_switch = build_property(par.int_switch, xmesh, par, 'int_switch', 0);
 end
