@@ -83,11 +83,6 @@ par.t0 = par.tmax/1e6;
 disp('Solution with mobility switched on')
 sol = df(sol, par);
 
-par.tmax = t_diff;
-par.t0 = par.tmax/1e6;
-
-sol = df(sol, par);
-
 all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
 % loop to check electrons have reached stable config- if not accelerate ions by
