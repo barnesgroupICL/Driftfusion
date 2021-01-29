@@ -15,7 +15,7 @@ classdef dfana
         function [u,t,x,par,dev,n,p,a,c,V] = splitsol(sol)
             % splits solution into useful outputs
             u = sol.u;
-            t = sol.t;
+            t = sol.t(1:size(u,1));
             x = sol.x;
             par = sol.par;
             dev = par.dev;
@@ -321,8 +321,7 @@ classdef dfana
         end
 
         function [g1, g2, g] = calcg(sol)
-            par = sol.par;
-            tmesh = sol.t;
+            [~,tmesh,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
             %% Generation function
             switch par.g1_fun_type
                 case 'constant'
@@ -604,13 +603,13 @@ classdef dfana
         end
 
         function Vapp = calcVapp(sol)
-            par = sol.par;
+            [~,t,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
             switch par.V_fun_type
                 case 'constant'
-                    Vapp = ones(1,length(sol.t))*par.Vapp;
+                    Vapp = ones(1,length(t))*par.Vapp;
                 otherwise
                     Vapp_fun = fun_gen(par.V_fun_type);
-                    Vapp = Vapp_fun(par.V_fun_arg, sol.t);
+                    Vapp = Vapp_fun(par.V_fun_arg, t);
             end
         end
 
