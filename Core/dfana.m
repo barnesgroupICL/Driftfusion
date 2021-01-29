@@ -349,16 +349,16 @@ classdef dfana
             % Property matrices
             eppmat = repmat(dev.epp, length(t), 1);
             nimat = repmat(dev.ni, length(t), 1);
-            ni_effmat = repmat(dev.ni_eff, length(t), 1);
+            nimat = repmat(dev.ni, length(t), 1);
             Bmat = repmat(dev.B, length(t), 1);
-            taun_effmat = repmat(dev.taun_eff, length(t), 1);
-            taup_effmat = repmat(dev.taup_eff, length(t), 1);
-            nt_effmat = repmat(dev.nt_eff, length(t), 1);
-            pt_effmat = repmat(dev.pt_eff, length(t), 1);
+            taunmat = repmat(dev.taun, length(t), 1);
+            taupmat = repmat(dev.taup, length(t), 1);
+            ntmat = repmat(dev.nt, length(t), 1);
+            ptmat = repmat(dev.pt, length(t), 1);
 
             % Recombination
             r.btb = Bmat.*(n.*p - nimat.^2);
-            r.srh = ((n.*p - ni_effmat.^2)./((taun_effmat.*(p+pt_effmat)) + (taup_effmat.*(n+nt_effmat))));
+            r.srh = ((n.*p - nimat.^2)./((taunmat.*(p+ptmat)) + (taupmat.*(n+ntmat))));
             r.tot = r.btb + r.srh;
         end
 
@@ -379,16 +379,16 @@ classdef dfana
             % Property matrices
             eppmat = repmat(devihalf.epp, length(t), 1);
             nimat = repmat(devihalf.ni, length(t), 1);
-            ni_effmat = repmat(devihalf.ni_eff, length(t), 1);
+            nimat = repmat(devihalf.ni, length(t), 1);
             Bmat = repmat(devihalf.B, length(t), 1);
-            taun_effmat = repmat(devihalf.taun_eff, length(t), 1);
-            taup_effmat = repmat(devihalf.taup_eff, length(t), 1);
-            nt_effmat = repmat(devihalf.nt_eff, length(t), 1);
-            pt_effmat = repmat(devihalf.pt_eff, length(t), 1);
+            taunmat = repmat(devihalf.taun, length(t), 1);
+            taupmat = repmat(devihalf.taup, length(t), 1);
+            ntmat = repmat(devihalf.nt, length(t), 1);
+            ptmat = repmat(devihalf.pt, length(t), 1);
 
             % Recombination
             r.btb = Bmat.*(n_ihalf.*p_ihalf - nimat.^2);
-            r.srh = ((n_ihalf.*p_ihalf - ni_effmat.^2)./((taun_effmat.*(p_ihalf+pt_effmat)) + (taup_effmat.*(n_ihalf+nt_effmat))));
+            r.srh = ((n_ihalf.*p_ihalf - nimat.^2)./((taunmat.*(p_ihalf+ptmat)) + (taupmat.*(n_ihalf+ntmat))));
             r.tot = r.btb + r.srh;
         end
 
