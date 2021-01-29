@@ -11,7 +11,7 @@
 % 
 %% Start code
 %% Read-in params
-par_3l = pc('input_files/IonMonger_default_IR.csv');
+par_3l = pc('input_files/spiro_mapi_tio2_vary.csv');
 
 %% Find equilibrium solution
 soleq_3l = equilibrate(par_3l);
@@ -54,7 +54,7 @@ end
 %% Plot the outputs
 for i = 1:Ntr
     figure(101)
-    plot(sol_VTROTTR(i).t, -deltaV(i,:));
+    plot(sol_VTROTTR(i).t, deltaV(i,:));
     hold on
 end
 xlabel('Time [s]')
