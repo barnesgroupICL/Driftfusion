@@ -169,6 +169,8 @@ while abs(fx1) > tol
 end
 
 sol_Voc = sol;
+sol_Voc.par.K_anion = 1;
+sol_Voc.par.K_cation = 1;
 
 Voc = x1;
 
