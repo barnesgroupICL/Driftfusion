@@ -20,10 +20,10 @@ soleq_3l = equilibrate(par_3l);
 
 %% Do IMPS
 % do_IMVS(sol_ini, int_base, int_delta, frequency, tmax, tpoints)
-sol_IMVS = doIMVS(soleq_3l.ion, 1, 0.2, 4, 1, 200);
+sol_IMVS = doIMVS(soleq_3l.ion, 1, 0.2, 4, 1, 401);
 
 %% Do IMPS
-sol_IMPS = doIMPS(soleq_3l.ion, 0, 0.02, 4, 1, 200);
+sol_IMPS = doIMPS(soleq_3l.ion, 0, 0.02, 4, 1, 401);
 
 %% Plot the Voc as a function of t
 dfplot.Voct(sol_IMVS);

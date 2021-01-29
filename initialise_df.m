@@ -18,8 +18,15 @@ set(0,'DefaultAxesYcolor', [0, 0, 0]);
 set(0,'DefaultAxesZcolor', [0, 0, 0]);
 set(0,'DefaultTextColor', [0, 0, 0]);
 
-% Add file paths to functions
-addpath(genpath(pwd))
-
+% Add file paths to functions, avoid hidden directories like .git
+addpath(pwd)
+files = dir(pwd);
+dirs = files(cat(1,files.isdir));
+for i=1:length(dirs)
+    dirname = dirs(i).name;
+    if ~any(regexp(dirname,'^\.'))
+        addpath(dirname);
+    end
+end
 
 end
