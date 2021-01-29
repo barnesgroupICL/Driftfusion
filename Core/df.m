@@ -361,17 +361,12 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 if Rs == 0
                     Vres = 0;
                 else
-                    Jr = e*sp_r*(ur(3) - pright) - e*sn_r*(ur(2) - nright);
-                    J = Jr;
+                    J = e*sp_r*(ur(3) - pright) - e*sn_r*(ur(2) - nright);
                     if Rs_initial
                         Vres = -J*Rs*t/par.tmax;    % Initial linear sweep
                     else
                         Vres = -J*Rs;
                     end
-                end
-                
-                if abs(Vres) > abs(maxEg)
-                    Vres = sign(Vres)*abs(maxEg);   % Limit the voltage drop across resistor to max cell VOC
                 end
               
                 Pl = [-ul(1);
