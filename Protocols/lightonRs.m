@@ -24,9 +24,12 @@ disp(['Starting LIGHTON_RS, Intensity = ', num2str(int1), ' Rs = ', num2str(Rs)]
 par = sol_ini.par;
 par_origin = par;
 
+% Characteristic diffusion time
+t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
+
 disp('Switching on illumination')
 par.mobseti = 0;
-par.tmax = 1e-3;
+par.tmax = 100*t_diff;
 par.t0 = par.tmax/1e6;
 par.Rs_initial = 0;
 par.int1 = int1;
@@ -39,16 +42,13 @@ sol_ill1 = df(sol_ini, par);
 
 par.g1_fun_type = 'constant';
 
-% Characteristic diffusion time
-t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
-
 C = par.e*par.epp(par.active_layer)*par.epp0/(par.d_active);      % Parallel plate capacitance
 tau_RC = C*Rs;
 
 par.tmesh_type = 2;
-par.tmax = tau_RC;
-par.t0 = par.tmax/1e6;
 par.tpoints = 20;
+par.tmax = 100*par.tpoints*t_diff;
+par.t0 = par.tmax/1e6;
 
 if Rs > 0
     par.Rs = Rs;
@@ -60,9 +60,9 @@ if Rs > 0
     
     % Longer linear time step to reach stabilisation
     par.Rs_initial = 0;
-    par.tmesh_type = 2;
-    par.tmax = tau_RC*1e-3;
-    par.t0 = par.tmax/1e6;
+    par.tmesh_type = 1;
+    par.tmax = 100*par.tpoints*t_diff;
+    par.t0 = 0;
     
     disp('Stabilisation step with Rs')
     sol_Rs = df(sol, par);
