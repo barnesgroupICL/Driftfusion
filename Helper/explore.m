@@ -42,6 +42,9 @@ classdef explore
                     % sets number of points in active layer to be number of
                     % nanometers/2
                     points = round((parval1(i)*1e7)/2);
+                    if points < 100
+                        points = 100;
+                    end
                     par = explore.helper(par, ['layer_points', str1(2:end)], points);
                 end
                 
