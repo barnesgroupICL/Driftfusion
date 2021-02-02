@@ -145,7 +145,7 @@ g2_fun_arg = par.g2_fun_arg;
 Vapp_fun = fun_gen(par.V_fun_type);
 Vapp = 0;
 Vres = 0;
-Jr = 0;
+J = 0;
 
 %% Solver options
 % MaxStep = limit maximum time step size during integration
