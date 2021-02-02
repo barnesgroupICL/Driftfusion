@@ -1,33 +1,38 @@
-function sol_int = changeLight(sol, newInt, tmax)
+function sol_int = changeLight(sol, newInt, tmax, lightSource)
 % CHANGELIGHT - Stabilize solutions at a new light intensity
 %
-% Syntax:  sol_int = changeLight(sol, newInt, tmax)
+% Syntax:  sol_int = changeLight(sol, newInt, tmax, lightSource)
 %
 % Inputs:
-%   sol - a solution sol as created by PINDRIFT.
-%   NEWINT - the requested light intensity, zero is not supported as it is
-%     much more robust to obtain a dark solution directly from equilibrate
-%   TMAX - the initial stabilization time, can be zero for an automatic
-%     guess
+%   SOL - a solution sol as created by DF.
+%   NEWINT - float, the requested light intensity, both increasing,
+%     decreasing and setting to zero are supported (but for a solution at
+%     zero illumination is more meaningful to take the solution directly
+%     from equilibrate)
+%   TMAX - float, the time over which simulate the illumination change,
+%     can be zero for an automatic guess
+%   LIGHTSOURCE - optional integer, illumination source to be varied:
+%     1 = first illumination source (from sol.par.light_source1),
+%     2 = second illumination source (from sol.par.light_source2)
 %
 % Outputs:
 %   sol_int - a solution sol at NEWINT light intensity
 %
 % Example:
-%   ssol_i_1S_SR_1mS = changeLight(ssol_i_1S_SR, 1e-3, 5)
-%     take the solution ssol_i_light and stabilize to a new light intensity
-%     of 0.001, use as stabilization time 5 seconds
-%   ssol_i_1S_SR_1mS = changeLight(ssol_i_1S_SR, 1e-3, 0)
-%     as above, but estimate a good time for stabilization
+%   sol_ion_1S = changeLight(soleq.ion, 1, 0)
+%     take the solution soleq.ion and stabilize to a new light intensity
+%     of 1 sun, guess a good tmax time, the light source is not specified,
+%     so the first one is used (usually, a solar spectra)
+%   sol_ion_5lazor = changeLight(soleq.ion, 5, 0, 2)
+%     as above, but set the intensity of the secondary illumination source
+%     (usually, a monochromatic illumination)
 %
 
-% Other m-files required: df, verifyStabilization
+% Other m-files required: df, stabilize
 % Subfunctions: none
 % MAT-files required: none
 %
 % See also genIntStructs, df.
-%
-%% LICENSE
 %
 %% LICENSE
 % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
@@ -44,7 +49,7 @@ function sol_int = changeLight(sol, newInt, tmax)
 % email address: iochesonome@gmail.com
 % Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
 % Imperial College London
-% October 2017; Last revision: January 2018
+% October 2017; Last revision: January 2021
 
 %------------- BEGIN CODE --------------
 
@@ -52,46 +57,104 @@ par = sol.par;
 par.tmesh_type = 2;
 par.t0 = 1e-10;
 par.tpoints = 30;
-sol_int = sol;
 
-% set an initial time for stabilization tmax
+% set an initial time for the simulation
 if tmax
-    tmax_temp = tmax;
+    par.tmax = tmax;
 else % if tmax was zero, estimate a good one
     if par.mobseti
-        tmax_temp = min(1, 2^(-log10(par.mucat(par.active_layer))) / 10 + 2^(-log10(par.mue(par.active_layer))));
+        par.tmax = min(1, 2^(-log10(par.mucat(par.active_layer(1)))) / 10 + 2^(-log10(par.mue(par.active_layer(1)))));
     else
-        tmax_temp = min(1e-3, 2^(-log10(par.mue(par.active_layer))));
+        par.tmax = min(1e-3, 2^(-log10(par.mue(par.active_layer(1)))));
     end
 end
-par.tmax = tmax_temp;
 
-% find the initial illumination intensity, if it's zero (dark) just use
-% 1e-4, so that the first stabilization will be from dark to 1e-3
-if par.int1
-    oldInt = par.int1;
-    steps = 1 + ceil(abs(log10(newInt / oldInt)));
-else
-    oldInt = 1e-3;
-    steps = 1 + ceil(max(1, log10(newInt / oldInt)));
+if ~exist('lightSource','var')
+    lightSource = 1;
 end
 
-% if the step is just one, then newInt is the output of logspace function
-Int_array = logspace(log10(oldInt), log10(newInt), steps);
+oldInt = getInt(par, lightSource);
 
 %% change light in steps
 % not needed to reach a good stabilized solution in
 % each step, so stabilization is not verified here
 
-% skip first value in the array as is the initial Int (and does not get through pindrift again) or, in case the input
-% was in dark, the first value is 1e-3 and gets skipped
-for i = 2:length(Int_array)
-    disp([mfilename ' - Go from light intensity ' num2str(par.int1) ' to ' num2str(Int_array(i)) ' over ' num2str(par.tmax) ' s'])
-    par.int1 = Int_array(i); % set new light intensity
-    sol_int = df(sol_int, par);
+lastStepSuccessful = false;
+steps = 1;
+
+while steps < 7 && ~lastStepSuccessful
+    sol_int = sol;
+    % list of valid illumination values to use
+    % sum a small number to avoid the problems with zero illumination
+    tiny = max(oldInt,newInt)/10000;
+    intArray = logspace(log10(oldInt+tiny), log10(newInt+tiny), steps+1);
+    % remove oldInt from the list
+    intArray = intArray(2:end)-tiny;
+    for i = intArray
+        prevInt = getInt(sol_int.par, lightSource);
+        switch lightSource
+            case 1
+                par.g1_fun_type = 'sweepAndStill';
+                % COEFF = [A_start, A_end, sweep_duration]
+                par.g1_fun_arg = [prevInt, i, par.tmax/2e3];
+            case 2
+                par.g2_fun_type = 'sweepAndStill';
+                % COEFF = [A_start, A_end, sweep_duration]
+                par.g2_fun_arg = [prevInt, i, par.tmax/2e3];
+        end
+        disp([mfilename ' - Go from light intensity ' num2str(prevInt) ' to ' num2str(i) ' over ' num2str(par.tmax) ' s'])
+
+        sol_int = df(sol_int, par);
+        
+        if size(sol_int.u,1) == par.tpoints
+            lastStepSuccessful = true;
+        else
+            lastStepSuccessful = false;
+            steps = steps + 1;
+            break
+        end
+    end
+end
+
+if ~lastStepSuccessful
+    error('Driftfusion:changeLight', 'THE SOLUTION DID NOT REACH COMPLETION')
+end
+
+%at some point in the future par.int1 should be eliminated in favour of g1_fun_arg(1)
+switch lightSource
+    case 1
+        sol_int.par.g1_fun_type = 'constant';
+        sol_int.par.g1_fun_arg = newInt;
+        if isprop(sol_int.par, 'int1')
+            sol_int.par.int1 = newInt;
+        end
+    case 2
+        sol_int.par.g2_fun_type = 'constant';
+        sol_int.par.g2_fun_arg = newInt;
+        if isprop(sol_int.par, 'int2')
+            sol_int.par.int2 = newInt;
+        end
 end
 
 %% stabilize
 sol_int = stabilize(sol_int); % go to steady state
+
+function int = getInt(par, lightSource)
+%at some point in the future par.int1 should be eliminated in favour of g1_fun_arg(1)
+switch lightSource
+    case 1
+        if isprop(par, 'int1')
+            int = par.int1;
+        else
+            int = par.g1_fun_arg(1);
+        end
+    case 2
+        if isprop(par, 'int2')
+            int = par.int2;
+        else
+            int = par.g2_fun_arg(1);
+        end
+end
+
 
 %------------- END OF CODE --------------
