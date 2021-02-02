@@ -38,12 +38,11 @@ classdef explore
                 par = par_base;
                 par = explore.helper(par, str1, parval1(i));
                 
-                if strmatch('dcell', parnames(1)) ~= 0
-                    % sets PCELL at the required position to provide a point
-                    % density of one point per nanometer for changes in
-                    % thickness
-                    layerpoints = round(parval1(i)*1e7);
-                    par = explore.helper(par, ['p', str1(2:end)], layerpoints);
+                if strmatch('d', parnames(1)) ~= 0
+                    % sets number of points in active layer to be number of
+                    % nanometers/2
+                    points = round((parval1(i)*1e7)/2);
+                    par = explore.helper(par, ['layer_points', str1(2:end)], points);
                 end
                 
                 % Refresh device
