@@ -21,10 +21,6 @@ switch par.tmesh_type
         t(1) = 0;
         t(end) = par.tmax;
     case 3
-        % For use with TPV only! Start with 100 points up to the decay then
-        % switches to log
-        t = [linspace(0, par.pulsestart+par.pulselen, 0.2*par.tpoints), par.pulsestart + par.pulselen + par.logspace(log10(par.deltat), log10(par.tmax- par.pulsestart- par.pulselen), 0.8*par.tpoints)];
-    case 4
         % 2 log meshes consecutively
         t1 = logspace(log10(par.t0),log10(par.tmax/2),round(par.tpoints/2));
         t1(1) = 0;

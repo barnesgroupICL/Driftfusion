@@ -69,9 +69,9 @@ classdef explore
             
                 Voc_stable = zeros(length(parval2), JVpnts);
                 PLint = zeros(length(parval2), JVpnts);
-                Vapp_f = zeros(1, JVpnts);
+                Vapp_f = zeros(length(parval2), JVpnts);
                 J_f = zeros(length(parval2), JVpnts);
-                Vapp_r = zeros(1, JVpnts);
+                Vapp_r = zeros(length(parval2), JVpnts);
                 J_r = zeros(length(parval2), JVpnts);
                 
                 for j = 1:length(parval2)
@@ -217,10 +217,10 @@ classdef explore
         
         function plotPL(exsol)
             figure(100)
-            s1 = surf(exsol.parval1, exsol.parval2, exsol.stats.PLint);
+            surf(exsol.parval1, exsol.parval2, exsol.stats.PLint(:,:,end));
             ylabel(exsol.parnames(1))
             xlabel(exsol.parnames(2))
-            set(s1,'YScale','log');
+            set(gca,'YScale','log');
             zlabel('PL intensity [cm-2s-1]')
             shading interp
             colorbar

@@ -21,8 +21,8 @@ par_tio2_base = pc('Input_files/spiro_mapi_tio2.csv');
 par_tio2_low_rec = par_tio2_base;
 
 %% Change the interfacial recombination parameters for interface 2 (layer no. 4)
-par_tio2_low_rec.taun(4) = 1e-9;
-par_tio2_low_rec.taup(4) = 1e-9;
+par_tio2_low_rec.sn(4) = 1;
+par_tio2_low_rec.sp(4) = 1;
 
 %% Refresh the device- rebuilds the device structures par.dev and par.dev_ihalf etc.
 par_tio2_low_rec = refresh_device(par_tio2_low_rec);
@@ -32,8 +32,8 @@ soleq_tio2_base = equilibrate(par_tio2_base);
 soleq_tio2_low_rec = equilibrate(par_tio2_low_rec);
 
 %% DoJVs 0 - 1.2 V
-JV_tio2_base = doJV(soleq_tio2_base.ion, 50e-3, 200, 1, 1, 0, 1.2, 3);
-JV_tio2_low_rec = doJV(soleq_tio2_low_rec.ion, 50e-3, 200, 1, 1, 0, 1.2, 3);
+JV_tio2_base = doJV(soleq_tio2_base.ion, 200e-3, 200, 1, 1, 0, 1.2, 3);
+JV_tio2_low_rec = doJV(soleq_tio2_low_rec.ion, 200e-3, 200, 1, 1, 0, 1.2, 3);
 
 %% Plot JVs
 dfplot.JV(JV_tio2_base, 3)
