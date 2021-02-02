@@ -151,6 +151,67 @@ Jr = 0;
 % MaxStep = limit maximum time step size during integration
 options = odeset('MaxStep', par.MaxStepFactor*0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
 
+%% Prepare variables for solver
+
+% prepare search for x in x_ihalf
+x_ihalf_length = length(x_ihalf);
+sampling_step = round(sqrt(x_ihalf_length));
+x_ihalf_padded = [x_ihalf, nan(1,sampling_step-mod(x_ihalf_length,sampling_step))];
+x_ihalf_padded_mat = single(reshape(x_ihalf_padded,sampling_step,[]));
+x_ihalf_sampled = x_ihalf_padded_mat(1,:);
+
+% normalise epp
+epp_norm = epp/eppmax;
+
+% prepare constant generation profiles
+int1gx1 = int1*gx1;
+int2gx2 = int2*gx2;
+
+% S_potential prefactor
+q_over_eppmax_epp0 = q/(eppmax*epp0);
+
+% pre-calculation S_potential static charge
+NANDNaniNcat = -NA+ND+Nani-Ncat;
+
+% pre-calculate kB*T
+kBT = kB*T;
+
+% pre-calculate the squared values of ni
+ni_squared = ni.^2;
+
+% pre-calculate
+gradNc_over_Nc = gradNc./Nc;
+gradNv_over_Nv = gradNv./Nv;
+
+% convert to boolean for faster check in dfode
+g1_fun_type_constant = g1_fun_type == "constant";
+g2_fun_type_constant = g2_fun_type == "constant";
+
+% C: Time-dependence prefactor term
+switch N_ionic_species
+    case 0
+        C_potential = 0;
+        C_electron = 1;
+        C_hole = 1;
+        Cpre = [C_potential; C_electron; C_hole];
+        N_ionic_species_two = false;
+    case 1
+        C_potential = 0;
+        C_electron = 1;
+        C_hole = 1;
+        C_cation = 1;
+        Cpre = [C_potential; C_electron; C_hole; C_cation];
+        N_ionic_species_two = false;
+    case 2
+        C_potential = 0;
+        C_electron = 1;
+        C_hole = 1;
+        C_cation = 1;
+        C_anion = 1;
+        Cpre = [C_potential; C_electron; C_hole; C_cation; C_anion];
+        N_ionic_species_two = true;
+end
+
 %% Call solver
 % inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
@@ -161,6 +222,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % C = Time-dependence prefactor
 % F = Flux terms
 % S = Source terms
+
     function [C,F,S] = dfpde(x,t,u,dudx)   
         % Get position point
         i = find(x_ihalf <= x);
@@ -241,11 +303,40 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
             F = [F; K_anion*mobseti*F_anion];
             
-            S_anion = 0;
-            S = [S; S_anion];
+            % S_potential: Source term for potential
+            % u(2) is n, electron concentration; u(3) is p, holes concentration
+            % u(4) is mobile cation concentration; u(5) is mobile anion concentration
+            % NANDNaniNcat is -NA+ND+Nani-Ncat
+            S_potential = q_over_eppmax_epp0*(-u(2)+u(3)-u(5)+u(4)+NANDNaniNcat(i));
+
+            % S: Source terms
+            S = [S_potential; S_electron_hole; S_electron_hole; 0; 0];
+        else
+            % F: Flux terms
+            F = [F_potential; F_electron; F_hole; F_cation];
+
+            % S_potential: Source term for potential
+            % u(2) is n, electron concentration; u(3) is p, holes concentration
+            % u(4) is mobile cation concentration; Nani is fixed anion concentration
+            % Nani(i) is fixed anion, NANDNaniNcat is -NA+ND+Nani-Ncat
+            S_potential = q_over_eppmax_epp0*(-u(2)+u(3)-Nani(i)+u(4)+NANDNaniNcat(i));
+
+            % S: Source terms
+            S = [S_potential; S_electron_hole; S_electron_hole; 0];
         end
-        
+    else
+        % F: Flux terms
+        F = [F_potential; F_electron; F_hole];
+
+        % S_potential: Source term for potential
+        % Ncat(i) is fixed cation concentration, Nani(i) is fixed anion concentration
+        % NANDNaniNcat is -NA+ND+Nani-Ncat
+        S_potential = q_over_eppmax_epp0*(-u(2)+u(3)-Nani(i)+Ncat(i)+NANDNaniNcat(i));
+
+        % S: Source terms
+        S = [S_potential;S_electron_hole;S_electron_hole];
     end
+end
 
 %% Define initial conditions.
     function u0 = dfic(x)
