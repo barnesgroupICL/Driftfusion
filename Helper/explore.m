@@ -118,9 +118,9 @@ classdef explore
                         FF_f(j) = stats.FF_f;
                         FF_r(j) = stats.FF_r;
                         
-                        % For steady-state solution
-                        % lighton_Rs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
-                        sol_ill = lightonRs(soleq.ion, Int, -10, 1, 1e6, JVpnts);
+                        % For steady-state open circuit solution
+                        % [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol)
+                        [sol_ill, Voc_ss] = findVoc(soleq.ion, 1, 1, stats.Voc_f-0.1, stats.Voc_f, 0.01);
                         
                         % Write steady-state solutions into temporary
                         % variables
