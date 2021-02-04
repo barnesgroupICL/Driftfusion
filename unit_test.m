@@ -178,11 +178,6 @@ dfplot.gxt(JVsol.ill.f)
 dfplot.rx(JVsol.ill.f)
 dfplot.rx(JVsol.ill.f,[0,100])
 
-%% Core dfplot JVrec
-
-% JVrec(JV, option)
-dfplot.JVrec(JVsol, 3)
-
 %% Core dfplot Ft
 
 % Ft(sol, xpos)
@@ -227,40 +222,16 @@ dfplot.rhoxFxVx(JVsol.ill.f,[0,100])
 dfplot.rhoxVx(soleq.ion)
 dfplot.rhoxVx(JVsol.ill.f,[0,100])
 
-%% Core dfplot ELx_single
-
-% ELx_single(varargin)
-dfplot.ELx_single(soleq.ion)
-dfplot.ELx_single(JVsol.ill.f,[0,100])
-
 %% Core dfplot ELnpx
 
 % ELnpx(varargin)
 dfplot.ELnpx(soleq.ion)
 dfplot.ELnpx(JVsol.ill.f,[0,100])
 
-%% Core dfplot Vacx
-
-% Vacx(varargin)
-dfplot.Vacx(soleq.ion)
-dfplot.Vacx(JVsol.ill.f,[0,100])
-
-%% Core dfplot Vionacx
-
-% Vionacx(varargin)
-dfplot.Vionacx(soleq.ion)
-dfplot.Vionacx(JVsol.ill.f,[0,100])
-
 %% Core dfplot Fiont
 
 % Fiont(sol, xpos)
 dfplot.Fiont(JVsol.ill.f, 2e-5)
-
-%% Core dfplot PLx
-
-% PLx(varargin)
-dfplot.PLx(JVsol.ill.f)
-dfplot.PLx(JVsol.ill.f,[0,100])
 
 %% Core dfplot colourblocks
 
@@ -468,15 +439,10 @@ generation(par, 'laser', 470);
 generation(par2, 'AM15', 470);
 generation(par2, 'laser', 470);
 
-%% Core getdevihalf
-
-% devihalf = getdevihalf(par)
-getdevihalf(par);
-
 %% Core getvarihalf
 
 % varihalf = getvarihalf(var)
-getvarihalf(par);
+getvarihalf(par.xx);
 
 %% Core getxihalf
 
@@ -590,6 +556,7 @@ inputs = dir('Input_files');
 for i=1:length(inputs)
     input = inputs(i).name;
     if ~any(regexp(input,'^\.'))
+        disp(input)
         par = pc(input);
         xpoints = round(1 + sum(par.layer_points));
 
@@ -709,7 +676,7 @@ importsolcoresol();
 %% Helper makemovie
 
 % Framefile = makemovie(sol, plotfun, xrange, yrange, movie_name, Vcounter, tcounter)
-makemovie(JVsol.ill.f, @dfplot.PLx, [0,100e-7], 0, 'test_makemovie_delete_me', true, true);
+makemovie(JVsol.ill.f, @dfplot.ELx, [0,100e-7], 0, 'test_makemovie_delete_me', true, true);
 
 %% Helper verifyStabilization
 
@@ -828,7 +795,7 @@ VappFunction(soleq.ion, 'sweep', [0.1, 1, 5], 10, 30, false);
 VappFunction(soleq.ion, 'square', [0, 1, 5, 30], 10, 30, false);
 
 % coeff(1) + coeff(2)*(sin(2*pi*coeff(3)*t + coeff(4)));
-VappFunction(soleq.ion, 'sin', [0.1, 1e-2, 1, 0], 10, 30, false);
+VappFunction(soleq.ion, 'sin', [0.01, 1e-2, 1, 0], 10, 30, false);
 
 % COEFF = [OFFSET, V1, V2, periods, tperiod]
 % triangle_fun(coeff, t);
