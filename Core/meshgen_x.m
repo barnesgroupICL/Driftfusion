@@ -55,7 +55,7 @@ switch par.xmesh_type
                 x_layer  = x_layer./max(x_layer);   % Normalise the funciton
                 x_layer = dcum0(i) + x_layer * d(i);
                 xcell{i} = x_layer(1:end-1);
-            elseif strcmp(par.layer_type{1,i}, 'junction')
+            elseif any(strcmp(par.layer_type{1,i}, {'junction', 'interface'}))
                 x_layer = linspace(dcum0(i), dcum0(i+1)-(d(i)/p(i)), p(i));
                 xcell{i} = x_layer;
             end

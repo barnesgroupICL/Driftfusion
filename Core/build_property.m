@@ -31,7 +31,7 @@ for i=1:length(par.dcum)                % i is the layer index
                     devprop(j) = property(i);
                 end
             end
-        elseif any(strcmp(par.layer_type{1,i}, {'junction'})) == 1
+        elseif any(strcmp(par.layer_type{1,i}, {'junction', 'interface'})) == 1
 
             if xmesh(j) >= par.dcum0(i)
                 xprime = xmesh(j)-par.dcum0(i);
