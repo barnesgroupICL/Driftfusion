@@ -74,7 +74,6 @@ while size(sol.u,1) ~= par.tpoints
         i = i + 1;
         old_tmax = par_tmax.tmax;
         par_tmax.tmax = old_tmax / 4;
-        par_tmax.tpoints = round(par_tmax.tpoints / 4);
         warning('Driftfusion:VappFunction',...
             ['VappFunction the solver did not succeed, trying to start from a short simulation reducing tmax from '...
             num2str(old_tmax) ' to ' num2str(par_tmax.tmax)]);
