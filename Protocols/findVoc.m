@@ -1,4 +1,4 @@
-function [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol)
+function [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints)
 % FINDVOC finds the open cicuit voltage of a device using a
 % Newton-Raphson iteration
 
@@ -68,7 +68,7 @@ par.V_fun_arg(2) = x0;
 par.V_fun_arg(3) = par.tmax;
 par.t0 = 0;
 par.tmesh_type = 1;
-par.tpoints = 100;
+par.tpoints = tpoints;
 par.int1 = Int;
 
 disp('Voltage sweep to initial guess')
@@ -96,9 +96,8 @@ fx1 = 10*tol;                 % Set any initial vale > tol
 
 figure(111)
 
+i = 1;
 while abs(fx1) > tol
-    
-    i = 1; 
     disp(['Newton-Raphson iteration', num2str(i)])
     
     %% Scan to new potential x1
@@ -158,7 +157,6 @@ while abs(fx1) > tol
     
     fx0 = fx1;  
     i = i+1;
-    
 end
 
 sol_Voc = sol;

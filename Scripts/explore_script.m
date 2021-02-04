@@ -12,7 +12,7 @@
 % 
 %% Start code
 % Obtain the base parameters
-par_ptpd = pc('input_files/3_layer_test.csv');
+par_ptpd = pc('input_files/ptpd_mapi_pcbm.csv');
 
 % For the first example we will run JV and steady-state Voc for 3 different
 % active layer thicknesses and light intensities 

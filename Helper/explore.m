@@ -33,7 +33,7 @@ classdef explore
             errorlog = zeros(length(parval1), length(parval2));
 
             j = 1;
-            parfor i = 1:length(parval1)
+            for i = 1:length(parval1)
                 
                 par = par_base;
                 par = explore.helper(par, str1, parval1(i));
@@ -120,14 +120,14 @@ classdef explore
                         
                         % For steady-state open circuit solution
                         % [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol)
-                        [sol_ill, Voc_ss] = findVoc(soleq.ion, 1, 1, stats.Voc_f-0.1, stats.Voc_f, 0.01);
+                        [sol_Voc, Voc_ss] = findVoc(soleq.ion, 1, 1, stats.Voc_f, stats.Voc_f+0.1, 0.01, JVpnts);
                         
                         % Write steady-state solutions into temporary
                         % variables
-                        Voc_stable(j,:) = dfana.calcVQFL(sol_ill);
-                        PLint(j,:) = dfana.PLt(sol_ill);
-                        n_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),1));
-                        p_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),2));
+                        Voc_stable(j,:) = dfana.calcVQFL(sol_Voc);
+                        PLint(j,:) = dfana.PLt(sol_Voc);
+                        n_av(j) = mean(sol_Voc.u(end, par.pcum(2):par.pcum(5),1));
+                        p_av(j) = mean(sol_Voc.u(end, par.pcum(2):par.pcum(5),2));
 %                         n_f = explore.writevar(n_f, i, j, par.xx, sol_ill.u(end,:,1));
 %                         p_f = explore.writevar(p_f, i, j, par.xx, sol_ill.u(end,:,2));
 %                         a_f = explore.writevar(a_f, i, j, par.xx, sol_ill.u(end,:,3));
