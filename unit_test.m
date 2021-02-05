@@ -643,23 +643,25 @@ explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
 
 %% Helper explore plotfinalELx
 
-% plotfinalELx(exsol)
-explore.plotfinalELx(exsol)
-
-%% Helper explore plotprof_2D
-
-% plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
-explore.plotprof_2D(exsol, 'J_f', [true,true], [true,true], true, true)
-
-%% Helper explore plotU
-
-% plotU(exsol, par1logical, par2logical,logx,logy)
-explore.plotU(exsol, [true,true], [true,true],false,false)
-
-%% Helper explore plotCE
-
-% plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
-explore.plotCE(exsol, exsol, false, false, false, "ciaomamma")
+% EXPLORE contains functions that plot the final time point solution but
+% this functionality is currently not working.
+% % plotfinalELx(exsol)
+% explore.plotfinalELx(exsol)
+% 
+% %% Helper explore plotprof_2D
+% 
+% % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
+% explore.plotprof_2D(exsol, 'J_f', [true,true], [true,true], true, true)
+% 
+% %% Helper explore plotU
+% 
+% % plotU(exsol, par1logical, par2logical,logx,logy)
+% explore.plotU(exsol, [true,true], [true,true],false,false)
+% 
+% %% Helper explore plotCE
+% 
+% % plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
+% explore.plotCE(exsol, exsol, false, false, false, "ciaomamma")
 
 %% Helper explore plotJV
 
@@ -671,15 +673,10 @@ explore.plotJV(exsol, [true,true], [true,true])
 % ppos = getpointpos(xpos, xmesh)
 getpointpos(1e-6, soleq.ion.x);
 
-%% Helper importsolcoresol
-
-% solstruct = importsolcoresol(varargin)
-importsolcoresol();
-
 %% Helper makemovie
 
 % Framefile = makemovie(sol, plotfun, xrange, yrange, movie_name, Vcounter, tcounter)
-makemovie(JVsol.ill.f, @dfplot.PLx, [0,100e-7], 0, 'test_makemovie_delete_me', true, true);
+makemovie(JVsol.dk.f, @dfplot.PLx, [0,100e-7], 0, 'test_makemovie_delete_me', true, true);
 
 %% Helper verifyStabilization
 
