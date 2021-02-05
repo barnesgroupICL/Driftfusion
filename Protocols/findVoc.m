@@ -108,14 +108,10 @@ while abs(fx1) > tol
     par.tmesh_type = 1;
     par.tmax = 1e-3;
     par.t0 = 0;
-    
-    disp('Scan to new potential x1')
+
     sol = df(sol, par);
-    disp('Complete')
     
-    %% Stabilised solution
-    disp('Stabilised solution')
-    
+    %% Stabilised solution    
     par.V_fun_type = 'constant';
     par.V_fun_arg(1) = x1;
     par.tmesh_type = 2;
@@ -123,9 +119,7 @@ while abs(fx1) > tol
     par.t0 = par.tmax/1e4;
     
     sol = df(sol, par);
-    
-    disp('Complete')
-    
+      
     J = dfana.calcJ(sol);
     fx1 = J.tot(end, end);
     
@@ -157,6 +151,7 @@ while abs(fx1) > tol
     
     fx0 = fx1;  
     i = i+1;
+    disp('Complete')
 end
 
 sol_Voc = sol;
