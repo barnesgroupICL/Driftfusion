@@ -516,8 +516,8 @@ parx.meshx_figon = true;
 parx.xmesh_type = 1;
 meshgen_x(parx);
 
-%% Core meshgen_x 2
-
+% %% Core meshgen_x 2
+%
 % x = meshgen_x(par)
 % parx = par;
 % parx.meshx_figon = true;
@@ -676,7 +676,7 @@ getpointpos(1e-6, soleq.ion.x);
 %% Helper makemovie
 
 % Framefile = makemovie(sol, plotfun, xrange, yrange, movie_name, Vcounter, tcounter)
-makemovie(JVsol.dk.f, @dfplot.PLx, [0,100e-7], 0, 'test_makemovie_delete_me', true, true);
+makemovie(JVsol.dk.f, @dfplot.ELx, [0,100e-7], 0, 'test_makemovie_delete_me', true, true);
 
 %% Helper verifyStabilization
 
