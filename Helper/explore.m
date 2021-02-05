@@ -333,8 +333,8 @@ classdef explore
         function plotfinalELx(exsol)
             % plots final energy level diagrams
             figure(105)
-            for i=1:length(parval1)
-                for j = 1:length(parval2)
+            for i=1:length(exsol.parval1)
+                for j = 1:length(exsol.parval2)
                     % Rebuild solutions
                     sol.u(1,:,1) = exsol.Vf(i, j, :);
                     sol.u(1,:,2) = exsol.nf(i, j, :);
