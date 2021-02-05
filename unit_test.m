@@ -605,9 +605,6 @@ end
 % [JV_ana, r0, k_rad, Voc, g0] = calcR0(EgArr, Jsc_vs_Eg, par)
 calcR0(EgArr, Jsc_vs_Eg, par);
 
-% [G0_Arr, k_rad_Arr, R0_Arr, Eg, VocArr, DeltaVoc] = Eg_vs_Voc(EgArr, Jsc_vs_Eg)
-Eg_vs_Voc(EgArr, Jsc_vs_Eg);
-
 %% Helper explore plotPL
 
 % plotPL(exsol)
