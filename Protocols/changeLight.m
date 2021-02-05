@@ -63,9 +63,9 @@ if tmax
     par.tmax = tmax;
 else % if tmax was zero, estimate a good one
     if par.mobseti
-        par.tmax = min(1, 2^(-log10(par.mucat(par.active_layer(1)))) / 10 + 2^(-log10(par.mue(par.active_layer(1)))));
+        tmax_temp = min(1, 2^(-log10(par.mucat(par.active_layer(1)))) / 10 + 2^(-log10(par.mue(par.active_layer(1)))));
     else
-        par.tmax = min(1e-3, 2^(-log10(par.mue(par.active_layer(1)))));
+        tmax_temp = min(1e-3, 2^(-log10(par.mue(par.active_layer(1)))));
     end
 end
 
@@ -105,7 +105,7 @@ while steps < 7 && ~lastStepSuccessful
         disp([mfilename ' - Go from light intensity ' num2str(prevInt) ' to ' num2str(i) ' over ' num2str(par.tmax) ' s'])
 
         sol_int = df(sol_int, par);
-        
+
         if size(sol_int.u,1) == par.tpoints
             lastStepSuccessful = true;
         else
