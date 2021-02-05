@@ -558,45 +558,6 @@ refresh_device(par);
 % y = triangle_fun(coeff, t)
 triangle_fun([0.1, 0.2, 1, 3, 5], 0:0.1:10);
 
-%% Input_files
-
-inputs = dir('Input_files');
-for i=1:length(inputs)
-    input = inputs(i).name;
-    if ~any(regexp(input,'^\.'))
-        par = pc(input);
-        xpoints = round(1 + sum(par.layer_points));
-
-        soleq = equilibrate(par);
-        
-        el = soleq.el;
-        el_s = size(el.u);
-
-        exp_el_s = [el.par.tpoints, xpoints, 3];
-        assert(all(el_s == exp_el_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
-        assert(~any(isnan(el.u(:))))
-        
-        ion = soleq.ion;
-        ion_s = size(ion.u);
-        
-        exp_ion_s = [ion.par.tpoints, xpoints, round(3+par.N_ionic_species)];
-        assert(all(ion_s == exp_ion_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
-        assert(~any(isnan(ion.u(:))))
-    end
-end
-
-%% Scripts
-
-inputs = dir('Scripts');
-for i=1:length(inputs)
-    input = inputs(i).name;
-    if ~any(regexp(input,'^\.|^test'))
-        
-        disp(['### running script ' input]);
-        run(input);
-    end
-end
-
 %% Helper calcJsc, calcR0 and Eg_vs_Voc
 
 % [EgArr, Jsc_vs_Eg] = calcJsc
@@ -696,12 +657,12 @@ doCV(soleq.ion, 0.1, 0, 0.5, -0.5, 0.1, 1, 50);
 %% Protocols doIMPS
 
 % sol_IMPS = doIMPS(sol_ini, int_base, int_delta, frequency, tmax, tpoints)
-doIMPS(soleq.ion, 0.2, 0.2, 1, 10, 50);
+doIMPS(soleq.ion, 0.2, 0.02, 1, 10, 50);
 
 %% Protocols doIMVS
 
 % sol_IMVS = doIMVS(sol_ini, int_base, int_delta, frequency, tmax, tpoints)
-doIMVS(soleq.ion, 0.2, 0.2, 1, 10, 50);
+doIMVS(soleq.ion, 1, 0.2, 4, 1, 50);
 
 %% Protocols doLightPulse
 
@@ -737,8 +698,8 @@ findVocDirect(soleq.ion, 1, true);
 
 %% Protocols findVoc
 
-% [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol)
-findVoc(soleq.ion, 1, true, 0.9, 1.3, 1e-5)
+% [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints)
+findVoc(soleq.ion, 1, true, 0.9, 1.3, 1e-5, 50)
 
 %% Protocols genIntStructs
 
@@ -821,6 +782,46 @@ lightsource('AM15', 500);
 
 % [n_interp, k_interp] = LoadRefrIndex(name,wavelengths)
 LoadRefrIndex(par.stack{1},300:767);
+
+
+%% Input_files
+
+inputs = dir('Input_files');
+for i=1:length(inputs)
+    input = inputs(i).name;
+    if ~any(regexp(input,'^\.'))
+        par = pc(input);
+        xpoints = round(1 + sum(par.layer_points));
+
+        soleq = equilibrate(par);
+        
+        el = soleq.el;
+        el_s = size(el.u);
+
+        exp_el_s = [el.par.tpoints, xpoints, 3];
+        assert(all(el_s == exp_el_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
+        assert(~any(isnan(el.u(:))))
+        
+        ion = soleq.ion;
+        ion_s = size(ion.u);
+        
+        exp_ion_s = [ion.par.tpoints, xpoints, round(3+par.N_ionic_species)];
+        assert(all(ion_s == exp_ion_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
+        assert(~any(isnan(ion.u(:))))
+    end
+end
+
+%% Scripts
+
+inputs = dir('Scripts');
+for i=1:length(inputs)
+    input = inputs(i).name;
+    if ~any(regexp(input,'^\.|^test'))
+        
+        disp(['### running script ' input]);
+        run(input);
+    end
+end
 
 %------------- END OF CODE --------------
 
