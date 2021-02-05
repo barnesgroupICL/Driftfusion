@@ -76,16 +76,11 @@ par.radset = 1;
 
 % Characteristic diffusion time
 t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
-par.tmax = 10*t_diff;
+par.tmax = 100*t_diff;
 par.t0 = par.tmax/1e6;
 
 %% Solution with mobility switched on
 disp('Solution with mobility switched on')
-sol = df(sol, par);
-
-par.tmax = t_diff;
-par.t0 = par.tmax/1e6;
-
 sol = df(sol, par);
 
 all_stable = verifyStabilization(sol.u, sol.t, 0.7);
@@ -97,7 +92,7 @@ j = 1;
 while any(all_stable) == 0
     disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
     
-    par.tmax = par.tmax*10;
+    par.tmax = 10*par.tmax;
     par.t0 = par.tmax/1e6;
     
     sol = df(sol, par);
@@ -156,7 +151,7 @@ if electronic_only == 0
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
     par.K_anion = rat_anion;
     par.K_cation = rat_cation;
-    par.tmax = 10*t_diff;
+    par.tmax = 100*t_diff;
     par.t0 = par.tmax/1e3;
       
     sol = df(sol, par);

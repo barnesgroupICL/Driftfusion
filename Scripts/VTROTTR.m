@@ -54,7 +54,7 @@ end
 %% Plot the outputs
 for i = 1:Ntr
     figure(101)
-    plot(sol_VTROTTR(i).t, -deltaV(i,:));
+    plot(sol_VTROTTR(i).t, deltaV(i,:));
     hold on
 end
 xlabel('Time [s]')

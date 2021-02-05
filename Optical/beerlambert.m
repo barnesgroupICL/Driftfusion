@@ -76,7 +76,7 @@ try
                 [n_layer, k_layer] = LoadRefrIndex(layers{i},lambda);
                 n(pcum1(i):pcum1(i+1),:) = repmat(n_layer,layer_points(i)+1, 1);
                 k(pcum1(i):pcum1(i+1),:) = repmat(k_layer,layer_points(i)+1, 1);       
-            case 'junction'
+            case {'junction', 'interface'}
                 xprime = x(pcum1(i):pcum1(i+1)) - x(pcum1(i));
                 xprime = xprime';
                 k(pcum1(i):pcum1(i+1),:) = zeros(length(xprime),length(lambda));
