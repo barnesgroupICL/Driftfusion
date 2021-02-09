@@ -747,21 +747,20 @@ transient_nid_ana(sol_OC);
 % sol = VappFunction(sol_ini, Vapp_func, Vapp_coeff, tmax, tpoints, logtime)
 
 % coeff(1);
-VappFunction(soleq.ion, 'constant', 0.2, 10, 30, false);
+VappFunction(soleq.ion, 'constant', 0, 10, 30, false);
 
 % coeff(1) + (coeff(2)-coeff(1))*t/coeff(3);
-VappFunction(soleq.ion, 'sweep', [0.1, 1, 5], 10, 30, false);
+VappFunction(soleq.ion, 'sweep', [0, 1, 5], 10, 30, false);
 
 % coeff(1) + (coeff(2)-coeff(1))*lt(mod(t,coeff(3))*1/coeff(3),coeff(4)/100);
-VappFunction(soleq.ion, 'square', [0, 1, 5, 30], 10, 30, false);
+% VappFunction(soleq.ion, 'square', [0.1, 0, 10, 90], 10, 30, false);
 
 % coeff(1) + coeff(2)*(sin(2*pi*coeff(3)*t + coeff(4)));
-VappFunction(soleq.ion, 'sin', [0.1, 1e-2, 1, 0], 10, 30, false);
+VappFunction(soleq.ion, 'sin', [0, 0.1, 1, 0], 10, 30, false);
 
 % COEFF = [OFFSET, V1, V2, periods, tperiod]
 % triangle_fun(coeff, t);
-VappFunction(soleq.ion, 'tri', [0.1, 0.2, 1, 3, 5], 10, 30, false);
-
+VappFunction(soleq.ion, 'tri', [0, 0.6, -0.1, 3, 5], 15, 60, false);
 
 %% Optical beerlambert
 
