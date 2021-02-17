@@ -79,7 +79,7 @@ par_pulseKeepOn.tpoints = 100;
 % Preallocate memory
 Jtr = zeros(par_pulseKeepOn.tpoints, length(tdwell_arr));
 t_Jtr = zeros(par_pulseKeepOn.tpoints, length(tdwell_arr));
-Jdk = zeros(length(tdwell_arr));
+Jdk = zeros(1,length(tdwell_arr));
 
 startFromSolJump = true;
 
@@ -96,6 +96,7 @@ for i = 1:length(tdwell_arr)
     if startFromSolJump
         par_dwell.tmax = tdwell_arr(i);
         sol_dwell = runDf(sol_jump, par_dwell);
+        %assignin('base', matlab.lang.makeValidName(['SDP_dwell_' inputname(1) '_int_' num2str(bias_int) '_' num2str(tdwell_arr(i))]), sol_dwell)
         if size(sol_dwell.u,1) == par_dwell.tpoints
             startFromSolJump = false;
         else
@@ -112,10 +113,11 @@ for i = 1:length(tdwell_arr)
     disp('Pulse keep on')
     if solver_split_pulse
         [~, Jtr(:,i), Jdk(i), t_Jtr(:,i)]= runDfFourTrunks(sol_pulseTurnOn, par_pulseKeepOn, sol_dwell);
-    else    
+    else
         sol_pulseKeepOn = runDf(sol_pulseTurnOn, par_pulseKeepOn);
         [Jtr(:,i), Jdk(i)] = calcJtrJdk(sol_dwell, sol_pulseKeepOn);
         t_Jtr(:,i) = sol_pulseKeepOn.t;
+        %assignin('base', matlab.lang.makeValidName(['SDP_' inputname(1) '_' num2str(tdwell_arr(i))]), sol_pulseKeepOn)
     end
 end
 
@@ -133,11 +135,11 @@ sdpsol.probe_tmax = pulse_tmax;
 end
 
 function [Jtr, Jdk] = calcJtrJdk(sol_dwell, sol_pulseKeepOn)
-J_dwell = dfana.calcJ(sol_dwell);
-J_pulse = dfana.calcJ(sol_pulseKeepOn);
-Jdk = J_dwell.tot(end, end);
-% Use end point of dark current as baseline- could average if noisy
-Jtr = J_pulse.tot(:, end) - Jdk;
+    J_dwell = dfana.calcJ(sol_dwell);
+    J_pulse = dfana.calcJ(sol_pulseKeepOn);
+    Jdk = J_dwell.tot(end, end);
+    % Use end point of dark current as baseline- could average if noisy
+    Jtr = J_pulse.tot(:, end) - Jdk;
 end
 
 function par = lightRampUp(par, source, initial_int, final_int)
@@ -230,18 +232,21 @@ function [sol4, Jtr, Jdk, t_Jtr] = runDfFourTrunks(sol_pre, par, sol_dwell)
         par2.tmax = (par.t0*par.tmax)^0.5 - par1.tmax;
         disp(['Split solution, second part. tmax: ' num2str(par2.tmax) ' s'])
         par2.tpoints = floor(par.tpoints / 4);
+        par2.t0 = par1.tmax / 10;
         sol2 = runDf(sol1, par2);
         
         par3 = par;
         par3.tmax = (par.t0^0.5*par.tmax^1.5)^0.5 - par1.tmax - par2.tmax;
         disp(['Split solution, third part. tmax: ' num2str(par3.tmax) ' s'])
         par3.tpoints = floor(par.tpoints / 4);
+        par3.t0 = par2.tmax / 10;
         sol3 = runDf(sol2, par3);
         
         par4 = par;
         par4.tmax = par.tmax - par1.tmax - par2.tmax - par3.tmax;
         disp(['Split solution, fourth part. tmax: ' num2str(par4.tmax) ' s'])
         par4.tpoints = par.tpoints - par1.tpoints - par2.tpoints - par3.tpoints;
+        par4.t0 = par3.tmax / 10;
         sol4 = runDf(sol3, par4);
         
         if nargout > 1
