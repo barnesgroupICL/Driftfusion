@@ -85,14 +85,18 @@ for i=1:length(par.dcum)                % i is the layer index
                         case 'mue_interface'
                             if alpha < 0
                                 devprop(j) = (par.mue(i-1)+(par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n);
-                            elseif alpha >= 0
+                            elseif alpha > 0
                                 devprop(j) = (par.mue(i+1)+(par.Nv(i-1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n);
+                            else
+                                devprop(j) = par.mue(i+1)*exp(abs(alpha)*xprime_n);
                             end
                         case 'muh_interface'
                             if beta < 0
-                                devprop(j) = (par.muh(i-1)+(par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p);
-                            elseif beta >= 0
+                                devprop(j) = (par.muh(i-1)+(par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p);  
+                            elseif beta > 0
                                 devprop(j) = (par.muh(i+1)+(par.Nc(i-1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p);
+                            else
+                                devprop(j) = par.muh(i+1)*exp(abs(beta)*xprime_p);
                             end
                         case 'int_switch'
                             devprop(j) = 0;
