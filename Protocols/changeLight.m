@@ -87,7 +87,7 @@ while steps < 7 && ~lastStepSuccessful
     % sum a small number to avoid the problems with zero illumination
     tiny = max(oldInt,newInt)/10000;
     intArray = logspace(log10(oldInt+tiny), log10(newInt+tiny), steps+1);
-    % remove oldInt from the list
+    % starting from 2, oldInt gets removed from the list
     intArray = intArray(2:end)-tiny;
     for i = intArray
         prevInt = getInt(sol_int.par, lightSource);
@@ -98,14 +98,12 @@ while steps < 7 && ~lastStepSuccessful
                 par.g1_fun_arg(1) = prevInt;
                 par.g1_fun_arg(2) = i;
                 par.g1_fun_arg(3) = par.tmax/2e3;
-                par.int1 = i;
             case 2
                 par.g2_fun_type = 'sweepAndStill';
                 % COEFF = [A_start, A_end, sweep_duration]
                 par.g2_fun_arg(1) = prevInt;
                 par.g2_fun_arg(2) = i;
                 par.g2_fun_arg(3) = par.tmax/2e3;
-                par.int2 = i;
         end
         disp([mfilename ' - Go from light intensity ' num2str(prevInt) ' to ' num2str(i) ' over ' num2str(par.tmax) ' s'])
 
@@ -125,23 +123,33 @@ if ~lastStepSuccessful
     error('Driftfusion:changeLight', 'THE SOLUTION DID NOT REACH COMPLETION')
 end
 
-%at some point in the future par.int1 should be eliminated in favour of g1_fun_arg(1)
+%% set static illumination
+
+%at some point in the future par.int1 should be eliminated (or just used as
+%an output value) in favour of g1_fun_arg(1). When this happens, this code
+%could need to be adapted accordingly.
 switch lightSource
     case 1
         sol_int.par.g1_fun_type = 'constant';
-        sol_int.par.g1_fun_arg(1) = newInt;
-        sol_int.par.int1 = newInt;
+        sol_int.par.g1_fun_arg = newInt;
+        if isprop(sol_int.par, 'int1')
+            sol_int.par.int1 = newInt;
+        end
     case 2
         sol_int.par.g2_fun_type = 'constant';
-        sol_int.par.g2_fun_arg(1) = newInt;
-        sol_int.par.int2 = newInt;
+        sol_int.par.g2_fun_arg = newInt;
+        if isprop(sol_int.par, 'int2')
+            sol_int.par.int2 = newInt;
+        end
 end
 
 %% stabilize
 sol_int = stabilize(sol_int); % go to steady state
 
 function int = getInt(par, lightSource)
-%at some point in the future par.int1 should be eliminated in favour of g1_fun_arg(1)
+%at some point in the future par.int1 should be eliminated (or just used as
+%an output value) in favour of g1_fun_arg(1). When this happens, this code
+%could need to be adapted accordingly.
 switch lightSource
     case 1
         if isprop(par, 'int1')
