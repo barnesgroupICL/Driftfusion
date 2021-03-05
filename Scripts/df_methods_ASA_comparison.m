@@ -49,3 +49,13 @@ ylim([1e9, 1e18])
 legend('HTL','interface 1','Active layer','Interface 2','ETL',...
     'n, 0 V', 'p, 0 V', 'n, 0.2 V', 'p, 0.2 V', 'n, 0.4 V', 'p, 0.4 V',...
     'n, 0.6 V', 'p, 0.6 V', 'n, 0.8 V', 'p, 0.8 V')
+
+%% Error comparison - requires ASA solutions
+getDFASAerror(JV_1a.dk.f, ASA_JVdark_1a);
+hold on
+getDFASAerror(JV_1b.dk.f, ASA_JVdark_1b);
+hold on
+getDFASAerror(JV_2a.dk.f, ASA_JVdark_2a);
+hold on
+getDFASAerror(JV_2b.dk.f, ASA_JVdark_2b);
+hold off
