@@ -13,14 +13,6 @@ function [JV_ana, r0, k_rad, Voc, g0] = calcR0(EgArr, Jsc_vs_Eg, par)
 % (at your option) any later version.
 %
 %% Start code
-set(0,'DefaultLineLinewidth',1);
-set(0,'DefaultAxesFontSize',16);
-set(0,'DefaultFigurePosition', [600, 400, 450, 300]);
-set(0,'DefaultAxesXcolor', [0, 0, 0]);
-set(0,'DefaultAxesYcolor', [0, 0, 0]);
-set(0,'DefaultAxesZcolor', [0, 0, 0]);
-set(0,'DefaultTextColor', [0, 0, 0]);
-
 figson = 1;
 
 %% Physical constants
@@ -39,9 +31,12 @@ q = 1.60217662e-19;         % Elementary charge [C]
 % xlabel('Energy [eV]')
 % ylabel('r0(E)')
 
-[~,Jsc_vs_Eg] = calcJsc(0);
 for i =1:length(par.Eg)
-
+    
+    if isnan(par.Eg(i))
+        continue
+    end
+    
     % Find maximum Jsc based on step function absorption and 100% EQE
     p = find(EgArr <= par.Eg(i));
     p = p(end);
@@ -80,10 +75,6 @@ for i =1:length(par.Eg)
         xlim([0, V(end)])
         hold on
     end
-
 end
-
     hold off
-
-
 end

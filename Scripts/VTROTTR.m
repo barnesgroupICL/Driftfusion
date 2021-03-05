@@ -11,27 +11,25 @@
 % 
 %% Start code
 %% Read-in params
-par_tio2 = pc('input_files/spiro_mapi_tio2.csv');
+par_3l = pc('input_files/IonMonger_default_IR.csv');
 
 %% Find equilibrium solution
-soleq_tio2 = equilibrate(par_tio2);
+soleq_3l = equilibrate(par_3l);
 
 %% Perform open circiut voltage transient
 % lightonRs(sol_ini, int1, stab_time, mobseti, Rs, pnts)
-sol_OC = lightonRs(soleq_tio2.ion, 1, 10, 1, 1e6, 400);
+stab_time = 10;
+sol_OC = lightonRs(soleq_3l.ion, 1, stab_time, 1, 1e6, 400);
 
 %% Create array of Ntr linearly spaced times
-Ntr = 6;    % Number of voltage transients
-tarr = 0:sol_OC.par.tmax/Ntr:sol_OC.par.tmax;
+Ntr = 6;            % Number of voltage transients
+tarr = logspace(log10(stab_time/1e3), log10(stab_time), Ntr);     % TPV every 0.5 second up to Ntrs secs
 
 %% Create temporary solution that solutions at specific times will be
 % written into
 sol_temp = sol_OC;
 
 %% Loop to get transients
-figure(101)
-hold on
-
 for i = 1:Ntr
     %% Find the approximate time point
     time_point = find(sol_OC.t <= tarr(i));
@@ -50,11 +48,14 @@ for i = 1:Ntr
     
     % Extract Voc vs t and subtract baseline
     Voc(i,:) = dfana.calcVQFL(sol_VTROTTR(i));
-    deltaV(i,:) = Voc(i,:) -  Voc(i,1);
-    
-    % Plot the outputs
-    plot(sol_VTROTTR(i).t, deltaV(i,:))
-           
+    deltaV(i,:) = Voc(i,:) -  Voc(i,1);    
+end
+
+%% Plot the outputs
+for i = 1:Ntr
+    figure(101)
+    plot(sol_VTROTTR(i).t, deltaV(i,:));
+    hold on
 end
 xlabel('Time [s]')
 ylabel('DeltaV [V]')

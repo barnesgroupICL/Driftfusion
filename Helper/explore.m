@@ -33,17 +33,19 @@ classdef explore
             errorlog = zeros(length(parval1), length(parval2));
 
             j = 1;
-            parfor i = 1:length(parval1)
+            for i = 1:length(parval1)
                 
                 par = par_base;
                 par = explore.helper(par, str1, parval1(i));
                 
-                if strmatch('dcell', parnames(1)) ~= 0
-                    % sets PCELL at the required position to provide a point
-                    % density of one point per nanometer for changes in
-                    % thickness
-                    layerpoints = round(parval1(i)*1e7);
-                    par = explore.helper(par, ['p', str1(2:end)], layerpoints);
+                if strmatch('d', parnames(1)) ~= 0
+                    % sets number of points in active layer to be number of
+                    % nanometers/2
+                    points = round((parval1(i)*1e7)/2);
+                    if points < 100
+                        points = 100;
+                    end
+                    par = explore.helper(par, ['layer_points', str1(2:end)], points);
                 end
                 
                 % Refresh device
@@ -69,9 +71,9 @@ classdef explore
             
                 Voc_stable = zeros(length(parval2), JVpnts);
                 PLint = zeros(length(parval2), JVpnts);
-                Vapp_f = zeros(1, JVpnts);
+                Vapp_f = zeros(length(parval2), JVpnts);
                 J_f = zeros(length(parval2), JVpnts);
-                Vapp_r = zeros(1, JVpnts);
+                Vapp_r = zeros(length(parval2), JVpnts);
                 J_r = zeros(length(parval2), JVpnts);
                 
                 for j = 1:length(parval2)
@@ -116,16 +118,16 @@ classdef explore
                         FF_f(j) = stats.FF_f;
                         FF_r(j) = stats.FF_r;
                         
-                        % For steady-state solution
-                        % lighton_Rs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
-                        sol_ill = lightonRs(soleq.ion, Int, -10, 1, 1e6, JVpnts);
+                        % For steady-state open circuit solution
+                        % [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol)
+                        [sol_Voc, Voc_ss] = findVoc(soleq.ion, 1, 1, stats.Voc_f, stats.Voc_f+0.1, 0.01, JVpnts);
                         
                         % Write steady-state solutions into temporary
                         % variables
-                        Voc_stable(j,:) = dfana.calcVQFL(sol_ill);
-                        PLint(j,:) = dfana.PLt(sol_ill);
-                        n_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),1));
-                        p_av(j) = mean(sol_ill.u(end, par.pcum(2):par.pcum(5),2));
+                        Voc_stable(j,:) = dfana.calcVQFL(sol_Voc);
+                        PLint(j,:) = dfana.PLt(sol_Voc);
+                        n_av(j) = mean(sol_Voc.u(end, par.pcum(2):par.pcum(5),1));
+                        p_av(j) = mean(sol_Voc.u(end, par.pcum(2):par.pcum(5),2));
 %                         n_f = explore.writevar(n_f, i, j, par.xx, sol_ill.u(end,:,1));
 %                         p_f = explore.writevar(p_f, i, j, par.xx, sol_ill.u(end,:,2));
 %                         a_f = explore.writevar(a_f, i, j, par.xx, sol_ill.u(end,:,3));
@@ -217,10 +219,10 @@ classdef explore
         
         function plotPL(exsol)
             figure(100)
-            s1 = surf(exsol.parval1, exsol.parval2, exsol.stats.PLint);
+            surf(exsol.parval1, exsol.parval2, exsol.stats.PLint(:,:,end));
             ylabel(exsol.parnames(1))
             xlabel(exsol.parnames(2))
-            set(s1,'YScale','log');
+            set(gca,'YScale','log');
             zlabel('PL intensity [cm-2s-1]')
             shading interp
             colorbar
@@ -331,8 +333,8 @@ classdef explore
         function plotfinalELx(exsol)
             % plots final energy level diagrams
             figure(105)
-            for i=1:length(parval1)
-                for j = 1:length(parval2)
+            for i=1:length(exsol.parval1)
+                for j = 1:length(exsol.parval2)
                     % Rebuild solutions
                     sol.u(1,:,1) = exsol.Vf(i, j, :);
                     sol.u(1,:,2) = exsol.nf(i, j, :);

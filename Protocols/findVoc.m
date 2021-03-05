@@ -1,4 +1,4 @@
-function [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol)
+function [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints)
 % FINDVOC finds the open cicuit voltage of a device using a
 % Newton-Raphson iteration
 
@@ -37,7 +37,7 @@ if mobseti == 1
     if isnan(rat_anion) || isinf(rat_anion)
         rat_anion = 0;
     end
-    
+
     if isnan(rat_cation) || isinf(rat_cation)
         rat_cation = 0;
     end
@@ -68,7 +68,7 @@ par.V_fun_arg(2) = x0;
 par.V_fun_arg(3) = par.tmax;
 par.t0 = 0;
 par.tmesh_type = 1;
-par.tpoints = 100;
+par.tpoints = tpoints;
 par.int1 = Int;
 
 disp('Voltage sweep to initial guess')
@@ -92,14 +92,12 @@ fx0 = J.tot(end, end);
 xrun = x0;
 yrun = fx0;
 
-fx1 = 1;%                 % Set any initial vale > 0.01
+fx1 = 10*tol;                 % Set any initial vale > tol
 
 figure(111)
 
+i = 1;
 while abs(fx1) > tol
-    
-    i = 1;
-    
     disp(['Newton-Raphson iteration', num2str(i)])
     
     %% Scan to new potential x1
@@ -110,14 +108,10 @@ while abs(fx1) > tol
     par.tmesh_type = 1;
     par.tmax = 1e-3;
     par.t0 = 0;
-    
-    disp('Scan to new potential x1')
+
     sol = df(sol, par);
-    disp('Complete')
     
-    %% Stabilised solution
-    disp('Stabilised solution')
-    
+    %% Stabilised solution    
     par.V_fun_type = 'constant';
     par.V_fun_arg(1) = x1;
     par.tmesh_type = 2;
@@ -125,14 +119,12 @@ while abs(fx1) > tol
     par.t0 = par.tmax/1e4;
     
     sol = df(sol, par);
-    
-    disp('Complete')
-    
+      
     J = dfana.calcJ(sol);
     fx1 = J.tot(end, end);
     
     % approximation to the gradient
-    fgrad = (fx1 - fx0)/(x1-x0)
+    fgrad = (fx1 - fx0)/(x1-x0);
     
     xplot = 0.6:0.01:1.6;
     yplot = fgrad*xplot + fx0- fgrad*x0;
@@ -149,26 +141,22 @@ while abs(fx1) > tol
     
     drawnow update
     % New initial guesses
-    x0 = x1
+    x0 = x1;
     
-    if fgrad ~= 0
-        
-        x1 = x1 - (fx1/fgrad);
-        
-    else
-        
-        x1 = x1 + 0.1;
-        
+    if fgrad ~= 0     
+        x1 = x1 - (fx1/fgrad);   
+    else  
+        x1 = x1 + 0.1;  
     end
     
-    fx0 = fx1
-    %sol_V0 = sol_V1;
-    
+    fx0 = fx1;  
     i = i+1;
-    
+    disp('Complete')
 end
 
 sol_Voc = sol;
+sol_Voc.par.K_anion = 1;
+sol_Voc.par.K_cation = 1;
 
 Voc = x1;
 
