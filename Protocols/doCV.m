@@ -41,7 +41,7 @@ end
 deltaV = abs(Vmax-V0)+abs(Vmin-Vmax)+abs(V0-Vmin);
 tmax = deltaV/scan_rate;
 
-disp('Performing cyclic voltamagram')
+disp('Performing cyclic voltammogram')
 sol_CV = VappFunction(sol, 'tri', [V0, Vmax, Vmin, cycles, tmax/cycles], tmax, tpoints, 0);
 disp('Complete')
 

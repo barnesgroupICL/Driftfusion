@@ -88,9 +88,16 @@ if struct.par.tmax < par.tmax
 end
 
 % the warnings are not needed here
-warning('off', 'df:verifyStabilization');
+warning('off', 'Driftfusion:verifyStabilization');
 
+i=0;
 while forceStabilization || ~verifyStabilization(steadystate_struct.u, steadystate_struct.t, 1e-3) % check stability
+    i = i + 1;
+    if i > 10
+        warning('Driftfusion:stabilize', [mfilename ' - not stabile after 10 attempts, giving up.']);
+        break
+    end
+
     disp([mfilename ' - Stabilizing ' inputname(1) ' over ' num2str(par.tmax) ' s with an applied voltage of ' num2str(par.Vapp) ' V']);
     % every cycle starts from the last timepoint of the previous cycle
     steadystate_struct = df(steadystate_struct, par);
@@ -115,6 +122,6 @@ while forceStabilization || ~verifyStabilization(steadystate_struct.u, steadysta
 end
 
 % re-enable the warnings
-warning('on', 'df:verifyStabilization');
+warning('on', 'Driftfusion:verifyStabilization');
 
 %------------- END OF CODE --------------

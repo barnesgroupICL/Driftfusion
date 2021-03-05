@@ -24,7 +24,6 @@ if figson == 1
     plot(AM15_data(1, :), AM15_data(2, :));
     xlabel('Wavelength [nm]');
     ylabel('Power density [mWcm-2nm-1]');
-    
 end
 
 % Convert AM1.5 to correct units

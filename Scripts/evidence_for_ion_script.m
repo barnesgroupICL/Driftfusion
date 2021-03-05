@@ -7,9 +7,8 @@
 % Similarly the open circuit voltage transients were obtained using a
 % symmetric model method previously while here a series resistance is
 % applied to the boundary conditions.
-% Note also that the ions have been accelerated by two orders of magnitude
-% as compared to the original publication mu_ion = 10^-10 cm2V-1s-1 to aid
-% convergence of the solutions
+% The recombination coefficients have also been adjusted as the finer mesh
+% results in a larger SRH recombination rate close to the interfaces
 %
 %% LICENSE
 % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
@@ -42,31 +41,29 @@ soleq_tc = equilibrate(par_tc);
 % for the JV: doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 % Slow scan with ion mobility set to 1 cm2V-1s-1 (by setting mobseti =
 % 1e10)- this ensure ions are in in equilibrium throughout scan
-JV.bc_0V_to_m1V = doJV(soleq_bc.ion, 1e-6, 40, 0, 1e10, 0, -1, 1);
+
 % Scan from -1.0 V to 1.2 V dark and light - ions must be accelerated by
-% x10 for convergence
-JV.bc_m1V_to_1p2V = doJV(JV.bc_0V_to_m1V.dk.f, 40, 200, 1, 10, -1, 1.2, 3);
+%sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
+sol_CV_bc = doCV(soleq_bc.ion, 1, 0, -1, 1.2, 40e-3, 1, 221);
 
 %% Top cathode device
 % Scan to -1.0 V with ion mobility off- dark only to get starting condition
 % for the JV
-JV.tc_0V_to_m1V = doJV(soleq_tc.ion, 1e-6, 40, 0, 1e10, 0, -1, 1);
-% Scan from -1.0 V to 1.4 V dark and light
-JV.tc_m1V_to_1p2V = doJV(JV.tc_0V_to_m1V.dk.f, 40, 200, 1, 10, -1, 1.2, 3);
-
-%% Plot the JV's and set limits
-dfplot.JV(JV.bc_m1V_to_1p2V,3);
-hold on
-dfplot.JV(JV.tc_m1V_to_1p2V,3);
-xlim([-0.2,1])
-ylim([-20e-3,5e-3])
-hold off
+sol_CV_tc = doCV(soleq_tc.ion, 1, 0, -1, 1.2, 40e-3, 1, 221);
 
 %% Open circuit voltage tranisents
 % Using Rs = 1 MOhm rather than the mirrored cell approach.
 % lightonRs(sol_ini, Int, stab_time, mobseti, Rs, pnts)
-Voc_transient_bc = lightonRs(soleq_bc.ion, 1, 1, 1, 1e6, 400);
-Voc_transient_tc = lightonRs(soleq_tc.ion, 1, 1, 1, 1e6, 400);
+Voc_transient_bc = lightonRs(soleq_bc.ion, 1, 100, 1, 1e6, 200);
+Voc_transient_tc = lightonRs(soleq_tc.ion, 1, 100, 1, 1e6, 200);
+
+%% Plot the JV's
+dfplot.JtotVapp(sol_CV_bc, 0);
+hold on
+dfplot.JtotVapp(sol_CV_tc, 0);
+xlim([-0.2,1])
+ylim([-20e-3,5e-3])
+hold off
 
 %% Plot the Voc transients
 dfplot.Voct(Voc_transient_bc);
