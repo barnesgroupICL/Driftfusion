@@ -56,8 +56,8 @@ dev.mue = build_property(par.mue, xmesh, par, 'mue_interface', 0);
 dev.muh = build_property(par.muh, xmesh, par, 'muh_interface', 0);
 dev.taun = build_property(par.taun, xmesh, par, 'surface_rec_taun', 0);
 dev.taup = build_property(par.taup, xmesh, par, 'surface_rec_taup', 0);
-dev.nt = build_property(par.nt, xmesh, par, 'surface_rec_nt', 1);
-dev.pt = build_property(par.pt, xmesh, par, 'surface_rec_pt', 1);
+dev.nt = build_property(par.nt, xmesh, par, 'surface_rec_nt', 0);
+dev.pt = build_property(par.pt, xmesh, par, 'surface_rec_pt', 0);
 dev.ni_srh = build_property(par.ni, xmesh, par, 'surface_rec_ni_srh', 0);
 dev.int_switch = build_property(par.int_switch, xmesh, par, 'int_switch', 0);
 end
