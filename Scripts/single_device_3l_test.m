@@ -26,11 +26,11 @@ sol_CV_200mVs = doCV(soleq_3l.ion, 1, 0, 1.2, -0.2, 200e-3, 1, 281);
 sol_CV_400mVs = doCV(soleq_3l.ion, 1, 0, 1.2, -0.2, 400e-3, 1, 281);
 
 %% plot the current voltage curve
-dfplot.JtotVapp(sol_CV_100mVs, 0)
+dfplot.JtotVapp_separate(sol_CV_100mVs, 0)
 hold on
-dfplot.JtotVapp(sol_CV_200mVs, 0)
+dfplot.JtotVapp_separate(sol_CV_200mVs, 0)
 hold on
-dfplot.JtotVapp(sol_CV_400mVs, 0)
+dfplot.JtotVapp_separate(sol_CV_400mVs, 0)
 hold off
 ylim([-30e-3,10e-3])
 xlim([-0.2, 1.2])
