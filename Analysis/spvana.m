@@ -77,10 +77,10 @@ spvdat.deltaViont = spvdat.Viont - spvdat.Viont(1);
 spvdat.SPV = spvdat.Velt - spvdat.Velt(1);
 
 %% Plot the outputs
-% figure(300)
-% plot(spvdat.t, spvdat.sigmat)
-% xlabel('Time [s]')
-% ylabel('Integrated charge desnity, \sigma [cm-2]')
+figure(300)
+plot(spvdat.t, spvdat.sigmat)
+xlabel('Time [s]')
+ylabel('Integrated charge desnity, \sigma [cm-2]')
 % 
 % figure(301)
 % plot(spvdat.t, spvdat.deltaFt)
