@@ -110,23 +110,23 @@ ylim([1e-4,1e20])
 subplot(3,1,3);
 ylim([0, 4e19])
 %% Electronic and ionic carriers
-dfplot.ELxnpxacx(OC_hom_Ncat1e17_ion)
+dfplot.ELxnpxacx(soleq_hom.ion)
 subplot(3,1,1)
 subplot(3,1,2);
 hold on
 subplot(3,1,3);
 hold on
 
-dfplot.ELxnpxacx(OC_hom_Ncat1e18_ion)
+dfplot.ELxnpxacx(soleq_hom_Ncat1e17.ion)
 subplot(3,1,1)
 subplot(3,1,2);
 hold on
 subplot(3,1,3);
 hold on
 
-dfplot.ELxnpxacx(OC_hom_ion)
+dfplot.ELxnpxacx(soleq_hom_Ncat1e18.ion)
 subplot(3,1,1)
-ylim([-8, -2])
+ylim([-8, -1])
 subplot(3,1,2);
 legend('', '', '', '', '', '', '',... % Layer blocks
     '\it{N}_{cat} = 10^{17} cm^{-3}, \it{n}', '\it{N}_{cat} = 10^{17} cm^{-3}, \it{p}',...
