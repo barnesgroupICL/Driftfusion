@@ -11,7 +11,7 @@ classdef dfplot
     
     methods (Static)
         
-        function ELx(varargin)
+        function ELxnpxacx(varargin)
             % Energy Level diagram, and charge densities plotter
             % SOL = the solution structure
             % TARR = An array containing the times that you wish to plot
@@ -22,13 +22,13 @@ classdef dfplot
             
             figure(1);
             subplot(3,1,1);
-            dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'}, {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
+            dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'\it{E}_{fn}', '\it{E}_{fp}', '\it{E}_{CB}', '\it{E}_{VB}'}, {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
             
             subplot(3,1,2);
-            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1)
+            dfplot.x2d(sol, x, {n, p}, {'\it{n}', '\it{p}'}, {'-', '-.'}, 'El. carrier density [cm-3]', tarr, xrange, 0, 1)
             
             subplot(3,1,3);
-            dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
+            dfplot.x2d(sol, x, {c, a}, {'\it{c}', '\it{a}'}, {'-', '-.'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
         end
         
         function acnpFx(varargin)
@@ -677,7 +677,7 @@ classdef dfplot
             dfplot.x2d(sol, x, {-V},{'V'},{'-'},'-Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
         
-        function ELx_single(varargin)
+        function ELx(varargin)
             % Energy Level diagram, and charge densities plotter
             % SOL = the solution structure
             % TARR = An array containing the times that you wish to plot
