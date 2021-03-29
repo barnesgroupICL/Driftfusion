@@ -74,14 +74,16 @@ for i=1:length(par.dcum)                % i is the layer index
                             end
                         case 'surface_rec_taun'
                                 devprop(j) = (deff/par.sn(i))*exp(-abs(alpha)*xprime_n);
+                                % devprop(j) = 1/par.sn(i));
                         case 'surface_rec_taup'
                                 devprop(j) = (deff/par.sp(i))*exp(-abs(beta)*xprime_p);
+                                % devprop(j) = 1/par.sp(i));
                         case 'surface_rec_nt'
-                                devprop(j) = par.nt(i)*exp(-abs(alpha)*xprime_n);
+                                devprop(j) = par.nt(i-1)*exp(-abs(alpha)*xprime_n);
                         case 'surface_rec_pt'
-                                devprop(j) = par.pt(i)*exp(-abs(beta)*xprime_p);
+                                devprop(j) = par.pt(i-1)*exp(-abs(beta)*xprime_p);
                         case 'surface_rec_ni_srh'
-                                devprop(j) = par.ni(i)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5); 
+                                devprop(j) = par.ni(i-1)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5); 
                         case 'mue_interface'
                             if alpha < 0
                                   devprop(j) = par.mue(i-1)*exp(abs(alpha)*xprime_n);
