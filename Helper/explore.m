@@ -237,7 +237,7 @@ classdef explore
             end
             
             figure(101)
-            surf(exsol.parval2, exsol.parval1, exsol.stats.Voc_f)
+            surf(exsol.parval2, exsol.parval1, y)
             s1 = gca;
             ylabel(exsol.parnames{1,1})
             xlabel(exsol.parnames{1,2})

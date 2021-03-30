@@ -37,7 +37,7 @@ for i=1:length(par.dcum)                % i is the layer index
                 xprime = xmesh(j)-par.dcum0(i);
                 if xmesh(j) >= par.dcum0(i)
                     deff = par.d(i);
-                    
+
                     % Gradient coefficients for surface recombination equivalence
                     alpha = ((par.EA(i-1) - par.EA(i+1))/(par.kB*par.T) + (log(par.Nc(i+1))-log(par.Nc(i-1))))/deff;
                     if alpha < 0
@@ -45,14 +45,14 @@ for i=1:length(par.dcum)                % i is the layer index
                     else
                         xprime_n = deff-xprime;
                     end
-                    
+
                     beta = ((par.IP(i+1) - par.IP(i-1))/(par.kB*par.T) + (log(par.Nv(i+1))-log(par.Nv(i-1))))/deff;
                     if beta < 0
                         xprime_p = xprime;
                     else
                         xprime_p = deff-xprime;
                     end
-                    
+
                     switch interface_switch
                         case 'zeroed'
                             devprop(j) = 0;
@@ -81,22 +81,22 @@ for i=1:length(par.dcum)                % i is the layer index
                         case 'surface_rec_pt'
                                 devprop(j) = par.pt(i)*exp(-abs(beta)*xprime_p);
                         case 'surface_rec_ni_srh'
-                                devprop(j) = par.ni(i)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5); 
+                                devprop(j) = par.ni(i)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5);
                         case 'mue_interface'
                             if alpha < 0
-                                devprop(j) = (par.mue(i-1)+(par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n);
+                                devprop(j) = par.mue(i-1)+(((par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n));
                             elseif alpha > 0
-                                devprop(j) = (par.mue(i+1)+(par.Nv(i-1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n);
+                                devprop(j) = par.mue(i+1)+(((par.Nv(i-1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n));
                             else
-                                devprop(j) = par.mue(i+1)*exp(abs(alpha)*xprime_n);
+                                devprop(j) = max([par.mue(i-1),par.mue(i+1)]);
                             end
                         case 'muh_interface'
                             if beta < 0
-                                devprop(j) = (par.muh(i-1)+(par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p);  
+                                devprop(j) = par.muh(i-1)+(((par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));
                             elseif beta > 0
-                                devprop(j) = (par.muh(i+1)+(par.Nc(i-1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p);
+                                devprop(j) = par.muh(i+1)+(((par.Nc(i-1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));
                             else
-                                devprop(j) = par.muh(i+1)*exp(abs(beta)*xprime_p);
+                                devprop(j) = max([par.muh(i-1),par.muh(i+1)]);
                             end
                         case 'int_switch'
                             devprop(j) = 0;
