@@ -46,8 +46,8 @@ classdef dfana
             Efp = zeros(size(n,1), size(n,2));
             
             % Filter
-            n(n<1e-2) = nan;
-            p(p<1e-2) = nan;
+            n(n<1e0) = nan;
+            p(p<1e0) = nan;
             
             if par.prob_distro_function == 'Fermi'
                 
