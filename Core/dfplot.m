@@ -30,6 +30,24 @@ classdef dfplot
             subplot(3,1,3);
             dfplot.x2d(sol, x, {c, a}, {'\it{c}', '\it{a}'}, {'-', '-.'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
         end
+
+        function ELxnpx(varargin)
+            % Energy Level diagram, and charge densities plotter
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+            
+            figure(101);
+            subplot(2,1,1);
+            dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'\it{E}_{fn}', '\it{E}_{fp}', '\it{E}_{CB}', '\it{E}_{VB}'}, {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
+            
+            subplot(2,1,2);
+            dfplot.x2d(sol, x, {n, p}, {'\it{n}', '\it{p}'}, {'-', '-.'}, 'El. carrier density [cm-3]', tarr, xrange, 0, 1)
+            
+        end
         
         function acnpFx(varargin)
             % Energy Level diagram, and charge densities plotter
@@ -795,26 +813,26 @@ classdef dfplot
 %                 1, 0.87, 0.87; ...                 ETL
 %                 0.9, 0.8, 1;...
 %                 0.9, 1, 0.8];
-            % French flag - 3 layer
+            % Mint- 3 layer
+            triplets = [0.8, 0.9, 1;...     HTL
+                1, 1, 0.7;...                 int1
+                1, 1, 1;...                     Active 1
+                1, 1, 0.7;...                 int 2
+                1, 0.87, 0.87; ...                 ETL
+                0.9, 0.8, 1;...
+                1, 0.87, 0.87];
+            % Homojunction
 %             triplets = [0.8, 0.9, 1;...     HTL
 %                 1, 1, 0.7;...                 int1
-%                 1, 1, 1;...                     Active 1
+%                 0.9, 1, 0.8;...                     Active 1
 %                 1, 1, 0.7;...                 int 2
+%                 1, 0.9, 0.7;...                 Active 2
+%                 1, 1, 0.7;...                 int 3
 %                 1, 0.87, 0.87; ...                 ETL
 %                 0.9, 0.8, 1;...
 %                 0.9, 1, 0.8];
-            % Homojunction
-            triplets = [0.8, 0.9, 1;...     HTL
-                1, 1, 0.7;...                 int1
-                0.9, 1, 0.8;...                     Active 1
-                1, 1, 0.7;...                 int 2
-                1, 0.9, 0.7;...                 Active 2
-                1, 1, 0.7;...                 int 3
-                1, 0.87, 0.87; ...                 ETL
-                0.9, 0.8, 1;...
-                0.9, 1, 0.8];
 
-%             % Homojunction - white absorber
+            % Homojunction - white absorber
 %             triplets = [0.8, 0.9, 1;...     HTL
 %                 1, 1, 0.7;...                 int1
 %                 1, 1, 1;...                     Active 1
