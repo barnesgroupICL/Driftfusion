@@ -8,6 +8,26 @@ JV_intrinsic_ion = doJV(soleq_intrinsic.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
 OC_intrinsic = lightonRs(soleq_intrinsic.el, 1, 1, 0, 1e6, 200);
 OC_intrinsic_ion = lightonRs(soleq_intrinsic.ion, 1, -100, 1, 1e6, 200);
 
+%% Intrinsic, Nion= 1e17 cm-3
+par_intrinsic_Ncat1e17 = pc('input_files/intrinsic.csv');
+par_intrinsic_Ncat1e17.Ncat = [1e17,1e17,1e17,1e17,1e17,1e17,1e17];
+par_intrinsic_Ncat1e17.Nani = [1e17,1e17,1e17,1e17,1e17,1e17,1e17];
+par_intrinsic_Ncat1e17 = refresh_device(par_intrinsic_Ncat1e17);
+
+soleq_intrinsic_Ncat1e17 = equilibrate(par_intrinsic_Ncat1e17);
+JV_intrinsic_Ncat1e17_ion = doJV(soleq_intrinsic_Ncat1e17.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
+OC_intrinsic_Ncat1e17_ion = lightonRs(soleq_intrinsic_Ncat1e17.ion, 1, -100, 1, 1e6, 200);
+
+%% Intrinsic, Nion= 1e18 cm-3
+par_intrinsic_Ncat1e18 = pc('input_files/intrinsic.csv');
+par_intrinsic_Ncat1e18.Ncat = [1e18,1e18,1e18,1e18,1e18,1e18,1e18];
+par_intrinsic_Ncat1e18.Nani = [1e18,1e18,1e18,1e18,1e18,1e18,1e18];
+par_intrinsic_Ncat1e18 = refresh_device(par_intrinsic_Ncat1e18);
+
+soleq_intrinsic_Ncat1e18 = equilibrate(par_intrinsic_Ncat1e18);
+JV_intrinsic_Ncat1e18_ion = doJV(soleq_intrinsic_Ncat1e18.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
+OC_intrinsic_Ncat1e18_ion = lightonRs(soleq_intrinsic_Ncat1e18.ion, 1, -100, 1, 1e6, 200);
+
 %% n-type
 par_ntype = pc('input_files/n_type.csv');
 soleq_ntype = equilibrate(par_ntype);
@@ -100,6 +120,116 @@ dfplot.Jtott(Jmpp_hom_ion, Jmpp_hom_ion.x(end));
 hold off
 ylim([0.0215, 0.022])
 
+%% Short circuit energy level diagrams and carriers for the intrinsic device
+%% Electronic carriers only
+dfplot.ELxnpx(soleq_intrinsic.el)
+subplot(2,1,1)
+hold on
+subplot(2,1,2);
+hold on
+
+dfplot.ELxnpx(soleq_ntype.el)
+subplot(2,1,1)
+ylim([-8, -1])
+legend('', '', '', '', '',... % Layer blocks
+    'intrinsic, \it{E}_{fn}', 'intrinsic, \it{E}_{fp}', 'intrinsic, \it{E}_{CB}', 'intrinsic, \it{E}_{VB}',...
+    'n-type, \it{E}_{fn}', 'n-type, \it{E}_{fp}', 'n-type, \it{E}_{CB}', 'n-type, \it{E}_{VB}')
+
+subplot(2,1,2);
+ylim([1e-4,1e20])
+legend('', '', '', '', '',... % Layer blocks
+    'intrinsic, \it{n}', 'intrinsic, \it{p}',...
+    'n-type, \it{n}', 'n-type, \it{p}')
+
+
+%% Electronic and ionic carriers
+dfplot.ELxnpxacx(soleq_intrinsic_Ncat1e17.ion)
+subplot(3,1,1)
+subplot(3,1,2);
+hold on
+subplot(3,1,3);
+hold on
+
+dfplot.ELxnpxacx(soleq_intrinsic_Ncat1e18.ion)
+subplot(3,1,1)
+subplot(3,1,2);
+hold on
+subplot(3,1,3);
+hold on
+
+dfplot.ELxnpxacx(soleq_intrinsic.ion)
+subplot(3,1,1)
+ylim([-8, -1])
+subplot(3,1,2);
+legend('', '', '', '', '', '', '',... % Layer blocks
+    '\it{N}_{cat} = 10^{17} cm^{-3}, \it{n}', '\it{N}_{cat} = 10^{17} cm^{-3}, \it{p}',...
+    '\it{N}_{cat} = 10^{18} cm^{-3}, \it{n}', '\it{N}_{cat} = 10^{18} cm^{-3}, \it{p}',...
+    '\it{N}_{cat} = 10^{19} cm^{-3}, \it{n}', '\it{N}_{cat} = 10^{19} cm^{-3}, \it{p}')
+hold off
+ylim([1e10,1e20])
+subplot(3,1,3);
+legend('', '', '', '', '', '', '',... % Layer blocks
+    '\it{N}_{cat} = 10^{17} cm^{-3}, \it{c}', '\it{N}_{cat} = 10^{17} cm^{-3}, \it{a}',...
+    '\it{N}_{cat} = 10^{18} cm^{-3}, \it{c}', '\it{N}_{cat} = 10^{18} cm^{-3}, \it{a}',...
+    '\it{N}_{cat} = 10^{19} cm^{-3}, \it{c}', '\it{N}_{cat} = 10^{19} cm^{-3}, \it{a}')
+hold off
+ylim([0, 4e19])
+
+%% Open circuit energy level diagrams and carriers for the intrinsic device
+%% Electronic carriers only
+dfplot.ELxnpx(OC_intrinsic)
+subplot(2,1,1)
+hold on
+subplot(2,1,2);
+hold on
+
+dfplot.ELxnpx(OC_ntype)
+subplot(2,1,1)
+ylim([-8, -2])
+legend('', '', '', '', '',... % Layer blocks
+    'intrinsic, \it{E}_{fn}', 'intrinsic, \it{E}_{fp}', 'intrinsic, \it{E}_{CB}', 'intrinsic, \it{E}_{VB}',...
+    'n-type, \it{E}_{fn}', 'n-type, \it{E}_{fp}', 'n-type, \it{E}_{CB}', 'n-type, \it{E}_{VB}')
+
+subplot(2,1,2);
+ylim([1e14,1e20])
+legend('', '', '', '', '',... % Layer blocks
+    'intrinsic, \it{n}', 'intrinsic, \it{p}',...
+    'n-type, \it{n}', 'n-type, \it{p}')
+
+
+%% Electronic and ionic carriers
+dfplot.ELxnpxacx(OC_intrinsic_Ncat1e17_ion)
+subplot(3,1,1)
+subplot(3,1,2);
+hold on
+subplot(3,1,3);
+hold on
+
+dfplot.ELxnpxacx(OC_intrinsic_Ncat1e18_ion)
+subplot(3,1,1)
+subplot(3,1,2);
+hold on
+subplot(3,1,3);
+hold on
+
+dfplot.ELxnpxacx(OC_intrinsic_ion)
+subplot(3,1,1)
+ylim([-8, -1])
+subplot(3,1,2);
+legend('', '', '', '', '', '', '',... % Layer blocks
+    '\it{N}_{cat} = 10^{17} cm^{-3}, \it{n}', '\it{N}_{cat} = 10^{17} cm^{-3}, \it{p}',...
+    '\it{N}_{cat} = 10^{18} cm^{-3}, \it{n}', '\it{N}_{cat} = 10^{18} cm^{-3}, \it{p}',...
+    '\it{N}_{cat} = 10^{19} cm^{-3}, \it{n}', '\it{N}_{cat} = 10^{19} cm^{-3}, \it{p}')
+hold off
+ylim([1e14,1e20])
+subplot(3,1,3);
+legend('', '', '', '', '', '', '',... % Layer blocks
+    '\it{N}_{cat} = 10^{17} cm^{-3}, \it{c}', '\it{N}_{cat} = 10^{17} cm^{-3}, \it{a}',...
+    '\it{N}_{cat} = 10^{18} cm^{-3}, \it{c}', '\it{N}_{cat} = 10^{18} cm^{-3}, \it{a}',...
+    '\it{N}_{cat} = 10^{19} cm^{-3}, \it{c}', '\it{N}_{cat} = 10^{19} cm^{-3}, \it{a}')
+hold off
+ylim([0, 1.2e19])
+
 %% Short circuit energy level diagrams and carriers for homojunction
 %% Electronic carriers only
 dfplot.ELxnpxacx(soleq_hom.el)
@@ -110,13 +240,6 @@ ylim([1e-4,1e20])
 subplot(3,1,3);
 ylim([0, 4e19])
 %% Electronic and ionic carriers
-dfplot.ELxnpxacx(soleq_hom.ion)
-subplot(3,1,1)
-subplot(3,1,2);
-hold on
-subplot(3,1,3);
-hold on
-
 dfplot.ELxnpxacx(soleq_hom_Ncat1e17.ion)
 subplot(3,1,1)
 subplot(3,1,2);
@@ -126,6 +249,13 @@ hold on
 
 dfplot.ELxnpxacx(soleq_hom_Ncat1e18.ion)
 subplot(3,1,1)
+subplot(3,1,2);
+hold on
+subplot(3,1,3);
+hold on
+
+dfplot.ELxnpxacx(soleq_hom.ion)
+subplot(3,1,1)
 ylim([-8, -1])
 subplot(3,1,2);
 legend('', '', '', '', '', '', '',... % Layer blocks
@@ -133,7 +263,7 @@ legend('', '', '', '', '', '', '',... % Layer blocks
     '\it{N}_{cat} = 10^{18} cm^{-3}, \it{n}', '\it{N}_{cat} = 10^{18} cm^{-3}, \it{p}',...
     '\it{N}_{cat} = 10^{19} cm^{-3}, \it{n}', '\it{N}_{cat} = 10^{19} cm^{-3}, \it{p}')
 hold off
-ylim([1e14,1e20])
+ylim([1e10,1e20])
 subplot(3,1,3);
 legend('', '', '', '', '', '', '',... % Layer blocks
     '\it{N}_{cat} = 10^{17} cm^{-3}, \it{c}', '\it{N}_{cat} = 10^{17} cm^{-3}, \it{a}',...
