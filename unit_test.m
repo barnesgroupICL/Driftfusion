@@ -788,6 +788,7 @@ LoadRefrIndex(par.stack{1},300:767);
 inputs = dir('Input_files');
 for i=1:length(inputs)
     input = inputs(i).name;
+    disp(input);
     if ~any(regexp(input,'^\.'))
         par = pc(input);
         xpoints = round(1 + sum(par.layer_points));
