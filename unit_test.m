@@ -812,7 +812,6 @@ for i=1:length(inputs)
 end
 
 %% Scripts
-
 inputs = dir('Scripts');
 for i=1:length(inputs)
     input = inputs(i).name;
