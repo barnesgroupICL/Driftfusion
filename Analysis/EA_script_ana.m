@@ -45,7 +45,7 @@ fig = figure('Name', 'Amplitude of EA second harmonic E_{AC}^2', 'NumberTitle', 
     xlabel('Frequency [Hz]');
     ylabel('Abs(E_{AC}^2) [V^2/cm^2]');
 
-legend(legendarr)
+legend(legendarr, 'Location', 'southeast')
 legend boxoff
 if 7~=exist(filename,'dir')
     mkdir(filename)
