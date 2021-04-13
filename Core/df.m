@@ -96,16 +96,21 @@ epp = device.epp;           % Dielectric constant
 eppmax = max(par.epp);      % Maximum dielectric constant (for normalisation)
 B = device.B;               % Radiative recombination rate coefficient
 ni = device.ni;             % Intrinsic carrier density
-ni_srh = device.ni_srh;       % Intrinsic carrier density
 taun = device.taun;         % Electron SRH time constant
 taup = device.taup;         % Electron SRH time constant
 nt = device.nt;             % SRH electron trap constant
 pt = device.pt;             % SRH hole trap constant
+ni_sr = device.ni_sr;       % Intrinsic carrier density- volumetric interfacial surface recombination scheme
+taun_sr = device.taun_sr;         % Electron SRH time constant- volumetric interfacial surface recombination scheme
+taup_sr = device.taup_sr;         % Electron SRH time constant- volumetric interfacial surface recombination scheme
+nt_sr = device.nt_sr;             % SRH electron trap constant- volumetric interfacial surface recombination scheme
+pt_sr = device.pt_sr;             % SRH hole trap constant- volumetric interfacial surface recombination scheme
 NA = device.NA;             % Acceptor doping density
 ND = device.ND;             % Donor doping density
 Ncat = device.Ncat;         % Uniform cation density
 Nani = device.Nani;         % Uniform anion density
 int_switch = device.int_switch;
+bulk_switch = abs(int_switch-1);
 N_ionic_species = par.N_ionic_species;      % Number of ionic species
 nleft = par.nleft;
 nright = par.nright;
@@ -219,8 +224,10 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni_srh(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));
-        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) - SRHset*(((n*p)-ni_srh(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));
+        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) -  bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));%...
+            %- int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p*exp(-dVdx/(kB*T)) + pt_sr(i)) + taup_sr(i)*(n*exp(dVdx/(kB*T)) + nt_sr(i))));
+        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) -  bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));%...
+            %- int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p*exp(-dVdx/(kB*T)) + pt_sr(i)) + taup_sr(i)*(n*exp(dVdx/(kB*T)) + nt_sr(i))));
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms

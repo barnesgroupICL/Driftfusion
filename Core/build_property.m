@@ -99,7 +99,7 @@ for i=1:length(par.dcum)                % i is the layer index
                                 devprop(j) = max([par.muh(i-1),par.muh(i+1)]);
                             end
                         case 'int_switch'
-                            devprop(j) = 0;
+                            devprop(j) = 1;
                     end
                 end
             end
