@@ -169,10 +169,10 @@ classdef dfana
             % Recombination
             r = dfana.calcr_ihalf(sol);
 
-            djndx = dndt + g - r.tot;    % Not certain about the sign here
-            djpdx = dpdt + g - r.tot;
-            djadx = dadt;
-            djcdx = dcdt;
+            djndx = -dndt + g - r.tot;
+            djpdx = -dpdt + g - r.tot;
+            djadx = -dadt;
+            djcdx = -dcdt;
 
             deltajn = cumtrapz(x, djndx, 2);
             deltajp = cumtrapz(x, djpdx, 2);
