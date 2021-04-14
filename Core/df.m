@@ -170,7 +170,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         % Get position point
         i = find(x_ihalf <= x);
         i = i(end);
-
+        
         switch g1_fun_type
             case 'constant'
                 gxt1 = int1*gx1(i);
@@ -223,11 +223,21 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         F = [F_potential; mobset*F_electron; mobset*F_hole];
 
         % Source terms
-        S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2)) -  bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));%...
-            %- int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p*exp(-dVdx/(kB*T)) + pt_sr(i)) + taup_sr(i)*(n*exp(dVdx/(kB*T)) + nt_sr(i))));
-        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2)) -  bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));%...
-            %- int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p*exp(-dVdx/(kB*T)) + pt_sr(i)) + taup_sr(i)*(n*exp(dVdx/(kB*T)) + nt_sr(i))));
+        S_potential = bulk_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
+        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2))...
+                    -  bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))))...
+                    - int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p + pt_sr(i)) + taup_sr(i)*(n + nt_sr(i))));
+                   % - int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p*exp(-dVdx/(kB*T)) + pt_sr(i)) + taup_sr(i)*(n*exp(dVdx/(kB*T)) + nt_sr(i))));  
+    %- int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p + pt_sr(i)) + taup_sr(i)*(n + nt_sr(i))));
+            %
+        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2))...
+                    -  bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))))...
+                    - int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p + pt_sr(i)) + taup_sr(i)*(n + nt_sr(i))));
+          %- int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p*exp(-dVdx/(kB*T)) + pt_sr(i)) + taup_sr(i)*(n*exp(dVdx/(kB*T)) + nt_sr(i))));         
+       %- int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p + pt_sr(i)) + taup_sr(i)*(n + nt_sr(i))));
+           
+%                - int_switch(i)*SRHset*(((n*p)-ni_sr(i)^2)/(taun_sr(i)*(p*exp(dVdx/(kB*T)) + pt_sr(i)) + taup_sr(i)*(n*exp(-dVdx/(kB*T)) + nt_sr(i))));
+
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms

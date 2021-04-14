@@ -257,8 +257,9 @@ classdef dfana
 
             % Recombination
             r.btb = dev.B.*(n.*p - dev.ni.^2);
-            r.srh = ((n.*p - dev.ni_srh.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
-            r.tot = r.btb + r.srh;
+            r.srh = ((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
+            r.sr = ((n.*p - dev.ni_sr.^2)./((dev.taun_sr.*(p+dev.pt_sr)) + (dev.taup_sr.*(n+dev.nt_sr))));
+            r.tot = r.btb + r.srh + r.sr;
         end
 
         function r = calcr_ihalf(sol)
@@ -266,14 +267,29 @@ classdef dfana
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             n_ihalf = getvarihalf(n);
             p_ihalf = getvarihalf(p);
-
+            for i=1:length(t)
+                dVdx(i,:) = gradient(V(i,:), x);
+                dVdx_ihalf(i,:) = getvarihalf(dVdx(i,:));
+            end
+            int_switch = repmat(par.dev_ihalf.int_switch, length(t), 1);
+            bulk_switch = abs(int_switch-1);
+            
             % Recombination
             r.btb = par.dev_ihalf.B.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni.^2);
 
-            r.srh = (n_ihalf.*p_ihalf - par.dev_ihalf.ni_srh.^2)...
+            r.srh = bulk_switch.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni.^2)...
                 ./ (par.dev_ihalf.taun.*(p_ihalf+par.dev_ihalf.pt)...
                 + par.dev_ihalf.taup.*(n_ihalf+par.dev_ihalf.nt));
-            r.tot = r.btb + r.srh;
+            
+%             r.sr = int_switch.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni_sr.^2)...
+%                 ./ (par.dev_ihalf.taun_sr.*(p_ihalf.*exp(-dVdx_ihalf./(par.kB*par.T)) + par.dev_ihalf.pt_sr)...
+%                 + par.dev_ihalf.taup_sr.*(n_ihalf.*exp(dVdx_ihalf./(par.kB*par.T)) + par.dev_ihalf.nt_sr));
+%             
+            r.sr = int_switch.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni_sr.^2)...
+                ./(par.dev_ihalf.taun_sr.*(p_ihalf + par.dev_ihalf.pt_sr)...
+                + par.dev_ihalf.taup_sr.*(n_ihalf + par.dev_ihalf.nt_sr));
+            
+            r.tot = r.btb + r.srh + r.sr;
         end
 
         function [jdd, Jdd, xout] = Jddxt(sol)
