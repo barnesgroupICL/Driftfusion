@@ -169,10 +169,10 @@ classdef dfana
             % Recombination
             r = dfana.calcr_ihalf(sol);
 
-            djndx = dndt + g - r.tot;    % Not certain about the sign here
-            djpdx = dpdt + g - r.tot;
-            djadx = dadt;
-            djcdx = dcdt;
+            djndx = -dndt + g - r.tot;    % Not certain about the sign here
+            djpdx = -dpdt + g - r.tot;
+            djadx = -dadt;
+            djcdx = -dcdt;
 
             deltajn = cumtrapz(x, djndx, 2);
             deltajp = cumtrapz(x, djpdx, 2);
@@ -218,7 +218,7 @@ classdef dfana
             FV_ihalf = dfana.calcF_ihalf(sol);
 
             [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
-            j.disp = -par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
+            j.disp = par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
 
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
@@ -263,7 +263,8 @@ classdef dfana
             % Bulk SRH
             r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
             % Volumetric surface SRH
-            r.vsr = int_switch.*((n.*p - dev.ni_vsr.^2)./((dev.taun_vsr.*(p.*exp(-dVdx/(kB*T))+dev.pt_vsr)) + (dev.taup_vsr.*(n.*exp(dVdx/(kB*T))+dev.nt_vsr))));
+            r.vsr = int_switch.*((n.*p - dev.ni_vsr.^2)./...
+                ((dev.taun_vsr.*(p+dev.pt_vsr)) + (dev.taup_vsr.*(n+dev.nt_vsr))));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end
@@ -289,7 +290,7 @@ classdef dfana
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
             % Volumetric surface SRH
             r.vsr = int_switch.*(n_ihalf.*p_ihalf - dev.ni_vsr.^2)...
-                ./(dev.taun_vsr.*(p_ihalf.*exp(-dVdx_ihalf./(par.kB*par.T)) + dev.pt_vsr) + dev.taup_vsr.*(n_ihalf.*exp(dVdx_ihalf./(par.kB*par.T)) + dev.nt_vsr));
+                ./(dev.taun_vsr.*(p_ihalf + dev.pt_vsr) + dev.taup_vsr.*(n_ihalf + dev.nt_vsr));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end
