@@ -34,13 +34,13 @@ par = sol_ini.par;
 %% Set up sweep
 % Characteristic diffusion time
 t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
-par.tmax = 100*t_diff;
+par.tmax = t_diff/1000;
 par.tmesh_type = 1;
 par.t0 = 0;
 par.V_fun_type = 'sweep';
 par.V_fun_arg(1) = par.Vapp;
 par.V_fun_arg(2) = Vjump;
-par.V_fun_arg(3) = 100*t_diff;
+par.V_fun_arg(3) = t_diff/1000;
 
 par.mobseti = 0;
 
