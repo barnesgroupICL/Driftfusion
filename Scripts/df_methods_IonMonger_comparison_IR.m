@@ -23,3 +23,22 @@ ylim([-10e-3,25e-3])
 xlim([-1.2, 0])
 legend('50 mVs-1', '100 mVs-1', '200 mVs-1') 
 hold off
+
+% %% Profile plots
+% Electrostatic potential during 1 Vs-1 forward scan
+dfplot.Vx(CV_df_100mVs_im, 10*[0, 0.3, 0.6, 0.9])
+legend('HTL','interface 1','Active layer','Interface 2','ETL','0 V', '0.3 V', '0.6 V', '0.9 V')
+
+% Electronic carrier densities during during 1 Vs-1 forward scan
+dfplot.npx(CV_df_100mVs_im, 10*[0, 0.3, 0.6, 0.9])
+ylim([1e10, 1e19])
+legend('HTL','interface 1','Active layer','Interface 2','ETL',...
+    'n, 0 V', 'p, 0 V', 'n, 0.3 V', 'p, 0.3 V', 'n, 0.6 V', 'p, 0.6 V',...
+    'n, 0.9 V', 'p, 0.9 V')
+
+% Ionic carrier densities during during 1 Vs-1 forward scan
+dfplot.acx(CV_df_100mVs_im, 10*[0, 0.3, 0.6, 0.9])
+xlim([497, 502])
+legend('HTL','interface 1','Active layer','Interface 2','ETL',...
+    'a, 0 V', 'c, 0 V', 'a, 0.3 V', 'c, 0.3 V', 'a, 0.6 V', 'c, 0.6 V',...
+    'a, 0.9 V', 'c, 0.9 V')

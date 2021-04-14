@@ -37,7 +37,7 @@ for i=1:length(par.dcum)                % i is the layer index
                 xprime = xmesh(j)-par.dcum0(i);
                 if xmesh(j) >= par.dcum0(i)
                     deff = par.d(i);
-                    
+
                     % Gradient coefficients for surface recombination equivalence
                     alpha = ((par.EA(i-1) - par.EA(i+1))/(par.kB*par.T) + (log(par.Nc(i+1))-log(par.Nc(i-1))))/deff;
                     if alpha < 0
@@ -45,14 +45,14 @@ for i=1:length(par.dcum)                % i is the layer index
                     else
                         xprime_n = deff-xprime;
                     end
-                    
+
                     beta = ((par.IP(i+1) - par.IP(i-1))/(par.kB*par.T) + (log(par.Nv(i+1))-log(par.Nv(i-1))))/deff;
                     if beta < 0
                         xprime_p = xprime;
                     else
                         xprime_p = deff-xprime;
                     end
-                    
+
                     switch interface_switch
                         case 'zeroed'
                             devprop(j) = 0;
@@ -72,16 +72,16 @@ for i=1:length(par.dcum)                % i is the layer index
                             else
                                 devprop(j) = property(i-1)*exp(log_gradient*xprime);
                             end
-                        case 'surface_rec_taun'
+                        case 'taun_vsr'
                                 devprop(j) = (deff/par.sn(i))*exp(-abs(alpha)*xprime_n);
-                        case 'surface_rec_taup'
+                        case 'taup_vsr'
                                 devprop(j) = (deff/par.sp(i))*exp(-abs(beta)*xprime_p);
-                        case 'surface_rec_nt'
+                        case 'nt_vsr'
                                 devprop(j) = par.nt(i)*exp(-abs(alpha)*xprime_n);
-                        case 'surface_rec_pt'
+                        case 'pt_vsr'
                                 devprop(j) = par.pt(i)*exp(-abs(beta)*xprime_p);
-                        case 'surface_rec_ni_srh'
-                                devprop(j) = par.ni(i)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5); 
+                        case 'ni_vsr'
+                                devprop(j) = par.ni(i)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5);
                         case 'mue_interface'
                             if alpha < 0
                                 devprop(j) = par.mue(i-1)+(((par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n));
@@ -92,14 +92,14 @@ for i=1:length(par.dcum)                % i is the layer index
                             end
                         case 'muh_interface'
                             if beta < 0
-                                devprop(j) = par.muh(i-1)+(((par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));  
+                                devprop(j) = par.muh(i-1)+(((par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));
                             elseif beta > 0
                                 devprop(j) = par.muh(i+1)+(((par.Nc(i-1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));
                             else
                                 devprop(j) = max([par.muh(i-1),par.muh(i+1)]);
                             end
                         case 'int_switch'
-                            devprop(j) = 0;
+                            devprop(j) = 1;
                     end
                 end
             end

@@ -26,10 +26,10 @@ end
 try
     par.sp = T{:,'sp'}';
 catch
-    warning('No sp value defined in .csv . Using default in PC')
+    % warning('No sp value defined in .csv . Using default in PC')
 end
 
-% Layer tyoe array
+% Layer type array
 try
     par.layer_type = T{:,'layer_type'}';
 catch

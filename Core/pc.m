@@ -182,7 +182,7 @@ classdef pc
 
         %% SRH time constants for each layer [s]
         taun = [1e6];           % [s] SRH time constant for electrons
-        taup = [1e6];           % [s] SRH time constant for holes
+        taup = [1e6];           % [s] SRH time constant for holes  
         
         sn = [0];
         sp = [0];

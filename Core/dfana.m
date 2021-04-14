@@ -94,62 +94,14 @@ classdef dfana
                 Efn_ihalf = real(Ecb_ihalf+(par.kB*par.T/par.q)*log(n./dev_ihalf.Nc));        % Electron quasi-Fermi level
                 Efp_ihalf = real(Evb_ihalf-(par.kB*par.T/par.q)*log(p./dev_ihalf.Nv));        % Hole quasi-Fermi level
             end
-
-            Efn = Efn_ihalf;% zeros(length(t), length(xmesh));
-            Efp = Efp_ihalf;% zeros(length(t), length(xmesh));
+            Efn = Efn_ihalf;
+            Efp = Efp_ihalf;
             Ecb = Ecb_ihalf;
             Evb = Evb_ihalf;
-            %             for ii = 1:length(t)
-            %                 Efn(ii,:) = interp1(x, Efn_ihalf(ii,:), xmesh);
-            %                 Efp(ii,:) = interp1(x, Efp_ihalf(ii,:), xmesh);
-            %                 Ecb(ii,:) = interp1(x, Ecb_ihalf(ii,:), xmesh);
-            %                 Evb(ii,:) = interp1(x, Evb_ihalf(ii,:), xmesh);
-            %             end
-        end
-
-        function [Ecb, Evb, Efn, Efp] = QFL_J(sol)
-            % u is the solution structure
-            % Simple structure names
-            [u,t,xmesh,par,dev,n0,p0,a0,c0,V0] = dfana.splitsol(sol);
-            n = getvarihalf(n0);
-            p = getvarihalf(p0);
-            V = getvarihalf(V0);
-
-            dev_ihalf = par.dev_ihalf;
-
-            [J, j, x] = dfana.calcJ(sol);
-            deltaEfn = cumtrapz(x, J.n./(par.e.*dev_ihalf.mue.*n), 2);
-            deltaEfp = cumtrapz(x, J.p./(par.e.*dev_ihalf.muh.*p), 2);
-
-            % Boundary values - electrostatic potential is assumed to be
-            % zero at left-hand boundary
-            %             Efn = zeros(size(n,1), size(n,2));
-            %             Efp = zeros(size(n,1), size(n,2));
-
-            if par.prob_distro_function == 'Fermi'
-
-                for i = 1:size(n,1)           % time
-                    for j = 1:size(n,2)       % position
-                        Efn_l(i) = distro_fun.Efn_fd_fun(n(i,1), dev_ihalf.Efn(j,1),  dev_ihalf.n_fd(j,1));
-                        Efp_l(i) = distro_fun.Efp_fd_fun(p(i,1), dev_ihalf.Efp(j,1),  dev_ihalf.p_fd(j,1));
-                    end
-                end
-
-            elseif par.prob_distro_function == 'Boltz'
-                Efn_l = real(par.EA(1)+(par.kB*par.T/par.q)*log(n(:,1)./dev_ihalf.Nc(1)));        % Electron quasi-Fermi level
-                Efp_l = real(par.IP(1)-(par.kB*par.T/par.q)*log(p(:,1)./dev_ihalf.Nv(1)));        % Hole quasi-Fermi level
-            end
-
-            Efn = Efn_l + deltaEfn;
-            Efp = Efp_l + deltaEfp;
-
-            Ecb = dev_ihalf.EA-V;                                 % Conduction band potential
-            Evb = dev_ihalf.IP-V;                                 % Valence band potential
         end
 
         function [J, j, x] = calcJ(sol)
             % Current, J and flux, j calculation from continuity equations
-
             % obtain SOL components for easy referencing
             [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
@@ -252,28 +204,47 @@ classdef dfana
         end
 
         function r = calcr(sol)
+            % Calculate the recombination rate on whole mesh
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            % Recombination
+            int_switch = repmat(dev.int_switch, length(t), 1);
+            bulk_switch = abs(int_switch-1);
+            % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
-            r.srh = ((n.*p - dev.ni_srh.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
-            r.tot = r.btb + r.srh;
+            % Bulk SRH
+            r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
+            % Volumetric surface SRH
+            r.vsr = int_switch.*((n.*p - dev.ni_vsr.^2)./...
+                ((dev.taun_vsr.*(p+dev.pt_vsr)) + (dev.taup_vsr.*(n+dev.nt_vsr))));
+            % Total
+            r.tot = r.btb + r.srh + r.vsr;
         end
 
         function r = calcr_ihalf(sol)
+            % Calculate the recombination rate on i-half mesh
             % obtain SOL components for easy referencing
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [u,t,x,par,~,n,p,a,c,V] = dfana.splitsol(sol);
+            dev = par.dev_ihalf;
             n_ihalf = getvarihalf(n);
             p_ihalf = getvarihalf(p);
+            for i=1:length(t)
+                dVdx(i,:) = gradient(V(i,:), x);
+                dVdx_ihalf(i,:) = getvarihalf(dVdx(i,:));
+            end
+            int_switch = repmat(dev.int_switch, length(t), 1);
+            bulk_switch = abs(int_switch-1);
 
-            % Recombination
-            r.btb = par.dev_ihalf.B.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni.^2);
-
-            r.srh = (n_ihalf.*p_ihalf - par.dev_ihalf.ni_srh.^2)...
-                ./ (par.dev_ihalf.taun.*(p_ihalf+par.dev_ihalf.pt)...
-                + par.dev_ihalf.taup.*(n_ihalf+par.dev_ihalf.nt));
-            r.tot = r.btb + r.srh;
+            % Band-to-band
+            r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
+            % Bulk SRH
+            r.srh = bulk_switch.*(n_ihalf.*p_ihalf - dev.ni.^2)...
+                ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
+            % Volumetric surface SRH
+            r.vsr = int_switch.*(n_ihalf.*p_ihalf - dev.ni_vsr.^2)...
+                ./(dev.taun_vsr.*(p_ihalf + dev.pt_vsr) + dev.taup_vsr.*(n_ihalf + dev.nt_vsr));
+            % Total
+            r.tot = r.btb + r.srh + r.vsr;
         end
 
         function [jdd, Jdd, xout] = Jddxt(sol)
