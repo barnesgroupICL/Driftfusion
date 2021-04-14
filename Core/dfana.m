@@ -255,13 +255,15 @@ classdef dfana
             % Calculate the recombination rate on whole mesh
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
+            int_switch = repmat(dev.int_switch, length(t), 1);
+            bulk_switch = abs(int_switch-1);
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
             % Bulk SRH
-            r.srh = ((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
+            r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
             % Volumetric surface SRH
-            r.vsr = ((n.*p - dev.ni_vsr.^2)./((dev.taun_vsr.*(p+dev.pt_vsr)) + (dev.taup_vsr.*(n+dev.nt_vsr))));
+            r.vsr = int_switch.*((n.*p - dev.ni_vsr.^2)./((dev.taun_vsr.*(p.*exp(-dVdx/(kB*T))+dev.pt_vsr)) + (dev.taup_vsr.*(n.*exp(dVdx/(kB*T))+dev.nt_vsr))));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end
@@ -287,7 +289,7 @@ classdef dfana
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
             % Volumetric surface SRH
             r.vsr = int_switch.*(n_ihalf.*p_ihalf - dev.ni_vsr.^2)...
-                ./(dev.taun_vsr.*(p_ihalf + dev.pt_vsr) + dev.taup_vsr.*(n_ihalf + dev.nt_vsr));
+                ./(dev.taun_vsr.*(p_ihalf.*exp(-dVdx_ihalf./(par.kB*par.T)) + dev.pt_vsr) + dev.taup_vsr.*(n_ihalf.*exp(dVdx_ihalf./(par.kB*par.T)) + dev.nt_vsr));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end
