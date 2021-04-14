@@ -252,44 +252,44 @@ classdef dfana
         end
 
         function r = calcr(sol)
+            % Calculate the recombination rate on whole mesh
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            % Recombination
+            % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
+            % Bulk SRH
             r.srh = ((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
-            r.sr = ((n.*p - dev.ni_sr.^2)./((dev.taun_sr.*(p+dev.pt_sr)) + (dev.taup_sr.*(n+dev.nt_sr))));
-            r.tot = r.btb + r.srh + r.sr;
+            % Volumetric surface SRH
+            r.vsr = ((n.*p - dev.ni_vsr.^2)./((dev.taun_vsr.*(p+dev.pt_vsr)) + (dev.taup_vsr.*(n+dev.nt_vsr))));
+            % Total
+            r.tot = r.btb + r.srh + r.vsr;
         end
 
         function r = calcr_ihalf(sol)
+            % Calculate the recombination rate on i-half mesh
             % obtain SOL components for easy referencing
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [u,t,x,par,~,n,p,a,c,V] = dfana.splitsol(sol);
+            dev = par.dev_ihalf;
             n_ihalf = getvarihalf(n);
             p_ihalf = getvarihalf(p);
             for i=1:length(t)
                 dVdx(i,:) = gradient(V(i,:), x);
                 dVdx_ihalf(i,:) = getvarihalf(dVdx(i,:));
             end
-            int_switch = repmat(par.dev_ihalf.int_switch, length(t), 1);
+            int_switch = repmat(dev.int_switch, length(t), 1);
             bulk_switch = abs(int_switch-1);
             
-            % Recombination
-            r.btb = par.dev_ihalf.B.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni.^2);
-
-            r.srh = bulk_switch.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni.^2)...
-                ./ (par.dev_ihalf.taun.*(p_ihalf+par.dev_ihalf.pt)...
-                + par.dev_ihalf.taup.*(n_ihalf+par.dev_ihalf.nt));
-            
-%             r.sr = int_switch.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni_sr.^2)...
-%                 ./ (par.dev_ihalf.taun_sr.*(p_ihalf.*exp(-dVdx_ihalf./(par.kB*par.T)) + par.dev_ihalf.pt_sr)...
-%                 + par.dev_ihalf.taup_sr.*(n_ihalf.*exp(dVdx_ihalf./(par.kB*par.T)) + par.dev_ihalf.nt_sr));
-%             
-            r.sr = int_switch.*(n_ihalf.*p_ihalf - par.dev_ihalf.ni_sr.^2)...
-                ./(par.dev_ihalf.taun_sr.*(p_ihalf + par.dev_ihalf.pt_sr)...
-                + par.dev_ihalf.taup_sr.*(n_ihalf + par.dev_ihalf.nt_sr));
-            
-            r.tot = r.btb + r.srh + r.sr;
+            % Band-to-band
+            r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
+            % Bulk SRH
+            r.srh = bulk_switch.*(n_ihalf.*p_ihalf - dev.ni.^2)...
+                ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
+            % Volumetric surface SRH
+            r.vsr = int_switch.*(n_ihalf.*p_ihalf - dev.ni_vsr.^2)...
+                ./(dev.taun_vsr.*(p_ihalf + dev.pt_vsr) + dev.taup_vsr.*(n_ihalf + dev.nt_vsr));
+            % Total
+            r.tot = r.btb + r.srh + r.vsr;
         end
 
         function [jdd, Jdd, xout] = Jddxt(sol)

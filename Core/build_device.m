@@ -58,10 +58,12 @@ dev.gradNv = build_property(par.Nv, xmesh, par, 'log_graded', 1);
 % Surface recombination velocity equivalence schemes
 dev.mue = build_property(par.mue, xmesh, par, 'mue_interface', 0);
 dev.muh = build_property(par.muh, xmesh, par, 'muh_interface', 0);
-dev.taun_sr = build_property(par.taun, xmesh, par, 'surface_rec_taun', 0);
-dev.taup_sr = build_property(par.taup, xmesh, par, 'surface_rec_taup', 0);
-dev.nt_sr = build_property(par.nt, xmesh, par, 'surface_rec_nt', 0);
-dev.pt_sr = build_property(par.pt, xmesh, par, 'surface_rec_pt', 0);
-dev.ni_sr = build_property(par.ni, xmesh, par, 'surface_rec_ni_srh', 0);
+dev.taun_vsr = build_property(par.taun, xmesh, par, 'taun_vsr', 0);
+dev.taup_vsr = build_property(par.taup, xmesh, par, 'taup_vsr', 0);
+dev.nt_vsr = build_property(par.nt, xmesh, par, 'nt_vsr', 0);
+dev.pt_vsr = build_property(par.pt, xmesh, par, 'pt_vsr', 0);
+dev.ni_vsr = build_property(par.ni, xmesh, par, 'ni_vsr', 0);
 dev.int_switch = build_property(par.int_switch, xmesh, par, 'int_switch', 1);
+dev.bulk_switch = abs(dev.int_switch-1);
+
 end

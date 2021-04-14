@@ -72,15 +72,15 @@ for i=1:length(par.dcum)                % i is the layer index
                             else
                                 devprop(j) = property(i-1)*exp(log_gradient*xprime);
                             end
-                        case 'surface_rec_taun'
+                        case 'taun_vsr'
                                 devprop(j) = (deff/par.sn(i))*exp(-abs(alpha)*xprime_n);
-                        case 'surface_rec_taup'
+                        case 'taup_vsr'
                                 devprop(j) = (deff/par.sp(i))*exp(-abs(beta)*xprime_p);
-                        case 'surface_rec_nt'
+                        case 'nt_vsr'
                                 devprop(j) = par.nt(i)*exp(-abs(alpha)*xprime_n);
-                        case 'surface_rec_pt'
+                        case 'pt_vsr'
                                 devprop(j) = par.pt(i)*exp(-abs(beta)*xprime_p);
-                        case 'surface_rec_ni_srh'
+                        case 'ni_vsr'
                                 devprop(j) = par.ni(i)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5);
                         case 'mue_interface'
                             if alpha < 0
