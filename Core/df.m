@@ -224,10 +224,10 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
         % Source terms
         S_potential = bulk_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2))...       % Radiative recombination
+        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2))...                                                       % Generation and radiative recombination
                     - bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))))...    % Bulk SRH
                     - int_switch(i)*SRHset*(((n*p)-ni_vsr(i)^2)/(taun_vsr(i)*(p + pt_vsr(i)) + taup_vsr(i)*(n + nt_vsr(i))));   % Volumetric surface SRH
-        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2))...       % Radiative recombination
+        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2))...                                                       % Generation and radiative recombination
                     - bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))))...    % Bulk SRH
                     - int_switch(i)*SRHset*(((n*p)-ni_vsr(i)^2)/(taun_vsr(i)*(p + pt_vsr(i)) + taup_vsr(i)*(n + nt_vsr(i))));   % Volumetric surface SRH
         S = [S_potential; S_electron; S_hole];
