@@ -39,15 +39,15 @@ hold on
 % dfplot.JtotVapp(CV_df_100mVs_im_100p, 0)
 % hold on
 dfplot.JtotVapp(CV_df_200mVs_im_100p, 0)
-
-figure(91)
-hold on
+% 
+% figure(91)
+% hold on
 % plotJV_im(sol_light_50mVs);
 % plotJV_im(sol_light_100mVs);
-plotJV_im(sol_light_200mVs);
-
-ylim([-10e-3,25e-3])
-xlim([-1.2, 0])
+% plotJV_im(sol_light_200mVs);
+% 
+% ylim([-10e-3,25e-3])
+% xlim([-1.2, 0])
 
 %% legend for comparison
 legend('DF- 50 mVs-1, 60 pnt interface', 'DF- 100 mVs-1, 60 pnt interface', 'DF- 200 mVs-1,  60 pnt interface',...
