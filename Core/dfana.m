@@ -218,13 +218,13 @@ classdef dfana
             FV_ihalf = dfana.calcF_ihalf(sol);
 
             [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
-            j.disp = -par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
+            j.disp = par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
 
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
             J.a = j.a*-par.e;
             J.c = j.c*par.e;
-            J.disp = j.disp*abs(par.e);
+            J.disp = j.disp*par.e;
 
             % Total current
             J.tot = J.n + J.p + J.a + J.c + J.disp;
