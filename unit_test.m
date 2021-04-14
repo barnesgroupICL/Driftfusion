@@ -301,11 +301,6 @@ dfana.QFLs(soleq.ion);
 % [Ecb, Evb, Efn, Efp] = QFL_ihalf(sol)
 dfana.QFL_ihalf(soleq.ion);
 
-%% Core dfana QFL_J
-
-% [Ecb, Evb, Efn, Efp] = QFL_J(sol)
-dfana.QFL_J(soleq.ion);
-
 %% Core dfana calcJ
 
 % [J, j, x] = calcJ(sol)
