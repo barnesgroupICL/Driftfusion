@@ -698,8 +698,8 @@ findVocDirect(soleq.ion, 1, true);
 
 %% Protocols findVoc
 
-% [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints)
-findVoc(soleq.ion, 1, true, 0.9, 1.3, 1e-5, 50)
+% [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints, plot)
+findVoc(soleq.ion, 1, true, 0.9, 1.3, 1e-5, 50, 0)
 
 %% Protocols genIntStructs
 

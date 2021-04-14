@@ -1,4 +1,4 @@
-function [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints)
+function [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints, plot)
 % FINDVOC finds the open cicuit voltage of a device using a
 % Newton-Raphson iteration
 
@@ -126,20 +126,22 @@ while abs(fx1) > tol
     % approximation to the gradient
     fgrad = (fx1 - fx0)/(x1-x0);
     
-    xplot = 0.6:0.01:1.6;
-    yplot = fgrad*xplot + fx0- fgrad*x0;
-    
-    xrun = [xrun, x1];
-    yrun = [yrun, fx1];
-    
-    plot(xrun, yrun, 'o', xplot, yplot);
-    xlim([0.6, 1.2]);
-    %ylim([-2e-6, 2e-6])
-    xlabel('x');
-    ylabel('fx');
-    grid on;
-    
-    drawnow update
+    if plot
+        xplot = 0:0.01:3.0;
+        yplot = fgrad*xplot + fx0- fgrad*x0;
+        
+        xrun = [xrun, x1];
+        yrun = [yrun, fx1];
+        
+        plot(xrun, yrun, 'o', xplot, yplot);
+        xlim([0.6, 1.2]);
+        %ylim([-2e-6, 2e-6])
+        xlabel('x');
+        ylabel('fx');
+        grid on;
+        
+        drawnow update
+    end
     % New initial guesses
     x0 = x1;
     
