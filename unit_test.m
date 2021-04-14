@@ -777,9 +777,7 @@ lightsource('AM15', 500);
 % [n_interp, k_interp] = LoadRefrIndex(name,wavelengths)
 LoadRefrIndex(par.stack{1},300:767);
 
-
 %% Input_files
-
 inputs = dir('Input_files');
 for i=1:length(inputs)
     input = inputs(i).name;
