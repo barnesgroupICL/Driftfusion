@@ -25,9 +25,9 @@
 % functions
 initialise_df
 
-% for testing a real structure
-%input_csv = 'Input_files/ptpd_mapi_pcbm.csv';
-% a structure written for testing puroposes
+% for testing more realistic parameters
+%input_csv = 'Input_files/pedotpss_mapi_pcbm.csv';
+% a structure written for testing purposes
 input_csv = 'Input_files/3_layer_unit_test.csv';
 
 % par = pc(varargin)
@@ -35,7 +35,7 @@ par = pc(input_csv);
 % soleq = equilibrate(varargin)
 soleq = equilibrate(par);
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
-JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.2, 3);
+JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.0, 3);
 
 % example taken from Scripts/explore_script
 % exsol = explore2par(par_base, parnames, parvalues, JVpnts)
