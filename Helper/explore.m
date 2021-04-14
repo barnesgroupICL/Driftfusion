@@ -33,7 +33,7 @@ classdef explore
             errorlog = zeros(length(parval1), length(parval2));
 
             j = 1;
-            for i = 1:length(parval1)
+            parfor i = 1:length(parval1)
                 
                 par = par_base;
                 par = explore.helper(par, str1, parval1(i));
@@ -119,8 +119,8 @@ classdef explore
                         FF_r(j) = stats.FF_r;
                         
                         % For steady-state open circuit solution
-                        % [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol)
-                        [sol_Voc, Voc_ss] = findVoc(soleq.ion, 1, 1, stats.Voc_f, stats.Voc_f+0.1, 0.01, JVpnts);
+                        % [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, plot)
+                        [sol_Voc, Voc_ss] = findVoc(soleq.ion, 1, 1, stats.Voc_f, stats.Voc_f+0.1, 0.01, JVpnts, 0);
                         
                         % Write steady-state solutions into temporary
                         % variables
