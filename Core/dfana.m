@@ -169,10 +169,10 @@ classdef dfana
             % Recombination
             r = dfana.calcr_ihalf(sol);
 
-            djndx = dndt + g - r.tot;    % Not certain about the sign here
-            djpdx = dpdt + g - r.tot;
-            djadx = dadt;
-            djcdx = dcdt;
+            djndx = -dndt + g - r.tot;    % Not certain about the sign here
+            djpdx = -dpdt + g - r.tot;
+            djadx = -dadt;
+            djcdx = -dcdt;
 
             deltajn = cumtrapz(x, djndx, 2);
             deltajp = cumtrapz(x, djpdx, 2);
@@ -218,7 +218,7 @@ classdef dfana
             FV_ihalf = dfana.calcF_ihalf(sol);
 
             [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
-            j.disp = -par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
+            j.disp = par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
 
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
