@@ -24,7 +24,13 @@ devprop = zeros(1, length(xmesh));
 for i=1:length(par.dcum)                % i is the layer index
     for j = 1:length(xmesh)             % j is the spatial mesh point index
         if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
-            if xmesh(j) >= par.dcum0(i)
+            if i == 1
+                condition = (xmesh(j) >= par.dcum0(i));
+            else
+                condition = (xmesh(j) > par.dcum0(i));
+            end
+            
+            if condition
                 if gradient_property == 1
                     devprop(j) = 0;
                 else
