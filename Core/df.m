@@ -213,8 +213,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         dpdx = dudx(3);
         
         %% Volumetric surface recombination field terms
-        Fn = exp((-dVdx.*xprime_n(i))/(par.kB*par.T) -alpha(i).*xprime_n(i));
-        Fp = exp((-dVdx.*xprime_p(i))/(par.kB*par.T) +beta(i).*xprime_p(i)); 
+        Fn = exp((sign(alpha(i))*dVdx.*xprime_n(i))/(par.kB*par.T) + sign(alpha(i))*alpha(i).*xprime_n(i));
+        Fp = exp((sign(beta(i))*-dVdx.*xprime_p(i))/(par.kB*par.T) + sign(beta(i))*beta(i).*xprime_p(i)); 
         
         %% Equation editor
         % Time-dependence prefactor term

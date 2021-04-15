@@ -27,7 +27,7 @@ for i=1:length(par.dcum)                % i is the layer index
             if i == 1
                 condition = (xmesh(j) >= par.dcum0(i));
             else
-                condition = (xmesh(j) > par.dcum0(i));
+                condition = (xmesh(j) >= par.dcum0(i));
             end
             
             if condition
@@ -85,20 +85,20 @@ for i=1:length(par.dcum)                % i is the layer index
                         case 'pt_vsr'
                                 devprop(j) = par.pt(i);%*exp(-abs(beta)*xprime_p);
                         case 'ni_vsr'
-                                devprop(j) = par.ni(i)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5);
+                                devprop(j) = par.ni(i);%./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5);
                         case 'mue_interface'
                             if alpha < 0
-                                devprop(j) = par.mue(i-1)+(((par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n));
+                                devprop(j) = (par.mue(i-1)+((par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n));
                             elseif alpha > 0
-                                devprop(j) = par.mue(i+1)+(((par.Nv(i-1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n));
+                                devprop(j) = (par.mue(i+1)+((par.Nv(i-1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n));
                             else
                                 devprop(j) = max([par.mue(i-1),par.mue(i+1)]);
                             end
                         case 'muh_interface'
                             if beta < 0
-                                devprop(j) = par.muh(i-1)+(((par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));
+                                devprop(j) = (par.muh(i-1)+((par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));
                             elseif beta > 0
-                                devprop(j) = par.muh(i+1)+(((par.Nc(i-1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));
+                                devprop(j) = (par.muh(i+1)+((par.Nc(i-1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));
                             else
                                 devprop(j) = max([par.muh(i-1),par.muh(i+1)]);
                             end
@@ -107,6 +107,8 @@ for i=1:length(par.dcum)                % i is the layer index
                         case 'xprime_n'
                             devprop(j) = xprime_n;
                         case 'xprime_p'
+                            devprop(j) = xprime_p;
+                        case 'xprime'
                             devprop(j) = xprime_p;
                         case 'alpha'
                             devprop(j) = alpha;

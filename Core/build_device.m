@@ -65,6 +65,7 @@ dev.pt_vsr = build_property(par.pt, xmesh, par, 'pt_vsr', 0);
 dev.ni_vsr = build_property(par.ni, xmesh, par, 'constant', 0);
 dev.int_switch = build_property(par.int_switch, xmesh, par, 'int_switch', 1);
 dev.bulk_switch = abs(dev.int_switch-1);
+dev.xprime = build_property(par.xx, xmesh, par, 'xprime', 1);
 dev.xprime_n = build_property(par.xx, xmesh, par, 'xprime_n', 1);
 dev.xprime_p = build_property(par.xx, xmesh, par, 'xprime_p', 1);
 dev.alpha = build_property(par.xx, xmesh, par, 'alpha', 1);
