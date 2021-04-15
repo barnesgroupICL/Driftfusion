@@ -27,7 +27,7 @@ for i=1:length(par.dcum)                % i is the layer index
             if i == 1
                 condition = (xmesh(j) >= par.dcum0(i));
             else
-                condition = (xmesh(j) > par.dcum0(i));
+                condition = (xmesh(j) >= par.dcum0(i));
             end
             
             if condition
