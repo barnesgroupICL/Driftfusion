@@ -24,7 +24,7 @@ devprop = zeros(1, length(xmesh));
 for i=1:length(par.dcum)                % i is the layer index
     for j = 1:length(xmesh)             % j is the spatial mesh point index
         if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
-            if xmesh(j) >= par.dcum0(i)
+            if xmesh(j) > par.dcum0(i)
                 if gradient_property == 1
                     devprop(j) = 0;
                 else
@@ -35,9 +35,7 @@ for i=1:length(par.dcum)                % i is the layer index
 
             if xmesh(j) >= par.dcum0(i)
                 xprime = xmesh(j)-par.dcum0(i);
-                if xmesh(j) >= par.dcum0(i)
                     deff = par.d(i);
-
                     % Gradient coefficients for surface recombination equivalence
                     alpha = ((par.EA(i-1) - par.EA(i+1))/(par.kB*par.T) + (log(par.Nc(i+1))-log(par.Nc(i-1))))/deff;
                     if alpha < 0
@@ -100,8 +98,11 @@ for i=1:length(par.dcum)                % i is the layer index
                             end
                         case 'int_switch'
                             devprop(j) = 1;
+                        case 'xprime_n'
+                            devprop(j) = xprime_n;
+                        case 'xprime_p'
+                            devprop(j) = xprime_p;
                     end
-                end
             end
         end
     end
