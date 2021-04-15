@@ -22,6 +22,8 @@ end
 dev.mucat = build_property(par.mucat, xmesh, par, 'constant', 0);
 dev.muani = build_property(par.muani, xmesh, par, 'constant', 0);
 dev.epp = build_property(par.epp, xmesh, par, 'constant', 0);
+dev.nt = build_property(par.nt, xmesh, par, 'constant', 0);
+dev.pt = build_property(par.pt, xmesh, par, 'constant', 0);
 
 % Linearly graded properties
 dev.EA = build_property(par.EA, xmesh, par, 'lin_graded', 0);
@@ -42,8 +44,6 @@ dev.DOSani = build_property(par.amax, xmesh, par, 'log_graded', 0);
 dev.DOScat = build_property(par.cmax, xmesh, par, 'log_graded', 0);
 dev.taun = build_property(par.taun, xmesh, par, 'log_graded', 0);
 dev.taup = build_property(par.taup, xmesh, par, 'log_graded', 0);
-dev.nt = build_property(par.nt, xmesh, par, 'log_graded', 0);
-dev.pt = build_property(par.pt, xmesh, par, 'log_graded', 0);
 
 % Properties that are zeroed in the interfaces
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);
@@ -62,10 +62,14 @@ dev.taun_vsr = build_property(par.taun, xmesh, par, 'taun_vsr', 0);
 dev.taup_vsr = build_property(par.taup, xmesh, par, 'taup_vsr', 0);
 dev.nt_vsr = build_property(par.nt, xmesh, par, 'nt_vsr', 0);
 dev.pt_vsr = build_property(par.pt, xmesh, par, 'pt_vsr', 0);
-dev.ni_vsr = build_property(par.ni, xmesh, par, 'ni_vsr', 0);
+dev.ni_vsr = build_property(par.ni, xmesh, par, 'constant', 0);
 dev.int_switch = build_property(par.int_switch, xmesh, par, 'int_switch', 1);
 dev.bulk_switch = abs(dev.int_switch-1);
 dev.xprime_n = build_property(par.xx, xmesh, par, 'xprime_n', 1);
 dev.xprime_p = build_property(par.xx, xmesh, par, 'xprime_p', 1);
+dev.alpha = build_property(par.xx, xmesh, par, 'alpha', 1);
+dev.beta = build_property(par.xx, xmesh, par, 'beta', 1);
+dev.sn = build_property(par.sn, xmesh, par, 'constant', 1);
+dev.sp = build_property(par.sp, xmesh, par, 'constant', 1);
 
 end

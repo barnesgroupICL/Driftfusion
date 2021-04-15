@@ -77,13 +77,13 @@ for i=1:length(par.dcum)                % i is the layer index
                                 devprop(j) = property(i-1)*exp(log_gradient*xprime);
                             end
                         case 'taun_vsr'
-                                devprop(j) = (deff/par.sn(i))*exp(-abs(alpha)*xprime_n);
+                                devprop(j) = (deff/par.sn(i));%*exp(-abs(alpha)*xprime_n);
                         case 'taup_vsr'
-                                devprop(j) = (deff/par.sp(i))*exp(-abs(beta)*xprime_p);
+                                devprop(j) = (deff/par.sp(i));%*exp(-abs(beta)*xprime_p);
                         case 'nt_vsr'
-                                devprop(j) = par.nt(i)*exp(-abs(alpha)*xprime_n);
+                                devprop(j) = par.nt(i);%*exp(-abs(alpha)*xprime_n);
                         case 'pt_vsr'
-                                devprop(j) = par.pt(i)*exp(-abs(beta)*xprime_p);
+                                devprop(j) = par.pt(i);%*exp(-abs(beta)*xprime_p);
                         case 'ni_vsr'
                                 devprop(j) = par.ni(i)./abs((exp(abs(alpha)*xprime_n).*exp(abs(beta)*xprime_p)).^0.5);
                         case 'mue_interface'
@@ -108,6 +108,10 @@ for i=1:length(par.dcum)                % i is the layer index
                             devprop(j) = xprime_n;
                         case 'xprime_p'
                             devprop(j) = xprime_p;
+                        case 'alpha'
+                            devprop(j) = alpha;
+                        case 'beta'
+                            devprop(j) = beta;
                     end
             end
         end

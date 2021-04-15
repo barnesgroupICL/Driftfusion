@@ -372,14 +372,15 @@ classdef dfplot
                 {'-'}, 'SRH recombination rate [cm-3s-1]', tarr, xrange, 0, 1);
         end
         
-        function rsrx(varargin)
+        function rvsrx(varargin)
             % Recombination rates as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            r = dfana.calcr(sol);
+            x_ihalf = par.x_ihalf;
+            r = dfana.calcr_ihalf(sol);
 
             figure(171)
-            dfplot.x2d(sol, x, {r.sr},{''},...
+            dfplot.x2d(sol, x_ihalf, {r.vsr},{''},...
                 {'-'}, 'Surface recombination rate [cm-3s-1]', tarr, xrange, 0, 1);
         end 
         
