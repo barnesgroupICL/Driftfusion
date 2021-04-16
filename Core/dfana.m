@@ -301,7 +301,26 @@ classdef dfana
                        
             Fn = exp(abs(dVdx_ihalf./(par.kB*par.T) + alpha).*xprime_n);
             Fp = exp(abs(-dVdx_ihalf./(par.kB*par.T) + beta).*xprime_p); 
-            
+% 
+%             n_corr = n_ihalf.*Fn;
+%             p_corr = p_ihalf.*Fp;
+%             
+%             figure(68)
+%             plot(xprime_n)
+%             hold on
+%             plot(xprime_p)
+%             hold off
+%             figure(69)
+%             semilogy(x_ihalf, Fn(end,:), x_ihalf, Fp(end,:))   
+%             figure(70)
+%             semilogy(x_ihalf, n_corr(end,:), x_ihalf, n_ihalf(end,:))
+%             ylabel('electrons')
+%             figure(701)
+%             semilogy(x_ihalf, p_corr(end,:), x_ihalf, p_ihalf(end,:))
+%             ylabel('holes')
+%             figure(71)
+%             semilogy(x_ihalf, n_corr(end,:).*p_corr(end,:))
+%             ylabel('product')
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
             % Bulk SRH

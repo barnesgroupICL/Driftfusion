@@ -31,8 +31,8 @@ dev.IP = build_property(par.IP, xmesh, par, 'lin_graded', 0);
 dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
 
 % Logarithmically graded properties
-dev.NA = build_property(par.NA, xmesh, par, 'log_graded', 0);
-dev.ND = build_property(par.ND, xmesh, par, 'log_graded', 0);
+dev.NA = build_property(par.NA, xmesh, par, 'zeroed', 0);
+dev.ND = build_property(par.ND, xmesh, par, 'zeroed', 0);
 dev.Nc = build_property(par.Nc, xmesh, par, 'log_graded', 0);
 dev.Nv = build_property(par.Nv, xmesh, par, 'log_graded', 0);
 dev.n0 = build_property(par.n0, xmesh, par, 'log_graded', 0);
