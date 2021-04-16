@@ -265,8 +265,8 @@ classdef dfana
             xprime_p = dev.xprime_p;
             alpha = dev.alpha;
             beta = dev.beta;
-            Fn = exp((-dVdx.*xprime_n)./(par.kB*par.T) -alpha.*xprime_n); 
-            Fp = exp((-dVdx.*xprime_p)./(par.kB*par.T) +beta.*xprime_p);    
+            Fn = exp(abs(dVdx.*xprime_n./(par.kB*par.T) +alpha).*xprime_n); 
+            Fp = exp(abs(-dVdx.*xprime_p./(par.kB*par.T) +beta).*xprime_p);    
             
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);

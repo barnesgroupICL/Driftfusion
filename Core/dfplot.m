@@ -230,7 +230,22 @@ classdef dfplot
             set(legend,'EdgeColor',[1 1 1]);
         end
 
-
+        function JtotVapp_mirror(sol, xpos)
+            % Obtain point position from x position
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+            
+            J = dfana.calcJ(sol);
+            Vapp = dfana.calcVapp(sol);
+            
+            figure(91)
+            plot(-Vapp, -J.tot(:, ppos));
+            xlabel('Applied Voltage, Vapp [V]');
+            ylabel('Current Density, J [A cm^{-2}]');
+            set(legend,'FontSize',16);
+            set(legend,'EdgeColor',[1 1 1]);
+        end
+        
         function logJVapp(sol, xpos)
             % plot the log of the mod J
 
