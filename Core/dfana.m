@@ -265,8 +265,8 @@ classdef dfana
             xprime_p = dev.xprime_p;
             alpha = dev.alpha;
             beta = dev.beta;
-            Fn = exp(abs(dVdx.*xprime_n./(par.kB*par.T) +alpha).*xprime_n); 
-            Fp = exp(abs(-dVdx.*xprime_p./(par.kB*par.T) +beta).*xprime_p);    
+            Fn = exp(abs(dVdx./(par.kB*par.T) + alpha).*xprime_n); 
+            Fp = exp(abs(-dVdx./(par.kB*par.T) + beta).*xprime_p);    
             
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
@@ -288,8 +288,9 @@ classdef dfana
             x_ihalf = par.x_ihalf;
             n_ihalf = getvarihalf(n);
             p_ihalf = getvarihalf(p);
+            dVdx_ihalf = zeros(length(t), length(x_ihalf));
             for i=1:length(t)
-                [V_ihalf(i,:), dVdx_ihalf(i,:)] = pdeval(0, x, V(i,:), x_ihalf);
+                [~, dVdx_ihalf(i,:)] = pdeval(0, x, V(i,:), x_ihalf);
             end
             int_switch = repmat(dev.int_switch, length(t), 1);
             bulk_switch = abs(int_switch-1);
@@ -301,26 +302,7 @@ classdef dfana
                        
             Fn = exp(abs(dVdx_ihalf./(par.kB*par.T) + alpha).*xprime_n);
             Fp = exp(abs(-dVdx_ihalf./(par.kB*par.T) + beta).*xprime_p); 
-% 
-%             n_corr = n_ihalf.*Fn;
-%             p_corr = p_ihalf.*Fp;
-%             
-%             figure(68)
-%             plot(xprime_n)
-%             hold on
-%             plot(xprime_p)
-%             hold off
-%             figure(69)
-%             semilogy(x_ihalf, Fn(end,:), x_ihalf, Fp(end,:))   
-%             figure(70)
-%             semilogy(x_ihalf, n_corr(end,:), x_ihalf, n_ihalf(end,:))
-%             ylabel('electrons')
-%             figure(701)
-%             semilogy(x_ihalf, p_corr(end,:), x_ihalf, p_ihalf(end,:))
-%             ylabel('holes')
-%             figure(71)
-%             semilogy(x_ihalf, n_corr(end,:).*p_corr(end,:))
-%             ylabel('product')
+
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
             % Bulk SRH
