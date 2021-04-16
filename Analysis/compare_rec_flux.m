@@ -25,12 +25,12 @@ R1_df2D = (ns1_df.*ps1_df - ni^2)./((1/sn1).*(ps1_df + pt1) + (1/sp1).*(ns1_df +
 R2_df2D = (ns2_df.*ps2_df - ni^2)./((1/sn2).*(ps2_df + pt2) + (1/sp2).*(ns2_df + nt2));
 
 %% Driftfusion 3D
-rx = dfana.calcr(sol_df);
+rx = dfana.calcr_ihalf(sol_df);
 
 R1_df3D = zeros(length(t), 1);
 for i=1:length(t)
-    R1_df3D(i) = trapz(x(par.pcum0(2)+1:par.pcum0(3)+1), rx.srh(i, par.pcum0(2)+1:par.pcum0(3)+1), 2);
-    R2_df3D(i) = trapz(x(par.pcum0(4)+1:par.pcum0(5)+1), rx.srh(i, par.pcum0(4)+1:par.pcum0(5)+1), 2);
+    R1_df3D(i) = trapz(x(par.pcum0(2)+1:par.pcum0(3)+1), rx.vsr(i, par.pcum0(2)+1:par.pcum0(3)+1), 2);
+    R2_df3D(i) = trapz(x(par.pcum0(4)+1:par.pcum0(5)+1), rx.vsr(i, par.pcum0(4)+1:par.pcum0(5)+1), 2);
 end
 
 %% IonMonger

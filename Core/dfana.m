@@ -298,27 +298,9 @@ classdef dfana
             
             alpha = dev.alpha;
             beta = dev.beta;
-            
-            Fn = exp((sign(alpha).*dVdx_ihalf.*xprime_n)./(par.kB*par.T) + sign(alpha).*alpha.*xprime_n);
-            Fp = exp((sign(beta).*-dVdx_ihalf.*xprime_p)./(par.kB*par.T) + sign(beta).*beta.*xprime_p); 
-            
-            n_corr = n_ihalf.*Fn;
-            p_corr = p_ihalf.*Fp;
-            
-            figure(68)
-            plot(xprime_n)
-            hold on
-            plot(xprime_p)
-            hold off
-            figure(69)
-            semilogy(x_ihalf, Fn(end,:), x_ihalf, Fp(end,:))   
-            figure(70)
-            semilogy(x_ihalf, n_corr(end,:), x_ihalf, n_ihalf(end,:))
-            figure(701)
-            semilogy(x_ihalf, p_corr(end,:), x_ihalf, p_ihalf(end,:))
-
-            figure(71)
-            semilogy(x_ihalf, n_corr(end,:).*p_corr(end,:))
+                       
+            Fn = exp(abs(dVdx_ihalf./(par.kB*par.T) + alpha).*xprime_n);
+            Fp = exp(abs(-dVdx_ihalf./(par.kB*par.T) + beta).*xprime_p); 
             
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
@@ -326,11 +308,8 @@ classdef dfana
             r.srh = bulk_switch.*(n_ihalf.*p_ihalf - dev.ni.^2)...
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
             % Volumetric surface SRH
-%             r.vsr = int_switch.*(n_ihalf.*p_ihalf - Fn.*Fp.*dev.ni_vsr.^2)...
-%                 ./(dev.taun_vsr.*Fn.*(p_ihalf + dev.pt_vsr.*Fp) + dev.taup_vsr.*Fp.*(n_ihalf + dev.nt_vsr.*Fn));
             r.vsr = int_switch.*(n_ihalf.*p_ihalf.*Fn.*Fp - dev.ni_vsr.^2)...
                 ./(dev.taun_vsr.*(p_ihalf.*Fp + dev.pt_vsr) + dev.taup_vsr.*(n_ihalf.*Fn + dev.nt_vsr));
-            %.*exp(-xprime_p.*dVdx_ihalf./(par.kB*par.T))
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end
