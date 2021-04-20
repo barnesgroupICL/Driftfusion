@@ -1,4 +1,4 @@
-function sdpsol = doSDP_alt(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_freeze_ions, solver_split_pulse)
+function sdpsol = doSDP_alt(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions, solver_split_pulse)
 % TARR =  a time array containing the dwell times
 % VJUMP = the jump to voltage. Vpre is defined by sol_ini which should be
 % a solution at steady-state
@@ -68,7 +68,7 @@ par_pulseTurnOn.tmax = jump_time;
 par_pulseKeepOn = lightConstant(par_pulseTurnOn, pulse_source, pulse_int);
 % we should not use pulses long enough to have ions moving, so we could as
 % well freeze them during the probe pulse, for helping the solver
-par_pulseKeepOn.mobseti = pulse_freeze_ions;
+par_pulseKeepOn.mobseti = pulse_mobile_ions;
 par_pulseKeepOn.tmesh_type = 2;
 par_pulseKeepOn.t0 = jump_time;
 par_pulseKeepOn.tmax = pulse_tmax;
@@ -96,11 +96,28 @@ for i = 1:length(tdwell_arr)
     if startFromSolJump
         par_dwell.tmax = tdwell_arr(i);
         sol_dwell = runDf(sol_jump, par_dwell);
-        %assignin('base', matlab.lang.makeValidName(['SDP_dwell_' inputname(1) '_int_' num2str(bias_int) '_' num2str(tdwell_arr(i))]), sol_dwell)
+        %to save the dwell solutions (via assignin) we want to keep
+        %startFromSolJump = true, so you'll have to comment out the whole
+        %if/else block where it could be set to true
+        %assignin('base', matlab.lang.makeValidName(['SDP_dwell_' inputname(1) '_int_' num2str(bias_int) '_tdwell_' num2str(tdwell_arr(i))]), sol_dwell)
         if size(sol_dwell.u,1) == par_dwell.tpoints
             startFromSolJump = false;
         else
             sol_dwell = runDfFourTrunks(sol_jump, par_dwell);
+%             J1 = dfana.calcJ(sol1);
+%             J2 = dfana.calcJ(sol2);        
+%             J3 = dfana.calcJ(sol3);
+%             J4 = dfana.calcJ(sol_dwell);
+%             Jtot1 = J1.tot(:,end);
+%             Jtot2 = J2.tot(:,end);        
+%             Jtot3 = J3.tot(:,end);
+%             Jtot4 = J4.tot(:,end);
+% 
+%             Jtot_dwell = [Jtot1; Jtot2; Jtot3; Jtot4];
+%             size(Jtot_dwell)
+%             t_Jtot_dwell = [sol1.t'; (sol2.t+sol1.par.tmax)'; (sol3.t+sol1.par.tmax+sol2.par.tmax)'; (sol_dwell.t+sol1.par.tmax+sol2.par.tmax+sol3.par.tmax)'];
+%             size(t_Jtot_dwell)
+%             assignin('base', matlab.lang.makeValidName(['SDP_dwell_Jtot_' inputname(1) '_int_' num2str(bias_int) '_tdwell_' num2str(tdwell_arr(i))]), [t_Jtot_dwell, Jtot_dwell])
             if size(sol_dwell.u,1) == par_dwell.tpoints
                 startFromSolJump = false;
             end
@@ -112,12 +129,12 @@ for i = 1:length(tdwell_arr)
     
     disp('Pulse keep on')
     if solver_split_pulse
-        [~, Jtr(:,i), Jdk(i), t_Jtr(:,i)]= runDfFourTrunks(sol_pulseTurnOn, par_pulseKeepOn, sol_dwell);
+        [~, ~, ~, ~, Jtr(:,i), Jdk(i), t_Jtr(:,i)]= runDfFourTrunks(sol_pulseTurnOn, par_pulseKeepOn, sol_dwell);
     else
         sol_pulseKeepOn = runDf(sol_pulseTurnOn, par_pulseKeepOn);
         [Jtr(:,i), Jdk(i)] = calcJtrJdk(sol_dwell, sol_pulseKeepOn);
         t_Jtr(:,i) = sol_pulseKeepOn.t;
-        %assignin('base', matlab.lang.makeValidName(['SDP_' inputname(1) '_' num2str(tdwell_arr(i))]), sol_pulseKeepOn)
+        %assignin('base', matlab.lang.makeValidName(['SDP_pulseKeepOn' inputname(1) '_' num2str(tdwell_arr(i))]), sol_pulseKeepOn)
     end
 end
 
@@ -221,7 +238,7 @@ function sol_post = runDf(sol_pre, par)
     sol_post.par.AbsTol = originalAbsTol;
 end
 
-function [sol4, Jtr, Jdk, t_Jtr] = runDfFourTrunks(sol_pre, par, sol_dwell)
+function [sol4, sol1, sol2, sol3, Jtr, Jdk, t_Jtr] = runDfFourTrunks(sol_pre, par, sol_dwell)
         par1 = par;
         par1.tmax = (par.t0^1.5*par.tmax^0.5)^0.5;
         disp(['Split solution, first part. tmax: ' num2str(par1.tmax) ' s'])
@@ -249,7 +266,7 @@ function [sol4, Jtr, Jdk, t_Jtr] = runDfFourTrunks(sol_pre, par, sol_dwell)
         par4.t0 = par3.tmax / 10;
         sol4 = runDf(sol3, par4);
         
-        if nargout > 1
+        if nargout > 4
             [Jtr_temp1, Jdk] = calcJtrJdk(sol_dwell, sol1);
             Jtr_temp2 = calcJtrJdk(sol_dwell, sol2);        
             Jtr_temp3 = calcJtrJdk(sol_dwell, sol3);
