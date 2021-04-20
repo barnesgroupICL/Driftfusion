@@ -41,8 +41,6 @@ end
 
 fig = figure('Name', 'SDP vs dwell time', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
 hold off
-xlabel('t_{dwell} [s]')
-ylabel('Jtr [Acm-2]')
 ymin = Inf;
 ymax = -Inf;
 %legendarr = zeros(length(varargin)/3, 1);
@@ -55,6 +53,8 @@ for i = 1:(length(varargin)/3)
     ymax = max(ymax, max(Jtr_time_arr(i,1:(end/2))));
     hold on
 end
+xlabel('t_{dwell} [s]')
+ylabel('Jtr [Acm-2]')
 ax = gca;
 ax.XScale = 'log'; % for putting the scale in log
 %xlim([2e-8, 1e3])
