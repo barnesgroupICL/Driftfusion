@@ -13,25 +13,26 @@ initialise_df
 
 %% Create a parameters object for Spiro/MAPI/TiO2 by including a filepath to the 
 % appropriate .csv as the arugment to the parameters class PC
-par_tio2 = pc('Input_files/spiro_mapi_tio2_mirror.csv');
+par_tio2 = pc('Input_files/spiro_mapi_tio2_vary.csv');
 
 %% Find the equilibrium solutions
 soleq_tio2 = equilibrate(par_tio2);
+dfplot.npx(soleq_tio2.ion)
 
 %% Perform dark and light current-voltage scan at 50 mVs-1 from 0 V to 1.2 V
 % Input arguments: 
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 sol_CV_100mVs = doCV(soleq_tio2.ion, 1, 0, -1.2, 0.2, 100e-3, 1, 281);
-sol_CV_200mVs = doCV(soleq_tio2.ion, 1, 0, -1.2, 0.2, 200e-3, 1, 281);
-sol_CV_400mVs = doCV(soleq_tio2.ion, 1, 0, -1.2, 0.2, 400e-3, 1, 281);
+% sol_CV_200mVs = doCV(soleq_tio2.ion, 1, 0, -1.2, 0.2, 200e-3, 1, 281);
+% sol_CV_400mVs = doCV(soleq_tio2.ion, 1, 0, -1.2, 0.2, 400e-3, 1, 281);
 
 %% plot the current voltage curve
 dfplot.JtotVapp_mirror(sol_CV_100mVs, 0)
-hold on
-dfplot.JtotVapp_mirror(sol_CV_200mVs, 0)
-hold on
-dfplot.JtotVapp_mirror(sol_CV_400mVs, 0)
-hold off
+% hold on
+% dfplot.JtotVapp_mirror(sol_CV_200mVs, 0)
+% hold on
+% dfplot.JtotVapp_mirror(sol_CV_400mVs, 0)
+% hold off
 ylim([-30e-3,10e-3])
 xlim([-0.2, 1.2])
 legend('100 mVs-1', '200 mVs-1', '400 mVs-1') 

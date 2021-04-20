@@ -34,8 +34,8 @@ soleq_df_im_mirror = equilibrate(par_df_im_mirror);
 % For comparison with IonMonger default parameters
 % sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
 CV_df_50mVs_im_mirror = doCV(soleq_df_im_mirror.ion, 1.0398, 0, 1.2, 0, 50e-3, 1, 241);
-CV_df_100mVs_im_mirror = doCV(soleq_df_im_mirror.ion, 1.0398, 0, -1.2, 0, 100e-3, 1, 241);
-CV_df_200mVs_im_mirror = doCV(soleq_df_im_mirror.ion, 1.0398, 0, -1.2, 0, 200e-3, 1, 241);
+CV_df_100mVs_im_mirror = doCV(soleq_df_im_mirror.ion, 1.0398, 0, 1.2, 0, 100e-3, 1, 241);
+CV_df_200mVs_im_mirror = doCV(soleq_df_im_mirror.ion, 1.0398, 0, 1.2, 0, 200e-3, 1, 241);
 
 %% Manual CV plots
 dfplot.JtotVapp_mirror(CV_df_50mVs_im_mirror, 0)
