@@ -494,11 +494,11 @@ classdef dfana
             % FV = Field calculated from the gradient of the potential
             % Frho = Field calculated from integrated space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
-            V_ihalf = getvarihalf(V);
-
-            FV = -gradient(V_ihalf, par.x_ihalf, t);                      % Electric field calculated from V
-
+            for i=1:length(t)
+                [~, dVdx_ihalf(i,:)] = pdeval(0,x,V(i,:),par.x_ihalf);
+            end
+            FV = -dVdx_ihalf;
+            
             if nargout > 1
                 rho = dfana.calcrho_ihalf(sol);
                 Frho = cumtrapz(par.x_ihalf, rho, 2)./(par.dev_ihalf.epp.*par.epp0) + FV(:,1);
