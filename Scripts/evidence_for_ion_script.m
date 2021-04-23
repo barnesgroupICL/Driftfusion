@@ -3,7 +3,7 @@
 % presented in Calado 2016. Note that there may be some differences in the
 % exact solutions owing to the difference in the methods used. Previously
 % the Current-Voltage scan was reproduced using a discretised step-wise
-% method (one solution per point) whereas here a single solution is used.
+% method (one solution per time point), whereas here a single solution is used.
 % Similarly the open circuit voltage transients were obtained using a
 % symmetric model method previously while here a series resistance is
 % applied to the boundary conditions.
@@ -71,10 +71,10 @@ hold on
 dfplot.Voct(Voc_transient_tc);
 hold off
 
-% Plot the EL diagrams at 1 ms and 1 sec
-dfplot.ELxnpxacx(Voc_transient_bc, [1e-3, 1])
+%% Plot the EL diagrams at 1 ms and 100 sec
+dfplot.ELxnpxacx(Voc_transient_bc, [1e-3, 100])
 % Uncomment to plot EL and carrier density diagrams for Top Cathode device
-%dfplot.ELxnpxacx(Voc_transient.tc, [1e-3, 1])
+%dfplot.ELxnpxacx(Voc_transient.tc, [1e-3, 100])
 
 % Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in
