@@ -225,16 +225,19 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
         F = [F_potential; mobset*F_electron; mobset*F_hole];
 
+        % Recombination terms
+        % Radiative
+        r_rad = radset*B(i)*((n*p)-(ni(i)^2));
+        % Bulk SRH
+        r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i))+taup(i)*(n+nt(i))));
+        % Volumetric surface recombination
+        r_vsr = int_switch(i)*SRHset*((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i))-ni(i)^2)/...
+        (taun_vsr(i)*(p*exp(beta*xprime_p(i))+pt(i))+taup_vsr(i)*(n*exp(alpha*xprime_n(i))+nt(i))));
+        
         % Source terms
-        S_potential = bulk_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - radset*B(i)*((n*p)-(ni(i)^2))...       % Radiative recombination
-                    - bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))))...    % Bulk SRH
-                    - int_switch(i)*SRHset*(((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i)))-ni(i)^2)...
-                    /(taun_vsr(i)*(p*exp(beta*xprime_p(i)) + pt(i)) + taup_vsr(i)*(n*exp(alpha*xprime_n(i)) + nt(i))));   % Volumetric surface SRH
-        S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2))...       % Radiative recombination
-                    - bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))))...    % Bulk SRH
-                    - int_switch(i)*SRHset*(((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i)))-ni(i)^2)...
-                    /(taun_vsr(i)*(p*exp(beta*xprime_p(i)) + pt(i)) + taup_vsr(i)*(n*exp(alpha*xprime_n(i)) + nt(i))));   % Volumetric surface SRH
+        S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
+        S_electron = g - r_rad - r_srh - r_vsr;
+        S_hole     = g - r_rad - r_srh - r_vsr;
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
