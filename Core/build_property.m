@@ -77,9 +77,17 @@ for i=1:length(par.dcum)                % i is the layer index
                                 devprop(j) = property(i-1)*exp(log_gradient*xprime);
                             end
                         case 'taun_vsr'
-                                devprop(j) = (deff/par.sn(i));
+                                if par.sn(i) == 0
+                                    devprop(j) = 1e100; % Avoid divide by zero error
+                                else
+                                    devprop(j) = (deff/par.sn(i));
+                                end
                         case 'taup_vsr'
-                                devprop(j) = (deff/par.sp(i));
+                                if par.sp(i) == 0
+                                    devprop(j) = 1e100; % Avoid divide by zero error
+                                else
+                                    devprop(j) = (deff/par.sp(i));
+                                end
                         case 'mue_interface'
                             if alpha_prime < 0
                                 devprop(j) = (par.mue(i-1)+((par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha_prime))))*exp(abs(alpha_prime)*xprime_n));
