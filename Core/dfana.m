@@ -263,19 +263,18 @@ classdef dfana
             end
             xprime_n = dev.xprime_n;
             xprime_p = dev.xprime_p;
-            alpha = dev.alpha;
-            beta = dev.beta;
-            Fn = exp(abs(dVdx./(par.kB*par.T) + alpha).*xprime_n); 
-            Fp = exp(abs(-dVdx./(par.kB*par.T) + beta).*xprime_p);    
+            alpha_prime = dev.alpha_prime;
+            beta_prime = dev.beta_prime;
+            alpha = abs(par.q*dVdx./(par.kB*par.T) + alpha_prime); 
+            beta = abs(par.q*-dVdx./(par.kB*par.T) + beta_prime);    
             
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
             % Bulk SRH
             r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
             % Volumetric surface SRH
-            r.vsr = int_switch.*((n.*p.*Fn.*Fp - dev.ni.^2)./...
-                ((dev.taun_vsr.*(p.*Fp+dev.pt)) + (dev.taup_vsr.*(n.*Fn+dev.nt))));
-            %.*exp(-dVdx/(kB*T))
+            r.vsr = int_switch.*((n.*exp(alpha.*xprime_n).*p.*exp(beta.*xprime_p) - dev.ni.^2)./...
+                ((dev.taun_vsr.*(p.*exp(beta.*xprime_p) + dev.pt)) + (dev.taup_vsr.*(n.*exp(alpha.*xprime_n) + dev.nt))));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end
