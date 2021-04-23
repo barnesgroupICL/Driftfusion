@@ -43,15 +43,15 @@ for i=1:length(par.dcum)                % i is the layer index
                 xprime = xmesh(j)-par.dcum0(i);
                     deff = par.d(i);
                     % Gradient coefficients for surface recombination equivalence
-                    alpha = ((par.EA(i-1) - par.EA(i+1))/(par.kB*par.T) + (log(par.Nc(i+1))-log(par.Nc(i-1))))/deff;
-                    if alpha < 0
+                    alpha_prime = ((par.EA(i-1) - par.EA(i+1))/(par.kB*par.T) + (log(par.Nc(i+1))-log(par.Nc(i-1))))/deff;
+                    if alpha_prime < 0
                         xprime_n = xprime;
                     else
                         xprime_n = deff-xprime;
                     end
 
-                    beta = ((par.IP(i+1) - par.IP(i-1))/(par.kB*par.T) + (log(par.Nv(i+1))-log(par.Nv(i-1))))/deff;
-                    if beta < 0
+                    beta_prime = ((par.IP(i+1) - par.IP(i-1))/(par.kB*par.T) + (log(par.Nv(i+1))-log(par.Nv(i-1))))/deff;
+                    if beta_prime < 0
                         xprime_p = xprime;
                     else
                         xprime_p = deff-xprime;
@@ -81,18 +81,18 @@ for i=1:length(par.dcum)                % i is the layer index
                         case 'taup_vsr'
                                 devprop(j) = (deff/par.sp(i));
                         case 'mue_interface'
-                            if alpha < 0
-                                devprop(j) = (par.mue(i-1)+((par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n));
-                            elseif alpha > 0
-                                devprop(j) = (par.mue(i+1)+((par.Nv(i-1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha))))*exp(abs(alpha)*xprime_n));
+                            if alpha_prime < 0
+                                devprop(j) = (par.mue(i-1)+((par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha_prime))))*exp(abs(alpha_prime)*xprime_n));
+                            elseif alpha_prime > 0
+                                devprop(j) = (par.mue(i+1)+((par.Nv(i-1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha_prime))))*exp(abs(alpha_prime)*xprime_n));
                             else
                                 devprop(j) = max([par.mue(i-1),par.mue(i+1)]);
                             end
                         case 'muh_interface'
-                            if beta < 0
-                                devprop(j) = (par.muh(i-1)+((par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));
-                            elseif beta > 0
-                                devprop(j) = (par.muh(i+1)+((par.Nc(i-1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta))))*exp(abs(beta)*xprime_p));
+                            if beta_prime < 0
+                                devprop(j) = (par.muh(i-1)+((par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta_prime))))*exp(abs(beta_prime)*xprime_p));
+                            elseif beta_prime > 0
+                                devprop(j) = (par.muh(i+1)+((par.Nc(i-1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta_prime))))*exp(abs(beta_prime)*xprime_p));
                             else
                                 devprop(j) = max([par.muh(i-1),par.muh(i+1)]);
                             end
@@ -104,10 +104,10 @@ for i=1:length(par.dcum)                % i is the layer index
                             devprop(j) = xprime_p;
                         case 'xprime'
                             devprop(j) = xprime_p;
-                        case 'alpha'
-                            devprop(j) = alpha;
-                        case 'beta'
-                            devprop(j) = beta;
+                        case 'alpha_prime'
+                            devprop(j) = alpha_prime;
+                        case 'beta_prime'
+                            devprop(j) = beta_prime;
                     end
             end
         end

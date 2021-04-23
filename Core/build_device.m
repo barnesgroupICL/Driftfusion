@@ -64,8 +64,8 @@ dev.muh = build_property(par.muh, xmesh, par, 'muh_interface', 0);
 % Surface recombination velocity equivalence schemes
 dev.taun_vsr = build_property(par.taun, xmesh, par, 'taun_vsr', 0);
 dev.taup_vsr = build_property(par.taup, xmesh, par, 'taup_vsr', 0);
-dev.alpha = build_property(par.xx, xmesh, par, 'alpha', 1);
-dev.beta = build_property(par.xx, xmesh, par, 'beta', 1);
+dev.alpha_prime = build_property(par.xx, xmesh, par, 'alpha_prime', 1);
+dev.beta_prime = build_property(par.xx, xmesh, par, 'beta_prime', 1);
 
 % Switches
 dev.int_switch = build_property(par.int_switch, xmesh, par, 'int_switch', 1);

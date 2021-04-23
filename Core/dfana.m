@@ -273,8 +273,8 @@ classdef dfana
             % Bulk SRH
             r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
             % Volumetric surface SRH
-            r.vsr = int_switch.*((n.*p.*Fn.*Fp - dev.ni_vsr.^2)./...
-                ((dev.taun_vsr.*(p.*Fp+dev.pt_vsr)) + (dev.taup_vsr.*(n.*Fn+dev.nt_vsr))));
+            r.vsr = int_switch.*((n.*p.*Fn.*Fp - dev.ni.^2)./...
+                ((dev.taun_vsr.*(p.*Fp+dev.pt)) + (dev.taup_vsr.*(n.*Fn+dev.nt))));
             %.*exp(-dVdx/(kB*T))
             % Total
             r.tot = r.btb + r.srh + r.vsr;
@@ -297,11 +297,11 @@ classdef dfana
             xprime_n = dev.xprime_n;
             xprime_p = dev.xprime_p;
             
-            alpha = dev.alpha;
-            beta = dev.beta;
+            alpha_prime = dev.alpha_prime;
+            beta_prime = dev.beta_prime;
                        
-            Fn = exp(abs(dVdx_ihalf./(par.kB*par.T) + alpha).*xprime_n);
-            Fp = exp(abs(-dVdx_ihalf./(par.kB*par.T) + beta).*xprime_p); 
+            alpha = abs(par.q*dVdx_ihalf./(par.kB*par.T) + alpha_prime);
+            beta = abs(par.q*-dVdx_ihalf./(par.kB*par.T) + beta_prime); 
 
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
@@ -309,8 +309,8 @@ classdef dfana
             r.srh = bulk_switch.*(n_ihalf.*p_ihalf - dev.ni.^2)...
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
             % Volumetric surface SRH
-            r.vsr = int_switch.*(n_ihalf.*p_ihalf.*Fn.*Fp - dev.ni_vsr.^2)...
-                ./(dev.taun_vsr.*(p_ihalf.*Fp + dev.pt_vsr) + dev.taup_vsr.*(n_ihalf.*Fn + dev.nt_vsr));
+            r.vsr = int_switch.*(n_ihalf.*exp(alpha.*xprime_n).*p_ihalf.*exp(beta.*xprime_p) - dev.ni.^2)...
+                ./(dev.taun_vsr.*(p_ihalf.*exp(beta.*xprime_p) + dev.pt) + dev.taup_vsr.*(n_ihalf.*exp(alpha.*xprime_n) + dev.nt));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end

@@ -62,21 +62,13 @@ dev = par.dev;
 
 %% Constants
 kB = par.kB;
-T = par.T;
 q = par.q;
 e = par.e;
 epp0 = par.epp0;
 
-%% Switches and accelerator coefficients
-mobset = par.mobset;        % Electronic carrier transport switch
-mobseti = par.mobseti;      % Ionic carrier transport switch
-K_cation = par.K_cation;    % Cation transport rate multiplier
-K_anion = par.K_anion;      % Anion transport rate multiplier
-radset = par.radset;        % Radiative recombination switch
-SRHset = par.SRHset;        % SRH recombination switch
-
 %% Device parameters
 device = par.dev_ihalf;
+T = par.T;
 mue = device.mue;           % Electron mobility
 muh = device.muh;           % Hole mobility
 Dn = mue*kB*T;              % Electron diffusion coefficient
@@ -105,13 +97,11 @@ NA = device.NA;             % Acceptor doping density
 ND = device.ND;             % Donor doping density
 Ncat = device.Ncat;         % Uniform cation density
 Nani = device.Nani;         % Uniform anion density
-int_switch = device.int_switch;
-bulk_switch = abs(int_switch-1);
-xprime_n = device.xprime_n;
-xprime_p = device.xprime_p;
-alpha = device.alpha;
-beta = device.beta;
-N_ionic_species = par.N_ionic_species;      % Number of ionic species
+xprime_n = device.xprime_n;             % Translated x co-ordinates for interfaces
+xprime_p = device.xprime_p;             % Translated x co-ordinates for interfaces
+alpha_prime = device.alpha_prime;       % alpha prime is alpha - field component
+beta_prime = device.beta_prime;         % beta prime is alpha - field component
+N_ionic_species = par.N_ionic_species;
 nleft = par.nleft;
 nright = par.nright;
 pleft = par.pleft;
@@ -120,9 +110,18 @@ sn_l = par.sn_l;
 sp_l = par.sp_l;
 sn_r = par.sn_r;
 sp_r = par.sp_r;
-maxEg = max(par.Eg);
 Rs = par.Rs;
 Rs_initial = par.Rs_initial;
+
+%% Switches and accelerator coefficients
+mobset = par.mobset;        % Electronic carrier transport switch
+mobseti = par.mobseti;      % Ionic carrier transport switch
+K_cation = par.K_cation;    % Cation transport rate multiplier
+K_anion = par.K_anion;      % Anion transport rate multiplier
+radset = par.radset;        % Radiative recombination switch
+SRHset = par.SRHset;        % SRH recombination switch
+int_switch = device.int_switch;   % 1 for interfacial points, 0 for bulk points
+bulk_switch = device.bulk_switch; % 1 for bulk points, 0 for interfacial points
 
 %% Spatial mesh
 x = xmesh;
@@ -209,11 +208,10 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         dndx = dudx(2);
         dpdx = dudx(3);
         
-        %% Volumetric surface recombination field terms
-%         Fn = exp(sign(alpha(i))*(dVdx.*xprime_n(i)/(par.kB*par.T) + alpha(i))*xprime_n(i));
-%         Fp = exp(sign(beta(i))*(-dVdx.*xprime_p(i)/(par.kB*par.T) + beta(i)).*xprime_p(i)); 
-        Fn = exp(abs(dVdx/(par.kB*par.T) + alpha(i))*xprime_n(i));
-        Fp = exp(abs(-dVdx/(par.kB*par.T) + beta(i)).*xprime_p(i));        
+        %% Volumetric surface recombination alpha and beta including field terms
+        alpha = abs(q*dVdx/(kB*T) + alpha_prime(i));
+        beta = abs(q*-dVdx/(kB*T) + beta_prime(i));        
+        
         %% Equation editor
         % Time-dependence prefactor term
         C_potential = 0;
@@ -231,10 +229,12 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         S_potential = bulk_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
         S_electron = g - radset*B(i)*((n*p)-(ni(i)^2))...       % Radiative recombination
                     - bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))))...    % Bulk SRH
-                    - int_switch(i)*SRHset*(((n*Fn*p*Fp)-ni(i)^2)/(taun_vsr(i)*(p*Fp + pt(i)) + taup_vsr(i)*(n*Fn + nt(i))));   % Volumetric surface SRH
+                    - int_switch(i)*SRHset*(((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i)))-ni(i)^2)...
+                    /(taun_vsr(i)*(p*exp(beta*xprime_p(i)) + pt(i)) + taup_vsr(i)*(n*exp(alpha*xprime_n(i)) + nt(i))));   % Volumetric surface SRH
         S_hole     = g - radset*B(i)*((n*p)-(ni(i)^2))...       % Radiative recombination
                     - bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))))...    % Bulk SRH
-                    - int_switch(i)*SRHset*(((n*Fn*p*Fp)-ni(i)^2)/(taun_vsr(i)*(p*Fp + pt(i)) + taup_vsr(i)*(n*Fn + nt(i))));   % Volumetric surface SRH
+                    - int_switch(i)*SRHset*(((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i)))-ni(i)^2)...
+                    /(taun_vsr(i)*(p*exp(beta*xprime_p(i)) + pt(i)) + taup_vsr(i)*(n*exp(alpha*xprime_n(i)) + nt(i))));   % Volumetric surface SRH
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
