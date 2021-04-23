@@ -90,17 +90,17 @@ for i=1:length(par.dcum)                % i is the layer index
                                 end
                         case 'mue_interface'
                             if alpha_prime < 0
-                                devprop(j) = (par.mue(i-1)+((par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha_prime))))*exp(abs(alpha_prime)*xprime_n));
+                                devprop(j) = (par.mue(i-1)+(par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha_prime))))*exp(abs(alpha_prime)*xprime_n);
                             elseif alpha_prime > 0
-                                devprop(j) = (par.mue(i+1)+((par.Nv(i-1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha_prime))))*exp(abs(alpha_prime)*xprime_n));
+                                devprop(j) = (par.mue(i+1)+(par.Nv(i-1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha_prime))))*exp(abs(alpha_prime)*xprime_n);
                             else
                                 devprop(j) = max([par.mue(i-1),par.mue(i+1)]);
                             end
                         case 'muh_interface'
                             if beta_prime < 0
-                                devprop(j) = (par.muh(i-1)+((par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta_prime))))*exp(abs(beta_prime)*xprime_p));
+                                devprop(j) = (par.muh(i-1)+(par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta_prime))))*exp(abs(beta_prime)*xprime_p);
                             elseif beta_prime > 0
-                                devprop(j) = (par.muh(i+1)+((par.Nc(i-1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta_prime))))*exp(abs(beta_prime)*xprime_p));
+                                devprop(j) = (par.muh(i+1)+(par.Nc(i-1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta_prime))))*exp(abs(beta_prime)*xprime_p);
                             else
                                 devprop(j) = max([par.muh(i-1),par.muh(i+1)]);
                             end
