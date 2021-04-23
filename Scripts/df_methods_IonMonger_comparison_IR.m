@@ -1,7 +1,7 @@
 initialise_df
 
 %% Read in base parameters
-par_df_im = pc('Input_files/IonMonger_default_IR_vary.csv');
+par_df_im = pc('Input_files/IonMonger_default_IR.csv');
 
 %% Get equilibrium solutions
 soleq_df_im = equilibrate(par_df_im);
