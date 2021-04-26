@@ -81,15 +81,15 @@ cap = IS_results.cap';
 dataCap = [frequencies, cap];
 
 % ionic capacitance
-capIonic = IS_results.cap_idrift';
+capIonic = IS_results.cap_ion_disp';
 dataCapIonic = [frequencies, capIonic];
 
 % recombination capacitance
-capRec = IS_results.cap_U';
+capRec = IS_results.cap_r';
 dataCapRec = [frequencies, capRec];
 
 % accumulating current capacitance
-capAcc = IS_results.cap_dQ';
+capAcc = IS_results.cap_np_dt';
 dataCapAcc = [frequencies, capAcc];
 
 % nyquist
@@ -104,23 +104,23 @@ impedance_abs = IS_results.impedance_abs';
 dataZabs = [frequencies, impedance_abs];
 
 % phase
-Zphase = -IS_results.J_phase';
+Zphase = -IS_results.Jtot_phase';
 dataZphase = [frequencies, Zphase];
 
 % ionic phase
-ZphaseIonic = -IS_results.J_i_phase';
+ZphaseIonic = -IS_results.ion_disp_phase';
 dataZphaseIonic = [frequencies, ZphaseIonic];
 
 % absolute ionic current amplitude
-JionicAmpAbs = abs(IS_results.J_i_amp)';
+JionicAmpAbs = abs(IS_results.ion_disp_amp)';
 dataJionicAmpAbs = [frequencies, JionicAmpAbs];
 
 % absolute out of phase current amplitude
-JampOutOfPhaseAbs = abs(IS_results.J_amp.*sin(IS_results.J_phase))';
+JampOutOfPhaseAbs = abs(IS_results.Jtot_amp.*sin(IS_results.Jtot_phase))';
 dataJampOutOfPhaseAbs = [frequencies, JampOutOfPhaseAbs];
 
 % absolute out of phase recombination current amplitude
-JrecAmpOutOfPhaseAbs = abs(IS_results.J_U_amp.*sin(IS_results.J_U_phase))';
+JrecAmpOutOfPhaseAbs = abs(IS_results.r_amp.*sin(IS_results.r_phase))';
 dataJrecAmpOutOfPhaseAbs = [frequencies, JrecAmpOutOfPhaseAbs];
 
 %% join fields
