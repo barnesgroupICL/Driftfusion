@@ -7,7 +7,7 @@ par_df_im_bulk = pc('Input_files/IonMonger_default_bulk.csv');
 soleq_df_im_bulk = equilibrate(par_df_im_bulk);
 
 %% Perform JV scan at 1.2 Vs-1
-%       doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
+% sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
 sol_CV_0p1Vs_im = doCV(soleq_df_im_bulk.ion, 1.0398, 0, -1.3, 0, 0.1, 1, 261);
 sol_CV_1Vs_im = doCV(soleq_df_im_bulk.ion, 1.0398, 0, -1.3, 0, 1, 1, 261);
 sol_CV_10Vs_im = doCV(soleq_df_im_bulk.ion, 1.0398, 0, -1.3, 0, 10, 1, 261);
