@@ -1,5 +1,6 @@
 function compare_rec_flux(sol_df, sol_im)
 % Script to compare the interfacial recombination fluxes from DF and IM
+% Currently only working for ETL-AL-HTL architecture
 par = sol_df.par;
 u = sol_df.u;
 t = sol_df.t;

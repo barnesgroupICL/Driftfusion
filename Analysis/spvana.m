@@ -62,6 +62,7 @@ Viont.dk = Vion.dk(:,end);
 %% Concatenate vectors and write to output structure SPVDAT
 spvdat.t = [t, t+t(end)];
 spvdat.sigmat = [sigmat.ill; sigmat.dk];
+spvdat.sigmat = spvdat.sigmat - spvdat.sigmat(1);
 spvdat.Ft = [Ft.ill; Ft.dk];
 spvdat.Vt = [Vt.ill; Vt.dk];
 spvdat.Fiont = [Fiont.ill; Fiont.dk];
@@ -77,20 +78,20 @@ spvdat.deltaViont = spvdat.Viont - spvdat.Viont(1);
 spvdat.SPV = spvdat.Velt - spvdat.Velt(1);
 
 %% Plot the outputs
-% figure(300)
-% plot(spvdat.t, spvdat.sigmat)
-% xlabel('Time [s]')
-% ylabel('Integrated charge desnity, \sigma [cm-2]')
+figure(300)
+plot(spvdat.t, spvdat.sigmat)
+xlabel('Time [s]')
+ylabel('Integrated charge desnity, \sigma [cm-2]')
 % 
 % figure(301)
 % plot(spvdat.t, spvdat.deltaFt)
 % xlabel('Time [s]')
 % ylabel('\Delta Field at x=d [Vcm-1]')
 
-figure(302)
-plot(spvdat.t, spvdat.deltaVt, spvdat.t, spvdat.deltaViont, spvdat.t, spvdat.SPV)
-xlabel('Time [s]')
-ylabel('\Delta Electric potential at x=d [V]')
-legend('Vtotal', 'Vion', 'Vtotal - Vion')
+% figure(302)
+% plot(spvdat.t, spvdat.deltaVt, spvdat.t, spvdat.deltaViont, spvdat.t, spvdat.SPV)
+% xlabel('Time [s]')
+% ylabel('\Delta Electric potential at x=d [V]')
+% legend('Vtotal', 'Vion', 'Vtotal - Vion')
 
 end
