@@ -30,7 +30,7 @@ par_ideal = refresh_device(par_ideal);
 soleq_ideal = equilibrate(par_ideal);
 
 %sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
-sol_CV_ideal = doCV(soleq_tio2.el, 1, 0, 1, 0, 100e-3, 1, 281);
+sol_CV_ideal = doCV(soleq_ideal.el, 1, 0, 1, 0, 100e-3, 1, 281);
 
 %% Poor transport, no rec
 par_trans = par;
@@ -47,4 +47,4 @@ par_trans = refresh_device(par_trans);
 soleq_trans = equilibrate(par_trans);
 
 %sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
-sol_CV_trans = doCV(soleq_tio2.el, 1, 0, 1, 0, 100e-3, 1, 281);
+sol_CV_trans = doCV(soleq_trans.el, 1, 0, 1, 0, 100e-3, 1, 281);
