@@ -16,8 +16,8 @@ nt1 = par.nt(al-1);
 pt1 = par.pt(al-1);
 nt2 = par.nt(al+1);
 pt2 = par.pt(al+1);
-alpha = par.dev.alpha;
-beta = par.dev.beta;
+alpha_prime = par.dev.alpha_prime;
+beta_prime = par.dev.beta_prime;
 xprime_n = par.dev.xprime_n;
 xprime_p = par.dev.xprime_p;
 mue = par.dev.mue;
@@ -31,17 +31,17 @@ ps1_df = u(:, par.pcum(al-2)+1, 3);
 ns2_df = u(:, par.pcum(al+1)+1, 2);
 ps2_df = u(:, par.pcum(al)+1, 3);
 
-n_ana = ns1_df.*exp(-abs(alpha).*xprime_n);
-jn_ana_drift = mue.*kBT.*abs(alpha).*n_ana;
-jn_ana_diff = -mue.*kBT.*abs(alpha).*n_ana;
+n_ana = ns1_df.*exp(-abs(alpha_prime).*xprime_n);
+jn_ana_drift = mue.*kBT.*abs(alpha_prime).*n_ana;
+jn_ana_diff = -mue.*kBT.*abs(alpha_prime).*n_ana;
 
 for i=1:length(sol_df.t)
     dn_anadx(i,:) = gradient(n_ana(i,:), xprime_n);
-    jn_ana(i,:) = mue.*kBT.*(abs(alpha).*n_ana(i,:) - dn_anadx(i,:));
+    jn_ana(i,:) = mue.*kBT.*(abs(alpha_prime).*n_ana(i,:) - dn_anadx(i,:));
 end
 
-p_ana = ps1_df.*exp(-abs(beta).*xprime_p);
-jp_ana = 2*mue.*kBT.*abs(beta).*p_ana;
+p_ana = ps1_df.*exp(-abs(beta_prime).*xprime_p);
+jp_ana = 2*mue.*kBT.*abs(beta_prime).*p_ana;
 
 % find the time
 p1 = find(sol_df.t <= tpoint);
