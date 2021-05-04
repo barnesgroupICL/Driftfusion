@@ -1,4 +1,4 @@
-% An example script for comparing the current-voltage curves for two different
+    % An example script for comparing the current-voltage curves for two different
 % architects of perovskite solar cell
 %
 %% LICENSE
