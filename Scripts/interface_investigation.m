@@ -21,10 +21,10 @@ par_ideal.sn(2) = 1e-20;
 par_ideal.sp(2) = 1e-20;
 par_ideal.sn(4) = 1e-20;
 par_ideal.sp(4) = 1e-20;
-par_ideal.mue(2) = 1e6;
-par_ideal.muh(2) = 1e6;
-par_ideal.mue(4) = 1e6;
-par_ideal.muh(4) = 1e6;
+par_ideal.mue(2) = 1e3;
+par_ideal.muh(2) = 1e3;
+par_ideal.mue(4) = 1e3;
+par_ideal.muh(4) = 1e3;
 par_ideal = refresh_device(par_ideal);
 
 soleq_ideal = equilibrate(par_ideal);
@@ -38,13 +38,46 @@ par_trans.sn(2) = 1e-20;
 par_trans.sp(2) = 1e-20;
 par_trans.sn(4) = 1e-20;
 par_trans.sp(4) = 1e-20;
-par_trans.mue(2) = 1e6;
-par_trans.muh(2) = 1e6;
-par_trans.mue(4) = 1e6;
-par_trans.muh(4) = 1e6;
+par_trans.mue(2) = 1e-4;
+par_trans.muh(2) = 1e-4;
+par_trans.mue(4) = 1e-4;
+par_trans.muh(4) = 1e-4;
 par_trans = refresh_device(par_trans);
 
 soleq_trans = equilibrate(par_trans);
 
 %sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
 sol_CV_trans = doCV(soleq_trans.el, 1, 0, 1, 0, 100e-3, 1, 281);
+
+%% High rec
+par_rec = par;
+par_rec.sn(2) = 1e6;
+par_rec.sp(2) = 1e8;
+par_rec.sn(4) = 1e8;
+par_rec.sp(4) = 1e6;
+par_rec.mue(2) = 1;
+par_rec.muh(2) = 1;
+par_rec.mue(4) = 1;
+par_rec.muh(4) = 1;
+par_rec = refresh_device(par_rec);
+
+soleq_rec = equilibrate(par_rec);
+
+%sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
+sol_CV_rec = doCV(soleq_rec.el, 1, 0, 1, 0, 100e-3, 1, 281);
+
+%% Plots
+% dfplot.JtotVapp(sol_CV_ideal,0)
+% hold on
+% dfplot.JtotVapp(sol_CV_trans,0)
+% hold on
+% dfplot.JtotVapp(sol_CV_rec,0)
+% hold off
+% ylim([-30e-3,10e-3])
+
+% dfplot.npx(sol_CV_ideal,5)
+% hold on
+% dfplot.npx(sol_CV_trans,5)
+% hold on
+dfplot.npx(sol_CV_rec,5)
+hold off
