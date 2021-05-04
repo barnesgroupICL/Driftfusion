@@ -210,13 +210,23 @@ classdef dfana
 
             int_switch = repmat(dev.int_switch, length(t), 1);
             bulk_switch = abs(int_switch-1);
+            for i=1:length(t)
+                dVdx(i,:) = pdeval(0, x, V(i,:), x);
+            end
+            xprime_n = dev.xprime_n;
+            xprime_p = dev.xprime_p;
+            alpha_prime = dev.alpha_prime;
+            beta_prime = dev.beta_prime;
+            alpha = abs(par.q*dVdx./(par.kB*par.T) + alpha_prime);
+            beta = abs(par.q*-dVdx./(par.kB*par.T) + beta_prime);
+
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
             % Bulk SRH
             r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
             % Volumetric surface SRH
-            r.vsr = int_switch.*((n.*p - dev.ni_vsr.^2)./...
-                ((dev.taun_vsr.*(p+dev.pt_vsr)) + (dev.taup_vsr.*(n+dev.nt_vsr))));
+            r.vsr = int_switch.*((n.*exp(alpha.*xprime_n).*p.*exp(beta.*xprime_p) - dev.ni.^2)./...
+                ((dev.taun_vsr.*(p.*exp(beta.*xprime_p) + dev.pt)) + (dev.taup_vsr.*(n.*exp(alpha.*xprime_n) + dev.nt))));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end
@@ -226,14 +236,23 @@ classdef dfana
             % obtain SOL components for easy referencing
             [u,t,x,par,~,n,p,a,c,V] = dfana.splitsol(sol);
             dev = par.dev_ihalf;
+            x_ihalf = par.x_ihalf;
             n_ihalf = getvarihalf(n);
             p_ihalf = getvarihalf(p);
+            dVdx_ihalf = zeros(length(t), length(x_ihalf));
             for i=1:length(t)
-                dVdx(i,:) = gradient(V(i,:), x);
-                dVdx_ihalf(i,:) = getvarihalf(dVdx(i,:));
+                [~, dVdx_ihalf(i,:)] = pdeval(0, x, V(i,:), x_ihalf);
             end
             int_switch = repmat(dev.int_switch, length(t), 1);
             bulk_switch = abs(int_switch-1);
+            xprime_n = dev.xprime_n;
+            xprime_p = dev.xprime_p;
+
+            alpha_prime = dev.alpha_prime;
+            beta_prime = dev.beta_prime;
+
+            alpha = abs(par.q*dVdx_ihalf./(par.kB*par.T) + alpha_prime);
+            beta = abs(par.q*-dVdx_ihalf./(par.kB*par.T) + beta_prime);
 
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
@@ -241,8 +260,8 @@ classdef dfana
             r.srh = bulk_switch.*(n_ihalf.*p_ihalf - dev.ni.^2)...
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
             % Volumetric surface SRH
-            r.vsr = int_switch.*(n_ihalf.*p_ihalf - dev.ni_vsr.^2)...
-                ./(dev.taun_vsr.*(p_ihalf + dev.pt_vsr) + dev.taup_vsr.*(n_ihalf + dev.nt_vsr));
+            r.vsr = int_switch.*(n_ihalf.*exp(alpha.*xprime_n).*p_ihalf.*exp(beta.*xprime_p) - dev.ni.^2)...
+                ./(dev.taun_vsr.*(p_ihalf.*exp(beta.*xprime_p) + dev.pt) + dev.taup_vsr.*(n_ihalf.*exp(alpha.*xprime_n) + dev.nt));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end
@@ -412,7 +431,7 @@ classdef dfana
             for i=1:length(t)
                 [~, dVdx_ihalf(i,:)] = pdeval(0,x,V(i,:),par.x_ihalf);
             end
-            FV = -dVdx_ihalf;              
+            FV = -dVdx_ihalf;
 
             if nargout > 1
                 rho = dfana.calcrho_ihalf(sol);

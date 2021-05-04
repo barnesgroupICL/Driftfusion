@@ -230,7 +230,22 @@ classdef dfplot
             set(legend,'EdgeColor',[1 1 1]);
         end
 
-
+        function JtotVapp_mirror(sol, xpos)
+            % Obtain point position from x position
+            xmesh = sol.x;
+            ppos = getpointpos(xpos, xmesh);
+            
+            J = dfana.calcJ(sol);
+            Vapp = dfana.calcVapp(sol);
+            
+            figure(91)
+            plot(-Vapp, -J.tot(:, ppos));
+            xlabel('Applied Voltage, Vapp [V]');
+            ylabel('Current Density, J [A cm^{-2}]');
+            set(legend,'FontSize',16);
+            set(legend,'EdgeColor',[1 1 1]);
+        end
+        
         function logJVapp(sol, xpos)
             % plot the log of the mod J
 
@@ -354,11 +369,12 @@ classdef dfplot
             % Recombination rates as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            r = dfana.calcr(sol);
+            x_ihalf = par.x_ihalf;
+            r = dfana.calcr_ihalf(sol);
 
             figure(17)
-            dfplot.x2d(sol, x, {r.btb, r.srh, r.tot},{'rbtb', 'rsrh', 'rtot'},...
-                {'-','-','-'}, 'Recombination rate [cm-3s-1]', tarr, xrange, 0, 0);
+            dfplot.x2d(sol, x_ihalf, {r.btb, r.srh, r.vsr, r.tot},{'rbtb', 'rsrh', 'rvsr', 'rtot'},...
+                {'-','-','-','-'}, 'Recombination rate [cm-3s-1]', tarr, xrange, 0, 0);
         end
 
         function rsrhx(varargin)
@@ -372,14 +388,15 @@ classdef dfplot
                 {'-'}, 'SRH recombination rate [cm-3s-1]', tarr, xrange, 0, 1);
         end
         
-        function rsrx(varargin)
+        function rvsrx(varargin)
             % Recombination rates as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            r = dfana.calcr(sol);
+            x_ihalf = par.x_ihalf;
+            r = dfana.calcr_ihalf(sol);
 
             figure(171)
-            dfplot.x2d(sol, x, {r.sr},{''},...
+            dfplot.x2d(sol, x_ihalf, {r.vsr},{''},...
                 {'-'}, 'Surface recombination rate [cm-3s-1]', tarr, xrange, 0, 1);
         end 
         

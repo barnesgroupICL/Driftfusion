@@ -37,8 +37,8 @@ xlim([-0.2, 1.2])
 legend('100 mVs-1', '200 mVs-1', '400 mVs-1') 
 
 %% plot the energy level diagram and carrier densities for the tio2 device at
-% 1 V (t= 10s) during the illuminated forward scan
-dfplot.ELxnpxacx(sol_CV_100mVs, 10)
+% 1 V (t= 6 s) during the illuminated forward scan
+dfplot.ELxnpxacx(sol_CV_100mVs, 6)
 
 %% Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in

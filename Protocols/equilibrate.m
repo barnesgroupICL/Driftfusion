@@ -151,18 +151,10 @@ if electronic_only == 0
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
     par.K_anion = rat_anion;
     par.K_cation = rat_cation;
-    par.tmax = 100*t_diff;
+    par.tmax = 1e3*t_diff;
     par.t0 = par.tmax/1e3;
       
-    sol = df(sol, par);
-    
-%     % Longer second solution
-%     par.calcJ = 0;
-%     par.tmax = 10*t_diff;
-%     par.t0 = par.tmax/1e3;
-    
-%     sol = df(sol, par);
-    
+    sol = df(sol, par);   
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     
     % loop to check ions have reached stable config- if not accelerate ions by
