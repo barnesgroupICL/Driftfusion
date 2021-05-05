@@ -193,7 +193,8 @@ classdef pc
         sn_r = 1e7;     % electron extraction velocity right boundary
         sp_l = 1e7;     % hole extraction left boundary
         sp_r = 1e7;     % hole surface recombination velocity right boundary
-
+        
+        r_constant = 0;
         %% Series resistance
         Rs = 0;
         Rs_initial = 0;         % Switch to allow linear ramp of Rs on first application
