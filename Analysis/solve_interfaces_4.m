@@ -3,40 +3,23 @@ function solve_interfaces_4
 % Boundary conditions: n(0) = ns, jn(0) = js
 % Assumptions: constant rec rate, r
 
-syms n x ns jn js c1 c2 gam r alph mu mus kB T d p p0 bet 
+syms n xn xp ns ps jns jps c1 c2 gam r alph bet mue muh kB T d p p0 bet dndx ni taun taup nt pt
 
-neq = (n == (c1/alph)*exp(alph*x) - r*x/(alph*mu*kB*T) + c2);
-% mu_expr = mus*exp(-alph*x);
-% neq = subs(neq, mu, mu_expr)
+r_eqn = r == (ns*ps - ni^2)/(taun*(ps +pt) + taup*(ns + nt));
 
-dndx = diff(rhs(neq), x)
+n_eqn = n == ns*exp(alph*xn) + jns/(alph*mue*kB*T)*(1-exp(alph*xn)) - (r/(alph^2 *mue*kB*T))*(1- exp(alph*xn) + alph*xn);
 
-jneq = (jn == mu*kB*T*(alph*rhs(neq) - dndx))
-jn = simplify(rhs(jneq))
-djndx = diff(rhs(jneq))
+n_eqn = subs(n_eqn, r, rhs(r_eqn))
+n_bc = subs(n_eqn, n, ns)
+n_bc = subs(n_bc, xn, 0)
 
-c1_expr = solve(neq, c1)
-c2_expr = solve(jn, c2)
+ps = solve(n_bc, ps)
 
-neq = subs(neq, c1, c1_expr)
-neq = subs(neq, c2, c2_expr)
+p_eqn = p == ps*exp(bet*x) + jps/(bet*muh*kB*T)*(1-exp(bet*x)) - (r/(bet^2 *muh*kB*T))*(1- exp(bet*x) + bet*x);
 
-% c1_express = ns - c2
-% c2_express = (1/(alph*mu*kB*T))*(js - r*(1/alph))
-% c1_express = subs(c1_express, c2, c2_express)
-% 
-% n = subs(n, c1, c1_express);
-% n = subs(n, c2, c2_express)
-% 
-% 
-% %% Fluxes
-% dndx = diff(n)
-% 
-% jn = mu*kB*T*(alph*n - dndx);
-% jn = simplify(jn)
-%n = subs(n, nr, gam*nl)
-%n = exp(-alph*x)*(nl + (nr - gam*nl + (d*r)/(T*alph*kB*mu))/(gam - 1)) - (nr - gam*nl + (d*r)/(T*alph*kB*mu))/(gam - 1) - (r*x)/(T*alph*kB*mu)
-
+p_eqn = subs(p_eqn, r, r_exp)
+p_bc = subs(p_eqn, p, ps)
+p_bc = subs(p_bc, x, 0)
 
 end
 
