@@ -112,6 +112,7 @@ sn_r = par.sn_r;
 sp_r = par.sp_r;
 Rs = par.Rs;
 Rs_initial = par.Rs_initial;
+r_constant = par.r_constant;
 
 %% Switches and accelerator coefficients
 mobset = par.mobset;        % Electronic carrier transport switch
@@ -231,13 +232,16 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         % Bulk SRH
         r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i))+taup(i)*(n+nt(i))));
         % Volumetric surface recombination
-        r_vsr = int_switch(i)*SRHset*((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i))-ni(i)^2)/...
-        (taun_vsr(i)*(p*exp(beta*xprime_p(i))+pt(i))+taup_vsr(i)*(n*exp(alpha*xprime_n(i))+nt(i))));
+        r_vsr =0;
+%         r_vsr = int_switch(i)*SRHset*((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i))-ni(i)^2)/...
+%         (taun_vsr(i)*(p*exp(beta*xprime_p(i))+pt(i))+taup_vsr(i)*(n*exp(alpha*xprime_n(i))+nt(i))));
+        % Constant rec rate in interfaces for testing
+        r_con = int_switch(i)*SRHset*r_constant;
         
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - r_rad - r_srh - r_vsr;
-        S_hole     = g - r_rad - r_srh - r_vsr;
+        S_electron = g - r_rad - r_srh - r_vsr - r_con;
+        S_hole     = g - r_rad - r_srh - r_vsr - r_con;
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
