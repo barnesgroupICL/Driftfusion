@@ -275,8 +275,10 @@ classdef dfana
             % Volumetric surface SRH
             r.vsr = int_switch.*((n.*exp(alpha.*xprime_n).*p.*exp(beta.*xprime_p) - dev.ni.^2)./...
                 ((dev.taun_vsr.*(p.*exp(beta.*xprime_p) + dev.pt)) + (dev.taup_vsr.*(n.*exp(alpha.*xprime_n) + dev.nt))));
+            
+            r.constant = int_switch.*par.r_constant;
             % Total
-            r.tot = r.btb + r.srh + r.vsr;
+            r.tot = r.btb + r.srh + r.vsr +r.constant;
         end
 
         function r = calcr_ihalf(sol)
@@ -310,8 +312,10 @@ classdef dfana
             % Volumetric surface SRH
             r.vsr = int_switch.*(n_ihalf.*exp(alpha.*xprime_n).*p_ihalf.*exp(beta.*xprime_p) - dev.ni.^2)...
                 ./(dev.taun_vsr.*(p_ihalf.*exp(beta.*xprime_p) + dev.pt) + dev.taup_vsr.*(n_ihalf.*exp(alpha.*xprime_n) + dev.nt));
+            
+            r.constant = int_switch.*par.r_constant;
             % Total
-            r.tot = r.btb + r.srh + r.vsr;
+            r.tot = r.btb + r.srh + r.vsr + r.constant;
         end
 
         function [jdd, Jdd, xout] = Jddxt(sol)
