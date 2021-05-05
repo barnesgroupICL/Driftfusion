@@ -51,14 +51,15 @@ sol_CV_trans = doCV(soleq_trans.el, 1, 0, 1, 0, 100e-3, 1, 281);
 
 %% High rec
 par_rec = par;
-par_rec.sn(2) = 1e6;
-par_rec.sp(2) = 1e8;
-par_rec.sn(4) = 1e8;
-par_rec.sp(4) = 1e6;
-par_rec.mue(2) = 1;
-par_rec.muh(2) = 1;
-par_rec.mue(4) = 1;
-par_rec.muh(4) = 1;
+par_rec.r_constant = 1e23;  % Uniform rec rate within interfacial regions
+par_rec.sn(2) = 1e-20;      
+par_rec.sp(2) = 1e-20;
+par_rec.sn(4) = 1e-20;
+par_rec.sp(4) = 1e-20;
+par_rec.mue(2) = 1e-4;
+par_rec.muh(2) = 1e-4;
+par_rec.mue(4) = 1e-4;
+par_rec.muh(4) = 1e-4;
 par_rec = refresh_device(par_rec);
 
 soleq_rec = equilibrate(par_rec);
@@ -66,7 +67,12 @@ soleq_rec = equilibrate(par_rec);
 %sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
 sol_CV_rec = doCV(soleq_rec.el, 1, 0, 1, 0, 100e-3, 1, 281);
 
-%% Plots
+%% Comparison with analytical solutions
+compare_carrier_interfaces_2(sol_CV_ideal, 5);
+%%
+compare_carrier_interfaces_2(sol_CV_trans, 5);
+%%
+compare_carrier_interfaces_2(sol_CV_rec, 5);
 % dfplot.JtotVapp(sol_CV_ideal,0)
 % hold on
 % dfplot.JtotVapp(sol_CV_trans,0)
@@ -79,5 +85,6 @@ sol_CV_rec = doCV(soleq_rec.el, 1, 0, 1, 0, 100e-3, 1, 281);
 % hold on
 % dfplot.npx(sol_CV_trans,5)
 % hold on
-dfplot.npx(sol_CV_rec,5)
-hold off
+% dfplot.npx(sol_CV_rec,5)
+% hold off
+
