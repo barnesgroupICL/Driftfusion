@@ -3,23 +3,35 @@ function solve_interfaces_4
 % Boundary conditions: n(0) = ns, jn(0) = js
 % Assumptions: constant rec rate, r
 
-syms n xn xp ns ps jns jps c1 c2 gam r alph bet mue muh kB T d p p0 bet dndx ni taun taup nt pt
+syms q kso n x ns ps jns jps c1 c2 gam r alph bet mue muh kB T d p p0 bet dndx ni taun taup nt pt
 
+%% SRH
 r_eqn = r == (ns*ps - ni^2)/(taun*(ps +pt) + taup*(ns + nt));
 
-n_eqn = n == ns*exp(alph*xn) + jns/(alph*mue*kB*T)*(1-exp(alph*xn)) - (r/(alph^2 *mue*kB*T))*(1- exp(alph*xn) + alph*xn);
+%% Second order
+%r_eqn = r == kso*ns*ps;
+
+%% Constant mobility
+n_eqn = n == ns*exp(alph*x) + q*jns/(alph*mue*kB*T)*(1-exp(alph*x)) - (r/(alph^2 *mue*kB*T))*(1- exp(alph*x) + alph*x);
+
+%% exponential mobility
+%n_eqn = n == (ns - q*jns*x/(mue*kB*T) + (r*x^2)/(2*kB*T))*exp(alph*x)
 
 n_eqn = subs(n_eqn, r, rhs(r_eqn))
-n_bc = subs(n_eqn, n, ns)
-n_bc = subs(n_bc, xn, 0)
+ns_expr = solve(n_eqn, ns)
+ns_expr = simplify(ns_expr)
 
-ps = solve(n_bc, ps)
+%% Constant mobility
+p_eqn = p == ps*exp(alph*x) + q*jps/(alph*mue*kB*T)*(1-exp(alph*x)) - (r/(alph^2 *mue*kB*T))*(1- exp(alph*x) + alph*x);
 
-p_eqn = p == ps*exp(bet*x) + jps/(bet*muh*kB*T)*(1-exp(bet*x)) - (r/(bet^2 *muh*kB*T))*(1- exp(bet*x) + bet*x);
+%% exponential mobility
+%p_eqn = p == (ps - q*jps*x/(muh*kB*T) + (r*x^2)/(2*kB*T))*exp(bet*x)
 
-p_eqn = subs(p_eqn, r, r_exp)
-p_bc = subs(p_eqn, p, ps)
-p_bc = subs(p_bc, x, 0)
+p_eqn = subs(p_eqn, r, rhs(r_eqn))
+ps_expr = solve(p_eqn, ps)
+ps_expr = simplify(ps_expr)
 
+ps_expr = subs(ps_expr, ns, ns_expr);
+ps_expr = simplify(ps_expr)
 end
 
