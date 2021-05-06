@@ -91,6 +91,8 @@ taun = device.taun;         % Electron SRH time constant
 taup = device.taup;         % Electron SRH time constant
 taun_vsr = device.taun_vsr; % Electron SRH time constant- volumetric interfacial surface recombination scheme
 taup_vsr = device.taup_vsr; % Electron SRH time constant- volumetric interfacial surface recombination scheme
+sn = device.sn;
+sp = device.sp;
 nt = device.nt;             % SRH electron trap constant
 pt = device.pt;             % SRH hole trap constant
 NA = device.NA;             % Acceptor doping density
@@ -123,6 +125,11 @@ radset = par.radset;        % Radiative recombination switch
 SRHset = par.SRHset;        % SRH recombination switch
 int_switch = device.int_switch;   % 1 for interfacial points, 0 for bulk points
 bulk_switch = device.bulk_switch; % 1 for bulk points, 0 for interfacial points
+ns_switch = device.ns_switch;
+ps_switch = device.ps_switch;
+
+r_sr_ps_store = 0;
+r_sr_ns_store = 0;
 
 %% Spatial mesh
 x = xmesh;
@@ -210,8 +217,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         dpdx = dudx(3);
         
         %% Volumetric surface recombination alpha and beta including field terms
-        alpha = abs(q*dVdx/(kB*T) + alpha_prime(i));
-        beta = abs(q*-dVdx/(kB*T) + beta_prime(i));        
+%         alpha = abs(q*dVdx/(kB*T) + alpha_prime(i));
+%         beta = abs(q*-dVdx/(kB*T) + beta_prime(i));        
         
         %% Equation editor
         % Time-dependence prefactor term
@@ -232,16 +239,36 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         % Bulk SRH
         r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i))+taup(i)*(n+nt(i))));
         % Volumetric surface recombination
-        r_vsr =0;
-        r_vsr = int_switch(i)*SRHset*((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i))-ni(i)^2)/...
-         (taun_vsr(i)*(p*exp(beta*xprime_p(i))+pt(i))+taup_vsr(i)*(n*exp(alpha*xprime_n(i))+nt(i))));
+        r_vsr = 0;
+%         r_vsr = int_switch(i)*SRHset*((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i))-ni(i)^2)/...
+%          (taun_vsr(i)*(p*exp(beta*xprime_p(i))+pt(i))+taup_vsr(i)*(n*exp(alpha*xprime_n(i))+nt(i))));
         % Constant rec rate in interfaces for testing
         r_con = 0;%int_switch(i)*SRHset*r_constant;
+        r_fo_ps = 0;%SRHset*ps_switch(i)*r_constant*(p-ni(i));
+        r_fo_ns = 0;%SRHset*ns_switch(i)*r_fo_ps;
+        
+        if ps_switch(i) == 1
+            alpha = abs(q*dVdx/(kB*T) + alpha_prime(i+1));
+            beta = abs(q*-dVdx/(kB*T) + beta_prime(i+1));      
+            d = xmesh(i+1)-xmesh(i);
+            ns = SRHset*n.*exp(alpha*2e-7) + (F_electron./(alpha.*mue(i+1).*kB*T)).*(1-exp(alpha*2e-7));
+            ps = p;
+            r_sr_ps = SRHset*(ns*ps-ni(i+1)^2)/((1/sn(i+1))*(ps+pt(i+1))+(1/sp(i+1))*(ns+ nt(i+1)));
+            r_sr_ps_store = r_sr_ps;
+        else
+            r_sr_ps = 0;
+        end
+        
+        if ns_switch(i) == 1
+            r_sr_ns = r_sr_ps_store;
+        else
+            r_sr_ns = 0;
+        end
         
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - r_rad - r_srh - r_vsr - r_con;
-        S_hole     = g - r_rad - r_srh - r_vsr - r_con;
+        S_electron = g - r_rad - r_srh - r_vsr - r_con - r_fo_ns - r_sr_ns;
+        S_hole     = g - r_rad - r_srh - r_vsr - r_con - r_fo_ps - r_sr_ps;
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms

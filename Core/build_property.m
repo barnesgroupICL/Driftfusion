@@ -22,6 +22,7 @@ function devprop = build_property(property, xmesh, par, interface_switch, gradie
 devprop = zeros(1, length(xmesh));
 
 for i=1:length(par.dcum)                % i is the layer index
+    k = 0;
     for j = 1:length(xmesh)             % j is the spatial mesh point index
         if any(strcmp(par.layer_type{1,i}, {'layer', 'active'})) == 1
             if i == 1
@@ -33,13 +34,15 @@ for i=1:length(par.dcum)                % i is the layer index
             if condition
                 if gradient_property == 1
                     devprop(j) = 0;
+                elseif gradient_property == 2
+                    % do nothing
                 else
                     devprop(j) = property(i);
                 end
             end
-        elseif any(strcmp(par.layer_type{1,i}, {'junction', 'interface'})) == 1
-
+        elseif any(strcmp(par.layer_type{1,i}, {'junction', 'interface'})) == 1                       
             if xmesh(j) >= par.dcum0(i)
+                k = k+1;
                 xprime = xmesh(j)-par.dcum0(i);
                     deff = par.d(i);
                     % Gradient coefficients for surface recombination equivalence
@@ -109,22 +112,22 @@ for i=1:length(par.dcum)                % i is the layer index
                             devprop(j) = 1;
                         case 'ns_switch'
                             if alpha_prime < 0
-                                if xprime == 0;
-                                    devprop(j) = 1;
+                                if k == 1
+                                    devprop(j-1) = 1;
                                 end
-                            else alpha_prime > 0
-                                if xprime == deff;
-                                    devprop(j) = 1;
+                            elseif alpha_prime >= 0
+                                if k == par.layer_points(i)-1
+                                    devprop(j+2) = 1;
                                 end
                             end
                         case 'ps_switch'
                             if beta_prime < 0
-                                if xprime == 0;
-                                    devprop(j) = 1;
+                                if k == 1
+                                    devprop(j-1) = 1;
                                 end
-                            else beta_prime > 0
-                                if xprime == deff;
-                                    devprop(j) = 1;
+                            elseif beta_prime >= 0
+                                if k == par.layer_points(i)-1
+                                    devprop(j+2) = 1;
                                 end
                             end
                         case 'xprime_n'
@@ -139,6 +142,7 @@ for i=1:length(par.dcum)                % i is the layer index
                             devprop(j) = beta_prime;
                     end
             end
+            
         end
     end
 end

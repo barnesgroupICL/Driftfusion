@@ -77,6 +77,6 @@ dev.xprime = build_property(par.xx, xmesh, par, 'xprime', 1);
 dev.xprime_n = build_property(par.xx, xmesh, par, 'xprime_n', 1);
 dev.xprime_p = build_property(par.xx, xmesh, par, 'xprime_p', 1);
 
-dev.ns_switch = build_property(par.xx, xmesh, par, 'ns_switch', 1);
-dev.ps_switch = build_property(par.xx, xmesh, par, 'ps_switch', 1);
+dev.ns_switch = build_property(par.xx, xmesh, par, 'ns_switch', 2);
+dev.ps_switch = build_property(par.xx, xmesh, par, 'ps_switch', 2);
 end
