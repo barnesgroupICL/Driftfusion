@@ -1,8 +1,9 @@
 function compare_carrier_interfaces_3(sol, tarr)
 % Function to compare the interfacial carrier densities between simulation
 % and analytical solution
-% TARR = array of time points
 % v3 calculates on the half mesh
+% TARR = array of time points
+
 
 par = sol.par;
 dev = par.dev_ihalf;
@@ -31,7 +32,7 @@ Vt = par.kB*par.T;
 for i=1:length(t)
     [n(i,:), ~] = pdeval(0, x, u(i,:,2), x_ihalf);
     [p(i,:), ~] = pdeval(0, x, u(i,:,3), x_ihalf);
-    [~, dVdx(i,:)] = pdeval(0, x, sol.u(i,:,1), x);
+    [~, dVdx(i,:)] = pdeval(0, x, sol.u(i,:,1), x_ihalf);
 end
 
 alpha = par.q*dVdx./(par.kB*par.T) + alpha_prime;
@@ -86,8 +87,8 @@ ns2_ana(par.pcum0(1):par.pcum0(al)+1) = 0;
 dfplot.npx(sol, tarr)
 hold on
 for i = 1:length(tarr)
-    plot(x*1e7, ps1_ana, 'k--', x*1e7, ps2_ana, 'k--',...
-        x*1e7, ns1_ana, 'k-.', x*1e7, ns2_ana, 'k-.')
+    plot(x_ihalf*1e7, ps1_ana, 'k--', x_ihalf*1e7, ps2_ana, 'k--',...
+        x_ihalf*1e7, ns1_ana, 'k-.', x_ihalf*1e7, ns2_ana, 'k-.')
 end
 hold off
     

@@ -1,6 +1,7 @@
 function compare_carrier_interfaces_2(sol, tarr)
 % Function to compare the interfacial carrier densities between simulation
 % and analytical solution
+% v2 Calculated on the whole mesh
 % TARR = array of time points
 
 par = sol.par;
@@ -44,6 +45,11 @@ for i = 1:length(tarr)
 
     alpha = alpha(p1,:);
     beta = beta(p1,:);
+    % Fix missing points
+%     alpha(par.pcum0(al-1)+1) = alpha(par.pcum0(al-1));
+%     beta(par.pcum0(al-1)+1) = beta(par.pcum0(al-1));
+%     alpha(par.pcum0(al+2)+1) = alpha(par.pcum0(al+2));
+%     beta(par.pcum0(al+2)+1) = beta(par.pcum0(al+2));
     
     %% Carrier densities
     ns1 = u(p1, par.pcum0(al-1)+1, 2);
@@ -74,10 +80,10 @@ for i = 1:length(tarr)
 end
 
 %clean up for plotting
-ps1_ana(par.pcum0(al)+1:end) = 0;
-ns1_ana(par.pcum0(al)+1:end) = 0;
-ps2_ana(par.pcum0(1):par.pcum0(al)+1) = 0;
-ns2_ana(par.pcum0(1):par.pcum0(al)+1) = 0;
+% ps1_ana(par.pcum0(al)+1:end) = 0;
+% ns1_ana(par.pcum0(al)+1:end) = 0;
+% ps2_ana(par.pcum0(1):par.pcum0(al)+1) = 0;
+% ns2_ana(par.pcum0(1):par.pcum0(al)+1) = 0;
 % plot carrier densities
 dfplot.npx(sol, tarr)
 hold on

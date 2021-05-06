@@ -233,10 +233,10 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i))+taup(i)*(n+nt(i))));
         % Volumetric surface recombination
         r_vsr =0;
-%         r_vsr = int_switch(i)*SRHset*((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i))-ni(i)^2)/...
-%         (taun_vsr(i)*(p*exp(beta*xprime_p(i))+pt(i))+taup_vsr(i)*(n*exp(alpha*xprime_n(i))+nt(i))));
+        r_vsr = int_switch(i)*SRHset*((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i))-ni(i)^2)/...
+         (taun_vsr(i)*(p*exp(beta*xprime_p(i))+pt(i))+taup_vsr(i)*(n*exp(alpha*xprime_n(i))+nt(i))));
         % Constant rec rate in interfaces for testing
-        r_con = int_switch(i)*SRHset*r_constant;
+        r_con = 0;%int_switch(i)*SRHset*r_constant;
         
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));

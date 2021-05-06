@@ -107,6 +107,26 @@ for i=1:length(par.dcum)                % i is the layer index
                             end
                         case 'int_switch'
                             devprop(j) = 1;
+                        case 'ns_switch'
+                            if alpha_prime < 0
+                                if xprime == 0;
+                                    devprop(j) = 1;
+                                end
+                            else alpha_prime > 0
+                                if xprime == deff;
+                                    devprop(j) = 1;
+                                end
+                            end
+                        case 'ps_switch'
+                            if beta_prime < 0
+                                if xprime == 0;
+                                    devprop(j) = 1;
+                                end
+                            else beta_prime > 0
+                                if xprime == deff;
+                                    devprop(j) = 1;
+                                end
+                            end
                         case 'xprime_n'
                             devprop(j) = xprime_n;
                         case 'xprime_p'
