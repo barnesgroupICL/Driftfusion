@@ -55,17 +55,17 @@ sol_CV_trans = doCV(soleq_trans.el, 1, 0, 1, 0, 100e-3, 1, 281);
 %% With ions
 sol_CV_trans_ion = doCV(soleq_trans.ion, 1, 0, 1, 0, 100e-3, 1, 281);
 
-%% High rec
+%% High mob, High rec
 par_rec = par;
 par_rec.r_constant = 0;  % Uniform rec rate within interfacial regions
 par_rec.sn(2) = 1e7;      
 par_rec.sp(2) = 1e3;
 par_rec.sn(4) = 1e3;
 par_rec.sp(4) = 1e7;
-par_rec.mue(2) = 1e-4;
-par_rec.muh(2) = 1e-4;
-par_rec.mue(4) = 1e-4;
-par_rec.muh(4) = 1e-4;
+par_rec.mue(2) = 1e3;
+par_rec.muh(2) = 1e3;
+par_rec.mue(4) = 1e3;
+par_rec.muh(4) = 1e3; 
 par_rec = refresh_device(par_rec);
 
 soleq_rec = equilibrate(par_rec);

@@ -101,6 +101,7 @@ Ncat = device.Ncat;         % Uniform cation density
 Nani = device.Nani;         % Uniform anion density
 xprime_n = device.xprime_n;             % Translated x co-ordinates for interfaces
 xprime_p = device.xprime_p;             % Translated x co-ordinates for interfaces
+xprime = device.xprime;
 alpha_prime = device.alpha_prime;       % alpha prime is alpha - field component
 beta_prime = device.beta_prime;         % beta prime is alpha - field component
 N_ionic_species = par.N_ionic_species;
@@ -152,6 +153,10 @@ g1_fun_type = par.g1_fun_type;
 g2_fun_type = par.g2_fun_type;
 g1_fun_arg = par.g1_fun_arg;
 g2_fun_arg = par.g2_fun_arg;
+
+%% Volumetric surface recombination
+jns = 0;    
+jps = 0;
 
 %% Voltage function
 Vapp_fun = fun_gen(par.V_fun_type);
@@ -217,8 +222,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         dpdx = dudx(3);
         
         %% Volumetric surface recombination alpha and beta including field terms
-%         alpha = abs(q*dVdx/(kB*T) + alpha_prime(i));
-%         beta = abs(q*-dVdx/(kB*T) + beta_prime(i));        
+        alpha = -abs(q*dVdx/(kB*T) + alpha_prime(i));
+        beta = -abs(q*-dVdx/(kB*T) + beta_prime(i));        
         
         %% Equation editor
         % Time-dependence prefactor term
@@ -240,17 +245,40 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i))+taup(i)*(n+nt(i))));
         % Volumetric surface recombination
         r_vsr = 0;
-%         r_vsr = int_switch(i)*SRHset*((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i))-ni(i)^2)/...
-%          (taun_vsr(i)*(p*exp(beta*xprime_p(i))+pt(i))+taup_vsr(i)*(n*exp(alpha*xprime_n(i))+nt(i))));
+        
+%         if ps_switch(i) == 1
+%             jps = F_hole;
+%             jns = F_electron;
+%         end
+%         
+%         if ns_switch(i) == 1
+%             jps = F_hole;
+%             jns = F_electron;
+%         end
+        
+        %if int_switch(i) == 1
+            %xmesh(i)
+            %jps;
+            %jns;
+            %ns = (n- (jns/(alpha*mue(i)*kB*T))*(1-exp(alpha*xprime(i))))*exp(-alpha*xprime(i));
+            %ps = (p- (jps/(beta*muh(i)*kB*T))*(1-exp(beta*xprime(i))))*exp(-beta*xprime(i));
+            ns = n*exp(-alpha*xprime_n(i));
+            ps = p*exp(-beta*xprime_p(i));
+            r_vsr = int_switch(i)*SRHset*(((ns*ps)-(ni(i)^2))/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
+            %r_vsr;
+        %else
+            % r_vsr = 0;
+        %end            
+
         % Constant rec rate in interfaces for testing
-        r_con = int_switch(i)*SRHset*r_constant;
+        r_con = 0;%int_switch(i)*SRHset*r_constant;
         r_fo_ps = 0;%SRHset*ps_switch(i)*r_constant*(p-ni(i));
         r_fo_ns = 0;%SRHset*ns_switch(i)*r_fo_ps;
         
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - r_rad - r_srh - r_vsr - r_con - r_fo_ns;
-        S_hole     = g - r_rad - r_srh - r_vsr - r_con - r_fo_ps;
+        S_electron = g - r_rad - r_srh - r_vsr;
+        S_hole     = g - r_rad - r_srh - r_vsr;
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
