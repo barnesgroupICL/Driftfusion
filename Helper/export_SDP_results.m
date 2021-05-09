@@ -19,13 +19,15 @@ function export_SDP_results(prefix, varargin)
 % MAT-files required: none
 %
 % See also doSDP_alt.
-
-% Author: Dr. Ilario Gelmetti
-% Institute of Chemical Research of Catalonia (ICIQ)
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
-% Imperial College London
 % April 2021
+
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 
@@ -43,23 +45,23 @@ for i = 1:length(varargin)
 end
 
 % round to two significant digits
-legendSDP = string(round(bias_ints, 2, 'significant'));
+legend = string(round(bias_ints, 2, 'significant'));
 % add sun to numbers in legend
-legendSDP = strcat(legendSDP, ' sun');
+legend = strcat(legend, ' sun');
 % replace zero in legend with dark
-legendSDP(legendSDP=="0 sun") = "dark";
+legend(legend=="0 sun") = "dark";
 
 %% get header
 
-header = strings([1,2*length(legendSDP)]);
-for i = 1:length(legendSDP)
+header = strings([1,2*length(legend)]);
+for i = 1:length(legend)
     header(i*2-1) = "Dwell time";
-    header(i*2) = legendSDP(i);
+    header(i*2) = legend(i);
 end
 
 %% get measure units
 
-units = repmat(["s", "mA/cm\+(2)"], 1,length(legendSDP));
+units = repmat(["s", "mA/cm\+(2)"], 1,length(legend));
 
 %% join fields
 
