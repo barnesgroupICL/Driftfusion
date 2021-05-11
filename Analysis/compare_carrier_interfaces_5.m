@@ -1,7 +1,8 @@
-function compare_carrier_interfaces_2(sol, tarr)
+function compare_carrier_interfaces_5(sol, tarr)
 % Function to compare the interfacial carrier densities between simulation
 % and analytical solution
-% v2 Calculated on the whole mesh
+% v5 Calculated on the whole mesh, uses jn instead of js
+% substitutes r for r=(jsp-jn)/x
 % TARR = array of time points
 
 par = sol.par;
@@ -58,7 +59,7 @@ for i = 1:length(tarr)
     ps2 = u(p1, par.pcum0(al+1)+1, 3);
 
     % Fluxes - approximate as calculated on half mesh
-    jns1 = jn(p1, par.pcum0(al-1)+2);   % Not sure why this needs to be +2- does not give correct solution otherwise
+    jns1 = jn(p1, par.pcum0(al-1)+2);
     jps1 = jp(p1, par.pcum0(al-1)+2);
     jns2 = jn(p1, par.pcum0(al+1)+2);
     jps2 = jp(p1, par.pcum0(al+1)+2);  
@@ -67,31 +68,27 @@ for i = 1:length(tarr)
     r = r_struct.tot(p1, :);
     %r = 0;
     
-    ps1_ana(i,:) = ps1.*exp(beta.*xprime_p) + jps1./(beta.*muh.*Vt).*(1-exp(beta.*xprime_p))...
-        - (r./(beta.^2.*muh.*Vt)).*(1-exp(beta.*xprime_p)+ beta.*xprime_p);
+    ps1_ana(i,:) = ps1.*exp(beta.*xprime_p) + jp(p1,:)./(beta.*muh.*Vt).*(1-exp(beta.*xprime_p))...
+        - ((jps1-jp(p1,:))./(beta.^2.*muh.*Vt.*xprime_p)).*(1-exp(beta.*xprime_p)+ beta.*xprime_p.*exp(beta.*xprime_p));
     
-    ps2_ana(i,:) = ps2.*exp(beta.*xprime_p) + jps2./(beta.*muh.*Vt).*(1-exp(beta.*xprime_p))...
-        - (r./(beta.^2.*muh.*Vt)).*(1-exp(beta.*xprime_p)+ beta.*xprime_p);
+    ps2_ana(i,:) = ps2.*exp(beta.*xprime_p) + jp(p1,:)./(beta.*muh.*Vt).*(1-exp(beta.*xprime_p))...
+        - ((jps2-jp(p1,:))./(beta.^2.*muh.*Vt.*xprime_p)).*(1-exp(beta.*xprime_p)+ beta.*xprime_p.*exp(beta.*xprime_p));
     
-    ns1_ana(i,:) = ns1.*exp(alpha.*xprime_n) + jns1./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n))...
-        - (r./(alpha.^2.*mue.*Vt)).*(1-exp(alpha.*xprime_n)+ alpha.*xprime_n);
+    ns1_ana(i,:) = ns1.*exp(alpha.*xprime_n) + jn(p1,:)./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n))...
+        - ((jns1-jn(p1,:))./(alpha.^2.*mue.*Vt.*xprime_n)).*(1-exp(alpha.*xprime_n)+ alpha.*xprime_n.*exp(alpha.*xprime_n));
+   
     
-%     n_comp = ns2.*exp(alpha.*xprime_n);
-%     j_comp = jns2./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n));
-%     r_comp = (r./(alpha.^2.*mue.*Vt)).*(1-exp(alpha.*xprime_n)+ alpha.*xprime_n);
-%     figure;plot(x, n_comp, x, j_comp, x, r_comp)
-    
-    ns2_ana(i,:) = ns2.*exp(alpha.*xprime_n) + jns2./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n))...
-        - (r./(alpha.^2.*mue.*Vt)).*(1-exp(alpha.*xprime_n)+ alpha.*xprime_n);
+    ns2_ana(i,:) = ns2.*exp(alpha.*xprime_n) + jn(p1,:)./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n))...
+        - ((jns2-jn(p1,:))./(alpha.^2.*mue.*Vt.*xprime_n)).*(1-exp(alpha.*xprime_n)+ alpha.*xprime_n.*exp(alpha.*xprime_n));
 end
 
 %clean up for plotting
-ps1_ana(:, pcum0(1):pcum0(2)) = NaN;
-ns1_ana(:, pcum0(1):pcum0(2)) = NaN;
+ps1_ana(:, pcum0(1):pcum0(2)-1) = NaN;
+ns1_ana(:, pcum0(1):pcum0(2)-1) = NaN;
 ps1_ana(:, pcum0(3)+1:end) = NaN;
 ns1_ana(:, pcum0(3)+1:end) = NaN;
-ps2_ana(:, pcum0(1):pcum0(4)) = NaN;
-ns2_ana(:, pcum0(1):pcum0(4)) = NaN;
+ps2_ana(:, pcum0(1):pcum0(4)-1) = NaN;
+ns2_ana(:, pcum0(1):pcum0(4)-1) = NaN;
 ps2_ana(:, pcum0(5)+1:end) = NaN;
 ns2_ana(:, pcum0(5)+1:end) = NaN;
 
