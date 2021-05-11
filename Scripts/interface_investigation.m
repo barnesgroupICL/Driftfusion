@@ -57,15 +57,15 @@ sol_CV_trans_ion = doCV(soleq_trans.ion, 1, 0, 1, 0, 100e-3, 1, 281);
 
 %% High mob, High rec
 par_rec = par;
-par_rec.r_constant = 0;  % Uniform rec rate within interfacial regions
-par_rec.sn(2) = 1e7;      
-par_rec.sp(2) = 1e3;
-par_rec.sn(4) = 1e3;
-par_rec.sp(4) = 1e7;
-par_rec.mue(2) = 1e3;
-par_rec.muh(2) = 1e3;
-par_rec.mue(4) = 1e3;
-par_rec.muh(4) = 1e3; 
+par_rec.r_constant = 1e22;  % Uniform rec rate within interfacial regions
+par_rec.sn(2) = 1e-20;      
+par_rec.sp(2) = 1e-20;
+par_rec.sn(4) = 1e-20;
+par_rec.sp(4) = 1e-20;
+par_rec.mue(2) = 1;
+par_rec.muh(2) = 1;
+par_rec.mue(4) = 1;
+par_rec.muh(4) = 1; 
 par_rec = refresh_device(par_rec);
 
 soleq_rec = equilibrate(par_rec);
@@ -80,18 +80,18 @@ ylim([-30e-3,10e-3])
 sol_CV_rec_ion = doCV(soleq_rec.ion, 1, 0, 1, 0, 100e-3, 1, 281);
 
 %% Comparison with analytical solutions
-compare_carrier_interfaces_2(sol_CV_ideal, [0, 4, 8, 12]);
+compare_carrier_interfaces_5(sol_CV_ideal, [0, 4, 8, 12]);
 %%
-compare_carrier_interfaces_2(sol_CV_trans, [0, 4, 8, 12]);
+compare_carrier_interfaces_5(sol_CV_trans, [0, 4, 8, 12]);
 %%
-compare_carrier_interfaces_2(sol_CV_rec, [0, 4, 8, 12]);
+compare_carrier_interfaces_5(sol_CV_rec, [0, 4, 8, 12]);
 
 %% Comparison with analytical solutions
-compare_carrier_interfaces_2(sol_CV_ideal_ion, [0, 4, 8, 12]);
+compare_carrier_interfaces_5(sol_CV_ideal_ion, [0, 4, 8, 12]);
 %%
-compare_carrier_interfaces_2(sol_CV_trans_ion, [0, 4, 8, 12]);
+compare_carrier_interfaces_5(sol_CV_trans_ion, [0, 4, 8, 12]);
 %%
-compare_carrier_interfaces_2(sol_CV_rec_ion, [0, 4, 8, 12]);
+compare_carrier_interfaces_5(sol_CV_rec_ion, [0, 4, 8, 12]);
 % dfplot.JtotVapp(sol_CV_ideal,0)
 % hold on
 % dfplot.JtotVapp(sol_CV_trans,0)
