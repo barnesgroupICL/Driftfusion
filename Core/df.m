@@ -271,14 +271,14 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         %end            
 
         % Constant rec rate in interfaces for testing
-        r_con = 0;%int_switch(i)*SRHset*r_constant;
+        r_con = 0;% int_switch(i)*SRHset*r_constant;
         r_fo_ps = 0;%SRHset*ps_switch(i)*r_constant*(p-ni(i));
         r_fo_ns = 0;%SRHset*ns_switch(i)*r_fo_ps;
         
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - r_rad - r_srh - r_vsr;
-        S_hole     = g - r_rad - r_srh - r_vsr;
+        S_electron = g - r_rad - r_srh - r_vsr - r_con;
+        S_hole     = g - r_rad - r_srh - r_vsr - r_con;
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
