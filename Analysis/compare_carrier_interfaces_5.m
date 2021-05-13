@@ -68,36 +68,47 @@ for i = 1:length(tarr)
     r = r_struct.tot(p1, :);
     %r = 0;
     
-    ps1_ana(i,:) = ps1.*exp(beta.*xprime_p) + jp(p1,:)./(beta.*muh.*Vt).*(1-exp(beta.*xprime_p))...
-        - ((jps1-jp(p1,:))./(beta.^2.*muh.*Vt.*xprime_p)).*(1-exp(beta.*xprime_p)+ beta.*xprime_p.*exp(beta.*xprime_p));
+%     p1_ana(i,:) = ps1.*exp(beta.*xprime_p) + jp(p1,:)./(beta.*muh.*Vt).*(1-exp(beta.*xprime_p))...
+%         - ((jps1-jp(p1,:))./(beta.^2.*muh.*Vt.*xprime_p)).*(1-exp(beta.*xprime_p)+ beta.*xprime_p.*exp(beta.*xprime_p));
+%     
+%     p2_ana(i,:) = ps2.*exp(beta.*xprime_p) + jp(p1,:)./(beta.*muh.*Vt).*(1-exp(beta.*xprime_p))...
+%         - ((jps2-jp(p1,:))./(beta.^2.*muh.*Vt.*xprime_p)).*(1-exp(beta.*xprime_p)+ beta.*xprime_p.*exp(beta.*xprime_p));
+%     
+%     n1_ana(i,:) = ns1.*exp(alpha.*xprime_n) + jn(p1,:)./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n))...
+%         - ((jns1-jn(p1,:))./(alpha.^2.*mue.*Vt.*xprime_n)).*(1-exp(alpha.*xprime_n)+ alpha.*xprime_n.*exp(alpha.*xprime_n));
+%     
+%     n2_ana(i,:) = ns2.*exp(alpha.*xprime_n) + jn(p1,:)./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n))...
+%         - ((jns2-jn(p1,:))./(alpha.^2.*mue.*Vt.*xprime_n)).*(1-exp(alpha.*xprime_n)+ alpha.*xprime_n.*exp(alpha.*xprime_n));
+%     
+    p1_ana(i,:) = ps1.*exp(beta.*xprime_p) + jp(p1,:)./(beta.*muh.*Vt).*(1-exp(beta.*xprime_p))...
+        - ((jns1-jn(p1,:))./(beta.^2.*muh.*Vt.*xprime_n)).*(1-exp(beta.*xprime_p)+ beta.*xprime_p.*exp(beta.*xprime_p));
     
-    ps2_ana(i,:) = ps2.*exp(beta.*xprime_p) + jp(p1,:)./(beta.*muh.*Vt).*(1-exp(beta.*xprime_p))...
-        - ((jps2-jp(p1,:))./(beta.^2.*muh.*Vt.*xprime_p)).*(1-exp(beta.*xprime_p)+ beta.*xprime_p.*exp(beta.*xprime_p));
+    p2_ana(i,:) = ps2.*exp(beta.*xprime_p) + jp(p1,:)./(beta.*muh.*Vt).*(1-exp(beta.*xprime_p))...
+        - ((jns2-jn(p1,:))./(beta.^2.*muh.*Vt.*xprime_n)).*(1-exp(beta.*xprime_p)+ beta.*xprime_p.*exp(beta.*xprime_p));
     
-    ns1_ana(i,:) = ns1.*exp(alpha.*xprime_n) + jn(p1,:)./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n))...
+    n1_ana(i,:) = ns1.*exp(alpha.*xprime_n) + jn(p1,:)./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n))...
         - ((jns1-jn(p1,:))./(alpha.^2.*mue.*Vt.*xprime_n)).*(1-exp(alpha.*xprime_n)+ alpha.*xprime_n.*exp(alpha.*xprime_n));
-   
     
-    ns2_ana(i,:) = ns2.*exp(alpha.*xprime_n) + jn(p1,:)./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n))...
+    n2_ana(i,:) = ns2.*exp(alpha.*xprime_n) + jn(p1,:)./(alpha.*mue.*Vt).*(1-exp(alpha.*xprime_n))...
         - ((jns2-jn(p1,:))./(alpha.^2.*mue.*Vt.*xprime_n)).*(1-exp(alpha.*xprime_n)+ alpha.*xprime_n.*exp(alpha.*xprime_n));
 end
 
 %clean up for plotting
-ps1_ana(:, pcum0(1):pcum0(2)-1) = NaN;
-ns1_ana(:, pcum0(1):pcum0(2)-1) = NaN;
-ps1_ana(:, pcum0(3)+1:end) = NaN;
-ns1_ana(:, pcum0(3)+1:end) = NaN;
-ps2_ana(:, pcum0(1):pcum0(4)-1) = NaN;
-ns2_ana(:, pcum0(1):pcum0(4)-1) = NaN;
-ps2_ana(:, pcum0(5)+1:end) = NaN;
-ns2_ana(:, pcum0(5)+1:end) = NaN;
+p1_ana(:, pcum0(1):pcum0(2)-1) = NaN;
+n1_ana(:, pcum0(1):pcum0(2)-1) = NaN;
+p1_ana(:, pcum0(3)+1:end) = NaN;
+n1_ana(:, pcum0(3)+1:end) = NaN;
+p2_ana(:, pcum0(1):pcum0(4)-1) = NaN;
+n2_ana(:, pcum0(1):pcum0(4)-1) = NaN;
+p2_ana(:, pcum0(5)+1:end) = NaN;
+n2_ana(:, pcum0(5)+1:end) = NaN;
 
 % plot carrier densities
 dfplot.npx(sol, tarr)
 hold on
 for i = 1:length(tarr)
-    plot(x*1e7, ps1_ana(i,:), 'k--', x*1e7, ps2_ana(i,:), 'k--',...
-        x*1e7, ns1_ana(i,:), 'k-.', x*1e7, ns2_ana(i,:), 'k-.')
+    plot(x*1e7, p1_ana(i,:), 'k--', x*1e7, p2_ana(i,:), 'k--',...
+        x*1e7, n1_ana(i,:), 'k-.', x*1e7, n2_ana(i,:), 'k-.')
 end
 % legend('HTL', 'Int 1', 'AL', 'Int 2', 'ETL',...
 %     'n', 'p', 'ps1-ana', 'ps2-ana', 'ns1-ana', 'ns2-ana')
