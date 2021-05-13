@@ -255,23 +255,23 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 %             jps = F_hole;
 %             jns = F_electron;
 %         end
-        
-        %if int_switch(i) == 1
-            %xmesh(i)
-            %jps;
-            %jns;
-            %ns = (n- (jns/(alpha*mue(i)*kB*T))*(1-exp(alpha*xprime(i))))*exp(-alpha*xprime(i));
-            %ps = (p- (jps/(beta*muh(i)*kB*T))*(1-exp(beta*xprime(i))))*exp(-beta*xprime(i));
-            ns = n*exp(-alpha*xprime_n(i));
-            ps = p*exp(-beta*xprime_p(i));
-            r_vsr = int_switch(i)*SRHset*(((ns*ps)-(ni(i)^2))/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
-            %r_vsr;
-        %else
-            % r_vsr = 0;
-        %end            
+%         
+%         if int_switch(i) == 1
+%             xmesh(i)
+%             jps;
+%             jns;
+%             ns = (n- (jns/(alpha*mue(i)*kB*T))*(1-exp(alpha*xprime(i))))*exp(-alpha*xprime(i));
+%             ps = (p- (jps/(beta*muh(i)*kB*T))*(1-exp(beta*xprime(i))))*exp(-beta*xprime(i));
+%             ns = n*exp(-alpha*xprime_n(i));
+%             ps = p*exp(-beta*xprime_p(i));
+%             r_vsr = int_switch(i)*SRHset*(((ns*ps)-(ni(i)^2))/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
+%             r_vsr;
+%         else
+%             r_vsr = 0;
+%         end            
 
         % Constant rec rate in interfaces for testing
-        r_con = 0;% int_switch(i)*SRHset*r_constant;
+        r_con = int_switch(i)*SRHset*r_constant;
         r_fo_ps = 0;%SRHset*ps_switch(i)*r_constant*(p-ni(i));
         r_fo_ns = 0;%SRHset*ns_switch(i)*r_fo_ps;
         
