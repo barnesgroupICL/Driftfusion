@@ -135,7 +135,7 @@ for i=1:length(par.dcum)                % i is the layer index
                         case 'xprime_p'
                             devprop(j) = xprime_p;
                         case 'xprime'
-                            devprop(j) = xprime_p;
+                            devprop(j) = xprime;
                         case 'alpha_prime'
                             devprop(j) = alpha_prime;
                         case 'beta_prime'
