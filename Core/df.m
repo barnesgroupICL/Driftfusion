@@ -221,10 +221,6 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         dndx = dudx(2);
         dpdx = dudx(3);
         
-        %% Volumetric surface recombination alpha and beta including field terms
-        alpha = -abs(q*dVdx/(kB*T) + alpha_prime(i));
-        beta = -abs(q*-dVdx/(kB*T) + beta_prime(i));        
-        
         %% Equation editor
         % Time-dependence prefactor term
         C_potential = 0;
@@ -233,10 +229,10 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         C = [C_potential; C_electron; C_hole];
 
         % Flux terms
-        F_potential  = (epp(i)/eppmax)*dVdx;
-        F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
-        F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F = [F_potential; mobset*F_electron; mobset*F_hole];
+        jV = (epp(i)/eppmax)*dVdx;
+        jn = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
+        jp = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
+        F = [jV; mobset*jn; mobset*jp];
 
         % Recombination terms
         % Radiative
@@ -246,29 +242,49 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         % Volumetric surface recombination
         r_vsr = 0;
         
-%         if ps_switch(i) == 1
-%             jps = F_hole;
-%             jns = F_electron;
-%         end
-%         
-%         if ns_switch(i) == 1
-%             jps = F_hole;
-%             jns = F_electron;
-%         end
-%         
-%         if int_switch(i) == 1
-%             xmesh(i)
-%             jps;
-%             jns;
+        %% Volumetric surface recombination alpha and beta including field terms
+        alpha = q*dVdx/(kB*T) + alpha_prime(i);
+        beta = q*-dVdx/(kB*T) + beta_prime(i);        
+        
+        if ps_switch(i) == 1
+            jps = jp;
+            jns = jn;
+        end
+        
+        if ns_switch(i) == 1
+            jps = jp;
+            jns = jn;
+        end
+        
+        if int_switch(i) == 1
+            X = exp(-abs(alpha).*xprime_n(i));
+            Y = exp(-abs(beta).*xprime_p(i));
+            
+            if alpha < 0
+                delta_jn = (jns-jn)/xprime_n(i);
+            else
+                delta_jn = (jps-jp)/xprime_p(i);
+            end
+            
+            if beta < 0
+                delta_jp = (jps-jp)/xprime_p(i);
+            else
+                delta_jp = (jns-jn)/xprime_n(i);
+            end
+            
+            ns = (1/X)*(n + sign(alpha).*(jn/(-abs(alpha)*mue(i)*kB*T))*(1 - X)...
+            - sign(alpha).*(delta_jn/(alpha^2*mue(i)*kB*T))*(1- X -abs(alpha)*xprime_n(i)*X));      
+            ps = (1/Y)*(p + sign(beta).*(jp/(-abs(beta)*muh(i)*kB*T))*(1 - Y)...
+            - sign(beta).*(delta_jp/(beta^2*muh(i)*kB*T))*(1- Y -abs(beta)*xprime_p(i)*Y));       
 %             ns = (n- (jns/(alpha*mue(i)*kB*T))*(1-exp(alpha*xprime(i))))*exp(-alpha*xprime(i));
 %             ps = (p- (jps/(beta*muh(i)*kB*T))*(1-exp(beta*xprime(i))))*exp(-beta*xprime(i));
 %             ns = n*exp(-alpha*xprime_n(i));
 %             ps = p*exp(-beta*xprime_p(i));
-%             r_vsr = int_switch(i)*SRHset*(((ns*ps)-(ni(i)^2))/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
-%             r_vsr;
-%         else
-%             r_vsr = 0;
-%         end            
+            r_vsr = int_switch(i)*SRHset*(((ns*ps)-(ni(i)^2))/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
+            r_vsr;
+        else
+            r_vsr = 0;
+        end            
 
         % Constant rec rate in interfaces for testing
         r_con = int_switch(i)*SRHset*r_constant;
@@ -276,7 +292,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         r_fo_ns = 0;%SRHset*ns_switch(i)*r_fo_ps;
         
         % Source terms
-        S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
+        S_potential = bulk_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
         S_electron = g - r_rad - r_srh - r_vsr - r_con;
         S_hole     = g - r_rad - r_srh - r_vsr - r_con;
         S = [S_potential; S_electron; S_hole];
