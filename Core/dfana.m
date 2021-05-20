@@ -289,6 +289,9 @@ classdef dfana
             x_ihalf = par.x_ihalf;
             n_ihalf = getvarihalf(n);
             p_ihalf = getvarihalf(p);
+            
+            %[~, j, ~] = dfana.calcJ(sol);
+            
             dVdx_ihalf = zeros(length(t), length(x_ihalf));
             for i=1:length(t)
                 [~, dVdx_ihalf(i,:)] = pdeval(0, x, V(i,:), x_ihalf);
@@ -309,10 +312,35 @@ classdef dfana
             % Bulk SRH
             r.srh = bulk_switch.*(n_ihalf.*p_ihalf - dev.ni.^2)...
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
-            % Volumetric surface SRH
-            r.vsr = int_switch.*(n_ihalf.*exp(alpha.*xprime_n).*p_ihalf.*exp(beta.*xprime_p) - dev.ni.^2)...
-                ./(dev.taun_vsr.*(p_ihalf.*exp(beta.*xprime_p) + dev.pt) + dev.taup_vsr.*(n_ihalf.*exp(alpha.*xprime_n) + dev.nt));
             
+%             %% Volumetric surface SRH
+%             for i =1:length(t)
+%                 
+%                 X = exp(-abs(alpha).*xprime_n);
+%                 Y = exp(-abs(beta).*xprime_p);
+%                 
+%                 if alpha < 0
+%                     delta_jn = (jns-jn)/xprime_n(i);
+%                 else
+%                     delta_jn = (jps-jp)/xprime_p(i);
+%                 end
+%                 
+%                 if beta < 0
+%                     delta_jp = (jps-jp)/xprime_p(i);
+%                 else
+%                     delta_jp = (jns-jn)/xprime_n(i);
+%                 end
+%                 
+%                 ns = (1/X).*(n + sign(alpha).*(jn./(-abs(alpha)*mue(i)*kB*T))*(1 - X)...
+%                     - sign(alpha).*(delta_jn/(alpha^2*mue(i)*kB*T))*(1- X -abs(alpha)*xprime_n(i)*X));
+%                 ps = (1/Y)*(p + sign(beta).*(jp./(-abs(beta)*muh(i)*kB*T))*(1 - Y)...
+%                     - sign(beta).*(delta_jp/(beta^2*muh(i)*kB*T))*(1- Y -abs(beta)*xprime_p(i)*Y));
+%                 
+%                 r.vsr(i,:) = int_switch.*(n_ihalf.*exp(alpha.*xprime_n).*p_ihalf.*exp(beta.*xprime_p) - dev.ni.^2)...
+%                     ./(dev.taun_vsr.*(p_ihalf.*exp(beta.*xprime_p) + dev.pt) + dev.taup_vsr.*(n_ihalf.*exp(alpha.*xprime_n) + dev.nt));
+%                 
+%             end
+            r.vsr = 0;
             r.constant = int_switch.*par.r_constant;
             % Total
             r.tot = r.btb + r.srh + r.vsr + r.constant;
