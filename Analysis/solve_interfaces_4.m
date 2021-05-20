@@ -1,37 +1,56 @@
 function solve_interfaces_4
 % Solves for the interfacial carrier densities
-% Boundary conditions: n(0) = ns, jn(0) = js
-% Assumptions: constant rec rate, r
+% Boundary conditions 1: n(0) = ns, jn(0) = js
+% Boundary conditions 2: n(d) = ns, jn(0) = js
+% Assumptions: 
+% - constant rec rate, r
+% - exponentially varying mobility
+% - constant alpha
+% - constant field
 
-syms q kso n x ns ps jns jps c1 c2 gam r alph bet mue muh kB T d p p0 bet dndx ni taun taup nt pt
+syms n dndx x d ns jn js c1 c2 gam r alph mu mus kB T p p0 bet 
 
-%% SRH
-r_eqn = r == (ns*ps - ni^2)/(taun*(ps +pt) + taup*(ns + nt));
+neqn = n == (c1/alph)*exp(alph*x) - r*x/(alph*mu*kB*T) + c2;
+mueqn = mu == mus*exp(-alph*x);
+neqn = subs(neqn, mu, rhs(mueqn));
 
-%% Second order
-%r_eqn = r == kso*ns*ps;
+dndxeqn = dndx == diff(rhs(neqn), x)
 
-%% Constant mobility
-n_eqn = n == ns*exp(alph*x) + (q*jns/(alph*mue*kB*T))*(1-exp(alph*x)) - (r/(alph^2 *mue*kB*T))*(1- exp(alph*x) + alph*x);
+jn_eqn = jn == mu*kB*T*(alph*n - dndx)
+jn_eqn = subs(jn_eqn, n, rhs(neqn))
+jn_eqn = subs(jn_eqn, dndx, rhs(dndxeqn))
 
-%% exponential mobility
-%n_eqn = n == (ns - q*jns*x/(mue*kB*T) + (r*x^2)/(2*kB*T))*exp(alph*x)
+%% Boundary conditions
+%% n(0) = ns, jn(0) = js
+neqn_bc1 = neqn;
+neqn_bc1 = subs(neqn, x, 0);
+neqn_bc1 = subs(neqn_bc1, n, ns);
+c1sol = solve(neqn_bc1, c1);
 
-n_eqn = subs(n_eqn, r, rhs(r_eqn))
-ns_expr = solve(n_eqn, ns)
-ns_expr = simplify(ns_expr)
+jn_eqn_bc1 = jn_eqn;
+jn_eqn_bc1 = subs(jn_eqn, x, 0);
+jn_eqn_bc1 = subs(jn_eqn_bc1, jn, js);
+jn_eqn_bc1 = simplify(jn_eqn_bc1);
+c2sol = solve(jn_eqn_bc1, c2);
 
-%% Constant mobility
-p_eqn = p == ps*exp(alph*x) + (q*jps/(alph*mue*kB*T))*(1-exp(alph*x)) - (r/(alph^2 *mue*kB*T))*(1- exp(alph*x) + alph*x);
+neqn_bc1_final = subs(neqn, c1, c1sol)
+neqn_bc1_final = subs(neqn_bc1_final, c2, c2sol)
 
-%% exponential mobility
-%p_eqn = p == (ps - q*jps*x/(muh*kB*T) + (r*x^2)/(2*kB*T))*exp(bet*x)
+%% n(d) = ns, jn(0) = js
+neqn_bc2 = neqn;
+neqn_bc2 = subs(neqn, x, d)
+neqn_bc2 = subs(neqn_bc2, n, ns)
+c1sol = solve(neqn_bc2, c1)
 
-p_eqn = subs(p_eqn, r, rhs(r_eqn))
-ps_expr = solve(p_eqn, ps)
-ps_expr = simplify(ps_expr)
+jn_eqn_bc2 = jn_eqn;
+jn_eqn_bc2 = subs(jn_eqn, x, 0)
+jn_eqn_bc2 = subs(jn_eqn_bc2, jn, js)
+jn_eqn_bc2 = subs(jn_eqn_bc2, c1, c1sol)
+c2sol = solve(jn_eqn_bc2, c2)
 
-ps_expr = subs(ps_expr, ns, ns_expr);
-ps_expr = simplify(ps_expr)
+neqn_bc2_final = subs(neqn, c1, c1sol)
+neqn_bc2_final = subs(neqn_bc2_final, c2, c2sol)
+neqn_bc2_final = subs(neqn_bc2_final, r, (js-jn)/x)
+
 end
 
