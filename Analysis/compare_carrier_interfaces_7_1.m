@@ -1,17 +1,20 @@
-function compare_carrier_interfaces_6(sol, tarr)
+function compare_carrier_interfaces_7_1(sol, tarr)
 % Function to compare the interfacial carrier densities between simulation
 % and analytical solution
 % v5 Calculated on the whole mesh, uses jn instead of js
-% substitutes r for r=(jsp-jn)/x
+% substitutes r for r=(jsp-jn)/x_ihalf
 % v6 Tests expressions for ns, ps for majority carrier sides of the
+% v7 as with v6 but calculated on the half mesh
+% v7.1 as with v7 but recombination flux terms are taken from LHS only
 % interface, using xprime_n and xprime_p
 % TARR = array of time points
 
 par = sol.par;
-dev = par.dev;
+dev = par.dev_ihalf;
 u = sol.u;
 t = sol.t;
 x = sol.x;
+x_ihalf = par.x_ihalf;
 al = par.active_layer;
 ni = par.ni(al);
 sn1 = par.sn(al-1);
@@ -30,8 +33,11 @@ mue = dev.mue;
 muh = dev.muh;
 Vt = par.kB*par.T;
 pcum0 = par.pcum0;
+
 for i=1:length(t)
-    [~, dVdx(i,:)] = pdeval(0, x, sol.u(i,:,1), x);
+    [~, dVdx(i,:)] = pdeval(0, x, sol.u(i,:,1), x_ihalf);
+    [n(i,:), ~] = pdeval(0, x, sol.u(i,:,2), x_ihalf);
+    [p(i,:), ~] = pdeval(0, x, sol.u(i,:,3), x_ihalf);
 end
 
 alphaM = par.q*dVdx./(par.kB*par.T) + alpha_prime;
@@ -39,30 +45,30 @@ betaM = par.q*-dVdx./(par.kB*par.T) + beta_prime;
 
 % Fluxes - approximate as on half mesh
 [J, j, x_ihalf] = dfana.calcJ(sol);
-jn = zeros(1, length(x));
-jp = zeros(1, length(x));
+jn = zeros(1, length(x_ihalf));
+jp = zeros(1, length(x_ihalf));
 for i = 1:length(t)
-    jn(i,:) = interp1(x_ihalf, j.n(i,:), x);
-    jp(i,:) = interp1(x_ihalf, j.p(i,:), x);
+    jn(i,:) = j.n(i,:);
+    jp(i,:) = j.p(i,:);
 end
 
 % recombination
 r_struct = dfana.calcr(sol);
 
-ns1 = zeros(1, length(x));
-ns2 = zeros(1, length(x));
-ps1 = zeros(1, length(x));
-ps2 = zeros(1, length(x));
-jns1 = zeros(1, length(x));
-jns2 = zeros(1, length(x));
-jps1 = zeros(1, length(x));
-jps2 = zeros(1, length(x));
+ns1 = zeros(1, length(x_ihalf));
+ns2 = zeros(1, length(x_ihalf));
+ps1 = zeros(1, length(x_ihalf));
+ps2 = zeros(1, length(x_ihalf));
+jns1 = zeros(1, length(x_ihalf));
+jns2 = zeros(1, length(x_ihalf));
+jps1 = zeros(1, length(x_ihalf));
+jps2 = zeros(1, length(x_ihalf));
 
 for i = 1:length(tarr)
     pnt = find(sol.t <= tarr(i));
     pnt = pnt(end);
     
-    for k = 1:length(x)
+    for k = 1:length(x_ihalf)
     alpha = alphaM(pnt,:);
     beta = betaM(pnt,:);
     
@@ -85,16 +91,16 @@ for i = 1:length(tarr)
     
     % Fluxes - approximate as calculated on half mesh
     if alpha(k) < 0
-        jns1(k) = jn(pnt, par.pcum0(al-1)+1);
-        jns2(k) = jn(pnt, par.pcum0(al+1)+1);
+        jns1(k) = jn(pnt, par.pcum0(al-1));
+        jns2(k) = jn(pnt, par.pcum0(al+1));
     elseif alpha(k) >= 0
         jns1(k) = jn(pnt, par.pcum0(al)+1);
         jns2(k) = jn(pnt, par.pcum0(al+2)+1);
     end
     
     if beta(k) < 0
-        jps1(k) = jp(pnt, par.pcum0(al-1)+1);
-        jps2(k) = jp(pnt, par.pcum0(al+1)+1);
+        jps1(k) = jp(pnt, par.pcum0(al-1));
+        jps2(k) = jp(pnt, par.pcum0(al+1));
     elseif beta(k) >= 0
         jps1(k) = jp(pnt, par.pcum0(al)+1);
         jps2(k) = jp(pnt, par.pcum0(al+2)+1);   
@@ -148,65 +154,77 @@ figure(501)
 for i = 1:length(tarr)
     pnt = find(sol.t <= tarr(i));
     pnt = pnt(end);
-    semilogy(x*1e7, u(pnt, :, 2), x*1e7, u(pnt, :, 3),...
-        x*1e7, n1_ana(i,:), 'k-.', x*1e7, p1_ana(i,:), 'k--')
+    subplot(2,2,1)
+    semilogy(x_ihalf*1e7, n(pnt, :), x_ihalf*1e7, p(pnt, :),...
+        x_ihalf*1e7, n1_ana(i,:), 'k-.', x_ihalf*1e7, p1_ana(i,:), 'k--')
     hold on
 end
 hold off
-legend('n', 'p', 'n-ana', 'p-ana')
-xlim([199.5,202.5])
+title('Interface 1')
+%legend('n', 'p', 'n-ana', 'p-ana')
+xlabel('Position, x (nm)')
+ylabel('Carrier density (cm-3)')
+xlim([1e7*par.dcum0(al-1)-0.5,1e7*par.dcum0(al)+0.5])
+
+%% Interface 2
+for i = 1:length(tarr)
+    pnt = find(sol.t <= tarr(i));
+    pnt = pnt(end);
+    subplot(2,2,2)
+    semilogy(x_ihalf*1e7, n(pnt, :), x_ihalf*1e7, p(pnt, :),...
+        x_ihalf*1e7, n2_ana(i,:), 'k-.', x_ihalf*1e7, p2_ana(i,:), 'k--')
+    hold on
+end
+hold off
+title('Interface 2')
+xlabel('Position, x (nm)')
+ylabel('Carrier density (cm-3)')
+%legend('n', 'p', 'n-ana', 'p-ana')
+xlim([1e7*par.dcum0(al+1)-0.5,1e7*par.dcum0(al+2)+0.5])
+
+%% Plot fluxes
+%% Interface 1
+for i = 1:length(tarr)
+    pnt = find(sol.t <= tarr(i));
+    pnt = pnt(end);
+    subplot(2,2,3)
+    plot(x_ihalf*1e7, jn(pnt,:), x_ihalf*1e7, jp(pnt,:),... 
+        x_ihalf*1e7, jn1_ana(i,:), 'k-.', x_ihalf*1e7, jp1_ana(i,:), 'k--')
+    hold on
+end
+title('Interface 1')
+xlabel('Position, x (nm)')
+ylabel('Flux (cm-2s-1)')
+xlim([1e7*par.dcum0(al-1)-0.5,1e7*par.dcum0(al)+0.5])
+hold off
+   
+%% Interface 2
+for i = 1:length(tarr)
+    pnt = find(sol.t <= tarr(i));
+    pnt = pnt(end);
+    subplot(2,2,4)
+    plot(x_ihalf*1e7, jn(pnt,:), x_ihalf*1e7, jp(pnt,:),... 
+         x_ihalf*1e7, jn2_ana(i,:), 'k-.', x_ihalf*1e7, jp2_ana(i,:), 'k--')
+    hold on
+end
+title('Interface 2')
+xlabel('Position, x (nm)')
+ylabel('Flux (cm-2s-1)')
+xlim([1e7*par.dcum0(al+1)-0.5,1e7*par.dcum0(al+2)+0.5])
+hold off
 
 % components
 figure(5011)
 for i = 1:length(tarr)
     pnt = find(sol.t <= tarr(i));
     pnt = pnt(end);
-    plot(x*1e7, n1_comp1(i,:), x*1e7, n1_comp2(i,:), x*1e7, n1_comp3(i,:), x*1e7, n1_ana(i,:), 'k-.')
+    plot(x_ihalf*1e7, n1_comp1(i,:), x_ihalf*1e7, n1_comp2(i,:), x_ihalf*1e7, n1_comp3(i,:), x_ihalf*1e7, n1_ana(i,:), 'k-.')
     hold on
 end
+xlabel('Position, x (nm)')
+ylabel('Carrier density (cm-3)')
 legend('n comp', 'j comp', 'r comp', 'sum')
-xlim([199.5,202.5])
-hold off
-
-%% Interface 2
-figure(502)
-for i = 1:length(tarr)
-    pnt = find(sol.t <= tarr(i));
-    pnt = pnt(end);
-    semilogy(x*1e7, u(pnt, :, 2), x*1e7, u(pnt, :, 3),...
-        x*1e7, n2_ana(i,:), 'k-.', x*1e7, p2_ana(i,:), 'k--')
-    hold on
-end
-hold off
-legend('n', 'p', 'n-ana', 'p-ana')
-xlim([541.5,544.5])
-
-%% Plot fluxes
-%% Interface 1
-figure(503)
-
-for i = 1:length(tarr)
-    pnt = find(sol.t <= tarr(i));
-    pnt = pnt(end);
-
-    plot(x*1e7, jn(pnt,:), x*1e7, jp(pnt,:),... 
-        x*1e7, jn1_ana(i,:), 'k-.', x*1e7, jp1_ana(i,:), 'k--')
-    hold on
-end
-xlim([199.5,202.5])
-hold off
-   
-%% Interface 2
-figure(504)
-hold on
-for i = 1:length(tarr)
-    pnt = find(sol.t <= tarr(i));
-    pnt = pnt(end);
-
-    plot(x*1e7, jn(pnt,:), x*1e7, jp(pnt,:),... 
-         x*1e7, jn2_ana(i,:), 'k-.', x*1e7, jp2_ana(i,:), 'k--')
-end
-xlim([541.5,544.5])
+xlim([1e7*par.dcum0(al-1)-0.5,1e7*par.dcum0(al)+0.5])
 hold off
 end
 
