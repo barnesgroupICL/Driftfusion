@@ -60,6 +60,7 @@ dev.gradNv = build_property(par.Nv, xmesh, par, 'log_graded', 1);
 % Surface recombination velocity equivalence schemes
 %dev.mue = build_property(par.mue, xmesh, par, 'mue_interface', 0);
 %dev.muh = build_property(par.muh, xmesh, par, 'muh_interface', 0);
+dev.dint = build_property(par.d, xmesh, par, 'constant', 1);    % Stores interface thickness at every interface point
 dev.mue = build_property(par.mue, xmesh, par, 'constant', 0);
 dev.muh = build_property(par.muh, xmesh, par, 'constant', 0);
 
