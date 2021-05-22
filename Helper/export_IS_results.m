@@ -1,4 +1,4 @@
-function export_IS_results(IS_results, prefix)
+function export_IS_results(prefix, IS_results)
 %EXPORT_IS_RESULTS - Exports data of a set of impedance simulations to text files
 % save the main data from an IS_results struct created by
 % IS_script to text files, for easing the import with Origin (from OriginLab).
@@ -164,17 +164,17 @@ toBeSavedJrecAmpOutOfPhaseAbs = fillmissing(toBeSavedJrecAmpOutOfPhaseAbs, 'cons
 
 %% save csv
 
-fid_cap = fopen([prefix '-cap.txt'], 'wt+');
-fid_capIonic = fopen([prefix '-capIonic.txt'], 'wt+');
-fid_capRec = fopen([prefix '-capRecombination.txt'], 'wt+');
-fid_capAcc = fopen([prefix '-capAccumulating.txt'], 'wt+');
-fid_nyquist = fopen([prefix '-nyquist.txt'], 'wt+');
-fid_Zabs = fopen([prefix '-Zabs.txt'], 'wt+');
-fid_phase = fopen([prefix '-Zphase.txt'], 'wt+');
-fid_phaseIonic = fopen([prefix '-ZphaseIonic.txt'], 'wt+');
-fid_JionicAmpAbs = fopen([prefix '-JionicAmpAbs.txt'], 'wt+');
-fid_JampOutOfPhaseAbs = fopen([prefix '-JampOutOfPhaseAbs.txt'], 'wt+');
-fid_JrecAmpOutOfPhaseAbs = fopen([prefix '-JrecAmpOutOfPhaseAbs.txt'], 'wt+');
+fid_cap = fopen([prefix '-EIS_cap.txt'], 'wt+');
+fid_capIonic = fopen([prefix '-EIS_capIonic.txt'], 'wt+');
+fid_capRec = fopen([prefix '-EIS_capRecombination.txt'], 'wt+');
+fid_capAcc = fopen([prefix '-EIS_capAccumulating.txt'], 'wt+');
+fid_nyquist = fopen([prefix '-EIS_nyquist.txt'], 'wt+');
+fid_Zabs = fopen([prefix '-EIS_Zabs.txt'], 'wt+');
+fid_phase = fopen([prefix '-EIS_Zphase.txt'], 'wt+');
+fid_phaseIonic = fopen([prefix '-EIS_ZphaseIonic.txt'], 'wt+');
+fid_JionicAmpAbs = fopen([prefix '-EIS_JionicAmpAbs.txt'], 'wt+');
+fid_JampOutOfPhaseAbs = fopen([prefix '-EIS_JampOutOfPhaseAbs.txt'], 'wt+');
+fid_JrecAmpOutOfPhaseAbs = fopen([prefix '-EIS_JrecAmpOutOfPhaseAbs.txt'], 'wt+');
 
 for i = 1:size(toBeSavedCap, 1)
     fprintf(fid_cap, '%s\t', toBeSavedCap(i, 1:end-1));
