@@ -76,16 +76,16 @@ legend = strcat(legend, legend_append);
 % replace zero in legend with dark
 legend(legend=="0 sun") = "dark";
 % repeat three times each element (e.g. 1 sun dark 1 sun dark 1 sun dark)
-legend_expanded = repelem(legend', 3);
+legend_expanded = repmat(legend', 1, 3);
 type = [" bias", " amp", " phase"];
-type = repmat(type, 1, length(legend));
+type = repelem(type, length(legend));
 % add type to each entry of the legend
 legend = strcat(legend_expanded, type);
 header = ['Frequency', legend];
 
 %% get measure units
 
-units = ['Hz', repmat(["V\+(2)/cm\+(2)", "V\+(2)/cm\+(2)", "rad"], 1, round(length(legend)/3))];
+units = ['Hz', repelem(["V\+(2)/cm\+(2)", "V\+(2)/cm\+(2)", "rad"], round(length(legend)/3))];
 
 %% get data
 
@@ -111,8 +111,8 @@ toBeSavedH2 = fillmissing(toBeSavedH2, 'constant', "NaN");
 
 %% save csv
 
-fid_H1 = fopen([prefix '-H1.txt'], 'wt+');
-fid_H2 = fopen([prefix '-H2.txt'], 'wt+');
+fid_H1 = fopen([prefix '-EA_H1.txt'], 'wt+');
+fid_H2 = fopen([prefix '-EA_H2.txt'], 'wt+');
 
 for i = 1:size(toBeSavedH1, 1)
     fprintf(fid_H1, '%s\t', toBeSavedH1(i, 1:end-1));
