@@ -103,7 +103,8 @@ for i = 1:length(tdwell_arr)
         if size(sol_dwell.u,1) == par_dwell.tpoints
             startFromSolJump = false;
         else
-            sol_dwell = runDfFourTrunks(sol_jump, par_dwell);
+            sol_dwell = runDfFourTrunks(sol_jump, par_dwell, '');
+%             [sol_dwell, sol1, sol2, sol3] = runDfFourTrunks(sol_jump, par_dwell, '');
 %             J1 = dfana.calcJ(sol1);
 %             J2 = dfana.calcJ(sol2);        
 %             J3 = dfana.calcJ(sol3);
@@ -129,7 +130,7 @@ for i = 1:length(tdwell_arr)
     
     disp('Pulse keep on')
     if solver_split_pulse
-        [~, ~, ~, ~, Jtr(:,i), Jdk(i), t_Jtr(:,i)]= runDfFourTrunks(sol_pulseTurnOn, par_pulseKeepOn, sol_dwell);
+        [~, ~, ~, ~, Jtr(:,i), Jdk(i), t_Jtr(:,i)]= runDfFourTrunks(sol_pulseTurnOn, par_pulseKeepOn, '', sol_dwell);
     else
         sol_pulseKeepOn = runDf(sol_pulseTurnOn, par_pulseKeepOn);
         [Jtr(:,i), Jdk(i)] = calcJtrJdk(sol_dwell, sol_pulseKeepOn);
@@ -197,36 +198,44 @@ function sol_post = runDf(sol_pre, par)
     if size(sol_post.u,1) ~= par.tpoints
         % try to force smaller time steps
         par.MaxStepFactor = par.MaxStepFactor/10;
-            warning(['Driftfusion:' mfilename],...
-                [mfilename ' - the solver did not succeed, decreasing the maximum time step changing par.MaxStepFactor to ' num2str(par.MaxStepFactor)])
+        %warning(['Driftfusion:' mfilename],...
+        disp([mfilename ' - the solver did not succeed, decreasing the maximum time step changing par.MaxStepFactor to ' num2str(par.MaxStepFactor)])
         sol_post = df(sol_pre, par);
     end
     if size(sol_post.u,1) ~= par.tpoints
-        par.RelTol = min(par.RelTol*3.5, 1e-2);
-        par.AbsTol = min(par.AbsTol*3.5, 1e-5);
-        warning(['Driftfusion:' mfilename],...
-            [mfilename ' - the solver did not succeed, loosening the relative and absolute tolerance.'])
-        sol_post = df(sol_pre, par);
-    end
-    if size(sol_post.u,1) ~= par.tpoints
-        % try to force smaller time steps
-        par.MaxStepFactor = par.MaxStepFactor/10;
-            warning(['Driftfusion:' mfilename],...
-                [mfilename ' - the solver did not succeed, decreasing the maximum time step changing par.MaxStepFactor to ' num2str(par.MaxStepFactor)])
-        sol_post = df(sol_pre, par);
-    end
-    if size(sol_post.u,1) ~= par.tpoints
-        par.RelTol = min(par.RelTol*3.5, 1e-2);
-        par.AbsTol = min(par.AbsTol*3.5, 1e-5);
-        warning(['Driftfusion:' mfilename],...
-            [mfilename ' - the solver did not succeed, loosening the relative and absolute tolerance.'])
-        sol_post = df(sol_pre, par);
+        previousRelTol = par.RelTol;
+        previousAbsTol = par.AbsTol;
+        par.RelTol = min(previousRelTol*3.5, 1e-2);
+        par.AbsTol = min(previousAbsTol*3.5, 1e-5);
+        if par.RelTol ~= previousRelTol || par.AbsTol ~= previousAbsTol
+            %warning(['Driftfusion:' mfilename],...
+            disp([mfilename ' - the solver did not succeed, loosening the relative tolerance from ' num2str(previousRelTol) ' to ' num2str(par.RelTol) ' and absolute tolerance from ' num2str(previousAbsTol) ' to ' num2str(par.AbsTol)])
+            sol_post = df(sol_pre, par);
+        end
     end
     if size(sol_post.u,1) ~= par.tpoints
         % try to force smaller time steps
         par.MaxStepFactor = par.MaxStepFactor/10;
-            warning(['Driftfusion:' mfilename],...
-                [mfilename ' - the solver did not succeed, decreasing the maximum time step changing par.MaxStepFactor to ' num2str(par.MaxStepFactor)])
+        %warning(['Driftfusion:' mfilename],...
+        disp([mfilename ' - the solver did not succeed, decreasing the maximum time step changing par.MaxStepFactor to ' num2str(par.MaxStepFactor)])
+        sol_post = df(sol_pre, par);
+    end
+    if size(sol_post.u,1) ~= par.tpoints
+        previousRelTol = par.RelTol;
+        previousAbsTol = par.AbsTol;
+        par.RelTol = min(previousRelTol*3.5, 1e-2);
+        par.AbsTol = min(previousAbsTol*3.5, 1e-5);
+        if par.RelTol ~= previousRelTol || par.AbsTol ~= previousAbsTol
+            %warning(['Driftfusion:' mfilename],...
+            disp([mfilename ' - the solver did not succeed, loosening the relative tolerance from ' num2str(previousRelTol) ' to ' num2str(par.RelTol) ' and absolute tolerance from ' num2str(previousAbsTol) ' to ' num2str(par.AbsTol)])
+            sol_post = df(sol_pre, par);
+        end
+    end
+    if size(sol_post.u,1) ~= par.tpoints
+        % try to force smaller time steps
+        par.MaxStepFactor = par.MaxStepFactor/10;
+        %warning(['Driftfusion:' mfilename],...
+        disp([mfilename ' - the solver did not succeed, decreasing the maximum time step changing par.MaxStepFactor to ' num2str(par.MaxStepFactor)])
         sol_post = df(sol_pre, par);
     end
     if size(sol_post.u,1) ~= par.tpoints
@@ -238,33 +247,53 @@ function sol_post = runDf(sol_pre, par)
     sol_post.par.AbsTol = originalAbsTol;
 end
 
-function [sol4, sol1, sol2, sol3, Jtr, Jdk, t_Jtr] = runDfFourTrunks(sol_pre, par, sol_dwell)
+function [sol4, sol1, sol2, sol3, Jtr, Jdk, t_Jtr] = runDfFourTrunks(sol_pre, par, extraOutput, sol_dwell)
         par1 = par;
         par1.tmax = (par.t0^1.5*par.tmax^0.5)^0.5;
-        disp(['Split solution, first part. tmax: ' num2str(par1.tmax) ' s'])
-        par1.tpoints = floor(par.tpoints / 4);
+        disp(['Split solution, part ' extraOutput '1. tmax: ' num2str(par1.tmax) ' s'])
+        par1.tpoints = max(floor(par.tpoints / 4), 10);
         sol1 = runDf(sol_pre, par1);
+        if size(sol1.u,1) ~= par1.tpoints
+            newExtraOutput = [extraOutput '1.'];
+            [sol_new4, sol_new1, sol_new2, sol_new3] = runDfFourTrunks(sol_pre, par1, newExtraOutput);
+            sol1 = mergeFourSolutions(sol_new1, sol_new2, sol_new3, sol_new4);
+        end
 
         par2 = par;
         par2.tmax = (par.t0*par.tmax)^0.5 - par1.tmax;
-        disp(['Split solution, second part. tmax: ' num2str(par2.tmax) ' s'])
-        par2.tpoints = floor(par.tpoints / 4);
+        disp(['Split solution, part ' extraOutput '2. tmax: ' num2str(par2.tmax) ' s'])
+        par2.tpoints = max(floor(par.tpoints / 4), 10);
         par2.t0 = par1.tmax / 10;
         sol2 = runDf(sol1, par2);
+        if size(sol2.u,1) ~= par2.tpoints
+            newExtraOutput = [extraOutput '2.'];
+            [sol_new4, sol_new1, sol_new2, sol_new3] = runDfFourTrunks(sol1, par2, newExtraOutput);
+            sol2 = mergeFourSolutions(sol_new1, sol_new2, sol_new3, sol_new4);
+        end
         
         par3 = par;
         par3.tmax = (par.t0^0.5*par.tmax^1.5)^0.5 - par1.tmax - par2.tmax;
-        disp(['Split solution, third part. tmax: ' num2str(par3.tmax) ' s'])
-        par3.tpoints = floor(par.tpoints / 4);
+        disp(['Split solution, part ' extraOutput '3. tmax: ' num2str(par3.tmax) ' s'])
+        par3.tpoints = max(floor(par.tpoints / 4), 10);
         par3.t0 = par2.tmax / 10;
         sol3 = runDf(sol2, par3);
+        if size(sol3.u,1) ~= par3.tpoints
+            newExtraOutput = [extraOutput '3.'];
+            [sol_new4, sol_new1, sol_new2, sol_new3] = runDfFourTrunks(sol2, par3, newExtraOutput);
+            sol3 = mergeFourSolutions(sol_new1, sol_new2, sol_new3, sol_new4);
+        end
         
         par4 = par;
         par4.tmax = par.tmax - par1.tmax - par2.tmax - par3.tmax;
-        disp(['Split solution, fourth part. tmax: ' num2str(par4.tmax) ' s'])
-        par4.tpoints = par.tpoints - par1.tpoints - par2.tpoints - par3.tpoints;
+        disp(['Split solution, part ' extraOutput '4. tmax: ' num2str(par4.tmax) ' s'])
+        par4.tpoints = max(par.tpoints - par1.tpoints - par2.tpoints - par3.tpoints, 10);
         par4.t0 = par3.tmax / 10;
         sol4 = runDf(sol3, par4);
+        if size(sol4.u,1) ~= par4.tpoints
+            newExtraOutput = [extraOutput '4.'];
+            [sol_new4, sol_new1, sol_new2, sol_new3] = runDfFourTrunks(sol3, par4, newExtraOutput);
+            sol4 = mergeFourSolutions(sol_new1, sol_new2, sol_new3, sol_new4);
+        end
         
         if nargout > 4
             [Jtr_temp1, Jdk] = calcJtrJdk(sol_dwell, sol1);
@@ -275,4 +304,11 @@ function [sol4, sol1, sol2, sol3, Jtr, Jdk, t_Jtr] = runDfFourTrunks(sol_pre, pa
             Jtr = [Jtr_temp1; Jtr_temp2; Jtr_temp3; Jtr_temp4];
             t_Jtr = [sol1.t'; (sol2.t+par1.tmax)'; (sol3.t+par1.tmax+par2.tmax)'; (sol4.t+par1.tmax+par2.tmax+par3.tmax)'];
         end
+end
+
+function sol = mergeFourSolutions(sol1, sol2, sol3, sol4)
+    sol.u = [sol1.u; sol2.u; sol3.u; sol4.u];
+    sol.x = sol4.x;
+    sol.par = sol4.par;
+    sol.t = [sol1.t, sol2.t+sol1.t(end), sol3.t+sol1.t(end)+sol2.t(end), sol4.t+sol1.t(end)+sol2.t(end)+sol3.t(end)];
 end
