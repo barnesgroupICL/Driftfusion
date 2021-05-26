@@ -115,9 +115,54 @@ classdef dfplot
 
             figure(301);
             dfplot.x2d(sol, par.x_ihalf, {j.n, j.p, j.a, j.c, j.disp},{'jn', 'jp', 'ja', 'jc', 'jdisp'},...
-                {'-','-','-','-','-'}, 'Current density [Acm-2]', tarr, xrange, 0, 0);
+                {'-','-','-','-','-'}, 'Flux [cm-2s-1]', tarr, xrange, 0, 0);
         end       
      
+        function jx2(varargin)
+            % Plots the carrier fluxes
+            % VARARGIN = [SOL, TARR, XRANGE]
+            % SOL = Solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [XMIN, XMAX]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [j, xplot] = dfana.calcj2(sol);
+
+            figure(301);
+            dfplot.x2d(sol, xplot, {j.n, j.p, j.a, j.c, j.disp},{'jn', 'jp', 'ja', 'jc', 'jdisp'},...
+                {'-','-','-','-','-'}, 'Flux [cm-2s-1]', tarr, xrange, 0, 0);
+        end       
+
+        function jQFLx(varargin)
+            % Plots the carrier fluxes
+            % VARARGIN = [SOL, TARR, XRANGE]
+            % SOL = Solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [XMIN, XMAX]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            j = dfana.calcjQFL(sol);
+            
+            figure(301);
+            dfplot.x2d(sol, par.xx, {j.n, j.p},{'jn', 'jp'},...
+                {'-','-'}, 'Flux [cm-2s-1]', tarr, xrange, 0, 0);
+        end     
+        
+        function jddx(varargin)
+            % Plots the carrier fluxes
+            % VARARGIN = [SOL, TARR, XRANGE]
+            % SOL = Solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [XMIN, XMAX]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            j = dfana.calcj(sol);
+
+            figure(301);
+            dfplot.x2d(sol, par.x_ihalf, {abs(j.n_drift), abs(j.n_diff), abs(j.p_drift), abs(j.p_diff)},{'jn_drift', 'jn_diff', 'jp_drift', 'jp_diff'},...
+                {'-','-','-','-'}, 'Flux [cm-2s-1]', tarr, xrange, 0, 0);
+        end       
+        
         function JV(JV, option)
             % JV - a solution from doJV
             % OPTION - 1 = dark only, 2 = light only, 3 = dark & light

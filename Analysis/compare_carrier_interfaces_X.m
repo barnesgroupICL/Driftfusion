@@ -178,7 +178,8 @@ for i = 1:length(tarr)
                 ps2_ana_r(i,k) = (1/Ystar)*(p(pnt,k) - (jps2/(beta(k)*muh(k)*Vt))*(1 - Ystar) + ((jps2-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 + beta(k)*xprime(k) - (1 + beta(k)*dint(k))*Ystar));
 %              end
                 ps1_ana(i,k) = max(ps1_ana_l(i,k), ps1_ana_r(i,k));
-                ps2_ana(i,k) = max(ps2_ana_l(i,k), ps2_ana_r(i,k));   
+                ps2_ana(i,k) = max(ps2_ana_l(i,k), ps2_ana_r(i,k));
+                
         end
         
         %% Fluxes
@@ -300,19 +301,19 @@ if plotswitch ==2
     ylabel('Carrier density (cm-3)')
     xlim([1e7*par.dcum0(al+1)-0.5,1e7*par.dcum0(al+2)+0.5])
     
-    % % components
-    % figure(5011)
-    % for i = 1:length(tarr)
-    %     pnt = find(sol.t <= tarr(i));
-    %     pnt = pnt(end);
-    %     plot(x*1e7, n1_comp1(i,:), x*1e7, n1_comp2(i,:), x*1e7, n1_comp3(i,:), x*1e7, n1_ana(i,:), 'k-.')
-    %     hold on
-    % end
-    % xlabel('Position, x (nm)')
-    % ylabel('Carrier density (cm-3)')
-    % legend('n comp', 'j comp', 'r comp', 'sum')
-    % xlim([199.5,202.5])
-    % hold off
+    % components
+    figure(5011)
+    for i = 1:length(tarr)
+        pnt = find(sol.t <= tarr(i));
+        pnt = pnt(end);
+        plot(x*1e7, n1_comp1(i,:), x*1e7, n1_comp2(i,:), x*1e7, n1_comp3(i,:), x*1e7, n1_ana(i,:), 'k-.')
+        hold on
+    end
+    xlabel('Position, x (nm)')
+    ylabel('Carrier density (cm-3)')
+    legend('n comp', 'j comp', 'r comp', 'sum')
+    xlim([199.5,202.5])
+    hold off
 end
 
 

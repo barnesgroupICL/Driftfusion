@@ -99,9 +99,8 @@ NA = device.NA;             % Acceptor doping density
 ND = device.ND;             % Donor doping density
 Ncat = device.Ncat;         % Uniform cation density
 Nani = device.Nani;         % Uniform anion density
-xprime_n = device.xprime_n;             % Translated x co-ordinates for interfaces
-xprime_p = device.xprime_p;             % Translated x co-ordinates for interfaces
 xprime = device.xprime;
+dint = device.dint;
 alpha_prime = device.alpha_prime;       % alpha prime is alpha - field component
 beta_prime = device.beta_prime;         % beta prime is alpha - field component
 N_ionic_species = par.N_ionic_species;
@@ -157,6 +156,10 @@ g2_fun_arg = par.g2_fun_arg;
 %% Volumetric surface recombination
 jns = 0;    
 jps = 0;
+ns = 0;
+ps = 0;
+r_vsr_temp = 0;
+r_vsr = 0;
 
 %% Voltage function
 Vapp_fun = fun_gen(par.V_fun_type);
@@ -240,61 +243,57 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         % Bulk SRH
         r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i))+taup(i)*(n+nt(i))));
         % Volumetric surface recombination
-        r_vsr = 0;
-        
-        %% Volumetric surface recombination alpha and beta including field terms
-        alpha = q*dVdx/(kB*T) + alpha_prime(i);
-        beta = q*-dVdx/(kB*T) + beta_prime(i);        
-        
-        if ps_switch(i) == 1
+              
+        if ps_switch(i) == 1 || ns_switch(i) == 1
             jps = jp;
             jns = jn;
         end
-        
-        if ns_switch(i) == 1
-            jps = jp;
-            jns = jn;
-        end
+%             n_l = n;
+%             p_l = p;
+%             
+%             alpha = q*dVdx/(kB*T) + alpha_prime(i);
+%             beta = q*-dVdx/(kB*T) + beta_prime(i);
+%             
+%             n_r = exp(alpha*dint(i))*(n + (jns/(alpha*mue(i)*kB*T))*(1 - exp(-alpha*dint(i))));
+%             p_r = exp(beta*dint(i))*(n + (jps/(beta*muh(i)*kB*T))*(1 - exp(-beta*dint(i))));
+%             
+%             ns = max(n_l, n_r);
+%             ps = max(n_l, n_r);
+%             r_vsr_temp = (((ns*ps)-(ni(i)^2))/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
+%         end
+%         r_vsr = int_switch(i)*SRHset*r_vsr_temp;
         
         if int_switch(i) == 1
-            X = exp(-abs(alpha).*xprime_n(i));
-            Y = exp(-abs(beta).*xprime_p(i));
+            %% obtain majority carrier densities
+            %% Volumetric surface recombination alpha and beta including field terms
+            alpha = q*dVdx/(kB*T) + alpha_prime(i);
+            beta = q*-dVdx/(kB*T) + beta_prime(i);
             
             if alpha < 0
-                delta_jn = (jns-jn)/xprime_n(i);
-            else
-                delta_jn = (jps-jp)/xprime_p(i);
+                X = exp(alpha*xprime(i));
+                ns = (1/X)*(n - ((jn/(alpha*mue(i)*kB*T))*(1 - X)));% + ((jns-jn)/(alpha^2*mue(i)*kB*T*xprime(i)))*(1 - X + alpha*xprime(i)));
+            elseif alpha >= 0
+                Xstar = exp(alpha*(xprime(i) - dint(i)));
+                ns = (1/Xstar)*(n - ((jn/(alpha*mue(i)*kB*T))*(1 - Xstar)));% + ((jns-jn)/(alpha^2*mue(i)*kB*T*xprime(i)))*(1 + alpha*xprime(i) - (1 + alpha*dint(i))*Xstar));
             end
             
             if beta < 0
-                delta_jp = (jps-jp)/xprime_p(i);
-            else
-                delta_jp = (jns-jn)/xprime_n(i);
+                Y = exp(beta*xprime(i));
+                ps = (1/Y)*(p - ((jp/(beta*muh(i)*kB*T))*(1 - Y)));% + ((jps-jp)/(beta^2*muh(i)*kB*T*xprime(i)))*(1 - Y + beta*xprime(i)));
+            elseif beta >= 0
+                Ystar = exp(beta*(xprime(i) - dint(i)));
+                ps = (1/Ystar)*(p - ((jp/(beta*muh(i)*kB*T))*(1 - Ystar)));% + ((jps-jp)/(beta^2*muh(i)*kB*T*xprime(i)))*(1 + beta*xprime(i) - (1 + beta*dint(i))*Ystar));
             end
             
-            ns = (1/X)*(n + sign(alpha).*(jn/(-abs(alpha)*mue(i)*kB*T))*(1 - X)...
-            - sign(alpha).*(delta_jn/(alpha^2*mue(i)*kB*T))*(1- X -abs(alpha)*xprime_n(i)*X));      
-            ps = (1/Y)*(p + sign(beta).*(jp/(-abs(beta)*muh(i)*kB*T))*(1 - Y)...
-            - sign(beta).*(delta_jp/(beta^2*muh(i)*kB*T))*(1- Y -abs(beta)*xprime_p(i)*Y));       
-%             ns = (n- (jns/(alpha*mue(i)*kB*T))*(1-exp(alpha*xprime(i))))*exp(-alpha*xprime(i));
-%             ps = (p- (jps/(beta*muh(i)*kB*T))*(1-exp(beta*xprime(i))))*exp(-beta*xprime(i));
-%             ns = n*exp(-alpha*xprime_n(i));
-%             ps = p*exp(-beta*xprime_p(i));
             r_vsr = int_switch(i)*SRHset*(((ns*ps)-(ni(i)^2))/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
-            r_vsr;
         else
             r_vsr = 0;
-        end            
-
-        % Constant rec rate in interfaces for testing
-        r_con = int_switch(i)*SRHset*r_constant;
-        r_fo_ps = 0;%SRHset*ps_switch(i)*r_constant*(p-ni(i));
-        r_fo_ns = 0;%SRHset*ns_switch(i)*r_fo_ps;
+        end
         
         % Source terms
         S_potential = bulk_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - r_rad - r_srh - r_vsr - r_con;
-        S_hole     = g - r_rad - r_srh - r_vsr - r_con;
+        S_electron = g - r_rad - r_srh - r_vsr;
+        S_hole     = g - r_rad - r_srh - r_vsr;
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
@@ -386,7 +385,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 % the difference in concentration from equilibrium and the extraction
 % coefficient.
     function [Pl,Ql,Pr,Qr] = dfbc(xl,ul,xr,ur,t)
-
+        
         switch par.V_fun_type
             case 'constant'
                 Vapp = par.V_fun_arg(1);

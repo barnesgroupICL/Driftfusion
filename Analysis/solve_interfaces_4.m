@@ -8,15 +8,15 @@ function solve_interfaces_4
 % - constant alpha
 % - constant field
 
-syms n dndx x d ns jn js c1 c2 gam r alph mu mus kB T p p0 bet 
+syms n dndx x d ns jn js c1 c2 gam r alph mus kB T p p0 bet 
 
-neqn = n == (c1/alph)*exp(alph*x) - r*x/(alph*mu*kB*T) + c2;
-mueqn = mu == mus*exp(-alph*x);
-neqn = subs(neqn, mu, rhs(mueqn));
+neqn = n == c1*exp(alph*x) + c2*x*exp(alph*x) + r*x^2*exp(alph*x)/(2*mus*kB*T) 
+% museqn = mus == muss*exp(-alph*x);
+% neqn = subs(neqn, mus, rhs(museqn));
 
 dndxeqn = dndx == diff(rhs(neqn), x)
 
-jn_eqn = jn == mu*kB*T*(alph*n - dndx)
+jn_eqn = jn == mus*kB*T*(alph*n - dndx)
 jn_eqn = subs(jn_eqn, n, rhs(neqn))
 jn_eqn = subs(jn_eqn, dndx, rhs(dndxeqn))
 
@@ -35,6 +35,7 @@ c2sol = solve(jn_eqn_bc1, c2);
 
 neqn_bc1_final = subs(neqn, c1, c1sol)
 neqn_bc1_final = subs(neqn_bc1_final, c2, c2sol)
+neqn_bc1_final = subs(neqn_bc1_final, r, (js-jn)/x)
 
 %% n(d) = ns, jn(0) = js
 neqn_bc2 = neqn;

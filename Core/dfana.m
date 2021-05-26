@@ -19,12 +19,12 @@ classdef dfana
             x = sol.x;
             par = sol.par;
             dev = par.dev;
-
+            
             % split the solution into its component parts (e.g. electrons, holes and efield)
             V = u(:,:,1);
             n = u(:,:,2);
             p = u(:,:,3);
-
+            
             if par.N_ionic_species == 1
                 c = u(:,:,4);
                 a = repmat(dev.Nani, length(t), 1);
@@ -36,19 +36,19 @@ classdef dfana
                 a = repmat(dev.Nani, length(t), 1);
             end
         end
-
+        
         function [Ecb, Evb, Efn, Efp] = QFLs(sol)
             % u is the solution structure
             % Simple structure names
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             Ecb = dev.EA-V;                                 % Conduction band potential
             Evb = dev.IP-V;                                 % Valence band potential
             Efn = zeros(size(n,1), size(n,2));
             Efp = zeros(size(n,1), size(n,2));
-
+            
             if par.prob_distro_function == 'Fermi'
-
+                
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
                         Efn(i,j) = distro_fun.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
@@ -57,30 +57,30 @@ classdef dfana
                 end
                 Efn = Efn-V;
                 Efp = Efp-V;
-
+                
             elseif par.prob_distro_function == 'Boltz'
                 Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./dev.Nc));        % Electron quasi-Fermi level
                 Efp = real(Evb-(par.kB*par.T/par.q)*log(p./dev.Nv));        % Hole quasi-Fermi level
             end
-
+            
         end
-
+        
         function [Ecb, Evb, Efn, Efp] = QFL_ihalf(sol)
             % Calculates the QFLs on the i_half xmesh
             % u is the solution structure
             % Simple structure names
             [u,t,xmesh,par,dev,n0,p0,a0,c0,V0] = dfana.splitsol(sol);
-
-
+            
+            
             n = getvarihalf(n0);
             p = getvarihalf(p0);
             V = getvarihalf(V0);
             dev_ihalf = par.dev_ihalf;
             Ecb_ihalf = dev_ihalf.EA-V;                                 % Conduction band potential
             Evb_ihalf = dev_ihalf.IP-V;                                 % Valence band potential
-
+            
             if par.prob_distro_function == 'Fermi'
-
+                
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
                         Efn_ihalf(i,j) = distro_fun.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
@@ -89,12 +89,12 @@ classdef dfana
                 end
                 Efn_ihalf = Efn_ihalf-V;
                 Efp_ihalf = Efp_ihalf-V;
-
+                
             elseif par.prob_distro_function == 'Boltz'
                 Efn_ihalf = real(Ecb_ihalf+(par.kB*par.T/par.q)*log(n./dev_ihalf.Nc));        % Electron quasi-Fermi level
                 Efp_ihalf = real(Evb_ihalf-(par.kB*par.T/par.q)*log(p./dev_ihalf.Nv));        % Hole quasi-Fermi level
             end
-
+            
             Efn = Efn_ihalf;% zeros(length(t), length(xmesh));
             Efp = Efp_ihalf;% zeros(length(t), length(xmesh));
             Ecb = Ecb_ihalf;
@@ -106,7 +106,7 @@ classdef dfana
             %                 Evb(ii,:) = interp1(x, Evb_ihalf(ii,:), xmesh);
             %             end
         end
-
+        
         function [Ecb, Evb, Efn, Efp] = QFL_J(sol)
             % u is the solution structure
             % Simple structure names
@@ -114,87 +114,87 @@ classdef dfana
             n = getvarihalf(n0);
             p = getvarihalf(p0);
             V = getvarihalf(V0);
-
+            
             dev_ihalf = par.dev_ihalf;
-
+            
             [J, j, x] = dfana.calcJ(sol);
             deltaEfn = cumtrapz(x, J.n./(par.e.*dev_ihalf.mue.*n), 2);
             deltaEfp = cumtrapz(x, J.p./(par.e.*dev_ihalf.muh.*p), 2);
-
+            
             % Boundary values - electrostatic potential is assumed to be
             % zero at left-hand boundary
             %             Efn = zeros(size(n,1), size(n,2));
             %             Efp = zeros(size(n,1), size(n,2));
-
+            
             if par.prob_distro_function == 'Fermi'
-
+                
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
                         Efn_l(i) = distro_fun.Efn_fd_fun(n(i,1), dev_ihalf.Efn(j,1),  dev_ihalf.n_fd(j,1));
                         Efp_l(i) = distro_fun.Efp_fd_fun(p(i,1), dev_ihalf.Efp(j,1),  dev_ihalf.p_fd(j,1));
                     end
                 end
-
+                
             elseif par.prob_distro_function == 'Boltz'
                 Efn_l = real(par.EA(1)+(par.kB*par.T/par.q)*log(n(:,1)./dev_ihalf.Nc(1)));        % Electron quasi-Fermi level
                 Efp_l = real(par.IP(1)-(par.kB*par.T/par.q)*log(p(:,1)./dev_ihalf.Nv(1)));        % Hole quasi-Fermi level
             end
-
+            
             Efn = Efn_l + deltaEfn;
             Efp = Efp_l + deltaEfp;
-
+            
             Ecb = dev_ihalf.EA-V;                                 % Conduction band potential
             Evb = dev_ihalf.IP-V;                                 % Valence band potential
         end
-
+        
         function [J, j, x] = calcJ(sol)
             % Current, J and flux, j calculation from continuity equations
-
+            
             % obtain SOL components for easy referencing
             [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             n_ihalf = getvarihalf(n);
             p_ihalf = getvarihalf(p);
             a_ihalf = getvarihalf(a);
             c_ihalf = getvarihalf(c);
-
+            
             x = par.x_ihalf;
             [~,~,g] = dfana.calcg(sol);
-
+            
             [~, dndt] = gradient(n_ihalf, x, t);
             [~, dpdt] = gradient(p_ihalf, x, t);
             [~, dadt] = gradient(a_ihalf, x, t);
             [~, dcdt] = gradient(c_ihalf, x, t);
-
+            
             % Recombination
             r = dfana.calcr_ihalf(sol);
-
-            djndx = dndt + g - r.tot;    % Not certain about the sign here
+            
+            djndx = dndt + g - r.tot;
             djpdx = dpdt + g - r.tot;
             djadx = dadt;
             djcdx = dcdt;
-
+            
             deltajn = cumtrapz(x, djndx, 2);
             deltajp = cumtrapz(x, djpdx, 2);
             deltaja = cumtrapz(x, djadx, 2);
             deltajc = cumtrapz(x, djcdx, 2);
-
+            
             %% Currents from the boundaries
             switch par.BC
                 case 2
                     jn_l = -par.sn_l*(n(:, 1) - par.nleft);
                     jp_l = -deltajp(:, end) + par.sp_r*(p(:, end) - par.pright);
-
+                    
                     jn_r = deltajn(:, end) - par.sn_l*(n(:, 1) - par.nleft);
                     jp_r = par.sp_r*(p(:, end) - par.pright);
                 case 3
                     jn_l = -par.sn_l*(n(:, 1) - par.nleft);
                     jp_l = -par.sp_l*(p(:, 1) - par.pleft);
-
+                    
                     jn_r = par.sn_r*(n(:, end) - par.nright);
                     jp_r = par.sp_r*(p(:, end) - par.pright);
             end
-
+            
             % Calculate total electron and hole currents from fluxes
             % Use the minority carrier flux as the boundary condition
             if par.pleft >= par.nleft && par.nright >= par.pright
@@ -211,25 +211,25 @@ classdef dfana
                 j.n = jn_l + deltajn;
                 j.p = jp_l + deltajp;
             end
-
+            
             j.a = 0 + deltaja;
             j.c = 0 + deltajc;
             % displacement flux
             FV_ihalf = dfana.calcF_ihalf(sol);
-
+            
             [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
             j.disp = -par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
-
+            
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
             J.a = j.a*-par.e;
             J.c = j.c*par.e;
             J.disp = j.disp*abs(par.e);
-
+            
             % Total current
             J.tot = J.n + J.p + J.a + J.c + J.disp;
         end
-
+        
         function [g1, g2, g] = calcg(sol)
             [~,tmesh,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
             %% Generation function
@@ -240,7 +240,7 @@ classdef dfana
                     g1_fun = fun_gen(par.g1_fun_type);
                     g1 = g1_fun(par.g1_fun_arg, tmesh')*par.gx1;
             end
-
+            
             switch par.g2_fun_type
                 case 'constant'
                     g2 = repmat(par.int2.*par.gx2, length(tmesh), 1);
@@ -250,7 +250,7 @@ classdef dfana
             end
             g = g1 + g2;
         end
-
+        
         function r = calcr(sol)
             % Calculate the recombination rate on whole mesh
             % obtain SOL components for easy referencing
@@ -265,8 +265,8 @@ classdef dfana
             xprime_p = dev.xprime_p;
             alpha_prime = dev.alpha_prime;
             beta_prime = dev.beta_prime;
-            alpha = abs(par.q*dVdx./(par.kB*par.T) + alpha_prime); 
-            beta = abs(par.q*-dVdx./(par.kB*par.T) + beta_prime);    
+            alpha = abs(par.q*dVdx./(par.kB*par.T) + alpha_prime);
+            beta = abs(par.q*-dVdx./(par.kB*par.T) + beta_prime);
             
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
@@ -280,83 +280,358 @@ classdef dfana
             % Total
             r.tot = r.btb + r.srh + r.vsr +r.constant;
         end
+        
+        function j = calcj(sol)
+            % Calculate the recombination rate on i-half mesh
+            % obtain SOL components for easy referencing
+            [u,t,x,par,~,~,~,~,~,~] = dfana.splitsol(sol);
+            
+            %% Constants
+            kB = par.kB;
+            T = par.T;
+            
+            dev = par.dev_ihalf;
+            x_ihalf = par.x_ihalf;
+            mue = dev.mue;
+            muh = dev.muh;
+            Nc = dev.Nc;
+            Nv = dev.Nv;
+            gradEA = dev.gradEA;
+            gradIP = dev.gradIP;
+            gradNc = dev.gradNc;
+            gradNv = dev.gradNv;
+            
+            V = zeros(length(t), length(x_ihalf));
+            dVdx = zeros(length(t), length(x_ihalf));
+            n = zeros(length(t), length(x_ihalf));
+            dndx = zeros(length(t), length(x_ihalf));
+            p = zeros(length(t), length(x_ihalf));
+            dpdx = zeros(length(t), length(x_ihalf));
+            
+            j.n = zeros(length(t), length(x_ihalf));
+            j.p = zeros(length(t), length(x_ihalf));
+            j.a = zeros(length(t), length(x_ihalf));
+            j.c = zeros(length(t), length(x_ihalf));
+            j.disp = zeros(length(t), length(x_ihalf));
+            
+            % Displacement flux
+            FV_ihalf = dfana.calcF_ihalf(sol);
+            [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
+            j.disp = -par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
+            
+            for i = 1:length(t)
+                [V(i,:), dVdx(i,:)] = pdeval(0, x, u(i,:,1), x_ihalf);
+                [n(i,:), dndx(i,:)] = pdeval(0, x, u(i,:,2), x_ihalf);
+                [p(i,:), dpdx(i,:)] = pdeval(0, x, u(i,:,3), x_ihalf);
+                
+                %                 [~, dVdx(i,:)] = pdeval(0, x, u(i,:,1), x_ihalf);
+                %                 [~, dndx(i,:)] = pdeval(0, x, u(i,:,2), x_ihalf);
+                %                 [~, dpdx(i,:)] = pdeval(0, x, u(i,:,3), x_ihalf);
+                
+                j.n_drift(i,:) = mue.*n(i,:).*(dVdx(i,:) - gradEA);
+                j.n_diff(i,:) = -(kB.*T.*mue.*(dndx(i,:) - ((n(i,:)./Nc).*gradNc)));
+                j.p_drift(i,:) = muh.*p(i,:).*(-dVdx(i,:) + gradIP);
+                j.p_diff(i,:) = -(kB.*T.*muh.*(dpdx(i,:) - ((p(i,:)./Nv).*gradNv)));
+            end
+            
+            j.n = j.n_drift + j.n_diff;
+            j.p = j.p_drift + j.p_diff;
+        end
+        
+        function [j, xout] = calcj2(sol)
+            % Calculate the recombination rate on i-half mesh
+            % obtain SOL components for easy referencing     
+            option = 4;
+            
+            % Displacement flux
+            %             FV_ihalf = dfana.calcF_ihalf(sol);
+            %             [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
+            %             j.disp = -par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
+            
+            switch option
+                case 1
+                    [u,t,x,par,~,~,~,~,~,~] = dfana.splitsol(sol);
+                    kB = par.kB;
+                    T = par.T;
+                    dev = par.dev_ihalf;
+                    x_ihalf = par.x_ihalf;
+                    mue = dev.mue;
+                    muh = dev.muh;
+                    Nc = dev.Nc;
+                    Nv = dev.Nv;
+                    gradEA = dev.gradEA;
+                    gradIP = dev.gradIP;
+                    gradNc = dev.gradNc;
+                    gradNv = dev.gradNv;
+                    
+                    V = zeros(length(t), length(x)-1);
+                    dVdx = zeros(length(t), length(x)-1);
+                    n = zeros(length(t), length(x)-1);
+                    dndx = zeros(length(t), length(x)-1);
+                    p = zeros(length(t), length(x)-1);
+                    dpdx = zeros(length(t), length(x)-1);
+                    
+                    j.n = zeros(length(t), length(x)-1);
+                    j.p = zeros(length(t), length(x)-1);
+                    j.a = zeros(length(t), length(x)-1);
+                    j.c = zeros(length(t), length(x)-1);
+                    j.disp = zeros(length(t), length(x)-1);
+                    for i = 1:length(t)   
+                        % Densities and derivatives calculated on half mesh
+                        [V(i,:), dVdx(i,:)] = pdeval(0, x, u(i,:,1), x_ihalf);
+                        [n(i,:), dndx(i,:)] = pdeval(0, x, u(i,:,2), x_ihalf);
+                        [p(i,:), dpdx(i,:)] = pdeval(0, x, u(i,:,3), x_ihalf);
+                        
+                        j.n_drift(i,:) = mue.*n(i,:).*(dVdx(i,:) - gradEA);
+                        j.n_diff(i,:) = -(kB.*T.*mue.*(dndx(i,:) - ((n(i,:)./Nc).*gradNc)));
+                        j.p_drift(i,:) = muh.*p(i,:).*(-dVdx(i,:) + gradIP);
+                        j.p_diff(i,:) = -(kB.*T.*muh.*(dpdx(i,:) - ((p(i,:)./Nv).*gradNv)));
+                    end
+                    xout = x_ihalf;
+                case 2
+                    [u,t,x,par,~,~,~,~,~,~] = dfana.splitsol(sol);
+                    kB = par.kB;
+                    T = par.T;
+                    dev = par.dev;
+                    x_ihalf = par.x_ihalf;
+                    mue = dev.mue;
+                    muh = dev.muh;
+                    Nc = dev.Nc;
+                    Nv = dev.Nv;
+                    gradEA = dev.gradEA;
+                    gradIP = dev.gradIP;
+                    gradNc = dev.gradNc;
+                    gradNv = dev.gradNv;
+                    
+                    V = zeros(length(t), length(x));
+                    dVdx = zeros(length(t), length(x));
+                    n = zeros(length(t), length(x));
+                    dndx = zeros(length(t), length(x));
+                    p = zeros(length(t), length(x));
+                    dpdx = zeros(length(t), length(x));
+                    
+                    j.n = zeros(length(t), length(x));
+                    j.p = zeros(length(t), length(x));
+                    j.a = zeros(length(t), length(x));
+                    j.c = zeros(length(t), length(x));
+                    j.disp = zeros(length(t), length(x));
+                    
+                    for i = 1:length(t)   
+                        % Derivatives calculated on half mesh, carriers on
+                        % whole
+                        [V_ihalf(i,:), ~] = pdeval(0, x, u(i,:,1), x_ihalf);
+                        [n_ihalf(i,:), ~] = pdeval(0, x, u(i,:,2), x_ihalf);
+                        [p_ihalf(i,:), ~] = pdeval(0, x, u(i,:,3), x_ihalf);
+                        
+                        [~, dVdx(i,(2:end-1))] = pdeval(0, x_ihalf, u(i,:,1), x(2:end-1));
+                        [~, dndx(i,(2:end-1))] = pdeval(0, x_ihalf, u(i,:,2), x(2:end-1));
+                        [~, dpdx(i,(2:end-1))] = pdeval(0, x_ihalf, u(i,:,3), x(2:end-1));
+                        
+                        [V(i,:), ~] = pdeval(0, x, u(i,:,1), x);
+                        [n(i,:), ~] = pdeval(0, x, u(i,:,2), x);
+                        [p(i,:), ~] = pdeval(0, x, u(i,:,3), x);
+                        
+                        j.n_drift(i,:) = mue.*n(i,:).*(dVdx(i,:) - gradEA);
+                        j.n_diff(i,:) = -(kB.*T.*mue.*(dndx(i,:) - ((n(i,:)./Nc).*gradNc)));
+                        j.p_drift(i,:) = muh.*p(i,:).*(-dVdx(i,:) + gradIP);
+                        j.p_diff(i,:) = -(kB.*T.*muh.*(dpdx(i,:) - ((p(i,:)./Nv).*gradNv)));
+                    end
+                    xout = x;
+                case 3
+                    for i = 1:length(t)
+                        % Derivatives calculated on whole mesh, carriers on
+                        % half
+                        [V_ihalf(i,:), ~] = pdeval(0, x, u(i,:,1), x_ihalf);
+                        [n_ihalf(i,:), ~] = pdeval(0, x, u(i,:,2), x_ihalf);
+                        [p_ihalf(i,:), ~] = pdeval(0, x, u(i,:,3), x_ihalf);
+                        
+                        for k= 1:length(x_ihalf)-1
+                            dVdx(i,k+1) = (V_ihalf(i,k+1)-V_ihalf(i,k))/(x_ihalf(k+1)-x_ihalf(k));
+                            dndx(i,k+1) = (n_ihalf(i,k+1)-n_ihalf(i,k))/(x_ihalf(k+1)-x_ihalf(k));
+                            dVdx(i,k+1) = (p_ihalf(i,k+1)-p_ihalf(i,k))/(x_ihalf(k+1)-x_ihalf(k));
+                        end
+                        [V(i,:), ~] = pdeval(0, x, u(i,:,1), x);
+                        [n(i,:), ~] = pdeval(0, x, u(i,:,2), x);
+                        [p(i,:), ~] = pdeval(0, x, u(i,:,3), x);
+                    end
+                case 4
+                                       [u,t,x,par,~,~,~,~,~,~] = dfana.splitsol(sol);
+                    kB = par.kB;
+                    T = par.T;
+                    dev = par.dev_ihalf;
+                    x_ihalf = par.x_ihalf;
+                    mue = dev.mue;
+                    muh = dev.muh;
+                    Nc = dev.Nc;
+                    Nv = dev.Nv;
+                    gradEA = dev.gradEA;
+                    gradIP = dev.gradIP;
+                    gradNc = dev.gradNc;
+                    gradNv = dev.gradNv;
+                    
+                    V = zeros(length(t), length(x)-1);
+                    dVdx = zeros(length(t), length(x)-1);
+                    n = zeros(length(t), length(x)-1);
+                    dndx = zeros(length(t), length(x)-1);
+                    p = zeros(length(t), length(x)-1);
+                    dpdx = zeros(length(t), length(x)-1);
+                    
+                    j.n = zeros(length(t), length(x)-1);
+                    j.p = zeros(length(t), length(x)-1);
+                    j.a = zeros(length(t), length(x)-1);
+                    j.c = zeros(length(t), length(x)-1);
+                    j.disp = zeros(length(t), length(x)-1);                    
+                    for i = 1:length(t)
+                        % Derivatives calculated on whole mesh, carriers on
+                        % half mesh
+                        [V_temp(i,:), ~] = pdeval(0, x, u(i,:,1), x);
+                        [n_temp(i,:), ~] = pdeval(0, x, u(i,:,2), x);
+                        [p_temp(i,:), ~] = pdeval(0, x, u(i,:,3), x);
+                        
+                        for k= 1:length(x_ihalf)-1
+                            dVdx(i,k+1) = (V_temp(i,k+1)-V_temp(i,k))/(x(k+1)-x(k));
+                            dndx(i,k+1) = (n_temp(i,k+1)-n_temp(i,k))/(x(k+1)-x(k));
+                            dVdx(i,k+1) = (p_temp(i,k+1)-p_temp(i,k))/(x(k+1)-x(k));
+                        end
+                        [V(i,:), ~] = pdeval(0, x, u(i,:,1), x_ihalf);
+                        [n(i,:), ~] = pdeval(0, x, u(i,:,2), x_ihalf);
+                        [p(i,:), ~] = pdeval(0, x, u(i,:,3), x_ihalf);
+                        j.n_drift(i,:) = mue.*n(i,:).*(dVdx(i,:) - gradEA);
+                        j.n_diff(i,:) = -(kB.*T.*mue.*(dndx(i,:) - ((n(i,:)./Nc).*gradNc)));
+                        j.p_drift(i,:) = muh.*p(i,:).*(-dVdx(i,:) + gradIP);
+                        j.p_diff(i,:) = -(kB.*T.*muh.*(dpdx(i,:) - ((p(i,:)./Nv).*gradNv)));  
+                        
+                    end     
+                    xout = x_ihalf;
+            end
 
+            j.n = j.n_drift + j.n_diff;
+            j.p = j.p_drift + j.p_diff;
+        end
+        
+        function j = calcjQFL(sol)
+            [u,t,x,par,~,~,~,a,c,V] = dfana.splitsol(sol);
+            [~, ~, Efn, Efp] = dfana.QFLs(sol);
+            
+            x_ihalf = par.x_ihalf;
+            dev = par.dev;
+            mue = dev.mue;
+            muh = dev.muh;
+            
+            for i= 1:length(t)
+                [n(i,:), ~] = pdeval(0, x, u(i,:,2), x);
+                [p(i,:), ~] = pdeval(0, x, u(i,:,3), x);
+                
+                gradEfn(i,:) = gradient(Efn(i,:), x);
+                gradEfp(i,:) = gradient(Efp(i,:), x);
+                j.n(i,:) = mue.*n(i,:).*gradEfn(i,:);
+                j.p(i,:) = muh.*p(i,:).*gradEfp(i,:);
+            end
+            
+        end
+        
         function r = calcr_ihalf(sol)
             % Calculate the recombination rate on i-half mesh
             % obtain SOL components for easy referencing
             [u,t,x,par,~,n,p,a,c,V] = dfana.splitsol(sol);
             dev = par.dev_ihalf;
+            
+            %% Constants
+            kB = par.kB;
+            T = par.T;
+            
             x_ihalf = par.x_ihalf;
             n_ihalf = getvarihalf(n);
             p_ihalf = getvarihalf(p);
             
             %[~, j, ~] = dfana.calcJ(sol);
             
-            dVdx_ihalf = zeros(length(t), length(x_ihalf));
-            for i=1:length(t)
-                [~, dVdx_ihalf(i,:)] = pdeval(0, x, V(i,:), x_ihalf);
-            end
             int_switch = repmat(dev.int_switch, length(t), 1);
             bulk_switch = abs(int_switch-1);
             xprime_n = dev.xprime_n;
             xprime_p = dev.xprime_p;
-            
+            xprime = dev.xprime;
             alpha_prime = dev.alpha_prime;
             beta_prime = dev.beta_prime;
-                       
-            alpha = abs(par.q*dVdx_ihalf./(par.kB*par.T) + alpha_prime);
-            beta = abs(par.q*-dVdx_ihalf./(par.kB*par.T) + beta_prime); 
-
+            mue = dev.mue;
+            muh = dev.muh;
+            
+            % Obtain field on half mesh
+            dVdx_ihalf = zeros(length(t), length(x_ihalf));
+            for i=1:length(t)
+                [~, dVdx_ihalf(i,:)] = pdeval(0, x, V(i,:), x_ihalf);
+            end
+            
+            alpha = par.q*dVdx_ihalf./(par.kB*par.T) + alpha_prime;
+            beta = par.q*-dVdx_ihalf./(par.kB*par.T) + beta_prime;
+            
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
             % Bulk SRH
             r.srh = bulk_switch.*(n_ihalf.*p_ihalf - dev.ni.^2)...
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
             
-%             %% Volumetric surface SRH
-%             for i =1:length(t)
-%                 
-%                 X = exp(-abs(alpha).*xprime_n);
-%                 Y = exp(-abs(beta).*xprime_p);
-%                 
-%                 if alpha < 0
-%                     delta_jn = (jns-jn)/xprime_n(i);
-%                 else
-%                     delta_jn = (jps-jp)/xprime_p(i);
-%                 end
-%                 
-%                 if beta < 0
-%                     delta_jp = (jps-jp)/xprime_p(i);
-%                 else
-%                     delta_jp = (jns-jn)/xprime_n(i);
-%                 end
-%                 
-%                 ns = (1/X).*(n + sign(alpha).*(jn./(-abs(alpha)*mue(i)*kB*T))*(1 - X)...
-%                     - sign(alpha).*(delta_jn/(alpha^2*mue(i)*kB*T))*(1- X -abs(alpha)*xprime_n(i)*X));
-%                 ps = (1/Y)*(p + sign(beta).*(jp./(-abs(beta)*muh(i)*kB*T))*(1 - Y)...
-%                     - sign(beta).*(delta_jp/(beta^2*muh(i)*kB*T))*(1- Y -abs(beta)*xprime_p(i)*Y));
-%                 
-%                 r.vsr(i,:) = int_switch.*(n_ihalf.*exp(alpha.*xprime_n).*p_ihalf.*exp(beta.*xprime_p) - dev.ni.^2)...
-%                     ./(dev.taun_vsr.*(p_ihalf.*exp(beta.*xprime_p) + dev.pt) + dev.taup_vsr.*(n_ihalf.*exp(alpha.*xprime_n) + dev.nt));
-%                 
-%             end
+            %             r.vsr(i,:) = int_switch(j)*(ns(i,j)*ps(i,j) - dev.ni(j)^2)...
+            %                         ./(dev.taun_vsr(j)*(ps(i,j) + dev.pt(j)) + dev.taup_vsr(j)*(ns(i,j) + dev.nt));
+            %             %% Volumetric surface SRH
+            %             for i =1:length(t)
+            %                 for j = 1:length(x_ihalf)
+            %
+            %             %% Carrier densities
+            %             if alpha(j) < 0
+            %                 ns1 = u(i, par.pcum0(al-1)+1, 2);
+            %                 ns2 = u(i, par.pcum0(al+1)+1, 2);
+            %             elseif alpha(j) >= 0
+            %                 ns1 = u(i, par.pcum0(al)+1, 2);
+            %                 ns2 = u(i, par.pcum0(al+2)+1, 2);
+            %             end
+            %
+            %             if beta(j) < 0
+            %                 ps1 = u(i, par.pcum0(al-1)+1, 3);
+            %                 ps2 = u(i, par.pcum0(al+1)+1, 3);
+            %             elseif beta(j) >= 0
+            %                 ps1 = u(i, par.pcum0(al)+1, 3);
+            %                 ps2 = u(i, par.pcum0(al+2)+1, 3);
+            %             end
+            %                     if alpha(i,j) < 0
+            %                         X = exp(alpha(i,j)*xprime(j));
+            %                         ns(i,j) = (1/X)*(n(i,j) - ((jn(i,j)/(alpha(i,j)*mue(j)*kB*T))*(1 - X)));% + ((jns-jn)/(alpha^2*mue(i)*kB*T*xprime(i)))*(1 - X + alpha*xprime(i)));
+            %                     elseif alpha(i,j) >= 0
+            %                         Xstar = exp(alpha(i,j)*(xprime(j) - dint(j)));
+            %                         ns(i,j) = (1/Xstar)*(n(i,j) - ((jn(i,j)/(alpha(i,j)*mue(j)*kB*T))*(1 - Xstar)));% + ((jns-jn)/(alpha^2*mue(i)*kB*T*xprime(i)))*(1 + alpha*xprime(i) - (1 + alpha*dint(i))*Xstar));
+            %                     end
+            %
+            %                     if beta(i,j) < 0
+            %                         Y = exp(beta(i,j)*xprime(j));
+            %                         ps(i,j) = (1/Y)*(p(i,j) - ((jp(i,j)/(beta(i,j)*muh(j)*kB*T))*(1 - Y)));% + ((jps-jp)/(beta^2*muh(i)*kB*T*xprime(i)))*(1 - Y + beta*xprime(i)));
+            %                     elseif beta(i,j) >= 0
+            %                         Ystar = exp(beta(i,j)*(xprime(j) - dint(j)));
+            %                         ps(i,j) = (1/Ystar)*(p(i,j) - ((jp(i,j)/(beta(i,j)*muh(j)*kB*T))*(1 - Ystar)));% + ((jps-jp)/(beta^2*muh(i)*kB*T*xprime(i)))*(1 + beta*xprime(i) - (1 + beta*dint(i))*Ystar));
+            %                     end
+            %
+            %                     r.vsr(i,:) = int_switch(j)*(ns(i,j)*ps(i,j) - dev.ni(j)^2)...
+            %                         ./(dev.taun_vsr(j)*(ps(i,j) + dev.pt(j)) + dev.taup_vsr(j)*(ns(i,j) + dev.nt));
+            %                 end
+            %             end
+            %                 end
+            %             end
             r.vsr = 0;
             r.constant = int_switch.*par.r_constant;
             % Total
             r.tot = r.btb + r.srh + r.vsr + r.constant;
         end
-
+        
         function [jdd, Jdd, xout] = Jddxt(sol)
             % Calculates drift and diffusion currents at every point and all times -
             % NOTE: UNRELIABLE FOR TOTAL CURRENT as errors in the calculation of the
             % spatial gradients mean that the currents do not cancel properly
             option = 1;
             % obtain SOL components for easy referencing
-
+            
             [u,t,xmesh,par,dev_i,n,p,a,c,V] = dfana.splitsol(sol);
             xhalfmesh = par.x_ihalf;
             dev_ihalf = par.dev_ihalf;
-
+            
             switch option
                 case 1
                     dev = dev_ihalf;
@@ -383,9 +658,9 @@ classdef dfana
             gradNv_mat = dev.gradNv;
             Nc_mat = dev.Nc;
             Nv_mat = dev.Nv;
-
+            
             for i = 1:length(t)
-
+                
                 switch option
                     case 1
                         [nloc(i,:),dndx(i,:)] = pdeval(0,xmesh,n(i,:),xhalfmesh);
@@ -405,7 +680,7 @@ classdef dfana
                         [aloc(i,:),~] = pdeval(0,xmesh,a(i,:),xhalfmesh);
                         [cloc(i,:),~] = pdeval(0,xmesh,c(i,:),xhalfmesh);
                         [Vloc(i,:),~] = pdeval(0,xmesh,V(i,:),xhalfmesh);
-
+                        
                         dndx(i,:) = gradient(nloc(i,:), xhalfmesh);
                         dpdx(i,:) = gradient(ploc(i,:), xhalfmesh);
                         dadx(i,:) = gradient(aloc(i,:), xhalfmesh);
@@ -421,7 +696,7 @@ classdef dfana
                             [Vloc(i,jj),dVdx(i,jj)] = dfana.pdentrp(0,0,xmesh(jj),V(i,jj),xmesh(jj+1),V(i,jj+1),xnow);
                         end
                 end
-
+                
                 % Diffusion coefficients
                 if par.prob_distro_function == 'Fermi'
                     for jj = 1:length(x)
@@ -430,18 +705,18 @@ classdef dfana
                     end
                 end
             end
-
+            
             if par.prob_distro_function == 'Boltz'
                 Dn_mat = mue_mat*par.kB*par.T;
                 Dp_mat = muh_mat*par.kB*par.T;
             end
-
+            
             % Particle fluxes
             jdd.ndiff = par.mobset*-(-Dn_mat.*(dndx-((nloc./Nc_mat).*gradNc_mat)));
             jdd.ndrift = par.mobset*-(mue_mat.*nloc.*(dVdx-gradEA_mat));
             jdd.pdiff = par.mobset*(-Dp_mat.*(dpdx-((ploc./Nv_mat).*gradNv_mat)));
             jdd.pdrift = par.mobset*(muh_mat.*ploc.*(-dVdx+gradIP_mat));
-
+            
             switch par.N_ionic_species
                 case 0
                     jdd.cdiff = zeros(length(t), length(xout));
@@ -459,19 +734,19 @@ classdef dfana
                     jdd.adiff = par.mobseti*-(-mu_ani.*par.kB*par.T.*dadx);
                     jdd.adrift = par.mobseti*-(mu_ani.*aloc.*dVdx);
             end
-
+            
             jdd.n = jdd.ndrift + jdd.ndiff;
             jdd.p = jdd.pdrift + jdd.pdiff;
             jdd.a = jdd.adrift + jdd.adiff;
             jdd.c = jdd.cdrift + jdd.cdiff;
-
+            
             % Displacement current
             [~, dVdxdt] = gradient(-dVdx, xout, t);
             j.disp = par.epp0.*eppmat.*dVdxdt;
-
+            
             jdd.disp = j.disp;
             jdd.tot = jdd.n + jdd.p + jdd.a + jdd.c + jdd.disp;
-
+            
             Jdd.ndrift = jdd.ndrift*par.e;
             Jdd.ndiff = jdd.ndiff*par.e;
             Jdd.pdrift = jdd.pdrift*par.e;
@@ -480,7 +755,7 @@ classdef dfana
             Jdd.adiff = jdd.adiff*par.e;
             Jdd.cdrift = jdd.cdrift*par.e;
             Jdd.cdiff = jdd.cdiff*par.e;
-
+            
             Jdd.n = par.e*jdd.n;
             Jdd.p = par.e*jdd.p;
             Jdd.a = par.e*jdd.a;
@@ -488,20 +763,20 @@ classdef dfana
             Jdd.disp = par.e*jdd.disp;
             Jdd.tot = par.e*jdd.tot;
         end
-
+        
         function [FV, Frho] = calcF(sol)
             % Electric field caculation
             % FV = Field calculated from the gradient of the potential
             % Frho = Field calculated from integrated space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             FV = -gradient(V, x, t);                      % Electric field calculated from V
-
+            
             if nargout > 1
                 rho = dfana.calcrho(sol);
                 Frho = cumtrapz(x, rho, 2)./(dev.epp.*par.epp0) + FV(:,1);
             end
         end
-
+        
         function [FV, Frho] = calcF_ihalf(sol)
             % Electric field caculation
             % FV = Field calculated from the gradient of the potential
@@ -517,28 +792,28 @@ classdef dfana
                 Frho = cumtrapz(par.x_ihalf, rho, 2)./(par.dev_ihalf.epp.*par.epp0) + FV(:,1);
             end
         end
-
+        
         function rho = calcrho(sol)
             % Calculates the space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             % charge density
             rho = -n + p - a + c - dev.NA + dev.ND + dev.Nani - dev.Ncat;
         end
-
+        
         function rho = calcrho_ihalf(sol)
             % Calculates the space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             n_ihalf = getvarihalf(n);
             p_ihalf = getvarihalf(p);
             a_ihalf = getvarihalf(a);
             c_ihalf = getvarihalf(c);
-
+            
             % charge density
             rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - par.dev_ihalf.NA + par.dev_ihalf.ND + par.dev_ihalf.Nani - par.dev_ihalf.Ncat;
         end
-
+        
         function Vapp = calcVapp(sol)
             [~,t,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
             switch par.V_fun_type
@@ -549,7 +824,7 @@ classdef dfana
                     Vapp = Vapp_fun(par.V_fun_arg, t);
             end
         end
-
+        
         function stats = JVstats(JVsol)
             % A function to pull statistics from a JV sweep using DOJV
             % JVsol - a solution from DOJV
@@ -564,31 +839,31 @@ classdef dfana
                         warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
                         stats.Jsc_f = 0;
                     end
-
+                    
                     try
                         stats.Voc_f = interp1(J.tot(:, end), Vapp, 0);
                     catch
                         warning('No Voc available- try increasing applied voltage range')
                         stats.Voc_f = 0;
                     end
-
+                    
                     if stats.Jsc_f ~= 0 && stats.Voc_f ~= 0
                         pow_f = J.tot(:,end).*Vapp;
                         stats.mpp_f = min(pow_f);
                         stats.mppV_f = Vapp(pow_f == stats.mpp_f);
                         stats.FF_f = stats.mpp_f/(stats.Jsc_f*stats.Voc_f);
                     end
-
+                    
                     %% Hysteresis Index
                     A_f = abs(trapz(Vapp(Vapp >=0 & Vapp <= stats.Voc_f), J.tot(Vapp >= 0 & Vapp <= stats.Voc_f, end)));
-
+                    
                 else
                     stats.Jsc_f = nan;
                     stats.Voc_f = nan;
                     stats.mpp_f = nan;
                     stats.FF_f = nan;
                 end
-
+                
                 if isfield(JVsol.ill, 'r')
                     Vapp = dfana.calcVapp(JVsol.ill.r);
                     Vapp = Vapp';
@@ -599,33 +874,33 @@ classdef dfana
                         warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
                         stats.Jsc_r = 0;
                     end
-
+                    
                     try
                         stats.Voc_r = interp1(J.tot(:, end), Vapp, 0);
                     catch
                         warning('No Voc available- try increasing applied voltage range')
                         stats.Voc_r = 0;
                     end
-
+                    
                     if stats.Jsc_r ~= 0 && stats.Voc_r ~= 0
                         pow_r = J.tot(:,end).*Vapp;
                         stats.mpp_r = min(pow_r);
                         stats.mppV_r = Vapp(pow_r == stats.mpp_r);
                         stats.FF_r = stats.mpp_r/(stats.Jsc_r*stats.Voc_r);
                     end
-
+                    
                     %% Hysteresis Factor
                     A_r = abs(trapz(Vapp(Vapp >=0 & Vapp <= stats.Voc_r), J.tot(Vapp >= 0 & Vapp <= stats.Voc_r, end)));
-
+                    
                     %% Sign to identify inverted hysteresis
                     if A_r >= A_f
                         B = 1;
                     elseif A_r < A_f
                         B = -1;
                     end
-
+                    
                     stats.HF = B*abs((A_r - A_f)/A_r);
-
+                    
                 else
                     stats.Jsc_r = NaN;
                     stats.Voc_r = NaN;
@@ -636,14 +911,14 @@ classdef dfana
             else
             end
         end
-
+        
         function value = PLt(sol)
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             Bmat = dev.B;
             value = trapz(x,(dev.B.*(n.*p-dev.ni.^2)),2);
         end
-
+        
         function VQFL = calcVQFL(sol)
             % Get QFLs
             [~, ~, Efn, Efp] = dfana.QFLs(sol);
@@ -659,43 +934,43 @@ classdef dfana
                 VQFL = Efn(:, end) - Efp(:, 1);
             end
         end
-
+        
         function deltaV = deltaVt(sol, p1, p2)
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             % Calculates the electorstatic potential difference as a function of time
             % between two points P1 and P2
             deltaV = V(:,p1) - V(:,p2);
         end
-
+        
         function sigma = calcsigma(sol)
             % calculates the integrated space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             rho = dfana.calcrho(sol);
             sigma = trapz(x, rho, 2);
         end
-
+        
         function sigma_ion = calcsigma_ion(sol)
             % calculates the integrated space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             rho_ion = c-a;
             sigma_ion = trapz(x, rho_ion, 2);
         end
-
+        
         function Fion = calcFion(sol)
-           [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
-           rhoion = c - dev.Ncat - a + dev.Nani;
-           Fion = cumtrapz(x, rhoion, 2)./(dev.epp*par.epp0);
-
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            rhoion = c - dev.Ncat - a + dev.Nani;
+            Fion = cumtrapz(x, rhoion, 2)./(dev.epp*par.epp0);
+            
         end
-
+        
         function Vion = calcVion(sol)
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             Fion = dfana.calcFion(sol);
             Vion = -cumtrapz(x, Fion,2);
         end
-
+        
         function [U,Ux] = pdentrp(singular,m,xL,uL,xR,uR,xout)
             % PDENTRP  Interpolation helper function for PDEPE.
             %   [U,UX] = PDENTRP(M,XL,UL,XR,UR,XOUT) uses solution values UL at XL and UR at XR
@@ -705,17 +980,17 @@ classdef dfana
             %   arrays U, UX correspond to XOUT(i).
             %
             %   See also PDEPE, PDEVAL, PDEODES.
-
+            
             %   Lawrence F. Shampine and Jacek Kierzenka
             %   Copyright 1984-2013 The MathWorks, Inc.
             %   $Revision: 1.5.4.4.54.1 $  $Date: 2013/09/27 03:10:22 $
-
+            
             xout = xout(:)';
             nout = length(xout);
-
+            
             U = uL(:,ones(1,nout));
             Ux = zeros(size(U));
-
+            
             uRL = uR - uL;
             % Use singular interpolant on all subintervals.
             if singular

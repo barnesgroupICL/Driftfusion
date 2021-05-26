@@ -111,24 +111,12 @@ for i=1:length(par.dcum)                % i is the layer index
                         case 'int_switch'
                             devprop(j) = 1;
                         case 'ns_switch'
-                            if alpha_prime < 0
-                                if k == 1
-                                    devprop(j-1) = 1;
-                                end
-                            elseif alpha_prime >= 0
-                                if k == par.layer_points(i)-1
-                                    devprop(j+2) = 1;
-                                end
+                            if k == 1
+                                devprop(j) = 1;
                             end
                         case 'ps_switch'
-                            if beta_prime < 0
-                                if k == 1
-                                    devprop(j-1) = 1;
-                                end
-                            elseif beta_prime >= 0
-                                if k == par.layer_points(i)-1
-                                    devprop(j+2) = 1;
-                                end
+                            if k == 1
+                                devprop(j) = 1;
                             end
                         case 'xprime_n'
                             devprop(j) = xprime_n;

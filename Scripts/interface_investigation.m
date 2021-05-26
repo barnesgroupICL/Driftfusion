@@ -61,11 +61,11 @@ sol_CV_trans_ion_dk = doCV(soleq_trans.ion, 0, 0, 1, 0, 100e-3, 1, 281);
 
 %% High mob, High rec
 par_rec = par;
-par_rec.r_constant = 1e23;  % Uniform rec rate within interfacial regions
-par_rec.sn(2) = 1e-20;      
-par_rec.sp(2) = 1e-20;
-par_rec.sn(4) = 1e-20;
-par_rec.sp(4) = 1e-20;
+%par_rec.r_constant = 1e23;  % Uniform rec rate within interfacial regions
+par_rec.sn(2) = 1e1;      
+par_rec.sp(2) = 1e6;
+par_rec.sn(4) = 1e6;
+par_rec.sp(4) = 1e1;
 par_rec.mue(2) = 1e3;
 par_rec.muh(2) = 1e3;
 par_rec.mue(4) = 1e3;
@@ -86,11 +86,11 @@ sol_CV_rec_ion_dk = doCV(soleq_rec.ion, 0, 0, 1, 0, 100e-3, 1, 281);
 
 %% Low mob, High rec - also asymmetric mob for testing
 par_lomob_hirec = par;
-par_lomob_hirec.r_constant = 1e23;  % Uniform rec rate within interfacial regions
-par_lomob_hirec.sn(2) = 1e-20;      
-par_lomob_hirec.sp(2) = 1e-20;
-par_lomob_hirec.sn(4) = 1e-20;
-par_lomob_hirec.sp(4) = 1e-20;
+%par_lomob_hirec.r_constant = 1e23;  % Uniform rec rate within interfacial regions
+par_rec.sn(2) = 1e1;      
+par_rec.sp(2) = 1e6;
+par_rec.sn(4) = 1e6;
+par_rec.sp(4) = 1e1;
 par_lomob_hirec.mue(2) = 1e-2;
 par_lomob_hirec.muh(2) = 1e-4;
 par_lomob_hirec.mue(4) = 1e-2;
