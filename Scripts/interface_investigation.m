@@ -131,7 +131,7 @@ compare_carrier_interfaces_X(sol_CV_trans_ion_dk, [0, 4, 8, 12]);
 %%
 compare_carrier_interfaces_X(sol_CV_rec_ion_dk, [0, 4, 8, 12]);
 %%
-compare_carrier_interfaces_X(sol_CV_lomob_hirec_ion, [0, 4, 8, 12]);
+compare_carrier_interfaces_X(sol_CV_lomob_hirec_ion_dk, [0, 4, 8, 12]);
 
 %% ILLUMINATED
 %%
@@ -141,7 +141,7 @@ compare_carrier_interfaces_X(sol_CV_trans_ion, [0, 4, 8, 12]);
 %%
 compare_carrier_interfaces_X(sol_CV_rec_ion, [0, 4, 8, 12]);
 %%
-compare_carrier_interfaces_X(sol_CV_lomob_hirec_ion_dk, [0, 4, 8, 12]);
+compare_carrier_interfaces_X(sol_CV_lomob_hirec_ion, [0, 4, 8, 12]);
 %% Plots
 % dfplot.JtotVapp(sol_CV_rec,0)
 % hold off
