@@ -341,7 +341,7 @@ classdef dfana
         function [j, xout] = calcj2(sol)
             % Calculate the recombination rate on i-half mesh
             % obtain SOL components for easy referencing     
-            option = 4;
+            option = 1;
             
             % Displacement flux
             %             FV_ihalf = dfana.calcF_ihalf(sol);
@@ -350,6 +350,8 @@ classdef dfana
             
             switch option
                 case 1
+                    % Densities and derivatives calculated on half mesh
+                    % using PDEVAL
                     [u,t,x,par,~,~,~,~,~,~] = dfana.splitsol(sol);
                     kB = par.kB;
                     T = par.T;
@@ -377,7 +379,7 @@ classdef dfana
                     j.c = zeros(length(t), length(x)-1);
                     j.disp = zeros(length(t), length(x)-1);
                     for i = 1:length(t)   
-                        % Densities and derivatives calculated on half mesh
+                        
                         [V(i,:), dVdx(i,:)] = pdeval(0, x, u(i,:,1), x_ihalf);
                         [n(i,:), dndx(i,:)] = pdeval(0, x, u(i,:,2), x_ihalf);
                         [p(i,:), dpdx(i,:)] = pdeval(0, x, u(i,:,3), x_ihalf);
@@ -502,6 +504,50 @@ classdef dfana
                         j.p_diff(i,:) = -(kB.*T.*muh.*(dpdx(i,:) - ((p(i,:)./Nv).*gradNv)));  
                         
                     end     
+                    xout = x_ihalf;
+                    
+                    case 5
+                    [u,t,x,par,~,~,~,~,~,~] = dfana.splitsol(sol);
+                    kB = par.kB;
+                    T = par.T;
+                    dev = par.dev_ihalf;
+                    x_ihalf = par.x_ihalf;
+                    mue = dev.mue;
+                    muh = dev.muh;
+                    Nc = dev.Nc;
+                    Nv = dev.Nv;
+                    gradEA = dev.gradEA;
+                    gradIP = dev.gradIP;
+                    gradNc = dev.gradNc;
+                    gradNv = dev.gradNv;
+                    
+                    V = zeros(length(t), length(x)-1);
+                    dVdx = zeros(length(t), length(x)-1);
+                    n = zeros(length(t), length(x)-1);
+                    dndx = zeros(length(t), length(x)-1);
+                    p = zeros(length(t), length(x)-1);
+                    dpdx = zeros(length(t), length(x)-1);
+                    
+                    j.n = zeros(length(t), length(x)-1);
+                    j.p = zeros(length(t), length(x)-1);
+                    j.a = zeros(length(t), length(x)-1);
+                    j.c = zeros(length(t), length(x)-1);
+                    j.disp = zeros(length(t), length(x)-1);
+                    for i = 1:length(t)   
+                        % Densities and derivatives calculated on half mesh
+                        [V(i,:), ~] = pdeval(0, x, u(i,:,1), x_ihalf);
+                        [n(i,:), ~] = pdeval(0, x, u(i,:,2), x_ihalf);
+                        [p(i,:), ~] = pdeval(0, x, u(i,:,3), x_ihalf);
+                        
+                        dVdx(i,:) = gradient(V(i,:), x_ihalf);
+                        dndx(i,:) = gradient(n(i,:), x_ihalf);
+                        dpdx(i,:) = gradient(p(i,:), x_ihalf);
+                        
+                        j.n_drift(i,:) = mue.*n(i,:).*(dVdx(i,:) - gradEA);
+                        j.n_diff(i,:) = -(kB.*T.*mue.*(dndx(i,:) - ((n(i,:)./Nc).*gradNc)));
+                        j.p_drift(i,:) = muh.*p(i,:).*(-dVdx(i,:) + gradIP);
+                        j.p_diff(i,:) = -(kB.*T.*muh.*(dpdx(i,:) - ((p(i,:)./Nv).*gradNv)));
+                    end
                     xout = x_ihalf;
             end
 
