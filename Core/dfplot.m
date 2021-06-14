@@ -115,7 +115,7 @@ classdef dfplot
 
             figure(301);
             dfplot.x2d(sol, par.x_ihalf, {j.n, j.p, j.a, j.c, j.disp},{'jn', 'jp', 'ja', 'jc', 'jdisp'},...
-                {'-','-','-','-','-'}, 'Current density [Acm-2]', tarr, xrange, 0, 0);
+                {'-','-','-','-','-'}, 'Flux [cm-2 s-1]', tarr, xrange, 0, 0);
         end       
      
         function JV(JV, option)
