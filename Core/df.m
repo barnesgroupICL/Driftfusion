@@ -158,7 +158,6 @@ jns = 0;
 jps = 0;
 ns = 0;
 ps = 0;
-r_vsr_temp = 0;
 r_vsr = 0;
 
 %% Voltage function
@@ -245,23 +244,29 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         % Volumetric surface recombination
               
         if ps_switch(i) == 1 || ns_switch(i) == 1
-            jps = jp;
-            jns = jn;
+                jps = jp;
+                jns = jn;
+                
         end
+        
+%         if int_switch(i) == 1
 %             n_l = n;
 %             p_l = p;
 %             
 %             alpha = q*dVdx/(kB*T) + alpha_prime(i);
 %             beta = q*-dVdx/(kB*T) + beta_prime(i);
 %             
-%             n_r = exp(alpha*dint(i))*(n + (jns/(alpha*mue(i)*kB*T))*(1 - exp(-alpha*dint(i))));
-%             p_r = exp(beta*dint(i))*(n + (jps/(beta*muh(i)*kB*T))*(1 - exp(-beta*dint(i))));
+%             n_r = exp(-alpha*dint(i))*(n + (jns/(alpha*mue(i)*kB*T))*(1 - exp(-alpha*dint(i))));
+%             p_r = exp(-beta*dint(i))*(n + (jps/(beta*muh(i)*kB*T))*(1 - exp(-beta*dint(i))));
 %             
 %             ns = max(n_l, n_r);
 %             ps = max(n_l, n_r);
-%             r_vsr_temp = (((ns*ps)-(ni(i)^2))/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
+%             r_vsr = (((ns*ps)-(ni(i)^2))/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
+%         
+%         else
+%             r_vsr = 0;
 %         end
-%         r_vsr = int_switch(i)*SRHset*r_vsr_temp;
+%         
         
         if int_switch(i) == 1
             %% obtain majority carrier densities
@@ -271,20 +276,19 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
             
             if alpha < 0
                 X = exp(alpha*xprime(i));
-                ns = (1/X)*(n - ((jn/(alpha*mue(i)*kB*T))*(1 - X)));% + ((jns-jn)/(alpha^2*mue(i)*kB*T*xprime(i)))*(1 - X + alpha*xprime(i)));
+                ns = (1/X)*(n - ((jns/(alpha*mue(i)*kB*T))*(1 - X)) + ((jns-jn)/(alpha^2*mue(i)*kB*T*xprime(i)))*(1 - X + alpha*xprime(i)));
             elseif alpha >= 0
                 Xstar = exp(alpha*(xprime(i) - dint(i)));
-                ns = (1/Xstar)*(n - ((jn/(alpha*mue(i)*kB*T))*(1 - Xstar)));% + ((jns-jn)/(alpha^2*mue(i)*kB*T*xprime(i)))*(1 + alpha*xprime(i) - (1 + alpha*dint(i))*Xstar));
+                ns = (1/Xstar)*(n - ((jns/(alpha*mue(i)*kB*T))*(1 - Xstar)) + ((jns-jn)/(alpha^2*mue(i)*kB*T*xprime(i)))*(1 + alpha*xprime(i) - (1 + alpha*dint(i))*Xstar));
             end
             
             if beta < 0
                 Y = exp(beta*xprime(i));
-                ps = (1/Y)*(p - ((jp/(beta*muh(i)*kB*T))*(1 - Y)));% + ((jps-jp)/(beta^2*muh(i)*kB*T*xprime(i)))*(1 - Y + beta*xprime(i)));
+                ps = (1/Y)*(p - ((jps/(beta*muh(i)*kB*T))*(1 - Y)) + ((jps-jp)/(beta^2*muh(i)*kB*T*xprime(i)))*(1 - Y + beta*xprime(i)));
             elseif beta >= 0
                 Ystar = exp(beta*(xprime(i) - dint(i)));
-                ps = (1/Ystar)*(p - ((jp/(beta*muh(i)*kB*T))*(1 - Ystar)));% + ((jps-jp)/(beta^2*muh(i)*kB*T*xprime(i)))*(1 + beta*xprime(i) - (1 + beta*dint(i))*Ystar));
-            end
-            
+                ps = (1/Ystar)*(p - ((jps/(beta*muh(i)*kB*T))*(1 - Ystar)) + ((jps-jp)/(beta^2*muh(i)*kB*T*xprime(i)))*(1 + beta*xprime(i) - (1 + beta*dint(i))*Ystar));
+            end            
             r_vsr = int_switch(i)*SRHset*(((ns*ps)-(ni(i)^2))/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
         else
             r_vsr = 0;
