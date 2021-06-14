@@ -111,7 +111,8 @@ for i = 1:length(tarr)
         %     end
         
         %recombination
-        r = r_struct.tot(pnt, :);
+       
+        r= r_struct.tot(pnt, :);
         
         if plotswitch == 1
             
