@@ -1,10 +1,10 @@
-function coeff = EA_ana(struct_IS_EA, do_graphics, local_field, demodulation, savefig_dir)
-%EA_ANA - Calculate ElectroAbsorbance (ElectroChromism, Stark spectroscopy) and phase using the same output as the impedance spectroscopy with oscillating voltage
+function coeff = EA_ana_plot(struct_IS_EA, do_graphics, local_field, demodulation, savefig_dir)
+%EA_ANA_PLOT - Calculate ElectroAbsorbance (ElectroChromism, Stark spectroscopy) and phase using the same output as the impedance spectroscopy with oscillating voltage
 % this file is heavily based on the equivalent script for Impedance
-% Spectroscopy: IS_ana
+% Spectroscopy: IS_ana_plot
 % The first and second harmonics are locally calculated and averaged over the device thickness.
 %
-% Syntax:  EA_ana(struct_IS_EA, do_graphics, local_field, demodulation, savefig_dir)
+% Syntax:  EA_ana_plot(struct_IS_EA, do_graphics, local_field, demodulation, savefig_dir)
 %
 % Inputs:
 %   STRUCT_IS_EA - a struct where a solution has been perturbed by an
@@ -43,9 +43,9 @@ function coeff = EA_ana(struct_IS_EA, do_graphics, local_field, demodulation, sa
 %     field, each column is a space point
 %
 % Example:
-%   EA_ana(doIS_EA(soleq.ion, 1, 2e-3, 1e6, 20, 40, 0, 1e-4), true, true, true, missing)
+%   EA_ana_plot(doIS_EA(soleq.ion, 1, 2e-3, 1e6, 20, 40, 0, 1e-4), true, true, true, missing)
 %     do simulation and plot, do not save images to files
-%   EA_ana(sol_i_eq_SR_ea_800mV_10mHz, true, true, true, ".")
+%   EA_ana_plot(sol_i_eq_SR_ea_800mV_10mHz, true, true, true, ".")
 %     do plot, save images to current directory
 %
 % Other m-files required: IS_EA_ana_fit, IS_EA_ana_demodulation
@@ -54,13 +54,13 @@ function coeff = EA_ana(struct_IS_EA, do_graphics, local_field, demodulation, sa
 %
 % See also EA_script, doIS_EA, IS_EA_ana_demodulation, IS_EA_ana_fit.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Davide Moia, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% October 2017; Last revision: May 2020
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 
