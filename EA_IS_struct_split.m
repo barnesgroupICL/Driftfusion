@@ -1,5 +1,5 @@
 function EA_IS_struct_split(in)
-
+% THIS SCRIPT IS NOT FOR PUBLICATION, JUST FOR INTERNAL USE WAITING FOR A TRANSITION OF THE OTHER SCRIPTS
 % sol_name: 'soleq_pedot_ion_stab_Int_0'
 %                            Vdc: [3×1 double]
 %                        periods: 20
