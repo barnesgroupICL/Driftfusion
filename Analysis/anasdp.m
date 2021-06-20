@@ -14,24 +14,17 @@ p1 = find(sdpsol.t_Jtr >= Jtr_time);
 p1 = p1(1);
 
 sdpsol.Jtr_time_arr = sdpsol.Jtr(p1,:);
-Jtrdk_time_arr = sdpsol.Jtr_time_arr + sdpsol.Jdk(:,1)';
 
-figure('Name', 'SDP vs dwell time', 'NumberTitle', 'off')
+figure(1)
 semilogx(sdpsol.tdwell_arr, sdpsol.Jtr_time_arr)
 xlabel('t_{dwell} [s]')
 ylabel('Jtr [Acm-2]')
 
-figure('Name', 'SDP+background vs dwell time', 'NumberTitle', 'off')
-semilogx(sdpsol.tdwell_arr, Jtrdk_time_arr)
-xlabel('t_{dwell} [s]')
-ylabel('Jtr [Acm-2]')
+figure(2)
 
-
-figure('Name', 'SDP vs pulse time at various dwell times', 'NumberTitle', 'off')
 for i = 1:length(sdpsol.tdwell_arr)
     
-    semilogx(sdpsol.t_Jtr(:,i), sdpsol.Jtr(:,i))
-    %legend(num2str(sdpsol.tdwell_arr(:),'%g'))
+    plot(sdpsol.t_Jtr, sdpsol.Jtr(:,i))
     xlabel('time [s]')
     ylabel('J [Acm-2]')
     hold on    
