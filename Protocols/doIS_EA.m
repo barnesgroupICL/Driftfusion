@@ -47,15 +47,15 @@ function struct_IS = doIS_EA(struct_Int, deltaV, freq, periods, tpoints_per_peri
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also df, verifyStabilization, IS_script.
+% See also df, verifyStabilization, IS_script, EA_script.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% October 2017; Last revision: March 2018
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 

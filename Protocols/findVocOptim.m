@@ -4,7 +4,7 @@ function [struct_voc, Voc] = findVocOptim(struct, approxVoc)
 % starting from the voltage present in the given solution. 
 % Requires MATLAB's Optimization Toolbox.
 %
-% Syntax:  [struct_voc, Voc] = findVocOptim(struct)
+% Syntax:  [struct_voc, Voc] = findVocOptim(struct, approxVoc)
 %
 % Inputs:
 %   STRUCT - a struct as created by DF
@@ -19,6 +19,8 @@ function [struct_voc, Voc] = findVocOptim(struct, approxVoc)
 % Example:
 %   [soleq_ion_voc, Voc] = findVocOptim(soleq.ion)
 %     get closer to the real VOC and save the open circuit voltage value in Voc variable
+%   [soleq_ion_voc, Voc] = findVocOptim(soleq.ion, 0.95)
+%     start from an estimated VOC for a faster execution
 %
 % Other m-files required: df, dfana, stabilize
 % Subfunctions: IgiveCurrentForVoltage
@@ -26,13 +28,13 @@ function [struct_voc, Voc] = findVocOptim(struct, approxVoc)
 %
 % See also df, findVoc, findVocDirect, dfana.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% April 2018; Last revision: June 2020
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 
