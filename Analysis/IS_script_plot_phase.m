@@ -1,16 +1,16 @@
-function IS_script_ana_phase(IS_results)
-%IS_SCRIPT_ANA_PHASE - Represents Bode plots of phase from impedance spectroscopy
+function IS_script_plot_phase(IS_results)
+%IS_SCRIPT_PLOT_PHASE - Represents Bode plots of phase from impedance spectroscopy
 % The phase of the current oscillation with regards to the applied voltage
 % is plotted as obtained from simulations made with
 % IS_script or IS_script_nonparallel
 %
-% Syntax:  IS_script_ana_phase(IS_results)
+% Syntax:  IS_script_plot_phase(IS_results)
 %
 % Inputs:
 %   IS_RESULTS - a struct containing the most important results of the IS simulation
 %
 % Example:
-%   IS_script_ana_phase(IS_oc)
+%   IS_script_plot_phase(IS_oc)
 %     do plot
 %
 % Other m-files required: none
@@ -19,13 +19,13 @@ function IS_script_ana_phase(IS_results)
 %
 % See also IS_script, IS_script_ana_nyquist, IS_script_ana_impedance.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% October 2017; Last revision: March 2018
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 

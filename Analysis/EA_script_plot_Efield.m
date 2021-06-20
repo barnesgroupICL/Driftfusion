@@ -1,11 +1,14 @@
-function EA_script_ana_phase(EA_results, savefig_dir)
-%EA_SCRIPT_ANA_PHASE - Plot phase Bode plots from ElectroAbsorbance (EA)
+function EA_script_plot_Efield(EA_results, savefig_dir)
+%EA_SCRIPT_PLOT_EFIELD - Plot electric field amplitude from ElectroAbsorption (EA)
 % in a range of background light intensities or applied DC voltages
-% This script is very similar to IS_script_ana_phase
-% Plots the first and second harmonic phase shift with regards to the
-% applied voltage.
+% this file is heavily based on the equivalent script for Impedance
+% Spectroscopy: IS_script_ana_impedance
+% The amplitude of the spatially averaged electric field first harmonic
+% $(x_2-x_1)^-1 \int_{x_1}{x_2}EDC(x) * EAC(x) dx$ and second
+% harmonic $(x_2-x_1)^-1 \int_{x_1}{x_2} EAC^2(x) dx$ are plotted
+% versus the applied voltage frequency.
 %
-% Syntax:  EA_script_ana_phase(EA_results)
+% Syntax:  EA_script_plot_Efield(EA_results)
 %
 % Inputs:
 %   EA_RESULTS - a struct containing the most important results of the EA simulation
@@ -13,22 +16,22 @@ function EA_script_ana_phase(EA_results, savefig_dir)
 %     at that path
 %
 % Example:
-%   EA_script_ana_phase(EA_results)
+%   EA_script_ana_Efield(EA_results)
 %     do plot
 %
 % Other m-files required: none
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also EA_script, IS_script_ana_phase, EA_script_ana_Efield.
+% See also EA_script.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% October 2017; Last revision: March 2018
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 
@@ -69,49 +72,50 @@ if nargin > 1
     legend_flip = strcat(legend_prepend, ':', legend_flip);
 end
 
-% in case just a single frequency was simulated, min and max are
-% coincident, so they are modified by a small percentage
-xlim_array = [min(min(EA_results.Freq))*0.99, max(max(EA_results.Freq)*1.01)];
-
-%% do EA first and second harmonic phase plots
-
-phase_n_deg = rad2deg(wrapTo2Pi(EA_results.AC_ExDC_E_phase));
-phase_i_deg = rad2deg(wrapTo2Pi(EA_results.AC_ExDC_E_i_phase));
-fig_1h = figure('Name', 'Phase plot of EA first harmonic', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+%% plot
+fig_1h = figure('Name', 'Amplitude of EA first harmonic E AC x E DC', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
     hold off
     for i = 1:length(legend_text)
-        h(i) = plot(EA_results.Freq(i, :), phase_n_deg(i, :)',...
+        h(i) = plot(EA_results.Freq(i, :), EA_results.AC_ExDC_E_amp(i, :)',...
             'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
             'MarkerSize', 3, 'LineWidth', 1.3);
         hold on
-        plot(EA_results.Freq(i, :), phase_i_deg(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+        if ~isnan(EA_results.AC_ExDC_E_i_amp(1))
+            % due to ions
+            %plot(EA_results.Freq(i, :), EA_results.AC_ExDC_E_i_amp(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+        end
     end
     ax = gca;
     ax.XScale = 'log'; % for putting the scale in log
-    xlim(xlim_array)
+    ax.YScale = 'log'; % for putting the scale in log
+    xlim([min(min(EA_results.Freq)), max(max(EA_results.Freq))])
     xlabel('Frequency [Hz]');
-    ylabel('Phase [deg]');
+    ylabel('Abs(E_{AC} x E_{DC}) [V^2/cm^2]');
     legend(flipud(h), legend_flip)
     legend boxoff
 
-phase_2h_deg = rad2deg(wrapToPi(EA_results.AC_Efield2_phase));
-phase_2h_i_deg = rad2deg(wrapTo2Pi(EA_results.AC_Efield2_i_phase));
-fig_2h = figure('Name', 'Phase plot of EA second harmonic', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+fig_2h = figure('Name', 'Amplitude of EA second harmonic E_{AC}^2', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
     hold off
     for i = 1:length(legend_text)
-        h(i) = plot(EA_results.Freq(i, :), phase_2h_deg(i, :)',...
+        h(i) = plot(EA_results.Freq(i, :), EA_results.AC_Efield2_amp(i, :)',...
             'Color', Int_colors(i, :), 'MarkerEdgeColor', Int_colors(i, :),...
             'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
             'MarkerSize', 3, 'LineWidth', 1.3);
         hold on
-        plot(EA_results.Freq(i, :), phase_2h_i_deg(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+       % plot(EA_results.Freq(i, :), EA_results.AC_Efield_amp_squared_mean(i, :)',...
+       %     'Color', Int_colors(i, :), 'LineStyle', '-.');
+        if ~isnan(EA_results.AC_Efield2_i_amp(1))
+            % due to ions
+            %plot(EA_results.Freq(i, :), EA_results.AC_Efield2_i_amp(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');
+        end
     end
     ax = gca;
     ax.XScale = 'log'; % for putting the scale in log
-    xlim(xlim_array)
+    ax.YScale = 'log'; % for putting the scale in log
+    xlim([min(min(EA_results.Freq)), max(max(EA_results.Freq))])
     xlabel('Frequency [Hz]');
-    ylabel('Phase [deg]');
+    ylabel('Abs(E_{AC}^2) [V^2/cm^2]');
     legend(flipud(h), legend_flip)
     legend boxoff
 
@@ -120,10 +124,10 @@ if nargin > 1
         mkdir(savefig_dir)
     end
     pathname = [char(savefig_dir) filesep char(inputname(1))];
-    saveas(fig_1h, [pathname '-phase-1h.fig'])
-    saveas(fig_2h, [pathname '-phase-2h.fig'])
-    saveas(fig_1h, [pathname '-phase-1h.png'])
-    saveas(fig_2h, [pathname '-phase-2h.png'])
+    saveas(fig_1h, [pathname '-Efield-1h.fig'])
+    saveas(fig_2h, [pathname '-Efield-2h.fig'])
+    saveas(fig_1h, [pathname '-Efield-1h.png'])
+    saveas(fig_2h, [pathname '-Efield-2h.png'])
 end
 
 %------------- END OF CODE --------------

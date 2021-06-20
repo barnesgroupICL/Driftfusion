@@ -1,14 +1,14 @@
-function coeff = IS_ana(s, minimal_mode, demodulation)
-%IS_ANA - Calculate impedance (reactance and resistance) and phase by Impedance Spectroscopy (IS) with oscillating voltage
+function coeff = IS_ana_plot(s, do_graphics, demodulation)
+%IS_ANA_PLOT - Calculate impedance (reactance and resistance) and phase by Impedance Spectroscopy (IS) with oscillating voltage
 %
-% Syntax:  IS_ana(s, minimal_mode, demodulation)
+% Syntax:  IS_ana_plot(s, minimal_mode, demodulation)
 %
 % Inputs:
 %   S - a struct with a solution being perturbed by an
 %     oscillating voltage, as generated from doIS_EA
-%   MINIMAL_MODE - logical, when true graphics does not get created and
+%   DO_GRAPHICS - logical, when false graphics does not get created and
 %     IS_subtracting_analysis does not get launched, useful when
-%     launched under parallelization
+%     run under parallelization
 %   DEMODULATION - logical, get phase via demodulation instead of using a fitting
 %
 % Outputs:
@@ -24,7 +24,7 @@ function coeff = IS_ana(s, minimal_mode, demodulation)
 %     different times
 %  
 % Example:
-%   IS_ana(ssol_i_1S_SR_is_100mHz_2mV, false, true)
+%   IS_ana_plot(ssol_i_1S_SR_is_100mHz_2mV, true, true)
 %     plot current profile, reference profiles and calculate the phase using demodulation approach
 %
 % Other m-files required: IS_ana_subtracting, IS_EA_ana_fit, IS_EA_ana_demodulation, dfana
@@ -33,13 +33,13 @@ function coeff = IS_ana(s, minimal_mode, demodulation)
 %
 % See also IS_script, doIS_EA, IS_ana_subtracting, IS_EA_ana_demodulation, IS_EA_ana_fit.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% October 2017; Last revision: May 2020
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 
@@ -183,7 +183,7 @@ end
 
 %% plot solutions
 
-if ~minimal_mode % disable all this stuff if under parallelization or if explicitly asked to not plot any graphics
+if do_graphics % disable all this stuff if under parallelization or if explicitly asked to not plot any graphics
 
     Vapp_func = fun_gen(s.par.V_fun_type);
     func_fixedfreq = @(coeff,t) Vapp_func([coeff(1), coeff(2), s.par.V_fun_arg(3), coeff(3)], t);

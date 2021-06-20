@@ -1,5 +1,5 @@
-function IS_script_ana_impedance(IS_results)
-%IS_SCRIPT_ANA_IMPEDANCE - Represents Bode plots of impedance and capacitance from impedance spectroscopy
+function IS_script_plot_impedance(IS_results)
+%IS_SCRIPT_PLOT_IMPEDANCE - Represents Bode plots of impedance and capacitance from impedance spectroscopy
 % Plot the value of absolute impedance magnitude |Z|, resistance Z'
 % (real component), reactance Z'' (imaginary component), and apparent
 % capacitance defined as \omega^-1 \Im{Z^-1} at various frequencies and
@@ -9,13 +9,13 @@ function IS_script_ana_impedance(IS_results)
 % and total charge time derivative as obtained from
 % IS_ana_subtracting
 %
-% Syntax:  IS_script_ana_impedance(IS_results)
+% Syntax:  IS_script_plot_impedance(IS_results)
 %
 % Inputs:
 %   IS_RESULTS - a struct containing the most important results of the ISstep or the IS simulation
 %
 % Example:
-%   IS_script_ana_impedance(IS_oc)
+%   IS_script_plot_impedance(IS_oc)
 %     do plot
 %
 % Other m-files required: none
@@ -24,13 +24,13 @@ function IS_script_ana_impedance(IS_results)
 %
 % See also IS_script, IS_script_ana_phase, IS_script_ana_nyquist.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% October 2017; Last revision: January 2018
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 
