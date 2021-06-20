@@ -1,35 +1,56 @@
-function SDP_script_ana(Jtr_time, filename, varargin)
+function SDP_script_plot(Jtr_time, dir_file_name, varargin)
+%SDP_SCRIPT_PLOT - Plots a list of Step-Dwell-Probe (SDP) results with explicit line makeup
+% The plots can be saved to files if the dir_file_name option is provided.
+% This is an alternative version of the anasdp.m and SDP_ana.m code.
+%
+% Syntax:  SDP_script_plot(Jtr_time, dir_file_name, varargin)
+%
+% Inputs:
+%   JTR_TIME - float, the time point (during the probe pulse step) that
+%     should be plotted. Ideally should be enough time for the free charges
+%     to reach steady state but not enough time for the ionic (which can
+%     also be frozen in the SDP_script)
+%   DIR_FILE_NAME - char array, images with this prefix will be created in
+%     a directory with this name. To avoid the saving, an empty char array
+%     can be specified: ''.
+%   VARARGIN - many arguments, the script will group the arguments in
+%     groups of three:
+%       the first of each group as the SDP struct with the SDP simulation
+%         data, it has to contain at least the properties t_Jtr, Jtr and
+%         tdwell_arr;
+%       the second of each group as the legend entry;
+%       the third, which has to be a {cell}, as the options to be passed to
+%         the plot command (e.g. specifying the color of the line).
+%
+% Example:
+%   SDP_script_plot(1e-7, '20210302_spiro',...
+%       sdpsol_spiro_lower_1sun, 'lower 1 sun',{':r','LineWidth',3},...
+%       sdpsol_spiro_1sun, '1 sun',{'--r'},...
+%       sdpsol_spiro_higher_1sun, 'higher 1 sun',{'-r'})
+%     plot 3 different SDP simulations, all in red but with different line
+%     style and different legends. And save the graphics as files.
+%
+% Other m-files required: none
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also SDP_script, anasdp, SDP_ana.
+
 %% LICENSE
-% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
 % This program is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
-%
-% sdpsol.t_Jtr
-% sdpsol.Jtr
-% sdpsol.tdwell_arr
 
-% 
-% SDP_script_ana(1e-7, '20210302_spiro_CBTiO2',...
-%     sdpsol_spiro_lowerCBTiO2_alt_dark, 'lower CBTiO2 dark',{':k','LineWidth',3},...
-%     sdpsol_spiro_lowerCBTiO2_alt_01sun, 'lower CBTiO2 0.1 sun',{':b','LineWidth',3},...
-%     sdpsol_spiro_lowerCBTiO2_alt_1sun, 'lower CBTiO2 1 sun',{':r','LineWidth',3},...
-%     sdpsol_spiro_alt_dark, ' dark',{'--k'},...
-%     sdpsol_spiro_alt_01sun, ' 0.1 sun',{'--b'},...
-%     sdpsol_spiro_alt_1sun, ' 1 sun',{'--r'},...
-%     sdpsol_spiro_higherCBTiO2_alt_dark, 'higher CBTiO2 dark',{'-k'},...
-%     sdpsol_spiro_higherCBTiO2_alt_01sun, 'higher CBTiO2 0.1 sun',{'-b'},...
-%     sdpsol_spiro_higherCBTiO2_alt_1sun, 'higher CBTiO2 1 sun',{'-r'})
-
-
+%------------- BEGIN CODE --------------
 
 for i = 1:(length(varargin)/3)
     isol = round((i*3)-2);
     p1_list = find(varargin{isol}.t_Jtr >= Jtr_time);
     p1(i) = p1_list(1);
-    Jtr_time_arr(i,:) = varargin{isol}.Jtr(p1(i),:);%+varargin{isol}.Jdk(p1(i));
+    Jtr_time_arr(i,:) = varargin{isol}.Jtr(p1(i),:);
     if ~ismembertol(i, 1)
         if ~ismembertol(varargin{isol-3}.t_Jtr(p1(i-1)), varargin{isol}.t_Jtr(p1(i)))
             warning('Solutions are plotted at different times!!!!')
@@ -62,10 +83,22 @@ range = ymax-ymin;
 ylim([ymin-0.03*range, ymax+0.03*range])
 legend(legendarr)
 legend boxoff
-if 7~=exist(filename,'dir')
-    mkdir(filename)
+
+
+valid_name = true;
+try
+    java.io.File(dir_file_name).toPath;
+catch
+    valid_name = false;
 end
-saveas(fig, [char(filename) filesep char(filename) char('-SDP.fig')])
-saveas(fig, [char(filename) filesep char(filename) char('-SDP.png')])
+if ~isempty(dir_file_name) && valid_name
+    if 7~=exist(dir_file_name,'dir')
+        mkdir(dir_file_name)
+    end
+    saveas(fig, [char(dir_file_name) filesep char(dir_file_name) char('-SDP.fig')])
+    saveas(fig, [char(dir_file_name) filesep char(dir_file_name) char('-SDP.png')])
+end
 
 end
+
+%------------- END OF CODE --------------
