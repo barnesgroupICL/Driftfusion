@@ -1,9 +1,8 @@
-function export_IS_results(prefix, IS_results)
+function IS_script_exporter(prefix, IS_results)
 %EXPORT_IS_RESULTS - Exports data of a set of impedance simulations to text files
 % save the main data from an IS_results struct created by
 % IS_script to text files, for easing the import with Origin (from OriginLab).
 % 
-%
 % Syntax:  export_IS_results(IS_results, prefix)
 %
 % Inputs:
@@ -18,8 +17,7 @@ function export_IS_results(prefix, IS_results)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also IS_EA, IS_script.
-% October 2017; Last revision: January 2018
+% See also doIS_EA, IS_script.
 
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes

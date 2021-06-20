@@ -1,4 +1,4 @@
-function export_EA_results(prefix, EA_results)
+function EA_script_exporter(prefix, EA_results)
 %EXPORT_EA_RESULTS - Exports data of a set of Electro Absorbance simulations to text files
 % save the main data from an EA_results struct created by
 % EA_script to text files, for easing the import with Origin (from OriginLab).
@@ -19,7 +19,6 @@ function export_EA_results(prefix, EA_results)
 % MAT-files required: none
 %
 % See also doIS_EA, EA_script.
-% April 2021
 
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes

@@ -1,9 +1,8 @@
-function export_SDP_results(prefix, varargin)
-%EXPORT_IS_RESULTS - Exports data of a set of Step-Dwell-Probe simulations to text files
+function SDP_script_exporter(prefix, varargin)
+%EXPORT_SDP_RESULTS - Exports data of a set of Step-Dwell-Probe simulations to text files
 % save the main data from a set of SDP_result structs created by
 % doSDP_alt to text files, for easing the import with Origin (from OriginLab).
 % 
-%
 % Syntax:  export_SDP_results(prefix, SDP_results1, SDP_results2, SDP_results3)
 %
 % Inputs:
@@ -19,7 +18,6 @@ function export_SDP_results(prefix, varargin)
 % MAT-files required: none
 %
 % See also doSDP_alt.
-% April 2021
 
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes

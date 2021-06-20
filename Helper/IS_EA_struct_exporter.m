@@ -1,9 +1,9 @@
-function export_IS_EA_struct(struct, prefix)
-%EXPORT_IS_EA_STRUCT - Exports single impedance simulation data to text file
-% Saves the main data from a oscillating solution created by IS_EA to text files
+function IS_EA_struct_exporter(struct, prefix)
+%IS_EA_STRUCT_EXPORTER - Exports single impedance simulation data to text file
+% Saves the main data from a oscillating solution created by doIS_EA to text files
 % for easing the import with Origin (from OriginLab).
 %
-% Syntax:  export_IS_EA_struct(struct, prefix)
+% Syntax:  IS_EA_struct_exporter(struct, prefix)
 %
 % Inputs:
 %   STRUCT - a struct with a solution being perturbed by an
@@ -11,22 +11,22 @@ function export_IS_EA_struct(struct, prefix)
 %   PREFIX - char array, prefix to be used for the text files names
 %
 % Example:
-%   export_IS_EA_struct(asymssol_i_1S_SR_is_100mHz_2mV, 'asymssol_i_1S_SR_is_100mHz_2mV')
+%   IS_EA_struct_exporter(asymssol_i_1S_SR_is_100mHz_2mV, 'asymssol_i_1S_SR_is_100mHz_2mV')
 %     save single simulation data to text files
 %
 % Other m-files required: none
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also IS_EA, IS_script, EA_script.
+% See also doIS_EA, IS_script, EA_script.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% October 2017; Last revision: January 2018
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 
