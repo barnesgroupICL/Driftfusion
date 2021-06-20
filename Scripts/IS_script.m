@@ -36,11 +36,11 @@ function IS_results = IS_script(structs, startFreq, endFreq, Freq_points, deltaV
 %   IS_RESULTS - a struct containing the most important results of the simulation
 %
 % Example:
-%   IS_oc = IS_script(genIntStructsRealVoc(soleq.ion, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, true, true)
+%   IS_oc = IS_script(genIntStructsVoc(soleq.ion, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, true, true)
 %     calculate starting from open circuit conditions on 8 different illumination intensities including dark, do not freeze ions, use a half peak to peak
 %     voltage oscillation amplitude of 2 mV, on 23 points from frequencies of 1 GHz to
 %     0.01 Hz and plot all graphics, including the ones for each solution
-%   IS_oc_frozenions = IS_script(genIntStructsRealVoc(soleq.ion, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, true, true, true)
+%   IS_oc_frozenions = IS_script(genIntStructsVoc(soleq.ion, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, true, true, true)
 %     as above but freezing ions during voltage oscillation
 %   IS_sc = IS_script(genIntStructs(soleq.ion, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, true, true)
 %     as the first example but starting from short circuit conditions
@@ -49,20 +49,20 @@ function IS_results = IS_script(structs, startFreq, endFreq, Freq_points, deltaV
 %   IS_dark = IS_script(soleq.ion, 1e9, 1e-2, 56, 2e-3, false, true, true)
 %     as above but using only dark solution with no bias voltage
 %
-% Other m-files required: doIS_EA, IS_ana, IS_script_ana_nyquist, IS_script_ana_impedance, 
+% Other m-files required: doIS_EA, IS_ana_plot, IS_script_ana_nyquist, IS_script_ana_impedance, 
 %   IS_script_ana_phase, dfana, stabilize
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also genIntStructs, df, doIS_EA, IS_script_ana_nyquist, IS_ana, IS_script_ana_impedance, IS_script_ana_phase.
+% See also genIntStructs, df, doIS_EA, IS_script_ana_nyquist, IS_ana_plot, IS_script_ana_impedance, IS_script_ana_phase.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% October 2017; Last revision: January 2018
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 
@@ -148,7 +148,7 @@ for i = 1:length(structs(1, :))
             Freq_array(j), periods, tpoints_per_period, 0.5, tempRelTol); % do IS
         % set IS_single_analysis minimal_mode to true as under
         % parallelization graphics for single solutions cannot be created
-        coeff = IS_ana(s_IS, true, demodulation);
+        coeff = IS_ana_plot(s_IS, false, demodulation);
         % a phase close to 90 degrees can be indicated as it was -90 degree
         % by demodulation in case the RelTol was not enough
 
@@ -161,7 +161,7 @@ for i = 1:length(structs(1, :))
             s_IS = doIS_EA(s_IS,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, 0.5, tempRelTol); % do IS
             % repeat analysis on new solution
-            coeff = IS_ana(s_IS, true, demodulation);
+            coeff = IS_ana_plot(s_IS, false, demodulation);
         end
         % if phase is negative or bigger than pi/2, it could be a failure of demodulation or a real thing,
         % for confirming that is a real thing use the alternative fitting method without repeating the simulation
@@ -169,7 +169,7 @@ for i = 1:length(structs(1, :))
             disp([mfilename ' - Int: ' num2str(s.par.int1) '; Vdc: ' num2str(Vdc_temp) ' V; Freq: ' num2str(Freq_array(j)) ' Hz; Phase is weird: ' num2str(rad2deg(coeff.Jtot(3))) ' degrees, confirming using alternative fitting method'])
             % in case demodulation was being used, use fitting instead, just in case the weird result was due to
             % demodulation failure
-            coeff = IS_ana(s_IS, true, ~demodulation);
+            coeff = IS_ana_plot(s_IS, false, ~demodulation);
             disp([mfilename ' - Int: ' num2str(s.par.int1) '; Vdc: ' num2str(Vdc_temp) ' V; Freq: ' num2str(Freq_array(j)) ' Hz; Phase from alternative fitting method is: ' num2str(rad2deg(coeff.Jtot(3))) ' degrees'])
         end
         % if phase is still negative or more than pi/2, check again increasing accuracy
@@ -179,7 +179,7 @@ for i = 1:length(structs(1, :))
             % start from the oscillating solution, better starting point
             s_IS = doIS_EA(s_IS,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, 0.5, tempRelTol); % do IS
-            coeff = IS_ana(s_IS, true, demodulation);
+            coeff = IS_ana_plot(s_IS, false, demodulation);
         end
         % save values
         Jtot_bias(i, j) = coeff.Jtot(1);

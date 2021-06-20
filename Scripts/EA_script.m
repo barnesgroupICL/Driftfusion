@@ -37,19 +37,19 @@ function EA_results = EA_script(structs, startFreq, endFreq, Freq_points, deltaV
 %   EA_dark = EA_script(soleq.ion, 1e9, 1e-2, 23, 1e-3, true, true)
 %     as above but only with no background illumination
 %
-% Other m-files required: doIS_EA, EA_ana, EA_script_ana_phase, dfana, EA_script_ana_Efield
+% Other m-files required: doIS_EA, EA_ana_plot, EA_script_ana_phase, dfana, EA_script_ana_Efield
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also genIntStructs, df, doIS_EA, EA_script_ana_phase, EA_ana, EA_script_ana_Efield.
+% See also genIntStructs, df, doIS_EA, EA_script_ana_phase, EA_ana_plot, EA_script_ana_Efield.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Davide Moia, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% March 2018; Last revision: March 2018
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 
@@ -119,7 +119,7 @@ for i = 1:length(structs(1, :))
         % parallelization graphics for single solutions cannot be created
         % set local_field to false for not calculating the field for each
         % position in the intrinsic
-        coeff = EA_ana(struct_EA, false, false, demodulation, missing);
+        coeff = EA_ana_plot(struct_EA, false, false, demodulation, missing);
         AC_ExDC_E_bias(i, j) =     coeff.h1_mean(1);
         AC_ExDC_E_amp(i, j) =      coeff.h1_mean(2);
         AC_ExDC_E_phase(i, j) =    coeff.h1_mean(3);

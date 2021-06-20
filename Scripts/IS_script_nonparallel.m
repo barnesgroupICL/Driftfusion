@@ -47,7 +47,7 @@ function IS_results = IS_script_nonparallel(structs, startFreq, endFreq, Freq_po
 %   IS_RESULTS - a struct containing the most important results of the simulation
 %
 % Example:
-%   IS_oc = IS_script_nonparallel(genIntStructsRealVoc(soleq.ion, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, false, true, false, true)
+%   IS_oc = IS_script_nonparallel(genIntStructsVoc(soleq.ion, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, false, true, false, true)
 %     calculate starting from open circuit conditions on 8 different illumination intensities including dark,
 %     on 23 points from frequencies of 1 GHz to 0.01 Hz,
 %     use a half peak to peak voltage oscillation amplitude of 2 mV,
@@ -56,7 +56,7 @@ function IS_results = IS_script_nonparallel(structs, startFreq, endFreq, Freq_po
 %     using demodulation instead of fitting,
 %     plot all graphics, including the ones for each solution,
 %     save to base workspace the single solutions
-%   IS_oc_sequential = IS_script_nonparallel(genIntStructsRealVoc(soleq.ion, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, true, false, true, false, true)
+%   IS_oc_sequential = IS_script_nonparallel(genIntStructsVoc(soleq.ion, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, true, false, true, false, true)
 %     as above but starting each simulation from the last point of the
 %     previous simulation, without reaching a stable solution
 %   IS_sc = IS_script_nonparallel(genIntStructs(soleq.ion, 1, 1e-3, 7, true), 1e9, 1e-2, 56, 2e-3, false, false, true, false, true)
@@ -66,20 +66,20 @@ function IS_results = IS_script_nonparallel(structs, startFreq, endFreq, Freq_po
 %   IS_dark = IS_script_nonparallel(soleq.ion, 1e9, 1e-2, 56, 2e-3, false, false, true, false, true)
 %     as above but using only dark solution with no bias voltage
 %
-% Other m-files required: doIS_EA, IS_ana, IS_script_ana_nyquist,
+% Other m-files required: doIS_EA, IS_ana_plot, IS_script_ana_nyquist,
 %   IS_script_ana_impedance, IS_script_ana_phase, dfana, stabilize
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also genIntStructs, df, doIS_EA, IS_script_ana_nyquist, IS_ana, IS_script_ana_impedance, IS_script_ana_phase.
+% See also genIntStructs, df, doIS_EA, IS_script_ana_nyquist, IS_ana_plot, IS_script_ana_impedance, IS_script_ana_phase.
 
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
-% October 2017; Last revision: May 2020
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
 
 %------------- BEGIN CODE --------------
 
@@ -172,7 +172,7 @@ for i = 1:length(structs(1, :))
         % set IS_single_analysis minimal_mode to false if graphics are
         % requested
         % extract parameters and do plot
-        coeff = IS_ana(s_IS, ~do_graphics, demodulation);
+        coeff = IS_ana_plot(s_IS, do_graphics, demodulation);
         % a phase close to 90 degrees can be indicated as it was -90 degree
         % by demodulation in case RelTol was not enough
 
@@ -191,7 +191,7 @@ for i = 1:length(structs(1, :))
             s_IS = doIS_EA(struct_temp,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, stability_timefraction, tempRelTol); % do IS
             % repeat analysis on new solution
-            coeff = IS_ana(s_IS, ~do_graphics, demodulation);
+            coeff = IS_ana_plot(s_IS, do_graphics, demodulation);
         end
         % if phase is negative or bigger than pi/2, it could be a failure of demodulation or a real thing,
         % for confirming that is a real thing use the alternative fitting method without repeating the simulation
@@ -200,7 +200,7 @@ for i = 1:length(structs(1, :))
             % in case demodulation was being used, use fitting instead, just in case the weird result was due to
             % demodulation failure
 
-            coeff = IS_ana(s_IS, ~do_graphics, ~demodulation);
+            coeff = IS_ana_plot(s_IS, do_graphics, ~demodulation);
             disp([mfilename ' - Int: ' num2str(Int_array(i)) '; Vdc: ' num2str(Vdc_array(i)) ' V; Freq: ' num2str(Freq_array(j)) ' Hz; Phase from alternative fitting method is: ' num2str(rad2deg(coeff.Jtot(3))) ' degrees'])
         end
         % if phase is still negative or more than pi/2, check again increasing accuracy
@@ -217,7 +217,7 @@ for i = 1:length(structs(1, :))
             s_IS = doIS_EA(struct_temp,...
                 deltaV, Freq_array(j), periods, tpoints_per_period, stability_timefraction, tempRelTol); % do IS
             % repeat analysis on new solution
-            coeff = IS_ana(s_IS, ~do_graphics, demodulation);
+            coeff = IS_ana_plot(s_IS, do_graphics, demodulation);
         end
         % save values
         Jtot_bias(i, j) = coeff.Jtot(1);
