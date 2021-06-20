@@ -42,7 +42,7 @@ for i = 1:length(sol.t)
     % Voltage counter
     if Vcounter
         dim = [.2 0 .3 .2];
-        Vnow = round(Vapp(i), 2, 'decimal');
+        Vnow = round(Vapp(i), 3, 'significant');
         anno = ['V = ', num2str(Vnow), ' V'];
         T = annotation('textbox', dim, 'String', anno, 'FitBoxToText','on');
         T.EdgeColor = 'none';
@@ -53,7 +53,7 @@ for i = 1:length(sol.t)
     % Time counter
     if tcounter
         dim = [.2 0 .3 .3];
-        tnow = round(sol.t(i), 2, 'decimal');
+        tnow = round(sol.t(i), 3, 'significant');
         anno = ['t = ', num2str(tnow), ' s'];
         T = annotation('textbox', dim, 'String', anno, 'FitBoxToText','on');
         T.EdgeColor = 'none';
