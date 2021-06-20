@@ -1,7 +1,7 @@
-function sdpsol = doSDP_alt(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions, solver_split_pulse)
-%DOSDP_ALT - an alternative script for Step-Dwell-Probe simulations.
+function sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions, solver_split_pulse)
+%SDP_SCRIPT - an alternative script for Step-Dwell-Probe simulations.
 %
-% Syntax:  sdpsol = doSDP_alt(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions, solver_split_pulse)
+% Syntax:  sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions, solver_split_pulse)
 %
 % Inputs:
 %   SOL_INI - a single struct created by DF.
@@ -41,7 +41,7 @@ function sdpsol = doSDP_alt(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, p
 %     parameters as supplied in the input arguments.
 %
 % Example:
-%   sdpsol_spiro_01sun = doSDP_alt(soleq_spiro.ion, [logspace(-8,3,56)], 0.6, 1, 0.1, 2, 5.12, 1e-3, true, true);
+%   sdpsol_spiro_01sun = SDP_script(soleq_spiro.ion, [logspace(-8,3,56)], 0.6, 1, 0.1, 2, 5.12, 1e-3, true, true);
 %     perform 56 SDP simulations using dwell times from 10 ns to 1000 s,
 %     using a voltage step of 0.6 V, illuminating from the primary light
 %     source (AM15 by default) with intensity of 0.1 sun during the dwell
@@ -57,7 +57,7 @@ function sdpsol = doSDP_alt(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, p
 % MAT-files required: none
 %
 % See also df, SDP_script_ana, export_SDP_results, doSDP.
-%
+
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
