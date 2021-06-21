@@ -513,7 +513,7 @@ classdef pc
 
         %% Intrinsic carrier densities (Boltzmann)
         function value = get.ni(par)
-            value = par.Nc.*exp(-par.Eg./(2*par.kB*par.T));
+            value = ((par.Nc.*par.Nv).^0.5).*exp(-par.Eg./(2*par.kB*par.T));
         end
 
         %% Equilibrium electron densities
