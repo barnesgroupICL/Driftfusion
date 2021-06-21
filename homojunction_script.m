@@ -1,21 +1,52 @@
+%% Ionic screening in perovskite p-n homojunctions
+% A script to reproduce the results from Calado, P. & Barnes, P. R. F. 
+% Ionic screening in perovskite p?n homojunctions. Nat. Energy 13?15 (2021). 
+% doi:10.1038/s41560-021-00838-1
+% Script author: P Calado, 2021
+% Email: p.calado13@imperial.ac.uk
+
+%% Add folders and set plotting defaults
+initialise_df
+
 %% Intrinsic, Nion= 1e19 cm-3
 %% Intrinsic
+% Create a parameters object for intrinsic absorber device
 par_intrinsic = pc('input_files/intrinsic.csv');
+% Find the equilibrium solutions with electronic carriers only, SOLEQ.EL
+% and with electronic and ionic carriers SOLEQ.ION
 soleq_intrinsic = equilibrate(par_intrinsic);
-JV_intrinsic = doJV(soleq_intrinsic.el, 1e-3, 100, 1, 0, 0, -1.2, 2);
+
+% Run current density voltage scans (J-V) at 1 mVs-1 from 0 to 1.2 V (the
+% voltage is negative in the argument due to the direction in which the
+% device is built in the simulation). Where _ION is used, this indicates
+% that Ncat = 1e19 cm-3 is used.
+% JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
+JV_intrinsic_el = doJV(soleq_intrinsic.el, 1e-3, 100, 1, 0, 0, -1.2, 2);
 JV_intrinsic_ion = doJV(soleq_intrinsic.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
+
+% Find approximate open circuit, illuminated steady-state solution.
+% Inputting a negative time uses the modulus as the initial guess but loops
+% with increasing time to find steady-state solution. Here we use a series
+% resistance of 10^6 Ohm cm2 to approximate open circuit.
 % sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
-OC_intrinsic = lightonRs(soleq_intrinsic.el, 1, 1, 0, 1e6, 200);
+OC_intrinsic_el = lightonRs(soleq_intrinsic.el, 1, 1, 0, 1e6, 200);
 OC_intrinsic_ion = lightonRs(soleq_intrinsic.ion, 1, -100, 1, 1e6, 200);
 
 %% Intrinsic, Nion= 1e17 cm-3
 par_intrinsic_Ncat1e17 = pc('input_files/intrinsic.csv');
+% Here we overwrite the ionic densities for each layer. Although ions are
+% defined in every layer, in the transport layers and interfaces,
+% the mobilities are set to zero and the charge is balanced by a static counter ion density 
+% such that the net space charge charge density due to ionic variables is zero.
 par_intrinsic_Ncat1e17.Ncat = [1e17,1e17,1e17,1e17,1e17,1e17,1e17];
 par_intrinsic_Ncat1e17.Nani = [1e17,1e17,1e17,1e17,1e17,1e17,1e17];
 par_intrinsic_Ncat1e17 = refresh_device(par_intrinsic_Ncat1e17);
 
 soleq_intrinsic_Ncat1e17 = equilibrate(par_intrinsic_Ncat1e17);
+
+% JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 JV_intrinsic_Ncat1e17_ion = doJV(soleq_intrinsic_Ncat1e17.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
+% sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
 OC_intrinsic_Ncat1e17_ion = lightonRs(soleq_intrinsic_Ncat1e17.ion, 1, -100, 1, 1e6, 200);
 
 %% Intrinsic, Nion= 1e18 cm-3
@@ -25,25 +56,32 @@ par_intrinsic_Ncat1e18.Nani = [1e18,1e18,1e18,1e18,1e18,1e18,1e18];
 par_intrinsic_Ncat1e18 = refresh_device(par_intrinsic_Ncat1e18);
 
 soleq_intrinsic_Ncat1e18 = equilibrate(par_intrinsic_Ncat1e18);
+
+% JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 JV_intrinsic_Ncat1e18_ion = doJV(soleq_intrinsic_Ncat1e18.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
+% sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
 OC_intrinsic_Ncat1e18_ion = lightonRs(soleq_intrinsic_Ncat1e18.ion, 1, -100, 1, 1e6, 200);
 
 %% n-type
 par_ntype = pc('input_files/n_type.csv');
 soleq_ntype = equilibrate(par_ntype);
-JV_ntype = doJV(soleq_ntype.el, 1e-3, 100, 1, 0, 0, -1.2, 2);
+
+% JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
+JV_ntype_el = doJV(soleq_ntype.el, 1e-3, 100, 1, 0, 0, -1.2, 2);
 JV_ntype_ion = doJV(soleq_ntype.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
-OC_hom_ion = lightonRs(soleq_hom.ion, 1, -100, 1, 1e6, 200);
-OC_ntype = lightonRs(soleq_ntype.el, 1, 1, 0, 1e6, 200);
+% sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
+OC_ntype_el = lightonRs(soleq_ntype.el, 1, 1, 0, 1e6, 200);
 OC_ntype_ion = lightonRs(soleq_ntype.ion, 1, -100, 0, 1e6, 200);
 
 %% Homojunction
 par_hom = pc('input_files/homojunction.csv');
 soleq_hom = equilibrate(par_hom);
-JV_hom = doJV(soleq_hom.el, 1e-3, 100, 1, 0, 0, -1.2, 2);
+
+% JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
+JV_hom_el = doJV(soleq_hom.el, 1e-3, 100, 1, 0, 0, -1.2, 2);
 JV_hom_ion = doJV(soleq_hom.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
 % sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
-OC_hom = lightonRs(soleq_hom.el, 1, 1, 0, 1e6, 200);
+OC_hom_el = lightonRs(soleq_hom.el, 1, 1, 0, 1e6, 200);
 OC_hom_ion = lightonRs(soleq_hom.ion, 1, -100, 1, 1e6, 200);
 
 %% Homojunction, Nion= 1e17 cm-3
@@ -53,7 +91,9 @@ par_hom_Ncat1e17.Nani = [1e17,1e17,1e17,1e17,1e17,1e17,1e17];
 par_hom_Ncat1e17 = refresh_device(par_hom_Ncat1e17);
 
 soleq_hom_Ncat1e17 = equilibrate(par_hom_Ncat1e17);
+% JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 JV_hom_Ncat1e17_ion = doJV(soleq_hom_Ncat1e17.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
+% sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
 OC_hom_Ncat1e17_ion = lightonRs(soleq_hom_Ncat1e17.ion, 1, -100, 1, 1e6, 200);
 
 %% Homojunction, Nion= 1e18 cm-3
@@ -63,7 +103,9 @@ par_hom_Ncat1e18.Nani = [1e18,1e18,1e18,1e18,1e18,1e18,1e18];
 par_hom_Ncat1e18 = refresh_device(par_hom_Ncat1e18);
 
 soleq_hom_Ncat1e18 = equilibrate(par_hom_Ncat1e18);
+% JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 JV_hom_Ncat1e18_ion = doJV(soleq_hom_Ncat1e18.ion, 1e-3, 100, 1, 1, 0, -1.2, 2);
+% sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
 OC_hom_Ncat1e18_ion = lightonRs(soleq_hom_Ncat1e18.ion, 1, -100, 1, 1e6, 200);
 
 %% J turn ons, Nion = 1e19 cm-3
@@ -74,19 +116,19 @@ Jmpp_hom_ion = jumptoV(soleq_hom.ion, -0.95, 10, 1, 1, 0, 0);
 
 %% J-V 1d Figure from Calado & Barnes (forward scan indicated by -F, reverse scan indicated by -R)
 %% Mobile electronic and ionic carriers
-dfplot.JV(JV_intrinsic, 2)
+dfplot.JV(JV_intrinsic_el, 2)
 figure(4)
 hold on
 dfplot.JV(JV_intrinsic_ion, 2)
 figure(4)
 hold on
-dfplot.JV(JV_hom, 2)
+dfplot.JV(JV_hom_el, 2)
 figure(4)
 hold on
 dfplot.JV(JV_hom_ion, 2)
 figure(4)
 hold on
-dfplot.JV(JV_ntype, 2)
+dfplot.JV(JV_ntype_el, 2)
 figure(4)
 hold off
 legend('intrinsic -F', 'intrinsic -R', 'intrinsic, Ncat = 1e19 cm-3 -F', 'intrinsic, Ncat = 1e19 cm-3 -R',...
@@ -95,8 +137,8 @@ legend('intrinsic -F', 'intrinsic -R', 'intrinsic, Ncat = 1e19 cm-3 -F', 'intrin
 xlim([0.7, 1.1])
 ylim([-5e-3, 25e-3])
 
-%% Open circuit Electric field 
-dfplot.Fx(OC_hom)
+%% Open circuit Electric field
+dfplot.Fx(OC_hom_el)
 hold on
 dfplot.Fx(OC_hom_Ncat1e17_ion)
 hold on
@@ -177,13 +219,13 @@ ylim([0, 4e19])
 
 %% Open circuit energy level diagrams and carriers for the intrinsic device
 %% Electronic carriers only
-dfplot.ELxnpx(OC_intrinsic)
+dfplot.ELxnpx(OC_intrinsic_el)
 subplot(2,1,1)
 hold on
 subplot(2,1,2);
 hold on
 
-dfplot.ELxnpx(OC_ntype)
+dfplot.ELxnpx(OC_ntype_el)
 subplot(2,1,1)
 ylim([-8, -2])
 legend('', '', '', '', '',... % Layer blocks
@@ -274,7 +316,7 @@ ylim([0, 4e19])
 
 %% Open circuit energy level diagrams and carriers for homojunction
 %% Electronic carriers only
-dfplot.ELxnpxacx(OC_hom)
+dfplot.ELxnpxacx(OC_hom_el)
 subplot(3,1,1)
 ylim([-8, -2])
 subplot(3,1,2)
