@@ -9,8 +9,9 @@ function IS_script_plot(type, dir_file_name, varargin)
 %     'impedance_re', 'impedance_im', 'impedance_abs', 'capacitance',
 %     'phase' or 'nyquist'
 %   DIR_FILE_NAME - char array, images with this prefix will be created in
-%     a directory with this name. To avoid the saving, an empty char array
-%     can be specified: ''.
+%     a the current directory. A path specifying the destination
+%     subdirectory can also be provided. To avoid the saving, an empty char
+%     array can be specified: ''.
 %   VARARGIN - many arguments, the script will group the arguments in
 %     groups of three:
 %       the first of each group as the IS struct with the IS simulation
@@ -114,11 +115,12 @@ catch
     valid_name = false;
 end
 if ~isempty(dir_file_name) && valid_name
-    if 7~=exist(dir_file_name,'dir')
-        mkdir(dir_file_name)
+    dirname = fileparts(dir_file_name);
+    if ~isempty(dirname) && 7~=exist(dirname,'dir')
+        mkdir(dirname)
     end
-    saveas(fig, [char(dir_file_name) filesep char(dir_file_name) char(['-IS_' type '.fig'])])
-    saveas(fig, [char(dir_file_name) filesep char(dir_file_name) char(['-IS_' type '.png'])])
+    saveas(fig, [char(dir_file_name) char(['-IS_' type '.fig'])])
+    saveas(fig, [char(dir_file_name) char(['-IS_' type '.png'])])
 end
 
 end
