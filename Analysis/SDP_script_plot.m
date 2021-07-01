@@ -11,8 +11,9 @@ function SDP_script_plot(Jtr_time, dir_file_name, varargin)
 %     to reach steady state but not enough time for the ionic (which can
 %     also be frozen in the SDP_script)
 %   DIR_FILE_NAME - char array, images with this prefix will be created in
-%     a directory with this name. To avoid the saving, an empty char array
-%     can be specified: ''.
+%     the current directory. A path specifying the destination
+%     subdirectory can also be provided. To avoid the saving, an empty char
+%     array can be specified: ''.
 %   VARARGIN - many arguments, the script will group the arguments in
 %     groups of three:
 %       the first of each group as the SDP struct with the SDP simulation
@@ -70,8 +71,8 @@ for i = 1:(length(varargin)/3)
     legendarr{i} = varargin{isol+1};
     options = varargin{isol+2};
     plot(varargin{isol}.tdwell_arr, Jtr_time_arr(i,:), options{:})
-    ymin = min(ymin, min(Jtr_time_arr(i,(end/2):end)));
-    ymax = max(ymax, max(Jtr_time_arr(i,1:(end/2))));
+    ymin = min(ymin, min(Jtr_time_arr(i,ceil(end/2):end)));
+    ymax = max(ymax, max(Jtr_time_arr(i,1:ceil(end/2))));
     hold on
 end
 xlabel('t_{dwell} [s]')
@@ -92,11 +93,12 @@ catch
     valid_name = false;
 end
 if ~isempty(dir_file_name) && valid_name
-    if 7~=exist(dir_file_name,'dir')
-        mkdir(dir_file_name)
+    dirname = fileparts(dir_file_name);
+    if ~isempty(dirname) && 7~=exist(dirname,'dir')
+        mkdir(dirname)
     end
-    saveas(fig, [char(dir_file_name) filesep char(dir_file_name) char('-SDP.fig')])
-    saveas(fig, [char(dir_file_name) filesep char(dir_file_name) char('-SDP.png')])
+    saveas(fig, [char(dir_file_name) char('-SDP.fig')])
+    saveas(fig, [char(dir_file_name) char('-SDP.png')])
 end
 
 end
