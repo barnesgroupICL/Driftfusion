@@ -88,7 +88,7 @@ for i=1:length(par.dcum)                % i is the layer index
                                 else
                                     devprop(j) = (deff/par.sp(i));
                                 end
-                        case 'mue_interface'
+                        case 'mue_vsr'
                             if alpha0 < 0
                                 devprop(j) = (par.mue(i-1)+(par.Nv(i+1)/par.Nv(i+1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(alpha0))))*exp(abs(alpha0)*xprime_n);
                             elseif alpha0 > 0
@@ -96,7 +96,7 @@ for i=1:length(par.dcum)                % i is the layer index
                             else
                                 devprop(j) = max([par.mue(i-1),par.mue(i+1)]);
                             end
-                        case 'muh_interface'
+                        case 'muh_vsr'
                             if beta0 < 0
                                 devprop(j) = (par.muh(i-1)+(par.Nc(i+1)/par.Nv(i-1))*(par.sn(i) + par.sp(i))*(1/(par.kB*par.T*abs(beta0))))*exp(abs(beta0)*xprime_p);
                             elseif beta0 > 0

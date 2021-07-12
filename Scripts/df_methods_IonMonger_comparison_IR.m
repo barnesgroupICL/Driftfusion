@@ -20,6 +20,8 @@ dfplot.JtotVapp(CV_df_100mVs_im, 0)
 hold on
 dfplot.JtotVapp(CV_df_200mVs_im, 0)
 hold on
+ylim([-10e-3,25e-3])
+xlim([-1.2, 0])
 
 %% Read in base parameters
 par_df_im_mirror = pc('Input_files/IonMonger_default_IR_mirror.csv');

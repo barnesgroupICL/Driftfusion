@@ -220,22 +220,22 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         C = [C_potential; C_electron; C_hole];
 
         % Flux terms
-        F_potential  = (epp(i)/eppmax)*dVdx;
-        F_electron   = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
-        F_hole       = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F = [F_potential; mobset*F_electron; mobset*F_hole];
+        FV = (epp(i)/eppmax)*dVdx;
+        Fn = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
+        Fp = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
+        F = [FV; mobset*Fn; mobset*Fp];
 
         % Recombination terms
         % Radiative
         r_rad = radset*B(i)*((n*p)-(ni(i)^2));
         % Bulk SRH
-        r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i))+taup(i)*(n+nt(i))));
+        r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
         % Volumetric surface recombination
         ns = n*exp(alpha*xprime_n(i));  % Projected surface electron density
         ps = p*exp(beta*xprime_p(i));   % Projected surface hole density
-        r_vsr = int_switch(i)*SRHset*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
+        r_vsr = int_switch(i)*SRHset*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
         
-        r = r_rad + r_srh + r_vsr;
+        r = r_rad + r_srh + r_vsr; 
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
         S_electron = g - r;

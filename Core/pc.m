@@ -184,8 +184,8 @@ classdef pc
         taun = [1e6];           % [s] SRH time constant for electrons
         taup = [1e6];           % [s] SRH time constant for holes  
         
-        sn = [0];
-        sp = [0];
+        sn = [0];               % Electron interfacial surface recombination velocity [cm s-1]
+        sp = [0];               % Hole interfacial surface recombination velocities [cm s-1]
         %% Surface recombination and extraction coefficients [cm s-1]
         % Descriptions given in the comments considering that holes are
         % extracted at left boundary, electrons at right boundary

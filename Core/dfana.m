@@ -274,27 +274,11 @@ classdef dfana
             % Calculates drift and diffusion currents at every point and all times -
             % NOTE: UNRELIABLE FOR TOTAL CURRENT as errors in the calculation of the
             % spatial gradients mean that the currents do not cancel properly
-            option = 1;
             % obtain SOL components for easy referencing
+            [~,t,x,par,~,n,p,a,c,V] = dfana.splitsol(sol);
+            xout = par.x_ihalf;
+            dev = par.dev_ihalf;
 
-            [u,t,xmesh,par,dev_i,n,p,a,c,V] = dfana.splitsol(sol);
-            xhalfmesh = par.x_ihalf;
-            dev_ihalf = par.dev_ihalf;
-
-            switch option
-                case 1
-                    dev = dev_ihalf;
-                    xout = xhalfmesh;
-                case 2
-                    dev = dev_i;
-                    xout = xmesh;
-                case 3
-                    dev = dev_ihalf;
-                    xout = xhalfmesh;
-                case 4
-                    dev = dev_ihalf;
-                    xout = xhalfmesh;
-            end
             % Property matrices
             eppmat = dev.epp;
             mue_mat = dev.mue;
@@ -307,94 +291,85 @@ classdef dfana
             gradNv_mat = dev.gradNv;
             Nc_mat = dev.Nc;
             Nv_mat = dev.Nv;
-
+            
+            V_sub = zeros(length(t), length(xout));
+            n_sub = zeros(length(t), length(xout));
+            p_sub = zeros(length(t), length(xout));
+            a_sub = zeros(length(t), length(xout));
+            c_sub = zeros(length(t), length(xout));
+            
+            dVdx = zeros(length(t), length(xout));
+            dndx = zeros(length(t), length(xout));
+            dpdx = zeros(length(t), length(xout));
+            dadx = zeros(length(t), length(xout));
+            dcdx = zeros(length(t), length(xout));             
+            
+            %% Avoid PDEVAL for faster calculation
+            % Obtain variables and gradients on sub-interval mesh
             for i = 1:length(t)
-
-                switch option
-                    case 1
-                        [nloc(i,:),dndx(i,:)] = pdeval(0,xmesh,n(i,:),xhalfmesh);
-                        [ploc(i,:),dpdx(i,:)] = pdeval(0,xmesh,p(i,:),xhalfmesh);
-                        [aloc(i,:),dadx(i,:)] = pdeval(0,xmesh,a(i,:),xhalfmesh);
-                        [cloc(i,:),dcdx(i,:)] = pdeval(0,xmesh,c(i,:),xhalfmesh);
-                        [Vloc(i,:),dVdx(i,:)] = pdeval(0,xmesh,V(i,:),xhalfmesh);
-                    case 2
-                        [nloc(i,:),dndx(i,:)] = pdeval(0,xmesh,n(i,:),xmesh);
-                        [ploc(i,:),dpdx(i,:)] = pdeval(0,xmesh,p(i,:),xmesh);
-                        [aloc(i,:),dadx(i,:)] = pdeval(0,xmesh,a(i,:),xmesh);
-                        [cloc(i,:),dcdx(i,:)] = pdeval(0,xmesh,c(i,:),xmesh);
-                        [Vloc(i,:),dVdx(i,:)] = pdeval(0,xmesh,V(i,:),xmesh);
-                    case 3
-                        [nloc(i,:),~] = pdeval(0,xmesh,n(i,:),xhalfmesh);
-                        [ploc(i,:),~] = pdeval(0,xmesh,p(i,:),xhalfmesh);
-                        [aloc(i,:),~] = pdeval(0,xmesh,a(i,:),xhalfmesh);
-                        [cloc(i,:),~] = pdeval(0,xmesh,c(i,:),xhalfmesh);
-                        [Vloc(i,:),~] = pdeval(0,xmesh,V(i,:),xhalfmesh);
-
-                        dndx(i,:) = gradient(nloc(i,:), xhalfmesh);
-                        dpdx(i,:) = gradient(ploc(i,:), xhalfmesh);
-                        dadx(i,:) = gradient(aloc(i,:), xhalfmesh);
-                        dcdx(i,:) = gradient(cloc(i,:), xhalfmesh);
-                        dVdx(i,:) = gradient(Vloc(i,:), xhalfmesh);
-                    case 4
-                        for jj = 1:length(xmesh)-1
-                            xnow = xmesh(jj) + 0.5*(xmesh(jj+1) - xmesh(jj));
-                            [nloc(i,jj),dndx(i,jj)] = dfana.pdentrp(0,0,xmesh(jj),n(i,jj),xmesh(jj+1),n(i,jj+1),xnow);
-                            [ploc(i,jj),dpdx(i,jj)] = dfana.pdentrp(0,0,xmesh(jj),p(i,jj),xmesh(jj+1),p(i,jj+1),xnow);
-                            [aloc(i,jj),dadx(i,jj)] = dfana.pdentrp(0,0,xmesh(jj),a(i,jj),xmesh(jj+1),a(i,jj+1),xnow);
-                            [cloc(i,jj),dcdx(i,jj)] = dfana.pdentrp(0,0,xmesh(jj),c(i,jj),xmesh(jj+1),c(i,jj+1),xnow);
-                            [Vloc(i,jj),dVdx(i,jj)] = dfana.pdentrp(0,0,xmesh(jj),V(i,jj),xmesh(jj+1),V(i,jj+1),xnow);
-                        end
-                end
-
-                % Diffusion coefficients
-                if par.prob_distro_function == 'Fermi'
-                    for jj = 1:length(x)
-                        Dn(i,jj) = distro_fun.D(nloc(i,jj), dev.Dnfun(jj,:), dev.n_fd(jj,:));
-                        Dp(i,jj) = distro_fun.D(ploc(i,jj), dev.Dpfun(jj,:), dev.p_fd(jj,:));
-                    end
+                V_sub(i,:) = 0.5*(V(i, 2:end) + V(i, 1:end-1));
+                n_sub(i,:) = 0.5*(n(i, 2:end) + n(i, 1:end-1));
+                p_sub(i,:) = 0.5*(p(i, 2:end) + p(i, 1:end-1));
+                c_sub(i,:) = 0.5*(c(i, 2:end) + c(i, 1:end-1));
+                a_sub(i,:) = 0.5*(a(i, 2:end) + a(i, 1:end-1));
+                
+                dVdx(i,:) = (V(i, 2:end) - V(i, 1:end-1))./(x(2:end) - x(1:end-1));   
+                dndx(i,:) = (n(i, 2:end) - n(i, 1:end-1))./(x(2:end) - x(1:end-1));
+                dpdx(i,:) = (p(i, 2:end) - p(i, 1:end-1))./(x(2:end) - x(1:end-1));
+                dcdx(i,:) = (c(i, 2:end) - c(i, 1:end-1))./(x(2:end) - x(1:end-1));
+                dadx(i,:) = (a(i, 2:end) - a(i, 1:end-1))./(x(2:end) - x(1:end-1));              
+            end
+                
+            % Diffusion coefficients
+            if par.prob_distro_function == 'Fermi'
+                for jj = 1:length(x)
+                    Dn(i,jj) = distro_fun.D(n(i,jj), dev.Dnfun(jj,:), dev.n_fd(jj,:));
+                    Dp(i,jj) = distro_fun.D(p(i,jj), dev.Dpfun(jj,:), dev.p_fd(jj,:));
                 end
             end
-
+        
             if par.prob_distro_function == 'Boltz'
                 Dn_mat = mue_mat*par.kB*par.T;
                 Dp_mat = muh_mat*par.kB*par.T;
             end
 
-            % Particle fluxes
-            jdd.ndiff = par.mobset*-(-Dn_mat.*(dndx-((nloc./Nc_mat).*gradNc_mat)));
-            jdd.ndrift = par.mobset*-(mue_mat.*nloc.*(dVdx-gradEA_mat));
-            jdd.pdiff = par.mobset*(-Dp_mat.*(dpdx-((ploc./Nv_mat).*gradNv_mat)));
-            jdd.pdrift = par.mobset*(muh_mat.*ploc.*(-dVdx+gradIP_mat));
-
+            % Particle fluxes (remember F = -dVdx)
+            jdd.ndrift = mue_mat.*n_sub.*(dVdx - gradEA_mat);
+            jdd.ndiff = -Dn_mat.*(dndx - ((n_sub./Nc_mat).*gradNc_mat));
+            jdd.pdrift = muh_mat.*p_sub.*(-dVdx + gradIP_mat);
+            jdd.pdiff = -Dp_mat.*(dpdx - ((p_sub./Nv_mat).*gradNv_mat));
+                     
             switch par.N_ionic_species
                 case 0
-                    jdd.cdiff = zeros(length(t), length(xout));
                     jdd.cdrift = zeros(length(t), length(xout));
-                    jdd.adiff = zeros(length(t), length(xout));
+                    jdd.cdiff = zeros(length(t), length(xout));
                     jdd.adrift = zeros(length(t), length(xout));
+                    jdd.adiff = zeros(length(t), length(xout));
                 case 1
-                    jdd.cdiff = par.mobseti*(-mu_cat.*par.kB*par.T.*dcdx);
-                    jdd.cdrift = par.mobseti*(mu_cat.*cloc.*-dVdx);
-                    jdd.adiff = zeros(length(t), length(xout));
+                    jdd.cdrift = mu_cat.*c_sub.*-dVdx;
+                    jdd.cdiff = -mu_cat.*par.kB*par.T.*dcdx;
                     jdd.adrift = zeros(length(t), length(xout));
+                    jdd.adiff = zeros(length(t), length(xout));               
                 case 2
-                    jdd.cdiff = par.mobseti*(-mu_cat.*par.kB*par.T.*dcdx);
-                    jdd.cdrift = par.mobseti*(mu_cat.*cloc.*-dVdx);
-                    jdd.adiff = par.mobseti*-(-mu_ani.*par.kB*par.T.*dadx);
-                    jdd.adrift = par.mobseti*-(mu_ani.*aloc.*dVdx);
+                    jdd.cdrift = mu_cat.*c_sub.*-dVdx;
+                    jdd.cdiff = -mu_cat.*par.kB*par.T.*dcdx;
+                    jdd.adrift = -mu_ani.*a_sub.*-dVdx;
+                    jdd.adiff = -mu_ani.*par.kB*par.T.*dadx;
             end
-
-            jdd.n = jdd.ndrift + jdd.ndiff;
-            jdd.p = jdd.pdrift + jdd.pdiff;
-            jdd.a = jdd.adrift + jdd.adiff;
-            jdd.c = jdd.cdrift + jdd.cdiff;
+            
+            % Note these have a negative sign compared with the expressions in DFPDE
+            jdd.n = par.mobset*(jdd.ndrift + jdd.ndiff );
+            jdd.p = par.mobset*(jdd.pdrift + jdd.pdiff);
+            jdd.a = par.mobseti*(jdd.adrift + jdd.adiff);
+            jdd.c = par.mobseti*(jdd.cdrift + jdd.cdiff);
 
             % Displacement current
-            [~, dVdxdt] = gradient(-dVdx, xout, t);
-            j.disp = par.epp0.*eppmat.*dVdxdt;
-
+            [~, dFdt] = gradient(-dVdx, xout, t);
+            j.disp = par.epp0.*eppmat.*dFdt;
+            
             jdd.disp = j.disp;
-            jdd.tot = jdd.n + jdd.p + jdd.a + jdd.c + jdd.disp;
+            % The total flux here includes the sign of the carrier
+            jdd.tot = -jdd.n + jdd.p - jdd.a + jdd.c + jdd.disp;
 
             Jdd.ndrift = jdd.ndrift*par.e;
             Jdd.ndiff = jdd.ndiff*par.e;
