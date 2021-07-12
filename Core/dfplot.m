@@ -168,6 +168,20 @@ classdef dfplot
                 {'.','-','.','-','.','-','.','-'},'Current density [Acm-2]', tarr, xrange, 0, 0);
         end
         
+        function jddx(varargin)
+            % figure(5)
+            % drift and diffusion currents as a function of position
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [j, ~, x] = dfana.Jddxt(sol);
+            
+            p_plot = find(sol.t <= tarr(1));
+            p_plot = p_plot(end);              
+
+            figure(304);
+            dfplot.x2d(sol, x, {j.n, j.p, j.disp}, {'jn', 'jp', 'jdisp'}, {'-','-','-'},'Flux [cm-2 s-1]', tarr, xrange, 0, 0);
+        end
+        
         function Voct(sol)
             [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
             Voc = dfana.calcVQFL(sol);
