@@ -58,14 +58,14 @@ dev.gradNc = build_property(par.Nc, xmesh, par, 'log_graded', 1);
 dev.gradNv = build_property(par.Nv, xmesh, par, 'log_graded', 1);
 
 % Specialist
-dev.mue = build_property(par.mue, xmesh, par, 'mue_interface', 0);
-dev.muh = build_property(par.muh, xmesh, par, 'muh_interface', 0);
+dev.mue = build_property(par.mue, xmesh, par, 'constant', 0);
+dev.muh = build_property(par.muh, xmesh, par, 'constant', 0);
 
 % Surface recombination velocity equivalence schemes
 dev.taun_vsr = build_property(par.taun, xmesh, par, 'taun_vsr', 0);
 dev.taup_vsr = build_property(par.taup, xmesh, par, 'taup_vsr', 0);
-dev.alpha_prime = build_property(par.xx, xmesh, par, 'alpha_prime', 1);
-dev.beta_prime = build_property(par.xx, xmesh, par, 'beta_prime', 1);
+dev.alpha0 = build_property(par.xx, xmesh, par, 'alpha0', 1);
+dev.beta0 = build_property(par.xx, xmesh, par, 'beta0', 1);
 
 % Switches
 dev.int_switch = build_property(par.int_switch, xmesh, par, 'int_switch', 1);

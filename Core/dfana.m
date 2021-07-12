@@ -215,18 +215,20 @@ classdef dfana
             end
             xprime_n = dev.xprime_n;
             xprime_p = dev.xprime_p;
-            alpha_prime = dev.alpha_prime;
-            beta_prime = dev.beta_prime;
-            alpha = abs(par.q*dVdx./(par.kB*par.T) + alpha_prime);
-            beta = abs(par.q*-dVdx./(par.kB*par.T) + beta_prime);
+            alpha0 = dev.alpha0;
+            beta0 = dev.beta0;
+            alpha = abs(par.q*dVdx./(par.kB*par.T) + alpha0);
+            beta = abs(par.q*-dVdx./(par.kB*par.T) + beta0);
 
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
             % Bulk SRH
             r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
             % Volumetric surface SRH
-            r.vsr = int_switch.*((n.*exp(alpha.*xprime_n).*p.*exp(beta.*xprime_p) - dev.ni.^2)./...
-                ((dev.taun_vsr.*(p.*exp(beta.*xprime_p) + dev.pt)) + (dev.taup_vsr.*(n.*exp(alpha.*xprime_n) + dev.nt))));
+            ns = n.*exp(alpha.*xprime_n);
+            ps = p.*exp(beta.*xprime_p);
+            r.vsr = int_switch.*((ns.*ps - dev.ni.^2)./...
+                ((dev.taun_vsr.*(ps + dev.pt)) + (dev.taup_vsr.*(ns + dev.nt))));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end
@@ -248,11 +250,11 @@ classdef dfana
             xprime_n = dev.xprime_n;
             xprime_p = dev.xprime_p;
 
-            alpha_prime = dev.alpha_prime;
-            beta_prime = dev.beta_prime;
+            alpha0 = dev.alpha0;
+            beta0 = dev.beta0;
 
-            alpha = abs(par.q*dVdx_ihalf./(par.kB*par.T) + alpha_prime);
-            beta = abs(par.q*-dVdx_ihalf./(par.kB*par.T) + beta_prime);
+            alpha = abs(par.q*dVdx_ihalf./(par.kB*par.T) + alpha0);
+            beta = abs(par.q*-dVdx_ihalf./(par.kB*par.T) + beta0);
 
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
@@ -260,8 +262,10 @@ classdef dfana
             r.srh = bulk_switch.*(n_ihalf.*p_ihalf - dev.ni.^2)...
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
             % Volumetric surface SRH
-            r.vsr = int_switch.*(n_ihalf.*exp(alpha.*xprime_n).*p_ihalf.*exp(beta.*xprime_p) - dev.ni.^2)...
-                ./(dev.taun_vsr.*(p_ihalf.*exp(beta.*xprime_p) + dev.pt) + dev.taup_vsr.*(n_ihalf.*exp(alpha.*xprime_n) + dev.nt));
+            ns = n_ihalf.*exp(alpha.*xprime_n); % Projected electron surface density
+            ps = p_ihalf.*exp(beta.*xprime_p);  % Projected hole surface density
+            r.vsr = int_switch.*(ns.*ps - dev.ni.^2)...
+                ./(dev.taun_vsr.*(ps + dev.pt) + dev.taup_vsr.*(ns + dev.nt));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
         end

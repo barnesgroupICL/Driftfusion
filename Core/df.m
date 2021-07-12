@@ -99,8 +99,8 @@ Ncat = device.Ncat;         % Uniform cation density
 Nani = device.Nani;         % Uniform anion density
 xprime_n = device.xprime_n;             % Translated x co-ordinates for interfaces
 xprime_p = device.xprime_p;             % Translated x co-ordinates for interfaces
-alpha_prime = device.alpha_prime;       % alpha prime is alpha - field component
-beta_prime = device.beta_prime;         % beta prime is alpha - field component
+alpha0 = device.alpha0;       % alpha0 is alpha for F = 0
+beta0 = device.beta0;         % beta0 is beta for F = 0
 N_ionic_species = par.N_ionic_species;
 nleft = par.nleft;
 nright = par.nright;
@@ -209,8 +209,8 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         dpdx = dudx(3);
 
         %% Volumetric surface recombination alpha and beta including field terms
-        alpha = abs(q*dVdx/(kB*T) + alpha_prime(i));
-        beta = abs(q*-dVdx/(kB*T) + beta_prime(i));
+        alpha = abs(q*dVdx/(kB*T) + alpha0(i));
+        beta = abs(q*-dVdx/(kB*T) + beta0(i));
 
         %% Equation editor
         % Time-dependence prefactor term
@@ -231,13 +231,15 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         % Bulk SRH
         r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i))+taup(i)*(n+nt(i))));
         % Volumetric surface recombination
-        r_vsr = int_switch(i)*SRHset*((n*exp(alpha*xprime_n(i))*p*exp(beta*xprime_p(i))-ni(i)^2)/...
-        (taun_vsr(i)*(p*exp(beta*xprime_p(i))+pt(i))+taup_vsr(i)*(n*exp(alpha*xprime_n(i))+nt(i))));
-
+        ns = n*exp(alpha*xprime_n(i));  % Projected surface electron density
+        ps = p*exp(beta*xprime_p(i));   % Projected surface hole density
+        r_vsr = int_switch(i)*SRHset*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i))+taup_vsr(i)*(ns+nt(i))));
+        
+        r = r_rad + r_srh + r_vsr;
         % Source terms
         S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - r_rad - r_srh - r_vsr;
-        S_hole     = g - r_rad - r_srh - r_vsr;
+        S_electron = g - r;
+        S_hole     = g - r;
         S = [S_potential; S_electron; S_hole];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
