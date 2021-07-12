@@ -15,18 +15,21 @@ t = sol_df.t;
 x = sol_df.x;
 al = par.active_layer;
 pcum1 = par.pcum + 1;   % Cumulative layer points array
-dev = par.dev_ihalf;
+dev = par.dev;
 alpha0 = dev.alpha0;
 beta0 = dev.beta0;
-xout = par.x_ihalf;
+x = par.x;
+xsub = par.x_ihalf;
 
 % Get subinterval values of carrier densities (as used in PDEPE)
-n = zeros(length(t), length(xout));
-p = zeros(length(t), length(xout));
-for i = 1:length(t)
-    n(i,:) = 0.5*(u(i, 2:end, 2) + u(i, 1:end-1, 2));
-    p(i,:) = 0.5*(u(i, 2:end, 3) + u(i, 1:end-1, 3));
-end
+% n = zeros(length(t), length(xout));
+% p = zeros(length(t), length(xout));
+% for i = 1:length(t)
+%     n(i,:) = 0.5*(u(i, 2:end, 2) + u(i, 1:end-1, 2));
+%     p(i,:) = 0.5*(u(i, 2:end, 3) + u(i, 1:end-1, 3));
+% end
+n = u(:, :, 2);
+p = u(:, :, 3);
 
 %% Driftfusion 3D
 rx = dfana.calcr_ihalf(sol_df);
@@ -41,7 +44,7 @@ ns = zeros(length(t), length(loc));     % Store time array of each ns in new col
 ps = zeros(length(t), length(loc));     % Store time array of each ps in new column
 R_abrupt = zeros(length(t), length(loc));
 R_vsr = zeros(length(t), length(loc));
-delta = zeros(length(t), length(loc));
+sigma = zeros(length(t), length(loc));
 
 for i = 1:length(loc)
     sn = par.sn(loc(i));
@@ -66,19 +69,14 @@ for i = 1:length(loc)
     R_abrupt(:, i) = (ns(:, i).*ps(:, i) - ni^2)./((1/sn).*(ps(:, i) + pt) + (1/sp).*(ns(:, i) + nt));
     
     for k = 1:length(t)
-        R_vsr(k, i) = trapz(xout(pcum1(loc(i)-1)-1:pcum1(loc(i))), rx.vsr(k, pcum1(loc(i)-1)-1:pcum1(loc(i))), 2);
+        R_vsr(k, i) = trapz(xsub(pcum1(loc(i)-1)-1:pcum1(loc(i))), rx.vsr(k, pcum1(loc(i)-1)-1:pcum1(loc(i))), 2);
     end
     
     %% Fractional difference
-    sigma(:, i) = 1-(R_vsr(:, i)./R_abrupt(:, i));
+    sigma(:, i) = (R_abrupt(:, i)-R_vsr(:, i))./R_abrupt(:, i);
     
     sigma(find(R_abrupt(:, i) < AbsTol_vsr), i) = NaN;
-    
-    if max(abs(sigma(:, i))) > RelTol_vsr
-    warning(['The max volumetric surface recombination model error for interface ', num2str(i),' (sigma_max = ', num2str(max(abs(sigma(:, i)))),') exceeded the user-defined tolerance level (tol_vsr = ', ...
-        num2str(RelTol_vsr), '). Consider increasing the interface layer electronic mobilities or switching to a alternative recombination model.'])
-    end
-    
+        
     if plot_switch
         figure(300)
         semilogy(t, R_abrupt(:, i) , t, R_vsr(:, i) , '--')
@@ -101,10 +99,26 @@ for i = 1:length(loc)
         hold on
     end
 end
+
+R_abrupt_sum = sum(R_abrupt, 2);
+R_vsr_sum = sum(R_vsr, 2);
+
+sigma_sum = 1-(R_vsr_sum./R_abrupt_sum);
+
+if max(abs(sigma_sum)) > RelTol_vsr
+    warning(['The max volumetric surface recombination model fractional error (sigma_max = ', num2str(max(abs(sigma_sum))),') exceeded the user-defined tolerance level (tol_vsr = ', ...
+        num2str(RelTol_vsr), '). Consider increasing the interface layer electronic mobilities, reducing energetic barriers, or switching to a alternative recombination model.'])
+end
+    
+if plot_switch
+    figure(303)
+    plot(t, sigma_sum)
+    xlabel('Time [s]')
+    ylabel('Fractional difference')
+end
+
 figure(300); hold off
 figure(301); hold off
 figure(302); hold off
-
-
 
 end
