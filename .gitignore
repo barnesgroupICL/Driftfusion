@@ -52,7 +52,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-
 # End of https://www.gitignore.io/api/osx,windows
 untitled.m
 evidence_for_ion_data.mat
@@ -60,3 +59,6 @@ Evidence_for_ion_ws.mat
 .DS_Store
 .DS_Store
 .DS_Store
+
+# Movie files
+*.avi
