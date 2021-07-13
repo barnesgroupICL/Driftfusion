@@ -73,6 +73,7 @@ dev.beta0 = build_property(par.xx, xmesh, par, 'beta0', 1);
 
 % Switches
 dev.int_switch = build_property(par.int_switch, xmesh, par, 'int_switch', 1);
+dev.rec_zone = build_property(par.int_switch, xmesh, par, 'rec_zone', 1);
 dev.bulk_switch = abs(dev.int_switch-1);
 
 % Tranlsated co-ordinates

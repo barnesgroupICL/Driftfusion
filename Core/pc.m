@@ -186,6 +186,8 @@ classdef pc
         
         sn = [0];               % Electron interfacial surface recombination velocity [cm s-1]
         sp = [0];               % Hole interfacial surface recombination velocities [cm s-1]
+        d_zone = 0.1e-7;        % recombination zone thickness [cm]
+        
         %% Surface recombination and extraction coefficients [cm s-1]
         % Descriptions given in the comments considering that holes are
         % extracted at left boundary, electrons at right boundary

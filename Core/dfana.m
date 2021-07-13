@@ -209,6 +209,7 @@ classdef dfana
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
             int_switch = repmat(dev.int_switch, length(t), 1);
+            rec_zone = repmat(dev.int_switch, length(t), 1);
             bulk_switch = abs(int_switch-1);
             for i=1:length(t)
                 dVdx(i,:) = pdeval(0, x, V(i,:), x);
@@ -227,7 +228,7 @@ classdef dfana
             % Volumetric surface SRH
             ns = n.*exp(alpha.*xprime_n);
             ps = p.*exp(beta.*xprime_p);
-            r.vsr = int_switch.*((ns.*ps - dev.ni.^2)./...
+            r.vsr = rec_zone.*((ns.*ps - dev.ni.^2)./...
                 ((dev.taun_vsr.*(ps + dev.pt)) + (dev.taup_vsr.*(ns + dev.nt))));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
@@ -246,6 +247,7 @@ classdef dfana
                 [~, dVdx_ihalf(i,:)] = pdeval(0, x, V(i,:), x_ihalf);
             end
             int_switch = repmat(dev.int_switch, length(t), 1);
+            rec_zone = repmat(dev.rec_zone, length(t), 1);
             bulk_switch = abs(int_switch-1);
             xprime_n = dev.xprime_n;
             xprime_p = dev.xprime_p;
@@ -264,7 +266,7 @@ classdef dfana
             % Volumetric surface SRH
             ns = n_ihalf.*exp(alpha.*xprime_n); % Projected electron surface density
             ps = p_ihalf.*exp(beta.*xprime_p);  % Projected hole surface density
-            r.vsr = int_switch.*(ns.*ps - dev.ni.^2)...
+            r.vsr = rec_zone.*(ns.*ps - dev.ni.^2)...
                 ./(dev.taun_vsr.*(ps + dev.pt) + dev.taup_vsr.*(ns + dev.nt));
             % Total
             r.tot = r.btb + r.srh + r.vsr;

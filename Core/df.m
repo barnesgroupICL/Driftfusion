@@ -121,6 +121,7 @@ K_anion = par.K_anion;      % Anion transport rate multiplier
 radset = par.radset;        % Radiative recombination switch
 SRHset = par.SRHset;        % SRH recombination switch
 int_switch = device.int_switch;   % 1 for interfacial points, 0 for bulk points
+rec_zone = device.rec_zone; 
 bulk_switch = device.bulk_switch; % 1 for bulk points, 0 for interfacial points
 
 %% Spatial mesh
@@ -233,7 +234,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         % Volumetric surface recombination
         ns = n*exp(alpha*xprime_n(i));  % Projected surface electron density
         ps = p*exp(beta*xprime_p(i));   % Projected surface hole density
-        r_vsr = int_switch(i)*SRHset*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
+        r_vsr = rec_zone(i)*SRHset*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
         
         r = r_rad + r_srh + r_vsr; 
         % Source terms

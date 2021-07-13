@@ -107,7 +107,7 @@ sigma_sum = 1-(R_vsr_sum./R_abrupt_sum);
 
 if max(abs(sigma_sum)) > RelTol_vsr
     warning(['The max volumetric surface recombination model fractional error (sigma_max = ', num2str(max(abs(sigma_sum))),') exceeded the user-defined tolerance level (tol_vsr = ', ...
-        num2str(RelTol_vsr), '). Consider increasing the interface layer electronic mobilities, reducing energetic barriers, or switching to a alternative recombination model.'])
+        num2str(RelTol_vsr), '). Consider increasing the interface layer electronic mobilities, reducing energetic barriers, reducing minority carrier recombination velocities or switching to a alternative recombination model.'])
 end
     
 if plot_switch
