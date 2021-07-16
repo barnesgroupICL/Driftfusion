@@ -11,7 +11,7 @@
 % 
 %% Start code
 %% Read-in params
-par_3l = pc('input_files/IonMonger_default_IR.csv');
+par_3l = pc('input_files/spiro_mapi_tio2.csv');
 
 %% Find equilibrium solution
 soleq_3l = equilibrate(par_3l);
