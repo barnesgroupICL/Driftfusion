@@ -21,11 +21,21 @@ soleq_tio2 = equilibrate(par_tio2);
 %% Perform dark and light current-voltage scan at 50 mVs-1 from 0 V to 1.2 V
 % Input arguments: 
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
+sol_CV_100mVs_dark = doCV(soleq_tio2.ion, 0, 0, 1.2, -0.2, 100e-3, 1, 281);
+sol_CV_200mVs_dark = doCV(soleq_tio2.ion, 0, 0, 1.2, -0.2, 200e-3, 1, 281);
+sol_CV_400mVs_dark = doCV(soleq_tio2.ion, 0, 0, 1.2, -0.2, 400e-3, 1, 281);
+
 sol_CV_100mVs = doCV(soleq_tio2.ion, 1, 0, 1.2, -0.2, 100e-3, 1, 281);
 sol_CV_200mVs = doCV(soleq_tio2.ion, 1, 0, 1.2, -0.2, 200e-3, 1, 281);
 sol_CV_400mVs = doCV(soleq_tio2.ion, 1, 0, 1.2, -0.2, 400e-3, 1, 281);
 
 %% plot the current voltage curve
+dfplot.JtotVapp(sol_CV_100mVs_dark, 0)
+hold on
+dfplot.JtotVapp(sol_CV_200mVs_dark, 0)
+hold on
+dfplot.JtotVapp(sol_CV_400mVs_dark, 0)
+hold on
 dfplot.JtotVapp(sol_CV_100mVs, 0)
 hold on
 dfplot.JtotVapp(sol_CV_200mVs, 0)
