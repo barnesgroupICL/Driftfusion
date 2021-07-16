@@ -687,7 +687,19 @@ classdef dfplot
             xlabel('Time')
             ylabel('Ion field [Vcm-1]')
         end
-
+        
+        
+        function rec_zone(sol)
+           dev = sol.par.dev_ihalf;
+           x = sol.par.x_ihalf;
+           
+           figure(27)
+           plot(x, dev.int_switch, x, dev.rec_zone)
+           xlabel('Position [nm]')
+           ylabel('norm')
+           legend('interface', 'vsr zone')
+        end
+        
         function colourblocks(sol, yrange)
             par = sol.par;
             dcum0 = par.dcum0*1e7;   % Convert to nm
