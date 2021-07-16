@@ -120,9 +120,9 @@ K_cation = par.K_cation;    % Cation transport rate multiplier
 K_anion = par.K_anion;      % Anion transport rate multiplier
 radset = par.radset;        % Radiative recombination switch
 SRHset = par.SRHset;        % SRH recombination switch
-int_switch = device.int_switch;   % 1 for interfacial points, 0 for bulk points
 rec_zone = device.rec_zone; 
 bulk_switch = device.bulk_switch; % 1 for bulk points, 0 for interfacial points
+vsr_mode = par.vsr_mode;
 
 %% Spatial mesh
 x = xmesh;
@@ -160,6 +160,23 @@ options = odeset('MaxStep', par.MaxStepFactor*0.1*abs(par.tmax - par.t0), 'RelTo
 % inputs with '@' are function handles to the subfunctions
 % below for the: equation, initial conditions, boundary conditions
 u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
+
+%% Ouputs
+% Store final voltage reading
+par.Vapp = Vapp;
+
+% Solutions and meshes to structure
+solstruct.u = u;
+solstruct.x = x;
+solstruct.t = t;
+
+% Store parameters object
+solstruct.par = par;
+
+%% Volumetric surface recombination error check
+if par.vsr_mode == 1 && par.vsr_check == 1
+    compare_rec_flux(solstruct, par.RelTol_vsr, par.AbsTol_vsr, 0); 
+end
 
 %% Subfunctions
 % Set up partial differential equation (pdepe) (see MATLAB pdepe help for details of C,F,S)
@@ -234,7 +251,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
         % Volumetric surface recombination
         ns = n*exp(alpha*xprime_n(i));  % Projected surface electron density
         ps = p*exp(beta*xprime_p(i));   % Projected surface hole density
-        r_vsr = rec_zone(i)*SRHset*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
+        r_vsr = vsr_mode*SRHset*rec_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
         
         r = r_rad + r_srh + r_vsr; 
         % Source terms
@@ -420,17 +437,5 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
                 end
         end
     end
-
-%% Ouputs
-% Store final voltage reading
-par.Vapp = Vapp;
-
-% Solutions and meshes to structure
-solstruct.u = u;
-solstruct.x = x;
-solstruct.t = t;
-
-% Store parameters object
-solstruct.par = par;
 
 end
