@@ -44,6 +44,8 @@ par.SRHset = 0;
 par.radset = 1;
 % Start with no ionic carriers
 par.N_ionic_species = 0;
+% Switch off volumetric surface recombination check
+par.vsr_check = 0;
 
 %% General initial parameters
 par.tmesh_type = 2;
@@ -102,8 +104,9 @@ end
 
 soleq_nosrh = sol;
 
-disp('Switching on interfacial recombination')
+disp('Switching on SRH recombination')
 par.SRHset = 1;
+par.vsr_check = 1;
 
 par.tmax = 10*t_diff;
 par.t0 = par.tmax/1e3;
@@ -115,7 +118,7 @@ if electronic_only == 0
     %% Equilibrium solutions with ion mobility switched on
     par.N_ionic_species = par_origin.N_ionic_species;
     
-    % CReate temporary solution for appending initial conditions to
+    % Create temporary solution for appending initial conditions to
     sol = soleq_nosrh;
     
     % Write ionic initial conditions
@@ -153,7 +156,8 @@ if electronic_only == 0
     par.K_cation = rat_cation;
     par.tmax = 1e3*t_diff;
     par.t0 = par.tmax/1e3;
-      
+    par.vsr_check = 1;
+    
     sol = df(sol, par);   
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     
