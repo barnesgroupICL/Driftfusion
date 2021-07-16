@@ -184,10 +184,6 @@ classdef pc
         taun = [1e6];           % [s] SRH time constant for electrons
         taup = [1e6];           % [s] SRH time constant for holes  
         
-        sn = [0];               % Electron interfacial surface recombination velocity [cm s-1]
-        sp = [0];               % Hole interfacial surface recombination velocities [cm s-1]
-        d_zone = 0.1e-7;        % recombination zone thickness [cm]
-        
         %% Surface recombination and extraction coefficients [cm s-1]
         % Descriptions given in the comments considering that holes are
         % extracted at left boundary, electrons at right boundary
@@ -195,7 +191,16 @@ classdef pc
         sn_r = 1e7;     % electron extraction velocity right boundary
         sp_l = 1e7;     % hole extraction left boundary
         sp_r = 1e7;     % hole surface recombination velocity right boundary
-
+        
+        %% Volumetric surface recombination
+        vsr_mode = 1;           % Either 1 for volumetric surface recombination approximation or 0 for off
+        vsr_check = 1;          % Perform check for self-consitency at the end of DF
+        sn = [0];               % Electron interfacial surface recombination velocity [cm s-1]
+        sp = [0];               % Hole interfacial surface recombination velocities [cm s-1]
+        frac_vsr_zone = 0.1;    % recombination zone thickness [fraction of interface thickness]
+        AbsTol_vsr = 1e8;       % The integrated interfacial recombination flux for which a warning is flagged [cm-2 s-1]
+        RelTol_vsr = 0.05;      % Fractional error between abrupt and volumetric surface recombination models above which a warning is flagged
+        
         %% Series resistance
         Rs = 0;
         Rs_initial = 0;         % Switch to allow linear ramp of Rs on first application

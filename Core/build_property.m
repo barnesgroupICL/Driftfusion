@@ -80,13 +80,13 @@ for i=1:length(par.dcum)                % i is the layer index
                         if par.sn(i) == 0
                             devprop(j) = 1e100; % Avoid divide by zero error
                         else
-                            devprop(j) = (par.d_zone/(par.sn(i)));
+                            devprop(j) = deff*par.frac_vsr_zone/(par.sn(i));
                         end
                     case 'taup_vsr'
                         if par.sp(i) == 0
                             devprop(j) = 1e100; % Avoid divide by zero error
                         else
-                            devprop(j) = (par.d_zone/(par.sp(i)));
+                            devprop(j) = deff*par.frac_vsr_zone/(par.sp(i));
                         end
                     case 'mue_vsr'
                         if alpha0 < 0
@@ -117,46 +117,65 @@ for i=1:length(par.dcum)                % i is the layer index
                     case 'beta0'
                         devprop(j) = beta0;
                     case 'rec_zone'
-                        %                             if xprime >= (deff/2) - (par.d_zone/2) && xprime < (deff/2) + (par.d_zone/2)
-                        %                                 devprop(j) = 1;
-                        %                             else
-                        %                                 devprop(j) = 0;
-                        %                             end
                         % intelligent location
-                        if alpha0 <= 0 && beta0 > 0
-                            if par.n0(i-1) > par.p0(i+1)
-                                if xprime >= (deff - par.d_zone) && xprime <= deff
+                        if (alpha0 <= 0 && beta0 > 0) || (alpha0 < 0 && beta0 >= 0)
+                            if par.n0(i+1) > par.p0(i-1)
+                                if xprime >= deff*(1 - par.frac_vsr_zone) && xprime <= deff
                                     devprop(j) = 1;
                                 else
                                     devprop(j) = 0;
                                 end
-                            elseif par.n0(i-1) < par.p0(i+1)
-                                if xprime <= par.d_zone
+                            elseif par.n0(i+1) < par.p0(i-1)
+                                if xprime <= deff*par.frac_vsr_zone
+                                    devprop(j) = 1;
+                                else
+                                    devprop(j) = 0;
+                                end
+                            else
+                                if xprime >= (deff/2)*(1 - par.frac_vsr_zone) && xprime <= (deff/2)*(1 + par.frac_vsr_zone)
                                     devprop(j) = 1;
                                 else
                                     devprop(j) = 0;
                                 end
                             end
-                        elseif alpha0 >= 0 && beta0 < 0
-                            if par.p0(i-1) > par.n0(i+1)
-                                if xprime >= (deff - par.d_zone) && xprime <= deff
+                        elseif (alpha0 >= 0 && beta0 < 0) || (alpha0 > 0 && beta0 <= 0)
+                            if par.p0(i+1) > par.n0(i-1)
+                                if xprime >= deff*(1 - par.frac_vsr_zone) && xprime <= deff
                                     devprop(j) = 1;
                                 else
                                     devprop(j) = 0;
                                 end
-                            elseif par.p0(i-1) < par.n0(i+1)
-                                if xprime <= par.d_zone
+                            elseif par.p0(i+1) < par.n0(i-1)
+                                if xprime <= deff*par.frac_vsr_zone
                                     devprop(j) = 1;
                                 else
                                     devprop(j) = 0;
                                 end
                             else % place in centre
-                                if xprime >= (deff/2) - (par.d_zone/2) && xprime <= (deff/2) + (par.d_zone/2)
+                                if xprime >= (deff/2)*(1 - par.frac_vsr_zone) && xprime <= (deff/2)*(1 + par.frac_vsr_zone)
                                     devprop(j) = 1;
                                 else
                                     devprop(j) = 0;
                                 end
                             end
+                        elseif (alpha0 <= 0 && beta0 < 0) || (alpha0 < 0 && beta0 <= 0)
+                                if xprime <= deff*par.frac_vsr_zone
+                                    devprop(j) = 1;
+                                else
+                                    devprop(j) = 0;
+                                end
+                        elseif (alpha0 >= 0  && beta0 > 0) || (alpha0 > 0  && beta0 >= 0)
+                                if xprime >= deff*(1 - par.frac_vsr_zone) && xprime <= deff
+                                    devprop(j) = 1;
+                                else
+                                    devprop(j) = 0;
+                                end
+                        else
+                                if xprime >= (deff/2)*(1 - par.frac_vsr_zone) && xprime <= (deff/2)*(1 + par.frac_vsr_zone)
+                                    devprop(j) = 1;
+                                else
+                                    devprop(j) = 0;
+                                end
                         end
                 end
             end
