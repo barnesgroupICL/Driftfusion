@@ -13,7 +13,7 @@
 % close all
 
 %% Build the parameters object
-par_3l = pc('Input_files/3_layer_test_symmetric.csv');
+par_3l = pc('Input_files/3_layer_test.csv');
 
 %% Get equilibrium solutions
 soleq_3l = equilibrate(par_3l);
