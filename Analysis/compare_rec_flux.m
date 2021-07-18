@@ -108,7 +108,7 @@ end
     
 if plot_switch
     figure(303)
-    plot(t, sigma_sum)
+    plot(t, sigma_sum_filter)
     xlabel('Time [s]')
     ylabel('Fractional difference')
     figure(300); hold off
