@@ -299,5 +299,21 @@ try
 catch
     % warning('Layer colours (layer_colour) undefined in .csv. Using default in PC')
 end
+% Recombination zone location
+% Illumination side
+if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
+    try
+        rec_zone_loc_user = T{:, 'rec_zone_loc'}';
+    catch
+        warning('Recomination zone location (rec_zone_loc) not defined in .csv . Using default in PC')
+        rec_zone_loc_user = strings(1, length(par.stack));
+        rec_zone_loc_user(1, 1:length(par.stack)) = deal('auto');
+    end
+        for i = 1:length(par.stack)
+            if any(strcmp(rec_zone_loc_user(i), {'L', 'R', 'C'})) == 1
+                par.rec_zone_loc(i) = rec_zone_loc_user(i);
+            end
+        end
+end
 
 end

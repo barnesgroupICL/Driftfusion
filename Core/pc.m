@@ -272,6 +272,7 @@ classdef pc
         pright
         pt              % Density of VB holes when Fermi level at trap state energy
         pt_inter
+        rec_zone_loc
         wn
         wp
         wscr            % Space charge region width
@@ -587,6 +588,10 @@ classdef pc
         % interface switch for zeroing field in interfaces
         function value = get.int_switch(par)
             value = ones(1, length(par.stack));
+        end
+        
+        function value = get.rec_zone_loc(par)
+            value = locate_rec_zone(par);            
         end
     end
 

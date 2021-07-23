@@ -117,65 +117,24 @@ for i=1:length(par.dcum)                % i is the layer index
                     case 'beta0'
                         devprop(j) = beta0;
                     case 'rec_zone'
-                        % intelligent location
-                        if (alpha0 <= 0 && beta0 > 0) || (alpha0 < 0 && beta0 >= 0)
-                            if par.n0(i+1) > par.p0(i-1)
-                                if xprime >= deff*(1 - par.frac_vsr_zone) && xprime <= deff
-                                    devprop(j) = 1;
-                                else
-                                    devprop(j) = 0;
-                                end
-                            elseif par.n0(i+1) < par.p0(i-1)
-                                if xprime <= deff*par.frac_vsr_zone
-                                    devprop(j) = 1;
-                                else
-                                    devprop(j) = 0;
-                                end
+                        if par.rec_zone_loc(i) == "L"
+                            if xprime <= deff*par.frac_vsr_zone
+                                devprop(j) = 1;
                             else
-                                if xprime >= (deff/2)*(1 - par.frac_vsr_zone) && xprime <= (deff/2)*(1 + par.frac_vsr_zone)
-                                    devprop(j) = 1;
-                                else
-                                    devprop(j) = 0;
-                                end
+                                devprop(j) = 0;
                             end
-                        elseif (alpha0 >= 0 && beta0 < 0) || (alpha0 > 0 && beta0 <= 0)
-                            if par.p0(i+1) > par.n0(i-1)
-                                if xprime >= deff*(1 - par.frac_vsr_zone) && xprime <= deff
-                                    devprop(j) = 1;
-                                else
-                                    devprop(j) = 0;
-                                end
-                            elseif par.p0(i+1) < par.n0(i-1)
-                                if xprime <= deff*par.frac_vsr_zone
-                                    devprop(j) = 1;
-                                else
-                                    devprop(j) = 0;
-                                end
-                            else % place in centre
-                                if xprime >= (deff/2)*(1 - par.frac_vsr_zone) && xprime <= (deff/2)*(1 + par.frac_vsr_zone)
-                                    devprop(j) = 1;
-                                else
-                                    devprop(j) = 0;
-                                end
+                        elseif par.rec_zone_loc(i) == "R"
+                            if xprime >= deff*(1 - par.frac_vsr_zone) && xprime <= deff
+                                devprop(j) = 1;
+                            else
+                                devprop(j) = 0;
                             end
-                        elseif (alpha0 <= 0 && beta0 < 0) || (alpha0 < 0 && beta0 <= 0)
-                                if xprime <= deff*par.frac_vsr_zone
-                                    devprop(j) = 1;
-                                else
-                                    devprop(j) = 0;
-                                end
-                        elseif (alpha0 >= 0  && beta0 > 0) || (alpha0 > 0  && beta0 >= 0)
-                                if xprime >= deff*(1 - par.frac_vsr_zone) && xprime <= deff
-                                    devprop(j) = 1;
-                                else
-                                    devprop(j) = 0;
-                                end
-                        else
-                                if xprime >= (deff/2)*(1 - par.frac_vsr_zone) && xprime <= (deff/2)*(1 + par.frac_vsr_zone)
-                                    devprop(j) = 1;
-                                else
-                                    devprop(j) = 0;
-                                end
+                        elseif par.rec_zone_loc(i) == "C"
+                            if xprime >= (deff/2)*(1 - par.frac_vsr_zone) && xprime <= (deff/2)*(1 + par.frac_vsr_zone)
+                                devprop(j) = 1;
+                            else
+                                devprop(j) = 0;
+                            end
                         end
                 end
             end
@@ -183,3 +142,4 @@ for i=1:length(par.dcum)                % i is the layer index
     end
 end
 end
+
