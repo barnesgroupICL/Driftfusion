@@ -1,4 +1,4 @@
-function compare_rec_flux_general(sol_df, RelTol_vsr, AbsTol_vsr, plot_switch)
+function compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plot_switch)
 % Script to compare the interfacial recombination fluxes from Driftfusion
 % (DF) and IonMonger (IM)
 % Currently only working for ETL-AL-HTL architecture
@@ -101,9 +101,14 @@ sigma_sum_filter = sigma_sum;
 [AbsTol_row, AbsTol_col] = find(R_vsr < AbsTol_vsr);
 sigma_sum_filter(AbsTol_row) = NaN;
 
-if max(abs(sigma_sum_filter)) > RelTol_vsr 
+if max(abs(sigma_sum_filter)) > RelTol_vsr
     warning(['The max volumetric surface recombination model fractional error (sigma_max = ', num2str(max(abs(sigma_sum))),') for recombination fluxes above ', num2str(AbsTol_vsr), ' cm-2s-1 exceeded the user-defined tolerance level (tol_vsr = ', ...
-        num2str(RelTol_vsr), '). Consider increasing the interface layer electronic mobilities, reducing energetic barriers, reducing minority carrier recombination velocities or switching to a alternative recombination model.'])
+        num2str(RelTol_vsr), '). Consider:' newline...
+        '- increasing the interface layer electronic mobilities' newline...
+        '- reducing energetic barriers' newline...
+        '- manually relocating recombination zones' newline...
+        '- reducing interfacial surface recombination velocities' newline...
+        '- switching to an alternative recombination model'])
 end
     
 if plot_switch

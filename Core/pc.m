@@ -198,6 +198,7 @@ classdef pc
         sn = [0];               % Electron interfacial surface recombination velocity [cm s-1]
         sp = [0];               % Hole interfacial surface recombination velocities [cm s-1]
         frac_vsr_zone = 0.1;    % recombination zone thickness [fraction of interface thickness]
+        rec_zone_loc = {'auto'};    % recombination zone location either: 'L', 'C', 'R', or 'auto'. IMPORT_PROPERTIES deals with the choice of value.
         AbsTol_vsr = 1e8;       % The integrated interfacial recombination flux for which a warning is flagged [cm-2 s-1]
         RelTol_vsr = 0.05;      % Fractional error between abrupt and volumetric surface recombination models above which a warning is flagged
         
@@ -272,7 +273,6 @@ classdef pc
         pright
         pt              % Density of VB holes when Fermi level at trap state energy
         pt_inter
-        rec_zone_loc
         wn
         wp
         wscr            % Space charge region width
@@ -290,6 +290,7 @@ classdef pc
                 par = import_properties(par, filepath);
             elseif length(varargin) > 1
                 filepath = varargin{1, 1};
+                par = import_properties(par, filepath);
                 warning('pc should have 0 or 1 input arguments- only the first argument will be used for the filepath')
             end
 
@@ -590,9 +591,6 @@ classdef pc
             value = ones(1, length(par.stack));
         end
         
-        function value = get.rec_zone_loc(par)
-            value = locate_rec_zone(par);            
-        end
     end
 
     methods (Static)
