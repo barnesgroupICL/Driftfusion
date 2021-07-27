@@ -97,8 +97,8 @@ NA = device.NA;             % Acceptor doping density
 ND = device.ND;             % Donor doping density
 Ncat = device.Ncat;         % Uniform cation density
 Nani = device.Nani;         % Uniform anion density
-xprime_n = device.xprime_n;             % Translated x co-ordinates for interfaces
-xprime_p = device.xprime_p;             % Translated x co-ordinates for interfaces
+xprime = device.xprime;             % Translated x co-ordinates for interfaces
+dint = device.dint;
 alpha0 = device.alpha0;       % alpha0 is alpha for F = 0
 beta0 = device.beta0;         % beta0 is beta for F = 0
 N_ionic_species = par.N_ionic_species;
@@ -226,10 +226,6 @@ end
         dndx = dudx(2);
         dpdx = dudx(3);
 
-        %% Volumetric surface recombination alpha and beta including field terms
-        alpha = abs(q*dVdx/(kB*T) + alpha0(i));
-        beta = abs(q*-dVdx/(kB*T) + beta0(i));
-
         %% Equation editor
         % Time-dependence prefactor term
         C_potential = 0;
@@ -248,9 +244,21 @@ end
         r_rad = radset*B(i)*((n*p)-(ni(i)^2));
         % Bulk SRH
         r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
-        % Volumetric surface recombination
-        ns = n*exp(alpha*xprime_n(i));  % Projected surface electron density
-        ps = p*exp(beta*xprime_p(i));   % Projected surface hole density
+        
+        %% Volumetric surface recombination
+        alpha = q*dVdx/(kB*T) + alpha0(i);
+        beta = q*-dVdx/(kB*T) + beta0(i);
+        if alpha < 0
+            ns = n*exp(-alpha.*xprime(i));
+        elseif alpha >=0
+            ns = n*exp(-alpha*(xprime(i)-dint(i)));
+        end
+        
+        if beta < 0
+            ps = p*exp(-beta*xprime(i));
+        elseif beta >=0
+            ps = p*exp(-beta*(xprime(i)-dint(i)));
+        end
         r_vsr = vsr_mode*SRHset*rec_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
         
         r = r_rad + r_srh + r_vsr; 

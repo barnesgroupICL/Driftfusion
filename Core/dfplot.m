@@ -702,7 +702,6 @@ classdef dfplot
             ylabel('Ion field [Vcm-1]')
         end
         
-        
         function rec_zone(sol)
            dev = sol.par.dev_ihalf;
            x = sol.par.x_ihalf;
@@ -712,6 +711,18 @@ classdef dfplot
            xlabel('Position [nm]')
            ylabel('norm')
            legend('interface', 'vsr zone')
+        end
+        
+        function alpha0beta0(sol)
+            dev = sol.par.dev_ihalf;
+            x = sol.par.x_ihalf;
+            
+            figure(28)
+            plot(x, dev.alpha0, x, dev.beta0)
+            xlabel('Position [nm]')
+            ylabel('')
+            legend('alpha0', 'beta0')
+            
         end
         
         function colourblocks(sol, yrange)

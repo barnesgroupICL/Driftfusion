@@ -106,18 +106,14 @@ for i=1:length(par.dcum)                % i is the layer index
                         end
                     case 'int_switch'
                         devprop(j) = 1;
-                    case 'xprime_n'
-                        devprop(j) = xprime_n;
-                    case 'xprime_p'
-                        devprop(j) = xprime_p;
                     case 'xprime'
                         devprop(j) = xprime;
+                    case 'dint'
+                        devprop(j) = deff;
                     case 'alpha0'
                         devprop(j) = alpha0;
                     case 'beta0'
                         devprop(j) = beta0;
-                    case 'dint'
-                        devprop(j) = deff;
                     case 'rec_zone'
                         if par.rec_zone_loc(i) == "L"
                             if xprime <= deff*par.frac_vsr_zone

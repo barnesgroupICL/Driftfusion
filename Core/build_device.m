@@ -27,7 +27,9 @@ dev.pt = build_property(par.pt, xmesh, par, 'constant', 0);
 dev.sn = build_property(par.sn, xmesh, par, 'constant', 1);
 dev.sp = build_property(par.sp, xmesh, par, 'constant', 1);
 dev.ni = build_property(par.ni, xmesh, par, 'constant', 0);
-
+dev.mue = build_property(par.mue, xmesh, par, 'constant', 0);
+dev.muh = build_property(par.muh, xmesh, par, 'constant', 0);
+    
 % Linearly graded properties
 dev.EA = build_property(par.EA, xmesh, par, 'lin_graded', 0);
 dev.IP = build_property(par.IP, xmesh, par, 'lin_graded', 0);
@@ -57,14 +59,6 @@ dev.gradIP = build_property(par.IP, xmesh, par, 'lin_graded', 1);
 dev.gradNc = build_property(par.Nc, xmesh, par, 'log_graded', 1);
 dev.gradNv = build_property(par.Nv, xmesh, par, 'log_graded', 1);
 
-% Specialist
-% if par.vsr_mode
-%     dev.mue = build_property(par.mue, xmesh, par, 'mue_vsr', 0);
-%     dev.muh = build_property(par.muh, xmesh, par, 'muh_vsr', 0);
-% else
-    dev.mue = build_property(par.mue, xmesh, par, 'constant', 0);
-    dev.muh = build_property(par.muh, xmesh, par, 'constant', 0);
-% end
 % Surface recombination velocity equivalence schemes
 dev.taun_vsr = build_property(par.taun, xmesh, par, 'taun_vsr', 0);
 dev.taup_vsr = build_property(par.taup, xmesh, par, 'taup_vsr', 0);

@@ -261,16 +261,15 @@ classdef dfana
             int_switch = repmat(dev.int_switch, length(t), 1);
             rec_zone = repmat(dev.rec_zone, length(t), 1);
             bulk_switch = abs(int_switch-1);
-            xprime_n = dev.xprime_n;
-            xprime_p = dev.xprime_p;
+
             xprime = dev.xprime;
             dint = dev.dint;
             
             alpha0 = dev.alpha0;
             beta0 = dev.beta0;
 
-            alpha = abs(par.q*dVdx_ihalf./(par.kB*par.T) + alpha0);
-            beta = abs(par.q*-dVdx_ihalf./(par.kB*par.T) + beta0);
+            alpha = par.q*dVdx_ihalf./(par.kB*par.T) + alpha0;
+            beta = -par.q*dVdx_ihalf./(par.kB*par.T) + beta0;
 
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
@@ -278,18 +277,22 @@ classdef dfana
             r.srh = bulk_switch.*(n_ihalf.*p_ihalf - dev.ni.^2)...
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
             % Volumetric surface SRH
-%             ns = n_ihalf.*exp(alpha.*xprime_n); % Projected electron surface density
-%             ps = p_ihalf.*exp(beta.*xprime_p);  % Projected hole surface density
-            if alpha < 0
-                ns = n_ihalf.*exp(-alpha.*xprime);
-            elseif alpha >=0
-                ns = n_ihalf.*exp(-alpha.*(xprime-dint));
-            end
-            
-            if beta < 0
-                ps = p_ihalf.*exp(beta.*xprime);
-            elseif beta >=0
-                ps = p_ihalf.*exp(beta.*(xprime-dint));
+            for k = 1:length(t)
+                for i = 1:length(x_ihalf)
+
+                    if alpha(k,i) < 0
+                        ns(k,i) = n_ihalf(k,i).*exp(-alpha(k,i).*xprime(i));
+                    elseif alpha(k,i) >=0
+                        ns(k,i) = n_ihalf(k,i).*exp(-alpha(k,i).*(xprime(i)-dint(i)));
+                    end
+                    
+                    if beta(k,i) < 0
+                        ps(k,i) = p_ihalf(k,i).*exp(-beta(k,i).*xprime(i));
+                    elseif beta(k,i) >=0
+                        ps(k,i) = p_ihalf(k,i).*exp(-beta(k,i).*(xprime(i)-dint(i)));
+                    end
+                    
+                end
             end
             r.vsr = rec_zone.*(ns.*ps - dev.ni.^2)...
                 ./(dev.taun_vsr.*(ps + dev.pt) + dev.taup_vsr.*(ns + dev.nt));
