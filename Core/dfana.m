@@ -234,7 +234,7 @@ classdef dfana
             r.tot = r.btb + r.srh + r.vsr;
         end
 
-        function r = calcr_ihalf(sol)
+        function [r, ns, ps] = calcr_ihalf(sol)
             % Calculate the recombination rate on i-half mesh
             % obtain SOL components for easy referencing
             [u,t,x,par,~,n,p,a,c,V] = dfana.splitsol(sol);
