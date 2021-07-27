@@ -301,12 +301,13 @@ catch
 end
 % Recombination zone location
 if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
+    rec_zone_loc_user = cell(1, length(par.stack));
     par.rec_zone_loc = cell(1, length(par.stack));
     rec_zone_loc_auto = locate_rec_zone(par);
     try
         rec_zone_loc_user = T{:, 'rec_zone_loc'}';
     catch
-        warning('Recomination zone location (rec_zone_loc) not defined in .csv . Using default in PC')
+        warning('Recomination zone location (rec_zone_loc) not defined in .csv . Using auto defined')
         par.rec_zone_loc = rec_zone_loc_auto;
     end
         for i = 1:length(par.stack)
