@@ -328,7 +328,21 @@ classdef dfplot
             dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-','-'},...
                 'Carrier density [cm-3]', tarr, xrange, 0, 1)
         end
-
+        
+        function nspsx(varargin)
+            % Carrier densities as a function of position
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [~, ns, ps] = dfana.calcr_ihalf(sol);
+            
+            figure(131);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-','-'},...
+                'Carrier density [cm-3]', tarr, xrange, 0, 1)
+            hold on
+            dfplot.x2d(sol, par.x_ihalf, {ns, ps}, {'ns', 'ps'}, {'-.','-.'},...
+                'Carrier density [cm-3]', tarr, xrange, 0, 1)
+        end
+        
         function acx(varargin)
             % Ionic carrier densities as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
