@@ -11,7 +11,8 @@ function compare_carrier_interfaces_X(sol, tarr)
 % jp(x), jns and jps
 % vX As with 8.2 but with more plot options
 % TARR = array of time points
-plotswitch = 2;     % 1 = plot n(x), p(x), 2 = plot ns, ps, 3 = 4x panels
+plotswitch = 1;     % 1 = plot n(x), p(x), 2 = plot ns, ps, 3 = 4x panels
+calc_option = 1;    %1 = all terms of expression, 2 = first term only
 
 par = sol.par;
 T = par.T;
@@ -53,7 +54,7 @@ for i=1:length(t)
     [n(i,:), ~] = pdeval(0, x, sol.u(i,:,2), x_sub);
     [p(i,:), ~] = pdeval(0, x, sol.u(i,:,3), x_sub);
 end
-    
+
 alphaM = par.q*dVdx./(par.kB*par.T) + alpha0;
 betaM = par.q*-dVdx./(par.kB*par.T) + beta0;
 
@@ -112,71 +113,98 @@ for i = 1:length(tarr)
         r = r_struct.tot(pnt, :);
         
         if plotswitch == 1 || plotswitch == 3
-            
+            if calc_option == 1
+                %% Carrier densities
+                if alpha(k) <0
+                    X = exp(alpha(k).*xprime(k));
+                    n1_ana(i,k) = ns1*X + jns1/(alpha(k)*mue(k)*Vt)*(1 - X)...
+                        - ((jns1-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 - X + alpha(k)*xprime(k));
+                    
+                    n2_ana(i,k) = ns2*X + jns2/(alpha(k)*mue(k)*Vt)*(1 - X)...
+                        - ((jns2-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 - X + alpha(k)*xprime(k));
+                    
+                elseif alpha(k) > 0
+                    Xstar = exp(alpha(k)*(xprime(k)-dint(k)));
+                    n1_ana(i,k) = ns1*Xstar + (jns1/(alpha(k)*mue(k)*Vt))*(1 - Xstar)...
+                        - ((jns1-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 + alpha(k)*xprime(k) - (1 + alpha(k)*dint(k))*Xstar);
+                    
+                    n2_ana(i,k) = ns2*Xstar + (jns2/(alpha(k)*mue(k)*Vt))*(1 - Xstar)...
+                        - ((jns2-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 + alpha(k)*xprime(k) - (1 + alpha(k)*dint(k))*Xstar);
+                end
+                
+                if beta(k) <0
+                    Y = exp(beta(k)*xprime(k));
+                    p1_ana(i,k) = ps1*Y + (jps1/(beta(k)*muh(k)*Vt))*(1 - Y)...
+                        - ((jps1-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 - Y + beta(k)*xprime(k));
+                    
+                    p2_ana(i,k) = ps2*Y + (jps2/(beta(k)*muh(k)*Vt))*(1 - Y)...
+                        - ((jps2-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 - Y + beta(k)*xprime(k));
+                    
+                elseif beta(k) >= 0
+                    Ystar = exp(beta(k)*(xprime(k)-dint(k)));
+                    p1_ana(i,k) = ps1*Ystar + (jps1/(beta(k)*muh(k)*Vt))*(1 - Ystar)...
+                        - ((jps1-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 + beta(k)*xprime(k) - (1 + beta(k)*dint(k))*Ystar);
+                    
+                    p2_ana(i,k) = ps2*Ystar + (jps2/(beta(k)*muh(k)*Vt))*(1 - Ystar)...
+                        - ((jps2-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 + beta(k)*xprime(k) - (1 + beta(k)*dint(k))*Ystar);
+                end
+            end
             %% Carrier densities
-            if alpha(k) <0
-                X = exp(alpha(k).*xprime(k));
-                n1_ana(i,k) = ns1*X + jns1/(alpha(k)*mue(k)*Vt)*(1 - X)...
-                    - ((jns1-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 - X + alpha(k)*xprime(k));
+            if calc_option == 2
+                if alpha(k) <0
+                    X = exp(alpha(k).*xprime(k));
+                    n1_ana(i,k) = ns1*X;
+                    
+                    n2_ana(i,k) = ns2*X;
+                    
+                elseif alpha(k) > 0
+                    Xstar = exp(alpha(k)*(xprime(k)-dint(k)));
+                    n1_ana(i,k) = ns1*Xstar;
+                    
+                    n2_ana(i,k) = ns2*Xstar;
+                end
                 
-                n2_ana(i,k) = ns2*X + jns2/(alpha(k)*mue(k)*Vt)*(1 - X)...
-                    - ((jns2-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 - X + alpha(k)*xprime(k));
-                
-            elseif alpha(k) > 0
-                Xstar = exp(alpha(k)*(xprime(k)-dint(k)));
-                n1_ana(i,k) = ns1*Xstar + (jns1/(alpha(k)*mue(k)*Vt))*(1 - Xstar)...
-                    - ((jns1-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 + alpha(k)*xprime(k) - (1 + alpha(k)*dint(k))*Xstar);
-                
-                n2_ana(i,k) = ns2*Xstar + (jns2/(alpha(k)*mue(k)*Vt))*(1 - Xstar)...
-                    - ((jns2-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 + alpha(k)*xprime(k) - (1 + alpha(k)*dint(k))*Xstar);
+                if beta(k) <0
+                    Y = exp(beta(k)*xprime(k));
+                    p1_ana(i,k) = ps1*Y;
+                    
+                    p2_ana(i,k) = ps2*Y;
+                    
+                elseif beta(k) >= 0
+                    Ystar = exp(beta(k)*(xprime(k)-dint(k)));
+                    p1_ana(i,k) = ps1*Ystar;
+                    
+                    p2_ana(i,k) = ps2*Ystar;
+                end
             end
-            
-            if beta(k) <0
-                Y = exp(beta(k)*xprime(k));
-                p1_ana(i,k) = ps1*Y + (jps1/(beta(k)*muh(k)*Vt))*(1 - Y)...
-                    - ((jps1-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 - Y + beta(k)*xprime(k));
-                
-                p2_ana(i,k) = ps2*Y + (jps2/(beta(k)*muh(k)*Vt))*(1 - Y)...
-                    - ((jps2-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 - Y + beta(k)*xprime(k));
-                
-            elseif beta(k) >= 0
-                Ystar = exp(beta(k)*(xprime(k)-dint(k)));
-                p1_ana(i,k) = ps1*Ystar + (jps1/(beta(k)*muh(k)*Vt))*(1 - Ystar)...
-                    - ((jps1-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 + beta(k)*xprime(k) - (1 + beta(k)*dint(k))*Ystar);
-                
-                p2_ana(i,k) = ps2*Ystar + (jps2/(beta(k)*muh(k)*Vt))*(1 - Ystar)...
-                    - ((jps2-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 + beta(k)*xprime(k) - (1 + beta(k)*dint(k))*Ystar);
-            end
-            
         end
-        
         if plotswitch == 2
             %% Carrier densities
-%             if alpha0(k) < 0
-                X = exp(alpha(k).*xprime(k));
-                ns1_ana_l(i,k) = (1/X)*(n(pnt,k) - (jns1/(alpha(k)*mue(k)*Vt))*(1 - X) + ((jns1-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 - X + alpha(k)*xprime(k)));
-                ns2_ana_l(i,k) = (1/X)*(n(pnt,k) - (jns2/(alpha(k)*mue(k)*Vt))*(1 - X) + ((jns2-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 - X + alpha(k)*xprime(k)));
-                
-%             elseif alpha0(k) >= 0
-                Xstar = exp(alpha(k)*(xprime(k)-dint(k)));
-                ns1_ana_r(i,k) = (1/Xstar)*(n(pnt,k) - (jns1/(alpha(k)*mue(k)*Vt))*(1 - Xstar) + ((jns1-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 + alpha(k)*xprime(k) - (1 + alpha(k)*dint(k))*Xstar));
-                ns2_ana_r(i,k) = (1/Xstar)*(n(pnt,k) - (jns2/(alpha(k)*mue(k)*Vt))*(1 - Xstar) + ((jns2-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 + alpha(k)*xprime(k) - (1 + alpha(k)*dint(k))*Xstar));
-%              end
-                ns1_ana(i,k) = max(ns1_ana_l(i,k), ns1_ana_r(i,k));
-                ns2_ana(i,k) = max(ns2_ana_l(i,k), ns2_ana_r(i,k));
-                
-%              if beta0(k) <0
-                Y = exp(beta(k)*xprime(k));
-                ps1_ana_l(i,k) = (1/Y)*(p(pnt,k) - (jps1/(beta(k)*muh(k)*Vt))*(1 - Y) + ((jps1-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 - Y + beta(k)*xprime(k)));
-                ps2_ana_l(i,k) = (1/Y)*(p(pnt,k) - (jps2/(beta(k)*muh(k)*Vt))*(1 - Y) + ((jps2-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 - Y + beta(k)*xprime(k)));
-
-%              elseif beta0(k) >= 0
-                Ystar = exp(beta(k)*(xprime(k)-dint(k)));
-                ps1_ana_r(i,k) = (1/Ystar)*(p(pnt,k) - (jps1/(beta(k)*muh(k)*Vt))*(1 - Ystar) + ((jps1-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 + beta(k)*xprime(k) - (1 + beta(k)*dint(k))*Ystar));
-                ps2_ana_r(i,k) = (1/Ystar)*(p(pnt,k) - (jps2/(beta(k)*muh(k)*Vt))*(1 - Ystar) + ((jps2-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 + beta(k)*xprime(k) - (1 + beta(k)*dint(k))*Ystar));
-%              end
-                ps1_ana(i,k) = max(ps1_ana_l(i,k), ps1_ana_r(i,k));
-                ps2_ana(i,k) = max(ps2_ana_l(i,k), ps2_ana_r(i,k));   
+            %             if alpha0(k) < 0
+            X = exp(alpha(k).*xprime(k));
+            ns1_ana_l(i,k) = (1/X)*(n(pnt,k) - (jns1/(alpha(k)*mue(k)*Vt))*(1 - X) + ((jns1-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 - X + alpha(k)*xprime(k)));
+            ns2_ana_l(i,k) = (1/X)*(n(pnt,k) - (jns2/(alpha(k)*mue(k)*Vt))*(1 - X) + ((jns2-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 - X + alpha(k)*xprime(k)));
+            
+            %             elseif alpha0(k) >= 0
+            Xstar = exp(alpha(k)*(xprime(k)-dint(k)));
+            ns1_ana_r(i,k) = (1/Xstar)*(n(pnt,k) - (jns1/(alpha(k)*mue(k)*Vt))*(1 - Xstar) + ((jns1-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 + alpha(k)*xprime(k) - (1 + alpha(k)*dint(k))*Xstar));
+            ns2_ana_r(i,k) = (1/Xstar)*(n(pnt,k) - (jns2/(alpha(k)*mue(k)*Vt))*(1 - Xstar) + ((jns2-jn(pnt,k))/(alpha(k)^2*mue(k)*Vt*xprime(k)))*(1 + alpha(k)*xprime(k) - (1 + alpha(k)*dint(k))*Xstar));
+            %              end
+            ns1_ana(i,k) = max(ns1_ana_l(i,k), ns1_ana_r(i,k));
+            ns2_ana(i,k) = max(ns2_ana_l(i,k), ns2_ana_r(i,k));
+            
+            %              if beta0(k) <0
+            Y = exp(beta(k)*xprime(k));
+            ps1_ana_l(i,k) = (1/Y)*(p(pnt,k) - (jps1/(beta(k)*muh(k)*Vt))*(1 - Y) + ((jps1-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 - Y + beta(k)*xprime(k)));
+            ps2_ana_l(i,k) = (1/Y)*(p(pnt,k) - (jps2/(beta(k)*muh(k)*Vt))*(1 - Y) + ((jps2-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 - Y + beta(k)*xprime(k)));
+            
+            %              elseif beta0(k) >= 0
+            Ystar = exp(beta(k)*(xprime(k)-dint(k)));
+            ps1_ana_r(i,k) = (1/Ystar)*(p(pnt,k) - (jps1/(beta(k)*muh(k)*Vt))*(1 - Ystar) + ((jps1-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 + beta(k)*xprime(k) - (1 + beta(k)*dint(k))*Ystar));
+            ps2_ana_r(i,k) = (1/Ystar)*(p(pnt,k) - (jps2/(beta(k)*muh(k)*Vt))*(1 - Ystar) + ((jps2-jp(pnt,k))/(beta(k)^2*muh(k)*Vt*xprime(k)))*(1 + beta(k)*xprime(k) - (1 + beta(k)*dint(k))*Ystar));
+            %              end
+            ps1_ana(i,k) = max(ps1_ana_l(i,k), ps1_ana_r(i,k));
+            ps2_ana(i,k) = max(ps2_ana_l(i,k), ps2_ana_r(i,k));
         end
         
         %% Fluxes
@@ -315,72 +343,72 @@ end
 
 if plotswitch == 3
     
-%% Plot carrier densities
-%% Interface 1
-figure(501)
-for i = 1:length(tarr)
-    pnt = find(sol.t <= tarr(i));
-    pnt = pnt(end);
-    subplot(2,2,1)
-    semilogy(x_sub*1e7, n(pnt, :), x_sub*1e7, p(pnt, :),...
-        x_sub*1e7, n1_ana(i,:), 'k-.', x_sub*1e7, p1_ana(i,:), 'k--')
-    hold on
-end
-hold off
-title('Interface 1')
-%legend('n', 'p', 'n-ana', 'p-ana')
-xlabel('Position, x (nm)')
-ylabel('Carrier density (cm-3)')
-xlim([1e7*par.dcum0(al-1)-0.5,1e7*par.dcum0(al)+0.5])
-
-%% Interface 2
-for i = 1:length(tarr)
-    pnt = find(sol.t <= tarr(i));
-    pnt = pnt(end);
-    subplot(2,2,2)
-    semilogy(x_sub*1e7, n(pnt, :), x_sub*1e7, p(pnt, :),...
-        x_sub*1e7, n2_ana(i,:), 'k-.', x_sub*1e7, p2_ana(i,:), 'k--')
-    hold on
-end
-hold off
-title('Interface 2')
-xlabel('Position, x (nm)')
-ylabel('Carrier density (cm-3)')
-%legend('n', 'p', 'n-ana', 'p-ana')
-xlim([1e7*par.dcum0(al+1)-0.5,1e7*par.dcum0(al+2)+0.5])
-
-%% Plot fluxes
-%% Interface 1
-for i = 1:length(tarr)
-    pnt = find(sol.t <= tarr(i));
-    pnt = pnt(end);
-    subplot(2,2,3)
-    plot(x_sub*1e7, jn(pnt,:), x_sub*1e7, jp(pnt,:),...
-        x_sub*1e7, jn1_ana(i,:), 'k-.', x_sub*1e7, jp1_ana(i,:), 'k--')
-    hold on
-end
-title('Interface 1')
-xlabel('Position, x (nm)')
-ylabel('Flux (cm-2s-1)')
-xlim([1e7*par.dcum0(al-1)-0.5,1e7*par.dcum0(al)+0.5])
-hold off
-
-%% Interface 2
-for i = 1:length(tarr)
-    pnt = find(sol.t <= tarr(i));
-    pnt = pnt(end);
-    subplot(2,2,4)
-    plot(x_sub*1e7, jn(pnt,:), x_sub*1e7, jp(pnt,:),...
-        x_sub*1e7, jn2_ana(i,:), 'k-.', x_sub*1e7, jp2_ana(i,:), 'k--')
-    hold on
-end
-title('Interface 2')
-xlabel('Position, x (nm)')
-ylabel('Flux (cm-2s-1)')
-xlim([1e7*par.dcum0(al+1)-0.5,1e7*par.dcum0(al+2)+0.5])
-hold off
-
-
+    %% Plot carrier densities
+    %% Interface 1
+    figure(501)
+    for i = 1:length(tarr)
+        pnt = find(sol.t <= tarr(i));
+        pnt = pnt(end);
+        subplot(2,2,1)
+        semilogy(x_sub*1e7, n(pnt, :), x_sub*1e7, p(pnt, :),...
+            x_sub*1e7, n1_ana(i,:), 'k-.', x_sub*1e7, p1_ana(i,:), 'k--')
+        hold on
+    end
+    hold off
+    title('Interface 1')
+    %legend('n', 'p', 'n-ana', 'p-ana')
+    xlabel('Position, x (nm)')
+    ylabel('Carrier density (cm-3)')
+    xlim([1e7*par.dcum0(al-1)-0.5,1e7*par.dcum0(al)+0.5])
+    
+    %% Interface 2
+    for i = 1:length(tarr)
+        pnt = find(sol.t <= tarr(i));
+        pnt = pnt(end);
+        subplot(2,2,2)
+        semilogy(x_sub*1e7, n(pnt, :), x_sub*1e7, p(pnt, :),...
+            x_sub*1e7, n2_ana(i,:), 'k-.', x_sub*1e7, p2_ana(i,:), 'k--')
+        hold on
+    end
+    hold off
+    title('Interface 2')
+    xlabel('Position, x (nm)')
+    ylabel('Carrier density (cm-3)')
+    %legend('n', 'p', 'n-ana', 'p-ana')
+    xlim([1e7*par.dcum0(al+1)-0.5,1e7*par.dcum0(al+2)+0.5])
+    
+    %% Plot fluxes
+    %% Interface 1
+    for i = 1:length(tarr)
+        pnt = find(sol.t <= tarr(i));
+        pnt = pnt(end);
+        subplot(2,2,3)
+        plot(x_sub*1e7, jn(pnt,:), x_sub*1e7, jp(pnt,:),...
+            x_sub*1e7, jn1_ana(i,:), 'k-.', x_sub*1e7, jp1_ana(i,:), 'k--')
+        hold on
+    end
+    title('Interface 1')
+    xlabel('Position, x (nm)')
+    ylabel('Flux (cm-2s-1)')
+    xlim([1e7*par.dcum0(al-1)-0.5,1e7*par.dcum0(al)+0.5])
+    hold off
+    
+    %% Interface 2
+    for i = 1:length(tarr)
+        pnt = find(sol.t <= tarr(i));
+        pnt = pnt(end);
+        subplot(2,2,4)
+        plot(x_sub*1e7, jn(pnt,:), x_sub*1e7, jp(pnt,:),...
+            x_sub*1e7, jn2_ana(i,:), 'k-.', x_sub*1e7, jp2_ana(i,:), 'k--')
+        hold on
+    end
+    title('Interface 2')
+    xlabel('Position, x (nm)')
+    ylabel('Flux (cm-2s-1)')
+    xlim([1e7*par.dcum0(al+1)-0.5,1e7*par.dcum0(al+2)+0.5])
+    hold off
+    
+    
 end
 
 

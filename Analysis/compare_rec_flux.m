@@ -78,7 +78,7 @@ for i = 1:length(loc)
         semilogy(t, R_abrupt(:, i) , t, R_vsr(:, i) , '--')
         xlabel('Time [s]')
         ylabel('Recombination flux [cm-2s-1]')
-        legend('DF abrupt', 'DF vsr')
+        legend('Abrupt interface', 'Discrete interface (volumetric)')
         hold on
         
         figure(301)
