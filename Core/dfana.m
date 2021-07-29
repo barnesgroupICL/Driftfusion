@@ -207,37 +207,45 @@ classdef dfana
             % Calculate the recombination rate on whole mesh
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
+            ns = zeros(length(t), length(x));
+            ps = zeros(length(t), length(x));
+            dVdx = zeros(length(t), length(x));
             int_switch = repmat(dev.int_switch, length(t), 1);
             rec_zone = repmat(dev.int_switch, length(t), 1);
             bulk_switch = abs(int_switch-1);
+            
             for i=1:length(t)
                 dVdx(i,:) = pdeval(0, x, V(i,:), x);
             end
             xprime = dev.xprime;
-            xprime_n = dev.xprime_n;
-            xprime_p = dev.xprime_p;
             dint = dev.dint;
             alpha0 = dev.alpha0;
             beta0 = dev.beta0;
             alpha = par.q*dVdx./(par.kB*par.T) + alpha0;
-            beta = par.q*dVdx./(par.kB*par.T) + beta0;
+            beta = -par.q*dVdx./(par.kB*par.T) + beta0;
 
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
             % Bulk SRH
             r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
             % Volumetric surface SRH
-            if alpha < 0
-                ns = n.*exp(-alpha.*xprime);
-            elseif alpha >=0
-                ns = n.*exp(-alpha.*(xprime-dint));
-            end
-            
-            if beta < 0
-                ps = p.*exp(-beta.*xprime);
-            elseif beta >=0
-                ps = p.*exp(-beta.*(xprime-dint));
+            for k = 1:length(t)
+                for i = 1:length(x)
+                    
+                    if alpha(k,i) < 0
+                        ns(k,i) = n(k,i).*exp(-alpha(k,i).*xprime(i));
+                    elseif alpha(k,i) >=0
+                        ns(k,i) = n(k,i).*exp(-alpha(k,i).*(xprime(i)-dint(i)));
+                    end
+                    
+                    if beta(k,i) < 0
+                        ps(k,i) = p(k,i).*exp(-beta(k,i).*xprime(i));
+                    elseif beta(k,i) >=0
+                        ps(k,i) = p(k,i).*exp(-beta(k,i).*(xprime(i)-dint(i)));
+                    end
+                    
+                end
             end
             
             r.vsr = rec_zone.*((ns.*ps - dev.ni.^2)./...
@@ -270,7 +278,8 @@ classdef dfana
 
             alpha = par.q*dVdx_ihalf./(par.kB*par.T) + alpha0;
             beta = -par.q*dVdx_ihalf./(par.kB*par.T) + beta0;
-
+            ns = zeros(length(t), length(x_ihalf));
+            ps = zeros(length(t), length(x_ihalf));
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
             % Bulk SRH
