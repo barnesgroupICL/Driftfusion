@@ -114,7 +114,7 @@ classdef dfplot
             [J, j, x] = dfana.calcJ(sol);
 
             figure(301);
-            dfplot.x2d(sol, par.x_ihalf, {j.n, j.p, j.a, j.c, j.disp},{'jn', 'jp', 'ja', 'jc', 'jdisp'},...
+            dfplot.x2d(sol, par.x_ihalf, {j.n, j.p, j.a, j.c, j.disp}, {'jn', 'jp', 'ja', 'jc', 'jdisp'},...
                 {'-','-','-','-','-'}, 'Flux [cm-2 s-1]', tarr, xrange, 0, 0);
         end       
      
