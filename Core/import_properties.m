@@ -299,6 +299,7 @@ try
 catch
     % warning('Layer colours (layer_colour) undefined in .csv. Using default in PC')
 end
+
 % Recombination zone location
 if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
     rec_zone_loc_user = cell(1, length(par.stack));
