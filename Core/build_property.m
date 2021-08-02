@@ -114,20 +114,20 @@ for i=1:length(par.dcum)                % i is the layer index
                         devprop(j) = alpha0;
                     case 'beta0'
                         devprop(j) = beta0;
-                    case 'rec_zone'
-                        if par.rec_zone_loc(i) == "L"
+                    case 'vsr_zone'
+                        if par.vsr_zone_loc(i) == "L"
                             if xprime <= deff*par.frac_vsr_zone
                                 devprop(j) = 1;
                             else
                                 devprop(j) = 0;
                             end
-                        elseif par.rec_zone_loc(i) == "R"
+                        elseif par.vsr_zone_loc(i) == "R"
                             if xprime >= deff*(1 - par.frac_vsr_zone) && xprime <= deff
                                 devprop(j) = 1;
                             else
                                 devprop(j) = 0;
                             end
-                        elseif par.rec_zone_loc(i) == "C"
+                        elseif par.vsr_zone_loc(i) == "C"
                             if xprime >= (deff/2)*(1 - par.frac_vsr_zone) && xprime <= (deff/2)*(1 + par.frac_vsr_zone)
                                 devprop(j) = 1;
                             else

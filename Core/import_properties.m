@@ -302,20 +302,20 @@ end
 
 % Recombination zone location
 if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
-    rec_zone_loc_user = cell(1, length(par.stack));
-    par.rec_zone_loc = cell(1, length(par.stack));
-    rec_zone_loc_auto = locate_rec_zone(par);
+    vsr_zone_loc_user = cell(1, length(par.stack));
+    par.vsr_zone_loc = cell(1, length(par.stack));
+    vsr_zone_loc_auto = locate_vsr_zone(par);
     try
-        rec_zone_loc_user = T{:, 'rec_zone_loc'}';
+        vsr_zone_loc_user = T{:, 'vsr_zone_loc'}';
     catch
-        warning('Recomination zone location (rec_zone_loc) not defined in .csv . Using auto defined')
-        par.rec_zone_loc = rec_zone_loc_auto;
+        warning('Recomination zone location (vsr_zone_loc) not defined in .csv . Using auto defined')
+        par.vsr_zone_loc = vsr_zone_loc_auto;
     end
         for i = 1:length(par.stack)
-            if any(strcmp(rec_zone_loc_user(i), {'L','C','R'})) == 1
-                par.rec_zone_loc(i) = rec_zone_loc_user(i);
-            elseif strcmp(rec_zone_loc_user(i), {'auto'}) == 1
-                par.rec_zone_loc(i) = rec_zone_loc_auto(i);
+            if any(strcmp(vsr_zone_loc_user(i), {'L','C','R'})) == 1
+                par.vsr_zone_loc(i) = vsr_zone_loc_user(i);
+            elseif strcmp(vsr_zone_loc_user(i), {'auto'}) == 1
+                par.vsr_zone_loc(i) = vsr_zone_loc_auto(i);
             end
         end
 end

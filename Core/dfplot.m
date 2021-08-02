@@ -707,10 +707,10 @@ classdef dfplot
            x = sol.par.x_ihalf;
            
            figure(27)
-           plot(x, dev.int_switch, x, dev.rec_zone)
+           plot(x, dev.int_switch, x, dev.srh_zone, x, dev.vsr_zone)
            xlabel('Position [nm]')
            ylabel('norm')
-           legend('interface', 'vsr zone')
+           legend('interface', 'SRH zone', 'VSR zone')
         end
         
         function alpha0beta0(sol)

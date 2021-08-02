@@ -212,7 +212,7 @@ classdef dfana
             ps = zeros(length(t), length(x));
             dVdx = zeros(length(t), length(x));
             int_switch = repmat(dev.int_switch, length(t), 1);
-            rec_zone = repmat(dev.int_switch, length(t), 1);
+            vsr_zone = repmat(dev.int_switch, length(t), 1);
             bulk_switch = abs(int_switch-1);
             
             for i=1:length(t)
@@ -248,7 +248,7 @@ classdef dfana
                 end
             end
             
-            r.vsr = rec_zone.*((ns.*ps - dev.ni.^2)./...
+            r.vsr = vsr_zone.*((ns.*ps - dev.ni.^2)./...
                 ((dev.taun_vsr.*(ps + dev.pt)) + (dev.taup_vsr.*(ns + dev.nt))));
             % Total
             r.tot = r.btb + r.srh + r.vsr;
@@ -267,8 +267,8 @@ classdef dfana
                 [~, dVdx_ihalf(i,:)] = pdeval(0, x, V(i,:), x_ihalf);
             end
             int_switch = repmat(dev.int_switch, length(t), 1);
-            rec_zone = repmat(dev.rec_zone, length(t), 1);
-            bulk_switch = abs(int_switch-1);
+            vsr_zone = repmat(dev.vsr_zone, length(t), 1);
+            srh_zone = repmat(dev.srh_zone, length(t), 1);
 
             xprime = dev.xprime;
             dint = dev.dint;
@@ -303,7 +303,7 @@ classdef dfana
                     
                 end
             end
-            r.vsr = rec_zone.*(ns.*ps - dev.ni.^2)...
+            r.vsr = vsr_zone.*(ns.*ps - dev.ni.^2)...
                 ./(dev.taun_vsr.*(ps + dev.pt) + dev.taup_vsr.*(ns + dev.nt));
             % Total
             r.tot = r.btb + r.srh + r.vsr;

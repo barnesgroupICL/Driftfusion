@@ -22,11 +22,9 @@ end
 dev.mucat = build_property(par.mucat, xmesh, par, 'constant', 0);
 dev.muani = build_property(par.muani, xmesh, par, 'constant', 0);
 dev.epp = build_property(par.epp, xmesh, par, 'constant', 0);
-dev.nt = build_property(par.nt, xmesh, par, 'constant', 0);
-dev.pt = build_property(par.pt, xmesh, par, 'constant', 0);
+
 dev.sn = build_property(par.sn, xmesh, par, 'constant', 1);
 dev.sp = build_property(par.sp, xmesh, par, 'constant', 1);
-dev.ni = build_property(par.ni, xmesh, par, 'constant', 0);
 dev.mue = build_property(par.mue, xmesh, par, 'constant', 0);
 dev.muh = build_property(par.muh, xmesh, par, 'constant', 0);
     
@@ -68,8 +66,24 @@ dev.dint = build_property(0, xmesh, par, 'dint', 1);
 
 % Switches
 dev.int_switch = build_property(0, xmesh, par, 'int_switch', 1);
-dev.rec_zone = build_property(0, xmesh, par, 'rec_zone', 1);
 dev.bulk_switch = abs(dev.int_switch-1);
+if par.vsr_mode
+    dev.vsr_zone = build_property(0, xmesh, par, 'vsr_zone', 1);
+    dev.srh_zone = dev.bulk_switch;
+    dev.Field_switch = dev.bulk_switch;
+    
+    dev.ni = build_property(par.ni, xmesh, par, 'constant', 0);
+    dev.nt = build_property(par.nt, xmesh, par, 'constant', 0);
+    dev.pt = build_property(par.pt, xmesh, par, 'constant', 0);
+else 
+    dev.vsr_zone = zeros(1, length(xmesh));
+    dev.srh_zone = ones(1, length(xmesh));
+    dev.Field_switch = ones(1, length(xmesh));
+    
+    dev.ni = build_property(par.ni, xmesh, par, 'exp_graded', 0);
+    dev.nt = build_property(par.nt, xmesh, par, 'exp_graded', 0);
+    dev.pt = build_property(par.pt, xmesh, par, 'exp_graded', 0);
+end
 
 % Tranlsated co-ordinates
 dev.xprime = build_property(par.xx, xmesh, par, 'xprime', 1);

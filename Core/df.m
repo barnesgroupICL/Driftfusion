@@ -122,9 +122,9 @@ K_cation = par.K_cation;    % Cation transport rate multiplier
 K_anion = par.K_anion;      % Anion transport rate multiplier
 radset = par.radset;        % Radiative recombination switch
 SRHset = par.SRHset;        % SRH recombination switch
-rec_zone = device.rec_zone;
-bulk_switch = device.bulk_switch; % 1 for bulk points, 0 for interfacial points
-vsr_mode = par.vsr_mode;
+vsr_zone = device.vsr_zone;
+srh_zone = device.vsr_zone;
+Field_switch = device.Field_switch;
 
 %% Spatial mesh
 x = xmesh;
@@ -203,7 +203,6 @@ end
             otherwise
                 gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
         end
-
         g = gxt1 + gxt2;
 
         %% Variables
@@ -228,16 +227,12 @@ end
         dndx = dudx(2);
         dpdx = dudx(3);
         
-        %% Volumetric surface recombination alpha and beta including field terms
-        alpha = abs(q*dVdx/(kB*T) + alpha0(i));
-        beta = abs(q*-dVdx/(kB*T) + beta0(i));
-        
         %% Equation editor
         % Time-dependence prefactor term
-        C_potential = 0;
-        C_electron = 1;
-        C_hole = 1;
-        C = [C_potential; C_electron; C_hole];
+        C_V = 0;
+        C_n = 1;
+        C_p = 1;
+        C = [C_V; C_n; C_p];
         
         % Flux terms
         FV = (epp(i)/eppmax)*dVdx;
@@ -249,39 +244,44 @@ end
         % Radiative
         r_rad = radset*B(i)*((n*p)-(ni(i)^2));
         % Bulk SRH
-        r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
+        r_srh = SRHset*srh_zone(i)*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
         % Volumetric surface recombination
-        ns = n*exp(alpha*xprime_n(i));  % Projected surface electron density
-        ps = p*exp(beta*xprime_p(i));   % Projected surface hole density
-        r_vsr = vsr_mode*SRHset*rec_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
-        
+        if vsr_zone(i)
+            alpha = abs(q*dVdx/(kB*T) + alpha0(i));
+            beta = abs(q*-dVdx/(kB*T) + beta0(i));
+            ns = n*exp(alpha*xprime_n(i));  % Projected surface electron density
+            ps = p*exp(beta*xprime_p(i));   % Projected surface hole density
+            r_vsr = SRHset*vsr_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
+        else
+            r_vsr = 0;
+        end
         r = r_rad + r_srh + r_vsr;
         % Source terms
-        S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - r;
-        S_hole     = g - r;
-        S = [S_potential; S_electron; S_hole];
+        S_V = Field_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
+        S_n = g - r;
+        S_p = g - r;
+        S = [S_V; S_n; S_p];
         
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
-            C_cation = 1;
-            C = [C; C_cation];
+            C_cat = 1;
+            C = [C; C_cat];
             
-            F_cation = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
-            F = [F; K_cation*mobseti*F_cation];
+            F_cat = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
+            F = [F; K_cation*mobseti*F_cat];
             
-            S_cation = 0;
-            S = [S; S_cation];
+            S_cat = 0;
+            S = [S; S_cat];
         end
         
         if N_ionic_species == 2     % Condition for anion terms
-            C_anion = 1;
-            C = [C; C_anion];
+            C_ani = 1;
+            C = [C; C_ani];
             
-            F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
-            F = [F; K_anion*mobseti*F_anion];
+            F_ani = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
+            F = [F; K_anion*mobseti*F_ani];
             
-            S_anion = 0;
-            S = [S; S_anion];
+            S_ani = 0;
+            S = [S; S_ani];
         end
         
     end

@@ -198,7 +198,7 @@ classdef pc
         sn = [0];               % Electron interfacial surface recombination velocity [cm s-1]
         sp = [0];               % Hole interfacial surface recombination velocities [cm s-1]
         frac_vsr_zone = 0.1;    % recombination zone thickness [fraction of interface thickness]
-        rec_zone_loc = {'auto'};    % recombination zone location either: 'L', 'C', 'R', or 'auto'. IMPORT_PROPERTIES deals with the choice of value.
+        vsr_zone_loc = {'auto'};    % recombination zone location either: 'L', 'C', 'R', or 'auto'. IMPORT_PROPERTIES deals with the choice of value.
         AbsTol_vsr = 1e8;       % The integrated interfacial recombination flux for which a warning is flagged [cm-2 s-1]
         RelTol_vsr = 0.03;      % Fractional error between abrupt and volumetric surface recombination models above which a warning is flagged
         
