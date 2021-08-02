@@ -35,17 +35,17 @@ dev.EA = build_property(par.EA, xmesh, par, 'lin_graded', 0);
 dev.IP = build_property(par.IP, xmesh, par, 'lin_graded', 0);
 dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
 
-% Logarithmically graded properties
-dev.Nc = build_property(par.Nc, xmesh, par, 'log_graded', 0);
-dev.Nv = build_property(par.Nv, xmesh, par, 'log_graded', 0);
-dev.n0 = build_property(par.n0, xmesh, par, 'log_graded', 0);
-dev.p0 = build_property(par.p0, xmesh, par, 'log_graded', 0);
-dev.Nani = build_property(par.Nani, xmesh, par, 'log_graded', 0);
-dev.Ncat = build_property(par.Ncat, xmesh, par, 'log_graded', 0);
-dev.DOSani = build_property(par.amax, xmesh, par, 'log_graded', 0);
-dev.DOScat = build_property(par.cmax, xmesh, par, 'log_graded', 0);
-dev.taun = build_property(par.taun, xmesh, par, 'log_graded', 0);
-dev.taup = build_property(par.taup, xmesh, par, 'log_graded', 0);
+% Exponentially graded properties
+dev.Nc = build_property(par.Nc, xmesh, par, 'exp_graded', 0);
+dev.Nv = build_property(par.Nv, xmesh, par, 'exp_graded', 0);
+dev.n0 = build_property(par.n0, xmesh, par, 'exp_graded', 0);
+dev.p0 = build_property(par.p0, xmesh, par, 'exp_graded', 0);
+dev.Nani = build_property(par.Nani, xmesh, par, 'exp_graded', 0);
+dev.Ncat = build_property(par.Ncat, xmesh, par, 'exp_graded', 0);
+dev.DOSani = build_property(par.amax, xmesh, par, 'exp_graded', 0);
+dev.DOScat = build_property(par.cmax, xmesh, par, 'exp_graded', 0);
+dev.taun = build_property(par.taun, xmesh, par, 'exp_graded', 0);
+dev.taup = build_property(par.taup, xmesh, par, 'exp_graded', 0);
 
 % Properties that are zeroed in the interfaces
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);
@@ -56,8 +56,8 @@ dev.ND = build_property(par.ND, xmesh, par, 'zeroed', 0);
 % Gradient properties
 dev.gradEA = build_property(par.EA, xmesh, par, 'lin_graded', 1);
 dev.gradIP = build_property(par.IP, xmesh, par, 'lin_graded', 1);
-dev.gradNc = build_property(par.Nc, xmesh, par, 'log_graded', 1);
-dev.gradNv = build_property(par.Nv, xmesh, par, 'log_graded', 1);
+dev.gradNc = build_property(par.Nc, xmesh, par, 'exp_graded', 1);
+dev.gradNv = build_property(par.Nv, xmesh, par, 'exp_graded', 1);
 
 % Surface recombination velocity equivalence schemes
 dev.taun_vsr = build_property(par.taun, xmesh, par, 'taun_vsr', 0);

@@ -7,7 +7,7 @@ function devprop = build_property(property, xmesh, par, interface_switch, gradie
 % INTERFACE_SWICTH  -   'zeroed' = set property value to zero for interfaces
 %                       'constant' = constant property values in interfaces
 %                       'lin_graded' = graded property values in interfaces
-%                       'log_graded' = graded property values in interfaces
+%                       'exp_graded' = graded property values in interfaces
 % GRADIENT_PROPERTIES - 1 if the property is a gradient e.g. dEAdx, 0 otherwise
 %
 %% LICENSE
@@ -69,7 +69,7 @@ for i=1:length(par.dcum)                % i is the layer index
                         else
                             devprop(j) = property(i-1) + xprime*gradient;
                         end
-                    case 'log_graded'
+                    case 'exp_graded'
                         log_gradient = (log(property(i+1))-log(property(i-1)))/deff;
                         if gradient_property == 1
                             devprop(j) = property(i-1)*log_gradient*exp(log_gradient*xprime);
