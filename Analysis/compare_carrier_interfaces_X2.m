@@ -23,17 +23,14 @@ t = sol.t;
 x = sol.x;
 x_sub = par.x_ihalf;
 pcum1 = par.pcum + 1;   % Cumulative layer points array
-al = par.active_layer;
 
-xprime_p = dev.xprime_p;
-xprime_n = dev.xprime_n;
 xprime = dev.xprime;
 alpha0 = dev.alpha0;
 beta0 = dev.beta0;
 mue = dev.mue;
 muh = dev.muh;
 dint = dev.dint;
-Vt = par.kB*par.T;
+Vt = kB*T;
 kB = par.kB;
 T = par.T;
 pcum0 = par.pcum0;
@@ -41,19 +38,19 @@ pcum0 = par.pcum0;
 dVdx = zeros(length(t), length(x_sub));
 n = zeros(length(t), length(x_sub));
 p = zeros(length(t), length(x_sub));
-n_ana = zeros(length(t), length(x_sub));
-p_ana = zeros(length(t), length(x_sub));
-jn_ana = zeros(length(t), length(x_sub));
-jp_ana = zeros(length(t), length(x_sub));
+n_ana = NaN(length(t), length(x_sub));
+p_ana = NaN(length(t), length(x_sub));
+jn_ana = NaN(length(t), length(x_sub));
+jp_ana = NaN(length(t), length(x_sub));
 
 for i=1:length(t)
-    [~, dVdx(i,:)] = pdeval(0, x, sol.u(i,:,1), x_sub);
-    [n(i,:), ~] = pdeval(0, x, sol.u(i,:,2), x_sub);
-    [p(i,:), ~] = pdeval(0, x, sol.u(i,:,3), x_sub);
+    [~, dVdx(i,:)] = pdeval(0, x, u(i,:,1), x_sub);
+    [n(i,:), ~] = pdeval(0, x, u(i,:,2), x_sub);
+    [p(i,:), ~] = pdeval(0, x, u(i,:,3), x_sub);
 end
 
-alpha = par.q*dVdx./(par.kB*par.T) + alpha0;
-beta = par.q*-dVdx./(par.kB*par.T) + beta0;
+alpha = par.q*dVdx./(kB*T) + alpha0;
+beta = par.q*-dVdx./(kB*T) + beta0;
 
 % Fluxes - approximate as on half mesh
 [~, j, ~] = dfana.calcJ(sol);
@@ -144,12 +141,12 @@ for m = 1:length(loc)
         %% Plot carrier densities
         %% Interface 1
         figure(500)
+        subplot(1,length(loc),m)
+        dfplot.colourblocks(sol, [1e-20,1e20]);
+        set(gca, 'YScale','log');
         for i = 1:length(tarr)
             k = find(sol.t <= tarr(i));
             k = k(end);
-            subplot(1,length(loc),m)
-%             dfplot.colourblocks(sol, [1e-20,1e20]);
-%             set(gca, 'YScale','log');
             semilogy(x_sub*1e7, n(k, :), x_sub*1e7, p(k, :),...
                 x_sub*1e7, n_ana(k,:), 'k-.', x_sub*1e7, p_ana(k,:), 'k--')
             hold on
@@ -160,6 +157,9 @@ for m = 1:length(loc)
         xlabel('Position, x (nm)')
         ylabel('Carrier density (cm-3)')
         xlim([1e7*par.dcum(loc(m)-1)-0.5,1e7*par.dcum(loc(m))+0.5])
+        ymin = min(min(min(n_ana(:, pcum1(loc(m)-1):pcum1(loc(m)))), min(p_ana(:, pcum1(loc(m)-1):pcum1(loc(m))))));
+        ymax = max(max(max(n_ana(:, pcum1(loc(m)-1):pcum1(loc(m)))), max(p_ana(:, pcum1(loc(m)-1):pcum1(loc(m))))));     
+        ylim([ymin*0.1, ymax*10])
         
         figure(600)
         %% Plot fluxes
@@ -196,7 +196,7 @@ for m = 1:length(loc)
         xlabel('Position, x (nm)')
         ylabel('Carrier density (cm-3)')
         xlim([1e7*par.dcum(loc(m)-1)-0.5,1e7*par.dcum(loc(m))+0.5])
-        
+
         for i = 1:length(tarr)
             k = find(sol.t <= tarr(i));
             k = k(end);
