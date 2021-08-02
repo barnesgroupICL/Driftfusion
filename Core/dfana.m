@@ -266,43 +266,26 @@ classdef dfana
             for i=1:length(t)
                 [~, dVdx_ihalf(i,:)] = pdeval(0, x, V(i,:), x_ihalf);
             end
-            int_switch = repmat(dev.int_switch, length(t), 1);
             vsr_zone = repmat(dev.vsr_zone, length(t), 1);
             srh_zone = repmat(dev.srh_zone, length(t), 1);
 
-            xprime = dev.xprime;
-            dint = dev.dint;
+            xprime_n = dev.xprime_n;
+            xprime_p = dev.xprime_p;
             
             alpha0 = dev.alpha0;
             beta0 = dev.beta0;
 
-            alpha = par.q*dVdx_ihalf./(par.kB*par.T) + alpha0;
-            beta = -par.q*dVdx_ihalf./(par.kB*par.T) + beta0;
-            ns = zeros(length(t), length(x_ihalf));
-            ps = zeros(length(t), length(x_ihalf));
+            alpha = abs(par.q*dVdx_ihalf./(par.kB*par.T) + alpha0);
+            beta = abs(par.q*-dVdx_ihalf./(par.kB*par.T) + beta0);
+
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
             % Bulk SRH
-            r.srh = bulk_switch.*(n_ihalf.*p_ihalf - dev.ni.^2)...
+            r.srh = srh_zone.*(n_ihalf.*p_ihalf - dev.ni.^2)...
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
             % Volumetric surface SRH
-            for k = 1:length(t)
-                for i = 1:length(x_ihalf)
-
-                    if alpha(k,i) < 0
-                        ns(k,i) = n_ihalf(k,i).*exp(-alpha(k,i).*xprime(i));
-                    elseif alpha(k,i) >=0
-                        ns(k,i) = n_ihalf(k,i).*exp(-alpha(k,i).*(xprime(i)-dint(i)));
-                    end
-                    
-                    if beta(k,i) < 0
-                        ps(k,i) = p_ihalf(k,i).*exp(-beta(k,i).*xprime(i));
-                    elseif beta(k,i) >=0
-                        ps(k,i) = p_ihalf(k,i).*exp(-beta(k,i).*(xprime(i)-dint(i)));
-                    end
-                    
-                end
-            end
+            ns = n_ihalf.*exp(alpha.*xprime_n); % Projected electron surface density
+            ps = p_ihalf.*exp(beta.*xprime_p);  % Projected hole surface density
             r.vsr = vsr_zone.*(ns.*ps - dev.ni.^2)...
                 ./(dev.taun_vsr.*(ps + dev.pt) + dev.taup_vsr.*(ns + dev.nt));
             % Total
