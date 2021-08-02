@@ -1,4 +1,4 @@
-function rec_zone_loc = locate_rec_zone(par)
+function rec_zone_loc = locate_vsr_zone(par)
 % A function to locate the recombination zone within the interfacial
 % regions based on the minority carrier densities at equilibrium
 % intelligent location
