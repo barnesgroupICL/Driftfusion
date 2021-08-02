@@ -57,7 +57,6 @@ beta = par.q*-dVdx./(par.kB*par.T) + beta0;
 
 % Fluxes - approximate as on half mesh
 [~, j, ~] = dfana.calcJ(sol);
-
 jn = j.n;
 jp = j.p;
 
@@ -77,28 +76,15 @@ jns = zeros(length(t), length(loc));     % Store time array of each ns in new co
 jps = zeros(length(t), length(loc));     % Store time array of each ps in new column
 
 for m = 1:length(loc)
-    
     % Check location of interfacial surface carrier densities
-    %     if alpha0(pcum1(loc(m)-1)) <= 0
     ns(:, m) = n(:, pcum1(loc(m)-1));
     jns(:, m) = jn(:, pcum1(loc(m)-1));     % jns and jps always from LH boundary
-    %     elseif alpha0(pcum1(loc(m)-1)) > 0
-    %         ns(:, m) = n(:, pcum1(loc(m)));
-    %         jns(:, m) = jn(:, pcum1(loc(m)-1));     % jns and jps always from LH boundary
-    %     end
-    
-    %     if beta0(pcum1(loc(m)-1)) <= 0
     ps(:, m) = p(:, pcum1(loc(m)-1));
     jps(:, m) = jp(:, pcum1(loc(m)-1));      % jns and jps always from LH boundary
-    %     elseif beta0(pcum1(loc(i)-1)) > 0
-    %         ps(:, m) = p(:, pcum1(loc(m)));
-    %         jps(:, m) = jp(:, pcum1(loc(m)-1));      % jns and jps always from LH boundary
-    %     end
-    
+
     for kk = 1:length(tarr)
         k = find(sol.t <= tarr(kk));
         k = k(end);
-        
         for i = 1:length(x_sub)
             if x_sub(i) >= par.dcum(loc(m)-1) && x_sub(i) <= par.dcum(loc(m))
                 %% Carrier densities
@@ -146,15 +132,11 @@ for m = 1:length(loc)
                         end
                 end
             end
-            
             %% Fluxes
             jn_ana(k,i) = jns(k,m) - r(k,i)*(xprime(i));
-            jp_ana(k,i) = jps(k,m) - r(k,i)*(xprime(i));
-            
-        end
-        
+            jp_ana(k,i) = jps(k,m) - r(k,i)*(xprime(i));        
+        end 
     end
-    
 end
 
 for m = 1:length(loc)
@@ -166,6 +148,8 @@ for m = 1:length(loc)
             k = find(sol.t <= tarr(i));
             k = k(end);
             subplot(1,length(loc),m)
+%             dfplot.colourblocks(sol, [1e-20,1e20]);
+%             set(gca, 'YScale','log');
             semilogy(x_sub*1e7, n(k, :), x_sub*1e7, p(k, :),...
                 x_sub*1e7, n_ana(k,:), 'k-.', x_sub*1e7, p_ana(k,:), 'k--')
             hold on
@@ -251,9 +235,9 @@ for m = 1:length(loc)
         for i = 1:length(tarr)
             k = find(sol.t <= tarr(i));
             k = k(end);
-            subplot(2,2,1)
+            subplot(2,length(loc),m)
             semilogy(x_sub*1e7, n(k, :), x_sub*1e7, p(k, :),...
-                x_sub*1e7, n1_ana(i,:), 'k-.', x_sub*1e7, p1_ana(i,:), 'k--')
+                x_sub*1e7, n_ana(i,:), 'k-.', x_sub*1e7, p_ana(i,:), 'k--')
             hold on
         end
         hold off
@@ -268,9 +252,9 @@ for m = 1:length(loc)
         for i = 1:length(tarr)
             k = find(sol.t <= tarr(i));
             k = k(end);
-            subplot(2,2,3)
+            subplot(2,length(loc),m)
             plot(x_sub*1e7, jn(k,:), x_sub*1e7, jp(k,:),...
-                x_sub*1e7, jn1_ana(i,:), 'k-.', x_sub*1e7, jp1_ana(i,:), 'k--')
+                x_sub*1e7, jn_ana(i,:), 'k-.', x_sub*1e7, jp_ana(i,:), 'k--')
             hold on
         end
         title('Interface 1')
