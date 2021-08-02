@@ -98,6 +98,8 @@ ND = device.ND;             % Donor doping density
 Ncat = device.Ncat;         % Uniform cation density
 Nani = device.Nani;         % Uniform anion density
 xprime = device.xprime;             % Translated x co-ordinates for interfaces
+xprime_n = device.xprime_n;             % Translated x co-ordinates for interfaces
+xprime_p = device.xprime_p;             % Translated x co-ordinates for interfaces
 dint = device.dint;
 alpha0 = device.alpha0;       % alpha0 is alpha for F = 0
 beta0 = device.beta0;         % beta0 is beta for F = 0
@@ -226,88 +228,62 @@ end
         dndx = dudx(2);
         dpdx = dudx(3);
         
+        %% Volumetric surface recombination alpha and beta including field terms
+        alpha = abs(q*dVdx/(kB*T) + alpha0(i));
+        beta = abs(q*-dVdx/(kB*T) + beta0(i));
+        
         %% Equation editor
         % Time-dependence prefactor term
-        C_V = 0;
-        C_n = 1;
-        C_p = 1;
-        C = [C_V; C_n; C_p];
-
-        %% Flux terms
-        F_V = (epp(i)/eppmax)*dVdx;
-        F_n = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
-        F_p = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F = [F_V; mobset*F_n; mobset*F_p];
-
-        %% Recombination
-        if vsr_mode
-            % Radiative
-            r_rad = bulk_switch(i)*radset*B(i)*((n*p)-(ni(i)^2));
-            % Bulk SRH
-            r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
-            % Volumetric surface recombination
-            if rec_zone(i)
-                %% Volumetric surface recombination
-                alpha = q*dVdx/(kB*T) + alpha0(i);
-                beta = q*-dVdx/(kB*T) + beta0(i);
-                if alpha <= 0
-                    ns = n*exp(-alpha.*xprime(i));
-                elseif alpha >0
-                    ns = n*exp(-alpha*(xprime(i)-dint(i)));
-                end
-                
-                if beta <= 0
-                    ps = p*exp(-beta*xprime(i));
-                elseif beta >0
-                    ps = p*exp(-beta*(xprime(i)-dint(i)));
-                end
-                r_vsr = vsr_mode*SRHset*rec_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
-            else
-                r_vsr = 0;
-            end
-        else
-            % Radiative
-            r_rad = bulk_switch(i)*radset*B(i)*((n*p)-(ni(i)^2));
-            % Bulk SRH
-            r_srh = SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
-            % Volumetric surface recombination
-            r_vsr = 0;
-        end
-
-        r = r_rad + r_srh + r_vsr; 
+        C_potential = 0;
+        C_electron = 1;
+        C_hole = 1;
+        C = [C_potential; C_electron; C_hole];
         
-        %% Source terms
-        if vsr_mode
-            S_V = bulk_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        else
-            S_V = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        end
-        S_n = g - r;
-        S_p = g - r;
-        S = [S_V; S_n; S_p];
-
+        % Flux terms
+        FV = (epp(i)/eppmax)*dVdx;
+        Fn = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
+        Fp = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
+        F = [FV; mobset*Fn; mobset*Fp];
+        
+        % Recombination terms
+        % Radiative
+        r_rad = radset*B(i)*((n*p)-(ni(i)^2));
+        % Bulk SRH
+        r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
+        % Volumetric surface recombination
+        ns = n*exp(alpha*xprime_n(i));  % Projected surface electron density
+        ps = p*exp(beta*xprime_p(i));   % Projected surface hole density
+        r_vsr = vsr_mode*SRHset*rec_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
+        
+        r = r_rad + r_srh + r_vsr;
+        % Source terms
+        S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
+        S_electron = g - r;
+        S_hole     = g - r;
+        S = [S_potential; S_electron; S_hole];
+        
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
-            C_cat = 1;
-            C = [C; C_cat];
-
-            F_cat = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
-            F = [F; K_cation*mobseti*F_cat];
-
-            S_cat = 0;
-            S = [S; S_cat];
+            C_cation = 1;
+            C = [C; C_cation];
+            
+            F_cation = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
+            F = [F; K_cation*mobseti*F_cation];
+            
+            S_cation = 0;
+            S = [S; S_cation];
         end
-
+        
         if N_ionic_species == 2     % Condition for anion terms
-            C_ani = 1;
-            C = [C; C_ani];
-
-            F_ani = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
-            F = [F; K_anion*mobseti*F_ani];
-
-            S_ani = 0;
-            S = [S; S_ani];
+            C_anion = 1;
+            C = [C; C_anion];
+            
+            F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
+            F = [F; K_anion*mobseti*F_anion];
+            
+            S_anion = 0;
+            S = [S; S_anion];
         end
-
+        
     end
 
 %% Define initial conditions.
