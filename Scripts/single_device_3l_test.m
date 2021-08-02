@@ -38,7 +38,7 @@ legend('100 mVs-1', '200 mVs-1', '400 mVs-1')
 
 %% plot the energy level diagram and carrier densities for the device at
 % 1 V (t= 10s) during the illuminated forward scan
-dfplot.ELxnpxacx(sol_CV_100mVs_3l, 10)
+dfplot.ELxnpxacx(sol_CV_100mVs_3l, 4)
 
 %% Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in
