@@ -75,10 +75,11 @@ for i = 1:length(loc)
         
     if plot_switch
         figure(300)
-        semilogy(t, R_abrupt(:, i) , t, R_vsr(:, i) , '--')
+        semilogy(t, R_abrupt(:, i) , t, R_vsr(:, i) , 'k--')
         xlabel('Time [s]')
         ylabel('Recombination flux [cm-2s-1]')
         legend('Abrupt interface', 'Discrete interface (volumetric)')
+        xlim([t(1), t(end)])
         hold on
         
         figure(301)
@@ -86,12 +87,14 @@ for i = 1:length(loc)
         xlabel('Time [s]')
         ylabel('Carrier density')
         legend('ns', 'ps')
+        xlim([t(1), t(end)])
         hold on
         
         figure(302)
         plot(t, sigma(:, i) )
         xlabel('Time [s]')
         ylabel('Fractional difference')
+        xlim([t(1), t(end)])
         hold on
     end
 end
