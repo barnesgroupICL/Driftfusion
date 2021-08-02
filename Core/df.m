@@ -120,7 +120,7 @@ K_cation = par.K_cation;    % Cation transport rate multiplier
 K_anion = par.K_anion;      % Anion transport rate multiplier
 radset = par.radset;        % Radiative recombination switch
 SRHset = par.SRHset;        % SRH recombination switch
-rec_zone = device.rec_zone; 
+rec_zone = device.rec_zone;
 bulk_switch = device.bulk_switch; % 1 for bulk points, 0 for interfacial points
 vsr_mode = par.vsr_mode;
 
@@ -241,27 +241,30 @@ end
 
         %% Recombination
         if vsr_mode
-            %% Volumetric surface recombination
-            alpha = q*dVdx/(kB*T) + alpha0(i);
-            beta = q*-dVdx/(kB*T) + beta0(i);
-            if alpha <= 0
-                ns = n*exp(-alpha.*xprime(i));
-            elseif alpha >0
-                ns = n*exp(-alpha*(xprime(i)-dint(i)));
-            end
-            
-            if beta <= 0
-                ps = p*exp(-beta*xprime(i));
-            elseif beta >0
-                ps = p*exp(-beta*(xprime(i)-dint(i)));
-            end
-            
             % Radiative
             r_rad = bulk_switch(i)*radset*B(i)*((n*p)-(ni(i)^2));
             % Bulk SRH
             r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
             % Volumetric surface recombination
-            r_vsr = vsr_mode*SRHset*rec_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));        
+            if rec_zone(i)
+                %% Volumetric surface recombination
+                alpha = q*dVdx/(kB*T) + alpha0(i);
+                beta = q*-dVdx/(kB*T) + beta0(i);
+                if alpha <= 0
+                    ns = n*exp(-alpha.*xprime(i));
+                elseif alpha >0
+                    ns = n*exp(-alpha*(xprime(i)-dint(i)));
+                end
+                
+                if beta <= 0
+                    ps = p*exp(-beta*xprime(i));
+                elseif beta >0
+                    ps = p*exp(-beta*(xprime(i)-dint(i)));
+                end
+                r_vsr = vsr_mode*SRHset*rec_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
+            else
+                r_vsr = 0;
+            end
         else
             % Radiative
             r_rad = bulk_switch(i)*radset*B(i)*((n*p)-(ni(i)^2));
