@@ -56,7 +56,7 @@ semilogx(t, nidt_mean)
 xlabel('Time [s]')
 ylabel('nid')
 xlim([t(1), t(end)])
-ylim([-1,3])
+ylim([0,max(nidt_mean)*1.1])
 
 figure(402)
 for i = 1:length(sol_OC)
