@@ -225,69 +225,84 @@ end
         dVdx = dudx(1);
         dndx = dudx(2);
         dpdx = dudx(3);
-
+        
         %% Equation editor
         % Time-dependence prefactor term
-        C_potential = 0;
-        C_electron = 1;
-        C_hole = 1;
-        C = [C_potential; C_electron; C_hole];
+        C_V = 0;
+        C_n = 1;
+        C_p = 1;
+        C = [C_V; C_n; C_p];
 
-        % Flux terms
-        FV = (epp(i)/eppmax)*dVdx;
-        Fn = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
-        Fp = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F = [FV; mobset*Fn; mobset*Fp];
+        %% Flux terms
+        F_V = (epp(i)/eppmax)*dVdx;
+        F_n = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
+        F_p = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
+        F = [F_V; mobset*F_n; mobset*F_p];
 
-        % Recombination terms
-        % Radiative
-        r_rad = radset*B(i)*((n*p)-(ni(i)^2));
-        % Bulk SRH
-        r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
-        
-        %% Volumetric surface recombination
-        alpha = q*dVdx/(kB*T) + alpha0(i);
-        beta = q*-dVdx/(kB*T) + beta0(i);
-        if alpha < 0
-            ns = n*exp(-alpha.*xprime(i));
-        elseif alpha >=0
-            ns = n*exp(-alpha*(xprime(i)-dint(i)));
+        %% Recombination
+        if vsr_mode
+            %% Volumetric surface recombination
+            alpha = q*dVdx/(kB*T) + alpha0(i);
+            beta = q*-dVdx/(kB*T) + beta0(i);
+            if alpha <= 0
+                ns = n*exp(-alpha.*xprime(i));
+            elseif alpha >0
+                ns = n*exp(-alpha*(xprime(i)-dint(i)));
+            end
+            
+            if beta <= 0
+                ps = p*exp(-beta*xprime(i));
+            elseif beta >0
+                ps = p*exp(-beta*(xprime(i)-dint(i)));
+            end
+            
+            % Radiative
+            r_rad = bulk_switch(i)*radset*B(i)*((n*p)-(ni(i)^2));
+            % Bulk SRH
+            r_srh = bulk_switch(i)*SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
+            % Volumetric surface recombination
+            r_vsr = vsr_mode*SRHset*rec_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));        
+        else
+            % Radiative
+            r_rad = bulk_switch(i)*radset*B(i)*((n*p)-(ni(i)^2));
+            % Bulk SRH
+            r_srh = SRHset*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
+            % Volumetric surface recombination
+            r_vsr = 0;
         end
-        
-        if beta < 0
-            ps = p*exp(-beta*xprime(i));
-        elseif beta >=0
-            ps = p*exp(-beta*(xprime(i)-dint(i)));
-        end
-        r_vsr = vsr_mode*SRHset*rec_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
-        
+
         r = r_rad + r_srh + r_vsr; 
-        % Source terms
-        S_potential = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_electron = g - r;
-        S_hole     = g - r;
-        S = [S_potential; S_electron; S_hole];
+        
+        %% Source terms
+        if vsr_mode
+            S_V = bulk_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
+        else
+            S_V = (q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
+        end
+        S_n = g - r;
+        S_p = g - r;
+        S = [S_V; S_n; S_p];
 
         if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
-            C_cation = 1;
-            C = [C; C_cation];
+            C_cat = 1;
+            C = [C; C_cat];
 
-            F_cation = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
-            F = [F; K_cation*mobseti*F_cation];
+            F_cat = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
+            F = [F; K_cation*mobseti*F_cat];
 
-            S_cation = 0;
-            S = [S; S_cation];
+            S_cat = 0;
+            S = [S; S_cat];
         end
 
         if N_ionic_species == 2     % Condition for anion terms
-            C_anion = 1;
-            C = [C; C_anion];
+            C_ani = 1;
+            C = [C; C_ani];
 
-            F_anion = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
-            F = [F; K_anion*mobseti*F_anion];
+            F_ani = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
+            F = [F; K_anion*mobseti*F_ani];
 
-            S_anion = 0;
-            S = [S; S_anion];
+            S_ani = 0;
+            S = [S; S_ani];
         end
 
     end
