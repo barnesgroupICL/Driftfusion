@@ -12,11 +12,11 @@
 % 
 %% Start code
 % Obtain the base parameters
-par_pedotpss = pc('input_files/pedotpss_mapi_pcbm.csv');
+par_explore = pc('input_files/3_layer_test.csv');
 
 % For the first example we will run JV and steady-state Voc for 3 different
 % active layer thicknesses and light intensities 
-parex_dactive_light = explore.explore2par(par_pedotpss, {'d(1,3)','Int'},...
+parex_dactive_light = explore.explore2par(par_explore, {'d(1,3)','Int'},...
     {[100e-7, 200e-7, 400e-7, 800e-7], logspace(-2,0,3)}, 200);
 
 %% Example plots
