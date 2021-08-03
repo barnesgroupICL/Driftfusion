@@ -245,15 +245,11 @@ end
         % Bulk SRH
         r_srh = SRHset*srh_zone(i)*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
         % Volumetric surface recombination
-        if vsr_zone(i)
-            alpha = sign_xn(i)*q*dVdx/(kB*T) + alpha0_xn(i);
-            beta = sign_xp(i)*q*-dVdx/(kB*T) + beta0_xp(i);
-            ns = n*exp(-alpha*xprime_n(i));  % Projected surface electron density
-            ps = p*exp(-beta*xprime_p(i));   % Projected surface hole density
-            r_vsr = SRHset*vsr_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
-        else
-            r_vsr = 0;
-        end
+        alpha = sign_xn(i)*q*dVdx/(kB*T) + alpha0_xn(i);
+        beta = sign_xp(i)*q*-dVdx/(kB*T) + beta0_xp(i);
+        r_vsr = SRHset*vsr_zone(i)*((n*exp(-alpha*xprime_n(i))*p*exp(-beta*xprime_p(i)) - ni(i)^2)...
+            /(taun_vsr(i)*(p*exp(-beta*xprime_p(i))+pt(i)) + taup_vsr(i)*(n*exp(-alpha*xprime_n(i))+nt(i))));
+
         r = r_rad + r_srh + r_vsr;
         % Source terms
         S_V = Field_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
