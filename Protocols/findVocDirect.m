@@ -8,7 +8,7 @@ function [sol_Voc, Voc] = findVocDirect(sol_ini, light_intensity, mobseti, tpoin
 % it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
-%
+% 
 %% Start code
 
 
