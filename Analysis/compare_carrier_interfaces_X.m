@@ -205,13 +205,13 @@ if plotswitch == 1
     figure(501)
     subplot(1,2,1)
     dfplot.colourblocks(sol, [1e-20,1e20])
+    hold on
     for i = 1:length(tarr)
         pnt = find(sol.t <= tarr(i));
         pnt = pnt(end);
         
         semilogy(x*1e7, n(pnt, :), x*1e7, p(pnt, :),...
             x*1e7, n1_ana(i,:), 'k-.', x*1e7, p1_ana(i,:), 'k--')
-        hold on
     end
     hold off
     title('Interface 1')
@@ -220,26 +220,30 @@ if plotswitch == 1
     ylabel('Carrier density (cm-3)')
     set(gca, 'YScale','log');
     xlim([1e7*par.dcum0(al-1)-0.5,1e7*par.dcum0(al)+0.5])
-    ylim([1e4, 1e20])
+    ylim([1e6, 1e20])
+    set(gca, 'Layer', 'top')
+    box on
     
     %% Interface 2
     subplot(1,2,2)
     dfplot.colourblocks(sol, [1e-20,1e20])
+    hold on
     for i = 1:length(tarr)
         pnt = find(sol.t <= tarr(i));
         pnt = pnt(end);
         semilogy(x*1e7, n(pnt, :), x*1e7, p(pnt, :),...
             x*1e7, n2_ana(i,:), 'k-.', x*1e7, p2_ana(i,:), 'k--')
-        hold on
     end
     hold off
     title('Interface 2')
     xlabel('Position, x (nm)')
     ylabel('Carrier density (cm-3)')
-    legend('n', 'p', 'n-ana', 'p-ana')
+    %legend('n', 'p', 'n-ana', 'p-ana')
     set(gca, 'YScale','log');
     xlim([1e7*par.dcum0(al+1)-0.5,1e7*par.dcum0(al+2)+0.5])
-    ylim([1e4, 1e20])
+    ylim([1e6, 1e20])
+    set(gca, 'Layer', 'top')
+    box on
     
     figure(502)
     %% Plot fluxes
