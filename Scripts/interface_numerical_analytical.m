@@ -12,7 +12,7 @@ initialise_df
 
 %% Create a parameters object for Spiro/MAPI/TiO2 by including a filepath to the 
 % appropriate .csv as the arugment to the parameters class PC
-par = pc('Input_files/3_layer_test.csv');
+par = pc('Input_files/3_layer_test_vary.csv');
 
 %% Good transport, no rec
 par_ideal = par;
