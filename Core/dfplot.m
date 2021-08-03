@@ -718,10 +718,10 @@ classdef dfplot
             x = sol.par.x_ihalf;
             
             figure(28)
-            plot(x, dev.alpha0, x, dev.beta0)
+            plot(x, dev.alpha0, x, dev.beta0, x, dev.alpha0_xn, x, dev.beta0_xp)
             xlabel('Position [nm]')
             ylabel('')
-            legend('alpha0', 'beta0')
+            legend('alpha0', 'beta0', 'alpha0-xn', 'beta0-xp')
             
         end
         
