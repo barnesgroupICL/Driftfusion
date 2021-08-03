@@ -49,15 +49,21 @@ elseif length(varargin) == 2
 end
 
 %% Unpack properties
-% Dependent properties: Prevents recalculation of dependent properties by pdepe defined in Methods
+%% Spatial mesh
+xmesh = par.xx;
+x_ihalf = par.x_ihalf;
+x = xmesh;
+
+%% Time mesh
+t = meshgen_t(par);
+
+%% Dependent properties: Prevents recalculation of dependent properties by pdepe defined in Methods
 % Can also use AbortSet in class def
 Vbi = par.Vbi;
 nleft = par.nleft;
 nright = par.nright;
 pleft = par.pleft;
 pright = par.pright;
-xmesh = par.xx;
-x_ihalf = par.x_ihalf;
 dev = par.dev;
 
 %% Constants
@@ -96,13 +102,13 @@ pt = device.pt;             % SRH hole trap constant
 NA = device.NA;             % Acceptor doping density
 ND = device.ND;             % Donor doping density
 Ncat = device.Ncat;         % Uniform cation density
-Nani = device.Nani;         % Uniform anion density
-xprime = device.xprime;             % Translated x co-ordinates for interfaces
-xprime_n = device.xprime_n;             % Translated x co-ordinates for interfaces
-xprime_p = device.xprime_p;             % Translated x co-ordinates for interfaces
-dint = device.dint;
-alpha0 = device.alpha0;       % alpha0 is alpha for F = 0
-beta0 = device.beta0;         % beta0 is beta for F = 0
+Nani = device.Nani;         % Uniform anion density 
+xprime_n = device.xprime_n;         % Translated x co-ordinates for interfaces
+xprime_p = device.xprime_p;         % Translated x co-ordinates for interfaces
+sign_xn = device.sign_xn;           % 1 if xn increasing, -1 if decreasing wrt x
+sign_xp = device.sign_xp;           % 1 if xp increasing, -1 if decreasing wrt x
+alpha0_xn = device.alpha0_xn;       % alpha0_xn is alpha for F = 0 reference to xprime_n
+beta0_xp = device.beta0_xp;         % beta0_xp is beta for F = 0 referenced to xprime_p
 N_ionic_species = par.N_ionic_species;
 nleft = par.nleft;
 nright = par.nright;
@@ -125,13 +131,6 @@ SRHset = par.SRHset;        % SRH recombination switch
 vsr_zone = device.vsr_zone;
 srh_zone = device.vsr_zone;
 Field_switch = device.Field_switch;
-
-%% Spatial mesh
-x = xmesh;
-
-%% Time mesh
-t = meshgen_t(par);
-tmesh = t;
 
 %% Generation
 g1_fun = fun_gen(par.g1_fun_type);
@@ -235,10 +234,10 @@ end
         C = [C_V; C_n; C_p];
         
         % Flux terms
-        FV = (epp(i)/eppmax)*dVdx;
-        Fn = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
-        Fp = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F = [FV; mobset*Fn; mobset*Fp];
+        F_V = (epp(i)/eppmax)*dVdx;
+        F_n = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
+        F_p = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
+        F = [F_V; mobset*F_n; mobset*F_p];
         
         % Recombination terms
         % Radiative
@@ -247,10 +246,10 @@ end
         r_srh = SRHset*srh_zone(i)*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
         % Volumetric surface recombination
         if vsr_zone(i)
-            alpha = abs(q*dVdx/(kB*T) + alpha0(i));
-            beta = abs(q*-dVdx/(kB*T) + beta0(i));
-            ns = n*exp(alpha*xprime_n(i));  % Projected surface electron density
-            ps = p*exp(beta*xprime_p(i));   % Projected surface hole density
+            alpha = sign_xn(i)*q*dVdx/(kB*T) + alpha0_xn(i);
+            beta = sign_xp(i)*q*-dVdx/(kB*T) + beta0_xp(i);
+            ns = n*exp(-alpha*xprime_n(i));  % Projected surface electron density
+            ps = p*exp(-beta*xprime_p(i));   % Projected surface hole density
             r_vsr = SRHset*vsr_zone(i)*((ns*ps - ni(i)^2)/(taun_vsr(i)*(ps+pt(i)) + taup_vsr(i)*(ns+nt(i))));
         else
             r_vsr = 0;
