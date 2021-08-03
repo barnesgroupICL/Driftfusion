@@ -271,12 +271,13 @@ classdef dfana
 
             xprime_n = dev.xprime_n;
             xprime_p = dev.xprime_p;
-            
-            alpha0 = dev.alpha0;
-            beta0 = dev.beta0;
+            sign_xn = repmat(dev.sign_xn, length(t), 1);    % 1 if xn increasing, -1 if decreasing wrt x
+            sign_xp = repmat(dev.sign_xp, length(t), 1);    % 1 if xp increasing, -1 if decreasing wrt x
+            alpha0_xn = repmat(dev.alpha0_xn, length(t), 1);
+            beta0_xp = repmat(dev.beta0_xp, length(t), 1);
 
-            alpha = abs(par.q*dVdx_ihalf./(par.kB*par.T) + alpha0);
-            beta = abs(par.q*-dVdx_ihalf./(par.kB*par.T) + beta0);
+            alpha = sign(sign_xn).*par.q.*dVdx_ihalf./(par.kB*par.T) + alpha0_xn;
+            beta = sign(sign_xp).*par.q.*-dVdx_ihalf./(par.kB*par.T) + beta0_xp;
 
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
@@ -284,8 +285,8 @@ classdef dfana
             r.srh = srh_zone.*(n_ihalf.*p_ihalf - dev.ni.^2)...
                 ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
             % Volumetric surface SRH
-            ns = n_ihalf.*exp(alpha.*xprime_n); % Projected electron surface density
-            ps = p_ihalf.*exp(beta.*xprime_p);  % Projected hole surface density
+            ns = n_ihalf.*exp(-alpha.*xprime_n); % Projected electron surface density
+            ps = p_ihalf.*exp(-beta.*xprime_p);  % Projected hole surface density
             r.vsr = vsr_zone.*(ns.*ps - dev.ni.^2)...
                 ./(dev.taun_vsr.*(ps + dev.pt) + dev.taup_vsr.*(ns + dev.nt));
             % Total
