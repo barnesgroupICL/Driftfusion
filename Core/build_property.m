@@ -42,19 +42,23 @@ for i=1:length(par.dcum)                % i is the layer index
             if xmesh(j) >= par.dcum0(i)
                 xprime = xmesh(j)-par.dcum0(i);
                 deff = par.d(i);
-                % Gradient coefficients for surface recombination equivalence
+                % Gradient coefficient for surface recombination equivalence
                 alpha0 = ((par.EA(i-1) - par.EA(i+1))/(par.kB*par.T) + (log(par.Nc(i+1))-log(par.Nc(i-1))))/deff;
                 if alpha0 < 0
                     xprime_n = xprime;
+                    alpha0_xn = alpha0;     % the sign of alpha0 is referenced to the direction of xprime_n
                 else
                     xprime_n = deff-xprime;
+                    alpha0_xn = -alpha0;     % the sign of alpha0 is referenced to the direction of xprime_n
                 end
-                
+                % Gradient coefficient for surface recombination equivalence
                 beta0 = ((par.IP(i+1) - par.IP(i-1))/(par.kB*par.T) + (log(par.Nv(i+1))-log(par.Nv(i-1))))/deff;
                 if beta0 < 0
                     xprime_p = xprime;
+                    beta0_xp = beta0;        % the sign of beta is referenced to the direction of xprime_p
                 else
-                    xprime_p = deff-xprime;
+                    xprime_p = deff-xprime;  
+                    beta0_xp = -beta0;       % the sign of beta is referenced to the direction of xprime_p
                 end
                 
                 switch interface_switch
@@ -108,12 +112,32 @@ for i=1:length(par.dcum)                % i is the layer index
                         devprop(j) = 1;
                     case 'xprime'
                         devprop(j) = xprime;
+                    case 'xprime_n'
+                        devprop(j) = xprime_n; 
+                    case 'xprime_p'
+                        devprop(j) = xprime_p;
+                    case 'sign_xn'
+                        if alpha0 < 0
+                            devprop(j) = 1;
+                        else
+                            devprop(j) = -1;
+                        end
+                    case 'sign_xp'
+                        if beta0 < 0
+                            devprop(j) = 1;
+                        else
+                            devprop(j) = -1;
+                        end
                     case 'dint'
                         devprop(j) = deff;
                     case 'alpha0'
                         devprop(j) = alpha0;
                     case 'beta0'
                         devprop(j) = beta0;
+                    case 'alpha0_xn'
+                        devprop(j) = alpha0_xn;
+                    case 'beta0_xp'
+                        devprop(j) = beta0_xp;
                     case 'vsr_zone'
                         if par.vsr_zone_loc(i) == "L"
                             if xprime <= deff*par.frac_vsr_zone

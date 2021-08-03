@@ -62,6 +62,8 @@ dev.taun_vsr = build_property(par.taun, xmesh, par, 'taun_vsr', 0);
 dev.taup_vsr = build_property(par.taup, xmesh, par, 'taup_vsr', 0);
 dev.alpha0 = build_property(0, xmesh, par, 'alpha0', 1);
 dev.beta0 = build_property(0, xmesh, par, 'beta0', 1);
+dev.alpha0_xn = build_property(0, xmesh, par, 'alpha0_xn', 1);
+dev.beta0_xp = build_property(0, xmesh, par, 'beta0_xp', 1);
 dev.dint = build_property(0, xmesh, par, 'dint', 1);
 
 % Switches
@@ -89,4 +91,6 @@ end
 dev.xprime = build_property(par.xx, xmesh, par, 'xprime', 1);
 dev.xprime_n = build_property(par.xx, xmesh, par, 'xprime_n', 1);
 dev.xprime_p = build_property(par.xx, xmesh, par, 'xprime_p', 1);
+dev.sign_xn = build_property(par.xx, xmesh, par, 'sign_xn', 1);
+dev.sign_xp = build_property(par.xx, xmesh, par, 'sign_xp', 1);
 end
