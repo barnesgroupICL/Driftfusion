@@ -88,7 +88,7 @@ sol = df(sol_Rs, par);
 par.Vapp = 0;
 
 % Stable time is enetered as negative then run to stable solution
-if stable_time < 0
+if stable_time < 0   
     warning('off', 'Driftfusion:verifyStabilization');
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     
