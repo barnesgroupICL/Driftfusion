@@ -203,7 +203,7 @@ classdef pc
         RelTol_vsr = 0.03;      % Fractional error between abrupt and volumetric surface recombination models above which a warning is flagged
         
         %% Series resistance
-        Rs = 0;
+        Rs = 10;
         Rs_initial = 0;         % Switch to allow linear ramp of Rs on first application
 
         %% Defect recombination rate coefficient
