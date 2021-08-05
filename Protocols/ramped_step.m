@@ -23,8 +23,8 @@ par = sol_ramp.par;
 
 par.tmesh_type = 2;
 par.tmax = t_dwell;
-par.t0 = t_dwell/1e8;
-par.tpoints = 300;
+par.t0 = t_dwell*1e-6;
+par.tpoints = 200;
 
 par.V_fun_type = 'constant';           
 par.V_fun_arg(1) = par.Vapp;   
