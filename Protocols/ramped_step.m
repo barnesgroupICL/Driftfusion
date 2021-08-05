@@ -1,4 +1,4 @@
-function [sol_ramp, sol_dwell] = ramped_step(sol_in, deltaV, t_ramp, t_dwell)
+function [sol_ramp, sol_dwell, sol_concat] = ramped_step(sol_in, deltaV, t_ramp, t_dwell)
 
 par = sol_in.par;
 
