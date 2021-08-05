@@ -12,7 +12,7 @@ function compare_carrier_interfaces_X2(sol, tarr)
 % vX As with 8.2 but with more plot options
 % TARR = array of time points
 plotswitch = 1;     % 1 = plot n(x), p(x), 2 = plot ns, ps, 3 = 4x panels
-calc_option = 2;    %1 = all terms of expression, 2 = first term only
+calc_option = 1;    %1 = all terms of expression, 2 = first term only
 
 par = sol.par;
 T = par.T;
@@ -81,7 +81,7 @@ for m = 1:length(loc)
 
     for kk = 1:length(tarr)
         k = find(sol.t <= tarr(kk));
-        k = k(end);
+        k = k(end);                     % k is the time point
         for i = 1:length(x_sub)
             if x_sub(i) >= par.dcum(loc(m)-1) && x_sub(i) <= par.dcum(loc(m))
                 %% Carrier densities
@@ -130,8 +130,8 @@ for m = 1:length(loc)
                 end
             end
             %% Fluxes
-            jn_ana(k,i) = jns(k,m) - r(k,i)*(xprime(i));
-            jp_ana(k,i) = jps(k,m) - r(k,i)*(xprime(i));        
+            jn_ana(k,i) = jns(k,m);% - r(k,i)*(xprime(i));
+            jp_ana(k,i) = jps(k,m);% - r(k,i)*(xprime(i));        
         end 
     end
 end
