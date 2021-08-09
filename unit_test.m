@@ -40,7 +40,7 @@ JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.0, 3);
 % example taken from Scripts/explore_script
 % exsol = explore2par(par_base, parnames, parvalues, JVpnts)
 exsol = explore.explore2par(par, {'d(1,3)','Int'},...
-    {[400e-7, 800e-7], logspace(-2,0,2)}, 20);
+    {[200e-7, 400e-7], logspace(-2,0,2)}, 20);
 
 %% Core df no input
 
@@ -552,6 +552,14 @@ refresh_device(par);
 
 % y = triangle_fun(coeff, t)
 triangle_fun([0.1, 0.2, 1, 3, 5], 0:0.1:10);
+
+%% Analysis
+% sigma_sum_filter = compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plot_switch)
+sigma_sum_R_flux = compare_rec_flux(JVsol.ill.f, 1e6, 0.05, 1);
+
+%% Analysis
+% [n_ana, p_ana, jn_ana, jp_ana] = compare_carrier_interfaces(sol, tarr, plot_switch)
+[n_ana, p_ana, jn_ana, jp_ana] = compare_carrier_interfaces(JVsol.ill.f, JVsol.ill.f.t(end)*[0, 0.2, 0.4, 0.6], 1);
 
 %% Helper calcJsc, calcR0 and Eg_vs_Voc
 
