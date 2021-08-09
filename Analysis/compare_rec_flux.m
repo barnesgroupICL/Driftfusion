@@ -1,14 +1,27 @@
-function compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plot_switch)
-% Script to compare the interfacial recombination fluxes from Driftfusion
-% (DF) and IonMonger (IM)
-% Currently only working for ETL-AL-HTL architecture
+function sigma_sum_filter = compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plot_switch)
+% Script to compare the interfacial recombination fluxes from Driftfusion.
+% The integrated recombination flux from the volumetric surface
+% recombination model is compared with the flux calculated from the
+% 2D SRH expression using the boundary carrier densities, ns and ps
+% directly
+%
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Input arguments
 % PLOT_SWITCH = 1 for plot outputs
 % RELTOL_VSR is the fractional difference between DF 2D and volumetric calculations above
 % which a warning is displayed
 % ABSTOL_VSR is the absolute value of the recombination flux below which
 % the difference is ignored (lower values tend to have much higher relative
 % errors)
-
+%
+%% Start code
 par = sol_df.par;
 u = sol_df.u;
 t = sol_df.t;
