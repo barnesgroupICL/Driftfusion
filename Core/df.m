@@ -10,14 +10,15 @@ function solstruct = df(varargin)
 % it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
-%
-%% Start code
+% 
+% Solution outputs
 % V = u(1) = electrostatic potential
 % n = u(2) = electron density
 % p = u(3) = holes density
 % c = u(4) = cation density (optional)
 % a = u(5) = anion density (optional)
-
+%
+%% Start code
 %% Deal with input arguments
 if length(varargin) == 0
     % If no input parameter set then call pc directly
