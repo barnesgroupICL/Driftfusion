@@ -44,6 +44,7 @@ else
     struct.par.tmax = min(1e-2, 2^(-log10(min(struct.par.mue))));
 end
 
+struct.par.tmesh_type = 2;
 struct.par.tpoints = 10;
 struct.par.t0 = struct.par.tmax / 1e6;
 
