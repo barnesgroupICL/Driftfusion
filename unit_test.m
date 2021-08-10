@@ -1,4 +1,4 @@
-%UNIT_TEST - Runs various simulations in order to test the functioning of Driftfusion and many other implemented functions
+% UNIT_TEST - Runs various simulations in order to test the functioning of Driftfusion and many other implemented functions
 % For profiling the time spent running each function run 'profile on' before running the tests and
 % 'profile viewer' after.
 % Using Matlab's Coverage Reports, the obsolete and unused code can be easily spotted.
