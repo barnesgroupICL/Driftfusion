@@ -133,7 +133,7 @@ if electronic_only == 0
     % Start without SRH or series resistance
     par.SRHset = 0;
     par.Rs = 0;
-%     
+   
     disp('Closed circuit equilibrium with ions')
     
     % Take ratio of electron and ion mobilities in the active layer
@@ -164,13 +164,10 @@ if electronic_only == 0
     % loop to check ions have reached stable config- if not accelerate ions by
     % order of mag
     while any(all_stable) == 0
-        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-        
+        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]); 
         par.tmax = par.tmax*10;
         par.t0 = par.tmax/1e6;
-        
         sol = df(sol, par);
-        
         all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     end
     
@@ -185,8 +182,6 @@ if electronic_only == 0
     %% Ion equilibrium with surface recombination
     disp('Switching on SRH recombination')
     par.SRHset = 1;
-    
-    par.calcJ = 0;
     par.tmax = 1e-6;
     par.t0 = par.tmax/1e3;
     par.mobseti = 1;

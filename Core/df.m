@@ -111,6 +111,7 @@ sign_xp = device.sign_xp;           % 1 if xp increasing, -1 if decreasing wrt x
 alpha0_xn = device.alpha0_xn;       % alpha0_xn is alpha for F = 0 reference to xprime_n
 beta0_xp = device.beta0_xp;         % beta0_xp is beta for F = 0 referenced to xprime_p
 N_ionic_species = par.N_ionic_species;
+N_variables = par.N_ionic_species + 3;  % +3 for V, n, and p
 nleft = par.nleft;
 nright = par.nright;
 pleft = par.pleft;
@@ -153,6 +154,15 @@ Vapp_fun = fun_gen(par.V_fun_type);
 Vapp = 0;
 Vres = 0;
 J = 0;
+
+%% Solver variables
+V = 0; n = 0; p = 0; a = 0; c = 0;
+dVdx = 0; dndx = 0; dpdx = 0; dadx = 0; dcdx = 0;
+C_V = 0; C_n = 0; C_p = 0; C_c = 0; C_a = 0;
+F_V = 0; F_n = 0; F_p = 0; F_c = 0; F_a = 0;
+S_V = 0; S_n = 0; S_p = 0; S_c = 0; S_a = 0;
+r_rad = 0; r_srh = 0; r_vsr = 0; r_np = 0;
+alpha = 0; beta = 0;
 
 %% Solver options
 % MaxStep = limit maximum time step size during integration
@@ -205,91 +215,95 @@ end
         end
         g = gxt1 + gxt2;
 
-        %% Variables
-        V = u(1); n = u(2); p = u(3);
-
-        if N_ionic_species == 1
-            c = u(4);           % Include cation variable
-            dcdx = dudx(4);
-            a = Nani(i);
-        elseif N_ionic_species == 2
-            c = u(4);           % Include cation variable
-            a = u(5);           % Include anion variable
-            dcdx = dudx(4);
-            dadx = dudx(5);
-        else
-            c = Ncat(i);
-            a = Nani(i);
+        %% Unpack Variables       
+        switch N_ionic_species
+            case 0
+                V = u(1);
+                n = u(2);
+                p = u(3);
+                c = 0;
+                a = 0;
+                dVdx = dudx(1);
+                dndx = dudx(2);
+                dpdx = dudx(3);
+                dcdx = 0;
+                dadx = 0;
+            case 1
+                V = u(1);
+                n = u(2);
+                p = u(3);
+                c = u(4);
+                a = Nani(i);
+                dVdx = dudx(1);
+                dndx = dudx(2);
+                dpdx = dudx(3);
+                dcdx = dudx(4);
+                dadx = 0;
+            case 2
+                V = u(1);
+                n = u(2);
+                p = u(3);
+                c = u(4);
+                a = u(5);
+                dVdx = dudx(1);
+                dndx = dudx(2);
+                dpdx = dudx(3);
+                dcdx = dudx(4);
+                dadx = dudx(5);
         end
-
-        %% Gradients
-        dVdx = dudx(1);
-        dndx = dudx(2);
-        dpdx = dudx(3);
+        
+        % Volumetric surface recombination gradients
+        alpha = sign_xn(i)*q*dVdx/(kB*T) + alpha0_xn(i);
+        beta = sign_xp(i)*q*-dVdx/(kB*T) + beta0_xp(i);
         
         %% Equation editor
         % Time-dependence prefactor term
         C_V = 0;
         C_n = 1;
         C_p = 1;
-        C = [C_V; C_n; C_p];
+        C_c = 1;
+        C_a = 1;
+        C = [C_V; C_n; C_p; C_c; C_a];
         
         % Flux terms
         F_V = (epp(i)/eppmax)*dVdx;
         F_n = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
         F_p = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F = [F_V; mobset*F_n; mobset*F_p];
+        F_c = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
+        F_a = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
+        F = [F_V; mobset*F_n; mobset*F_p; K_cation*mobseti*F_c; K_anion*mobseti*F_a];
         
-        % Recombination terms
+        % Electron and holes recombination
         % Radiative
         r_rad = radset*B(i)*((n*p)-(ni(i)^2));
         % Bulk SRH
         r_srh = SRHset*srh_zone(i)*(((n*p)-ni(i)^2)/(taun(i)*(p+pt(i)) + taup(i)*(n+nt(i))));
         % Volumetric surface recombination
-        alpha = sign_xn(i)*q*dVdx/(kB*T) + alpha0_xn(i);
-        beta = sign_xp(i)*q*-dVdx/(kB*T) + beta0_xp(i);
         r_vsr = SRHset*vsr_zone(i)*((n*exp(-alpha*xprime_n(i))*p*exp(-beta*xprime_p(i)) - ni(i)^2)...
             /(taun_vsr(i)*(p*exp(-beta*xprime_p(i))+pt(i)) + taup_vsr(i)*(n*exp(-alpha*xprime_n(i))+nt(i))));
-
-        r = r_rad + r_srh + r_vsr;
+        r_np = r_rad + r_srh + r_vsr;
+        
         % Source terms
-        S_V = Field_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c+Nani(i)-Ncat(i));
-        S_n = g - r;
-        S_p = g - r;
-        S = [S_V; S_n; S_p];
+        S_V = Field_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c);
+        S_n = g - r_np;
+        S_p = g - r_np;
+        S_c = 0;
+        S_a = 0;
+        S = [S_V; S_n; S_p; S_c; S_a];
         
-        if N_ionic_species == 1 || N_ionic_species == 2  % Condition for cation and anion terms
-            C_cat = 1;
-            C = [C; C_cat];
-            
-            F_cat = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
-            F = [F; K_cation*mobseti*F_cat];
-            
-            S_cat = 0;
-            S = [S; S_cat];
-        end
-        
-        if N_ionic_species == 2     % Condition for anion terms
-            C_ani = 1;
-            C = [C; C_ani];
-            
-            F_ani = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
-            F = [F; K_anion*mobseti*F_ani];
-            
-            S_ani = 0;
-            S = [S; S_ani];
-        end
-        
+        % Remove unused variables - faster and tidier than using conditional
+        % statements
+        C = C(1:N_variables);
+        F = F(1:N_variables);
+        S = S(1:N_variables);
     end
 
 %% Define initial conditions.
     function u0 = dfic(x)
-
         if dficAnalytical
-
             i = find(xmesh <= x);
             i = i(end);
-
+            
             switch N_ionic_species
                 case 0
                     if length(par.dcell) == 1
