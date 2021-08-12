@@ -15,11 +15,11 @@ x = spvsol.ill.x;
 
 %% Illuminated step
 % integrated charge density as a function of time
-rho.ill = dfana.calcrho(spvsol.ill);
+rho.ill = dfana.calcrho(spvsol.ill, "whole");
 sigmat.ill = trapz(x, rho.ill, 2);
 
 % Get illuminated field
-F.ill = dfana.calcF(spvsol.ill);
+F.ill = dfana.calcF(spvsol.ill, "whole");
 % Field at final position x=d as a function of time
 Ft.ill = F.ill(:,end);
 % Ionic component of field
@@ -38,11 +38,11 @@ Viont.ill = Vion.ill(:,end);
 
 %% Dark decay time step
 % integrated charge density as a function of time
-rho.dk = dfana.calcrho(spvsol.dk);
+rho.dk = dfana.calcrho(spvsol.dk, "whole");
 sigmat.dk = trapz(x, rho.dk, 2);
 
 % Get dark field
-F.dk = dfana.calcF(spvsol.dk);
+F.dk = dfana.calcF(spvsol.dk, "whole");
 % Field at final position x=d as a function of time
 Ft.dk = F.dk(:,end);
 % Ionic component of field

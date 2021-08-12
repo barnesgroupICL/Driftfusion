@@ -25,20 +25,17 @@ function sigma_sum_filter = compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plo
 par = sol_df.par;
 u = sol_df.u;
 t = sol_df.t;
-x = sol_df.x;
-al = par.active_layer;
 pcum1 = par.pcum + 1;   % Cumulative layer points array
 dev = par.dev;
 alpha0 = dev.alpha0;
 beta0 = dev.beta0;
-x = par.x;
-xsub = par.x_ihalf;
+xsub = par.x_sub;
 
 n = u(:, :, 2);
 p = u(:, :, 3);
 
 %% Driftfusion 3D
-rx = dfana.calcr_ihalf(sol_df);
+rx = dfana.calcr(sol_df, "sub");
 
 %% Get indexes of interfaces
 %int_index = find(contains(par.layer_type, 'interface'));   % only

@@ -66,39 +66,38 @@ classdef dfana
 
         end
 
-        function [Ecb, Evb, Efn, Efp] = QFL_ihalf(sol)
+        function [Ecb, Evb, Efn, Efp] = QFL_sub(sol)
             % Calculates the QFLs on the i_half xmesh
             % u is the solution structure
             % Simple structure names
             [u,t,xmesh,par,dev,n0,p0,a0,c0,V0] = dfana.splitsol(sol);
 
-
-            n = getvarihalf(n0);
-            p = getvarihalf(p0);
-            V = getvarihalf(V0);
-            dev_ihalf = par.dev_ihalf;
-            Ecb_ihalf = dev_ihalf.EA-V;                                 % Conduction band potential
-            Evb_ihalf = dev_ihalf.IP-V;                                 % Valence band potential
+            n = getvar_sub(n0);
+            p = getvar_sub(p0);
+            V = getvar_sub(V0);
+            dev_sub = par.dev_sub;
+            Ecb_sub = dev_sub.EA-V;                                 % Conduction band potential
+            Evb_sub = dev_sub.IP-V;                                 % Valence band potential
 
             if par.prob_distro_function == 'Fermi'
 
                 for i = 1:size(n,1)           % time
                     for j = 1:size(n,2)       % position
-                        Efn_ihalf(i,j) = distro_fun.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
-                        Efp_ihalf(i,j) = distro_fun.Efp_fd_fun(p(i,j), dev.Efp(j,:),  dev.p_fd(j,:));
+                        Efn_sub(i,j) = distro_fun.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
+                        Efp_sub(i,j) = distro_fun.Efp_fd_fun(p(i,j), dev.Efp(j,:),  dev.p_fd(j,:));
                     end
                 end
-                Efn_ihalf = Efn_ihalf-V;
-                Efp_ihalf = Efp_ihalf-V;
+                Efn_sub = Efn_sub - V;
+                Efp_sub = Efp_sub - V;
 
             elseif par.prob_distro_function == 'Boltz'
-                Efn_ihalf = real(Ecb_ihalf+(par.kB*par.T/par.q)*log(n./dev_ihalf.Nc));        % Electron quasi-Fermi level
-                Efp_ihalf = real(Evb_ihalf-(par.kB*par.T/par.q)*log(p./dev_ihalf.Nv));        % Hole quasi-Fermi level
+                Efn_sub = real(Ecb_sub+(par.kB*par.T/par.q)*log(n./dev_sub.Nc));        % Electron quasi-Fermi level
+                Efp_sub = real(Evb_sub-(par.kB*par.T/par.q)*log(p./dev_sub.Nv));        % Hole quasi-Fermi level
             end
-            Efn = Efn_ihalf;
-            Efp = Efp_ihalf;
-            Ecb = Ecb_ihalf;
-            Evb = Evb_ihalf;
+            Efn = Efn_sub;
+            Efp = Efp_sub;
+            Ecb = Ecb_sub;
+            Evb = Evb_sub;
         end
 
         function [J, j, x] = calcJ(sol)
@@ -106,21 +105,21 @@ classdef dfana
             % obtain SOL components for easy referencing
             [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            n_ihalf = getvarihalf(n);
-            p_ihalf = getvarihalf(p);
-            a_ihalf = getvarihalf(a);
-            c_ihalf = getvarihalf(c);
+            n_sub = getvar_sub(n);
+            p_sub = getvar_sub(p);
+            a_sub = getvar_sub(a);
+            c_sub = getvar_sub(c);
 
-            x = par.x_ihalf;
+            x = par.x_sub;
             [~,~,g] = dfana.calcg(sol);
 
-            [~, dndt] = gradient(n_ihalf, x, t);
-            [~, dpdt] = gradient(p_ihalf, x, t);
-            [~, dadt] = gradient(a_ihalf, x, t);
-            [~, dcdt] = gradient(c_ihalf, x, t);
+            [~, dndt] = gradient(n_sub, x, t);
+            [~, dpdt] = gradient(p_sub, x, t);
+            [~, dadt] = gradient(a_sub, x, t);
+            [~, dcdt] = gradient(c_sub, x, t);
 
             % Recombination
-            r = dfana.calcr_ihalf(sol);
+            r = dfana.calcr(sol, "sub");
 
             djndx = -dndt + g - r.tot;
             djpdx = -dpdt + g - r.tot;
@@ -168,10 +167,10 @@ classdef dfana
             j.a = 0 + deltaja;
             j.c = 0 + deltajc;
             % displacement flux
-            FV_ihalf = dfana.calcF_ihalf(sol);
+            FV_sub = dfana.calcF(sol, "sub");
 
-            [~, FV_ihalf_dt] = gradient(FV_ihalf, x, t);
-            j.disp = par.epp0.*par.dev_ihalf.epp.*FV_ihalf_dt;
+            [~, FV_sub_dt] = gradient(FV_sub, x, t);
+            j.disp = par.epp0.*par.dev_sub.epp.*FV_sub_dt;
 
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
@@ -204,57 +203,6 @@ classdef dfana
             g = g1 + g2;
         end
 
-%         function r = calcr(sol)
-%             % Calculate the recombination rate on whole mesh
-%             % obtain SOL components for easy referencing
-%             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-%             
-%             ns = zeros(length(t), length(x));
-%             ps = zeros(length(t), length(x));
-%             dVdx = zeros(length(t), length(x));
-%             int_switch = repmat(dev.int_switch, length(t), 1);
-%             vsr_zone = repmat(dev.int_switch, length(t), 1);
-%             bulk_switch = abs(int_switch-1);
-%             
-%             for i=1:length(t)
-%                 dVdx(i,:) = pdeval(0, x, V(i,:), x);
-%             end
-%             xprime = dev.xprime;
-%             dint = dev.dint;
-%             alpha0 = dev.alpha0;
-%             beta0 = dev.beta0;
-%             alpha = par.q*dVdx./(par.kB*par.T) + alpha0;
-%             beta = -par.q*dVdx./(par.kB*par.T) + beta0;
-% 
-%             % Band-to-band
-%             r.btb = dev.B.*(n.*p - dev.ni.^2);
-%             % Bulk SRH
-%             r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
-%             % Volumetric surface SRH
-%             for k = 1:length(t)
-%                 for i = 1:length(x)
-%                     
-%                     if alpha(k,i) < 0
-%                         ns(k,i) = n(k,i).*exp(-alpha(k,i).*xprime(i));
-%                     elseif alpha(k,i) >=0
-%                         ns(k,i) = n(k,i).*exp(-alpha(k,i).*(xprime(i)-dint(i)));
-%                     end
-%                     
-%                     if beta(k,i) < 0
-%                         ps(k,i) = p(k,i).*exp(-beta(k,i).*xprime(i));
-%                     elseif beta(k,i) >=0
-%                         ps(k,i) = p(k,i).*exp(-beta(k,i).*(xprime(i)-dint(i)));
-%                     end
-%                     
-%                 end
-%             end
-%             
-%             r.vsr = vsr_zone.*((ns.*ps - dev.ni.^2)./...
-%                 ((dev.taun_vsr.*(ps + dev.pt)) + (dev.taup_vsr.*(ns + dev.nt))));
-%             % Total
-%             r.tot = r.btb + r.srh + r.vsr;
-%         end
-
         function [r, ns, ps] = calcr(sol, mesh_option)
             % Calculate the recombination rate on i-half mesh
             % obtain SOL components for easy referencing
@@ -269,10 +217,10 @@ classdef dfana
                     n = u(:,:,2);
                     p = u(:,:,3);
                 case "sub"
-                    dev = par.dev_ihalf;
-                    x = par.x_ihalf;
-                    n = getvarihalf(u(:,:,2));
-                    p = getvarihalf(u(:,:,3));
+                    dev = par.dev_sub;
+                    x = par.x_sub;
+                    n = getvar_sub(u(:,:,2));
+                    p = getvar_sub(u(:,:,3));
             end
             
             dVdx = zeros(length(t), length(x));
@@ -312,8 +260,8 @@ classdef dfana
             % spatial gradients mean that the currents do not cancel properly
             % obtain SOL components for easy referencing
             [~,t,x,par,~,n,p,a,c,V] = dfana.splitsol(sol);
-            xout = par.x_ihalf;
-            dev = par.dev_ihalf;
+            xout = par.x_sub;
+            dev = par.dev_sub;
 
             % Property matrices
             eppmat = dev.epp;
@@ -424,55 +372,50 @@ classdef dfana
             Jdd.tot = par.e*jdd.tot;
         end
 
-        function [FV, Frho] = calcF(sol)
+        function [FV, Frho] = calcF(sol, mesh_option)
             % Electric field caculation
             % FV = Field calculated from the gradient of the potential
             % Frho = Field calculated from integrated space charge density
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            FV = -gradient(V, x, t);                      % Electric field calculated from V
-
-            if nargout > 1
-                rho = dfana.calcrho(sol);
-                Frho = cumtrapz(x, rho, 2)./(dev.epp.*par.epp0) + FV(:,1);
+            [u,t,x_whole,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            switch mesh_option
+                case "whole"
+                    x = x_whole;
+                case "sub"
+                    x = par.x_sub;
             end
-        end
-
-        function [FV, Frho] = calcF_ihalf(sol)
-            % Electric field caculation
-            % FV = Field calculated from the gradient of the potential
-            % Frho = Field calculated from integrated space charge density
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
             for i=1:length(t)
-                [~, dVdx_ihalf(i,:)] = pdeval(0,x,V(i,:),par.x_ihalf);
+                [~, dVdx(i,:)] = pdeval(0,x_whole,V(i,:),x);
             end
-            FV = -dVdx_ihalf;
+            FV = -dVdx;
 
             if nargout > 1
-                rho = dfana.calcrho_ihalf(sol);
-                Frho = cumtrapz(par.x_ihalf, rho, 2)./(par.dev_ihalf.epp.*par.epp0) + FV(:,1);
+                rho = dfana.calcrho(sol, "sub");
+                Frho = cumtrapz(x, rho, 2)./(par.dev_sub.epp.*par.epp0) + FV(:,1);
             end
         end
 
-        function rho = calcrho(sol)
+        function rho = calcrho(sol, mesh_option)
             % Calculates the space charge density
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            [u,t,x,par,dev,n_whole,p_whole,a_whole,c_whole,V_whole] = dfana.splitsol(sol);
+            
+            switch mesh_option
+                case "whole"  
+                    dev = par.dev;
+                    n = n_whole;
+                    p = p_whole;
+                    a = a_whole;
+                    c = c_whole;
+                case "sub"
+                    dev = par.dev_sub;
+                    n = getvar_sub(n_whole);
+                    p = getvar_sub(p_whole);
+                    a = getvar_sub(a_whole);
+                    c = getvar_sub(c_whole);
+            end
             % charge density
             rho = -n + p - a + c - dev.NA + dev.ND;
-        end
-
-        function rho = calcrho_ihalf(sol)
-            % Calculates the space charge density
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
-            n_ihalf = getvarihalf(n);
-            p_ihalf = getvarihalf(p);
-            a_ihalf = getvarihalf(a);
-            c_ihalf = getvarihalf(c);
-
-            % charge density
-            rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - par.dev_ihalf.NA + par.dev_ihalf.ND;
         end
 
         function Vapp = calcVapp(sol)
@@ -606,7 +549,7 @@ classdef dfana
         function sigma = calcsigma(sol)
             % calculates the integrated space charge density
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            rho = dfana.calcrho(sol);
+            rho = dfana.calcrho(sol, "whole");
             sigma = trapz(x, rho, 2);
         end
 

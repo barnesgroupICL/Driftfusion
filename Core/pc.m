@@ -216,9 +216,9 @@ classdef pc
         genspace = [];
         x = [];
         xx = [];
-        x_ihalf = [];
+        x_sub = [];
         dev = [];
-        dev_ihalf = [];
+        dev_sub = [];
         t = [];
         xpoints = [];
         gx1 = [];       % Light source 1

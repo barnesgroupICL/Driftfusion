@@ -52,7 +52,7 @@ end
 %% Unpack properties
 %% Spatial mesh
 xmesh = par.xx;
-x_ihalf = par.x_ihalf;
+x_sub = par.x_sub;
 x = xmesh;
 
 %% Time mesh
@@ -74,7 +74,7 @@ e = par.e;
 epp0 = par.epp0;
 
 %% Device parameters
-device = par.dev_ihalf;
+device = par.dev_sub;
 T = par.T;
 mue = device.mue;           % Electron mobility
 muh = device.muh;           % Hole mobility
@@ -199,7 +199,7 @@ end
 % S = Source terms
     function [C,F,S] = dfpde(x,t,u,dudx)
         % Get position point
-        i = find(x_ihalf <= x);
+        i = find(x_sub <= x);
         i = i(end);
         
         switch g1_fun_type

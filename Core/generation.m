@@ -13,7 +13,7 @@ function gx = generation(par, source_type, laserlambda)
 % (at your option) any later version.
 %
 %% Start code
-xsolver = par.x_ihalf;
+xsolver = par.x_sub;
 switch par.OM
     case 0
         % This currently results in the generation profile being stored twice and could be optimised

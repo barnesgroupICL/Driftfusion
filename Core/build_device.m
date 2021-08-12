@@ -12,10 +12,10 @@ function dev = build_device(par, meshoption)
 %
 %% Start code
 switch meshoption
-    case 'iwhole'
+    case 'whole'
         xmesh = par.xx;
-    case 'ihalf'
-        xmesh = getvarihalf(par.xx);
+    case 'sub'
+        xmesh = par.x_sub;
 end
 
 % Constant properties

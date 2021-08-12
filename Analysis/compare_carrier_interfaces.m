@@ -29,11 +29,11 @@ calc_option = 1;    %1 = all terms of expression, 2 = first term only
 par = sol.par;
 T = par.T;
 kB = par.kB;
-dev = par.dev_ihalf;
+dev = par.dev_sub;
 u = sol.u;
 t = sol.t;
 x = sol.x;
-x_sub = par.x_ihalf;
+x_sub = par.x_sub;
 pcum1 = par.pcum + 1;   % Cumulative layer points array
 
 xprime = dev.xprime;
@@ -77,7 +77,7 @@ jn = j.n;
 jp = j.p;
 
 % recombination
-r = dfana.calcr_ihalf(sol);
+r = dfana.calcr(sol, "sub");
 
 %% Get indexes of interfaces
 %int_index = find(contains(par.layer_type, 'interface'));   % only

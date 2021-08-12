@@ -273,8 +273,8 @@ dfplot.x2d(JVsol.ill.f, JVsol.ill.f.x, {JVsol.ill.f.u(:,:,1)}, {'test'}, ['-','.
 %% Core build_device
 
 % dev = build_device(par, meshoption)
-dev1 = build_device(par, 'iwhole');
-dev2 = build_device(par, 'ihalf');
+dev1 = build_device(par, 'whole');
+dev2 = build_device(par, 'sub');
 
 %% Core build_property
 
@@ -296,10 +296,10 @@ dfana.splitsol(soleq.ion);
 % [Ecb, Evb, Efn, Efp] = QFLs(sol)
 dfana.QFLs(soleq.ion);
 
-%% Core dfana QFL_ihalf
+%% Core dfana QFL_sub
 
-% [Ecb, Evb, Efn, Efp] = QFL_ihalf(sol)
-dfana.QFL_ihalf(soleq.ion);
+% [Ecb, Evb, Efn, Efp] = QFL_sub(sol)
+dfana.QFL_sub(soleq.ion);
 
 %% Core dfana calcJ
 
@@ -313,13 +313,9 @@ dfana.calcg(soleq.ion);
 
 %% Core dfana calcr
 
-% r = calcr(sol)
-dfana.calcr(soleq.ion);
-
-%% Core dfana calcr_ihalf
-
-% r = calcr_ihalf(sol)
-dfana.calcr_ihalf(soleq.ion);
+% r = calcr(sol, mesh_option)
+dfana.calcr(soleq.ion, "whole");
+dfana.calcr(soleq.ion, "sub");
 
 %% Core dfana Jddxt
 
@@ -328,23 +324,15 @@ dfana.Jddxt(soleq.ion);
 
 %% Core dfana calcF
 
-% [FV, Frho] = calcF(sol)
-dfana.calcF(soleq.ion);
-
-%% Core dfana calcF_ihalf
-
-% [FV, Frho] = calcF_ihalf(sol)
-dfana.calcF_ihalf(soleq.ion);
+% [FV, Frho] = calcF(sol, mesh_option)
+dfana.calcF(soleq.ion, "whole");
+dfana.calcF(soleq.ion, "sub");
 
 %% Core dfana calcrho
 
-% rho = calcrho(sol)
-dfana.calcrho(soleq.ion);
-
-%% Core dfana calcrho_ihalf
-
-% rho = calcrho_ihalf(sol)
-dfana.calcrho_ihalf(soleq.ion);
+% rho = calcrho(sol, mesh_option)
+dfana.calcrho(soleq.ion, "whole");
+dfana.calcrho(soleq.ion, "sub");
 
 %% Core dfana calcVapp
 
@@ -450,15 +438,15 @@ generation(par, 'laser', 470);
 generation(par2, 'AM15', 470);
 generation(par2, 'laser', 470);
 
-%% Core getvarihalf
+%% Core getvarsub
 
-% varihalf = getvarihalf(var)
-getvarihalf(par.dev.EA);
+% varsub = getvarsub(var)
+getvarsub(par.dev.EA);
 
-%% Core getxihalf
+%% Core getx_sub
 
-% xsolver = getxihalf(sol)
-getxihalf(soleq.ion);
+% xsolver = getx_sub(sol)
+getx_sub(soleq.ion);
 
 %% Core import_properties
 
