@@ -114,6 +114,8 @@ N_max_variables = par.N_max_variables;  % Maximum number of variables allowable 
 N_ionic_species = par.N_ionic_species;  % Number of ionic species in this solution
 N_variables = par.N_ionic_species + 3;  % Number of variables in this solution (+3 for V, n, and p)
 
+z_c = par.z_c;
+z_a = par.z_a;
 nleft = par.nleft;
 nright = par.nright;
 pleft = par.pleft;
@@ -271,8 +273,8 @@ end
         F_V = (epp(i)/eppmax)*dVdx;
         F_n = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
         F_p = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F_c = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(cmax(i)-c)))));
-        F_a = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(amax(i)-a)))));
+        F_c = mucat(i)*(z_c*c*dVdx + kB*T*(dcdx + (c*(dcdx/(cmax(i)-c)))));
+        F_a = muani(i)*(z_a*a*-dVdx + kB*T*(dadx+(a*(dadx/(amax(i)-a)))));
         F = [F_V; mobset*F_n; mobset*F_p; K_cation*mobseti*F_c; K_anion*mobseti*F_a];
         
         % Electron and holes recombination
@@ -283,10 +285,11 @@ end
         % Volumetric surface recombination
         r_vsr = SRHset*vsr_zone(i)*((n*exp(-alpha*xprime_n(i))*p*exp(-beta*xprime_p(i)) - ni(i)^2)...
             /(taun_vsr(i)*(p*exp(-beta*xprime_p(i))+pt(i)) + taup_vsr(i)*(n*exp(-alpha*xprime_n(i))+nt(i))));
+        % Total electron and hole recombination
         r_np = r_rad + r_srh + r_vsr;
         
         % Source terms
-        S_V = Field_switch(i)*(q/(eppmax*epp0))*(-n+p-NA(i)+ND(i)-a+c);
+        S_V = Field_switch(i)*(q/(eppmax*epp0))*(-n + p - NA(i) + ND(i) + z_a*a + z_c*c);
         S_n = g - r_np;
         S_p = g - r_np;
         S_c = 0;

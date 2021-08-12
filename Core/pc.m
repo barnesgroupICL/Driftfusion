@@ -77,23 +77,23 @@ classdef pc
         tpoints = 100;              % Number of time points
 
         %% GENERAL CONTROL PARAMETERS
-        OC = 0;                 % Closed circuit = 0, Open Circuit = 1
-        Vapp = 0;               % Applied bias
-        BC = 3;                 % Boundary Conditions. Must be set to one for first solution
-        figson = 1;             % Toggle figures on/off
-        meshx_figon = 0;        % Toggles x-mesh figures on/off
-        mesht_figon = 0;        % Toggles t-mesh figures on/off
-        side = 1;               % illumination side 1 = left, 2 = right
-        calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
-        mobset = 1;             % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
-        mobseti = 1;
-        SRHset = 1;
-        radset = 1;
-        JV = 0;                 % Toggle run JV scan on/off
-        prob_distro_function = 'Boltz';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
-        Fermi_limit = 0.2;      % Max allowable limit for Fermi levels beyond the bands [eV]
-        Fermi_Dn_points = 400;  % No. of points in the Fermi-Dirac look-up table
-        intgradfun = 'linear'      % Interface gradient function 'linear' = linear, 'erf' = 'error function'
+        OC = 0;                             % Closed circuit = 0, Open Circuit = 1
+        Vapp = 0;                           % Applied bias
+        BC = 3;                             % Boundary Conditions. Must be set to one for first solution
+        figson = 1;                         % Toggle figures on/off
+        meshx_figon = 0;                    % Toggles x-mesh figures on/off
+        mesht_figon = 0;                    % Toggles t-mesh figures on/off
+        side = 1;                           % illumination side 1 = left, 2 = right
+        calcJ = 0;                          % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
+        mobset = 1;                         % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
+        mobseti = 1;                        % Switch on/off ionic carrier mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
+        SRHset = 1;                         % Switch on/off SRH recombination - recommend setting to zero for initial solution
+        radset = 1;                         % Switch on/off band-to-band recombination
+        N_max_variables = 5;                % Total number of allowable variables in this version of Driftfusion
+        prob_distro_function = 'Boltz';     % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
+        Fermi_limit = 0.2;                  % Max allowable limit for Fermi levels beyond the bands [eV]
+        Fermi_Dn_points = 400;              % No. of points in the Fermi-Dirac look-up table
+        intgradfun = 'linear'               % Interface gradient function 'linear' = linear, 'erf' = 'error function'
 
         %% Generation
         % OM = Optical Model
@@ -149,35 +149,34 @@ classdef pc
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
-
-        %% Mobile ions
-        % Mobile ion defect density [cm-3]
-        N_ionic_species = 1;
-        N_max_variables = 5;            % Total number of allowable variables in this version of Driftfusion
-        K_anion = 1;                    % Coefficients to easily accelerate ions
-        K_cation = 1;                   % Coefficients to easily accelerate ions
-        Nani = [1e19];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.
-        Ncat = [1e19];
-        % Approximate density of iodide sites [cm-3]
-        % Limits the density of iodide vancancies
+        
+        %% Mobile ions        
+        N_ionic_species = 1;        
+        Nani = [1e19];                  % Mobile ion defect density [cm-3] - A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.
+        Ncat = [1e19];                  % Mobile ion defect density [cm-3] - A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.
+        z_c = 1;                        % Integer charge state for cations
+        z_a = -1;                       % Integer charge state for anions
+        % Limits the density of ions - Approximate density of iodide sites [cm-3]
         amax = [1.21e22];                 % P. Calado thesis
         cmax = [1.21e22];
+        
+        K_anion = 1;                    % Coefficients to easily accelerate ions
+        K_cation = 1;                   % Coefficients to easily accelerate ions
+        
         %% Mobilities   [cm2V-1s-1]
         mue = [1];         % electron mobility
         muh = [1];         % hole mobility
-
-        muani = [1e-10];          % ion mobility
-        mucat = [1e-14];
+        mucat = [1e-10];
+        muani = [1e-12]; 
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
         % TiO2 mue = 0.09 cm2V-1s-1 Bak2008
         % Spiro muh = 0.02 cm2V-1s-1 Hawash2018
-
         %% Relative dielectric constants
         epp = [10];
 
         %% Recombination
-        % Radiative recombination, U = k(np - ni^2)
+        % Radiative recombination, r_rad = k(np - ni^2)
         % [cm3 s-1] Radiative Recombination coefficient
         B = [3.6e-12];
 
@@ -204,7 +203,7 @@ classdef pc
         RelTol_vsr = 0.05;          % Fractional error between abrupt and volumetric surface recombination models above which a warning is flagged
         
         %% Series resistance
-        Rs = 10;
+        Rs = 0;
         Rs_initial = 0;         % Switch to allow linear ramp of Rs on first application
 
         %% Defect recombination rate coefficient
