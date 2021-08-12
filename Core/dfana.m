@@ -24,16 +24,17 @@ classdef dfana
             V = u(:,:,1);
             n = u(:,:,2);
             p = u(:,:,3);
-
-            if par.N_ionic_species == 1
-                c = u(:,:,4);
-                a = repmat(dev.Nani, length(t), 1);
-            elseif par.N_ionic_species == 2
-                c = u(:,:,4);
-                a = u(:,:,5);
-            else
-                c = repmat(dev.Ncat, length(t), 1);
-                a = repmat(dev.Nani, length(t), 1);
+            
+            switch par.N_ionic_species
+                case 0
+                    c = 0;
+                    a = 0;
+                case 1
+                    c = u(:,:,4);
+                    a = repmat(dev.Nani, length(t), 1);
+                case 2
+                    c = u(:,:,4);
+                    a = u(:,:,5);
             end
         end
 
@@ -203,68 +204,80 @@ classdef dfana
             g = g1 + g2;
         end
 
-        function r = calcr(sol)
-            % Calculate the recombination rate on whole mesh
-            % obtain SOL components for easy referencing
-            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            
-            ns = zeros(length(t), length(x));
-            ps = zeros(length(t), length(x));
-            dVdx = zeros(length(t), length(x));
-            int_switch = repmat(dev.int_switch, length(t), 1);
-            vsr_zone = repmat(dev.int_switch, length(t), 1);
-            bulk_switch = abs(int_switch-1);
-            
-            for i=1:length(t)
-                dVdx(i,:) = pdeval(0, x, V(i,:), x);
-            end
-            xprime = dev.xprime;
-            dint = dev.dint;
-            alpha0 = dev.alpha0;
-            beta0 = dev.beta0;
-            alpha = par.q*dVdx./(par.kB*par.T) + alpha0;
-            beta = -par.q*dVdx./(par.kB*par.T) + beta0;
+%         function r = calcr(sol)
+%             % Calculate the recombination rate on whole mesh
+%             % obtain SOL components for easy referencing
+%             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+%             
+%             ns = zeros(length(t), length(x));
+%             ps = zeros(length(t), length(x));
+%             dVdx = zeros(length(t), length(x));
+%             int_switch = repmat(dev.int_switch, length(t), 1);
+%             vsr_zone = repmat(dev.int_switch, length(t), 1);
+%             bulk_switch = abs(int_switch-1);
+%             
+%             for i=1:length(t)
+%                 dVdx(i,:) = pdeval(0, x, V(i,:), x);
+%             end
+%             xprime = dev.xprime;
+%             dint = dev.dint;
+%             alpha0 = dev.alpha0;
+%             beta0 = dev.beta0;
+%             alpha = par.q*dVdx./(par.kB*par.T) + alpha0;
+%             beta = -par.q*dVdx./(par.kB*par.T) + beta0;
+% 
+%             % Band-to-band
+%             r.btb = dev.B.*(n.*p - dev.ni.^2);
+%             % Bulk SRH
+%             r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
+%             % Volumetric surface SRH
+%             for k = 1:length(t)
+%                 for i = 1:length(x)
+%                     
+%                     if alpha(k,i) < 0
+%                         ns(k,i) = n(k,i).*exp(-alpha(k,i).*xprime(i));
+%                     elseif alpha(k,i) >=0
+%                         ns(k,i) = n(k,i).*exp(-alpha(k,i).*(xprime(i)-dint(i)));
+%                     end
+%                     
+%                     if beta(k,i) < 0
+%                         ps(k,i) = p(k,i).*exp(-beta(k,i).*xprime(i));
+%                     elseif beta(k,i) >=0
+%                         ps(k,i) = p(k,i).*exp(-beta(k,i).*(xprime(i)-dint(i)));
+%                     end
+%                     
+%                 end
+%             end
+%             
+%             r.vsr = vsr_zone.*((ns.*ps - dev.ni.^2)./...
+%                 ((dev.taun_vsr.*(ps + dev.pt)) + (dev.taup_vsr.*(ns + dev.nt))));
+%             % Total
+%             r.tot = r.btb + r.srh + r.vsr;
+%         end
 
-            % Band-to-band
-            r.btb = dev.B.*(n.*p - dev.ni.^2);
-            % Bulk SRH
-            r.srh = bulk_switch.*((n.*p - dev.ni.^2)./((dev.taun.*(p+dev.pt)) + (dev.taup.*(n+dev.nt))));
-            % Volumetric surface SRH
-            for k = 1:length(t)
-                for i = 1:length(x)
-                    
-                    if alpha(k,i) < 0
-                        ns(k,i) = n(k,i).*exp(-alpha(k,i).*xprime(i));
-                    elseif alpha(k,i) >=0
-                        ns(k,i) = n(k,i).*exp(-alpha(k,i).*(xprime(i)-dint(i)));
-                    end
-                    
-                    if beta(k,i) < 0
-                        ps(k,i) = p(k,i).*exp(-beta(k,i).*xprime(i));
-                    elseif beta(k,i) >=0
-                        ps(k,i) = p(k,i).*exp(-beta(k,i).*(xprime(i)-dint(i)));
-                    end
-                    
-                end
-            end
-            
-            r.vsr = vsr_zone.*((ns.*ps - dev.ni.^2)./...
-                ((dev.taun_vsr.*(ps + dev.pt)) + (dev.taup_vsr.*(ns + dev.nt))));
-            % Total
-            r.tot = r.btb + r.srh + r.vsr;
-        end
-
-        function [r, ns, ps] = calcr_ihalf(sol)
+        function [r, ns, ps] = calcr(sol, mesh_option)
             % Calculate the recombination rate on i-half mesh
             % obtain SOL components for easy referencing
-            [u,t,x,par,~,n,p,a,c,V] = dfana.splitsol(sol);
-            dev = par.dev_ihalf;
-            x_ihalf = par.x_ihalf;
-            n_ihalf = getvarihalf(n);
-            p_ihalf = getvarihalf(p);
-            dVdx_ihalf = zeros(length(t), length(x_ihalf));
+            % MESH_OPTION = "whole" for input mesh or "sub" for subinetrval
+            % mesh
+            [u,t,x_input,par,~,n,p,a,c,V] = dfana.splitsol(sol);
+            
+            switch mesh_option
+                case "whole"
+                    dev = par.dev;
+                    x = x_input;
+                    n = u(:,:,2);
+                    p = u(:,:,3);
+                case "sub"
+                    dev = par.dev_ihalf;
+                    x = par.x_ihalf;
+                    n = getvarihalf(u(:,:,2));
+                    p = getvarihalf(u(:,:,3));
+            end
+            
+            dVdx = zeros(length(t), length(x));
             for i=1:length(t)
-                [~, dVdx_ihalf(i,:)] = pdeval(0, x, V(i,:), x_ihalf);
+                [~, dVdx(i,:)] = pdeval(0, x, V(i,:), x);
             end
             vsr_zone = repmat(dev.vsr_zone, length(t), 1);
             srh_zone = repmat(dev.srh_zone, length(t), 1);
@@ -276,17 +289,17 @@ classdef dfana
             alpha0_xn = repmat(dev.alpha0_xn, length(t), 1);
             beta0_xp = repmat(dev.beta0_xp, length(t), 1);
 
-            alpha = sign(sign_xn).*par.q.*dVdx_ihalf./(par.kB*par.T) + alpha0_xn;
-            beta = sign(sign_xp).*par.q.*-dVdx_ihalf./(par.kB*par.T) + beta0_xp;
+            alpha = sign(sign_xn).*par.q.*dVdx./(par.kB*par.T) + alpha0_xn;
+            beta = sign(sign_xp).*par.q.*-dVdx./(par.kB*par.T) + beta0_xp;
 
             % Band-to-band
-            r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
+            r.btb = dev.B.*(n.*p - dev.ni.^2);
             % Bulk SRH
-            r.srh = srh_zone.*(n_ihalf.*p_ihalf - dev.ni.^2)...
-                ./(dev.taun.*(p_ihalf+dev.pt) + dev.taup.*(n_ihalf+dev.nt));
+            r.srh = srh_zone.*(n.*p - dev.ni.^2)...
+                ./(dev.taun.*(p+dev.pt) + dev.taup.*(n+dev.nt));
             % Volumetric surface SRH
-            ns = n_ihalf.*exp(-alpha.*xprime_n); % Projected electron surface density
-            ps = p_ihalf.*exp(-beta.*xprime_p);  % Projected hole surface density
+            ns = n.*exp(-alpha.*xprime_n); % Projected electron surface density
+            ps = p.*exp(-beta.*xprime_p);  % Projected hole surface density
             r.vsr = vsr_zone.*(ns.*ps - dev.ni.^2)...
                 ./(dev.taun_vsr.*(ps + dev.pt) + dev.taup_vsr.*(ns + dev.nt));
             % Total
@@ -446,7 +459,7 @@ classdef dfana
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
             % charge density
-            rho = -n + p - a + c - dev.NA + dev.ND + dev.Nani - dev.Ncat;
+            rho = -n + p - a + c - dev.NA + dev.ND;
         end
 
         function rho = calcrho_ihalf(sol)
@@ -459,7 +472,7 @@ classdef dfana
             c_ihalf = getvarihalf(c);
 
             % charge density
-            rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - par.dev_ihalf.NA + par.dev_ihalf.ND + par.dev_ihalf.Nani - par.dev_ihalf.Ncat;
+            rho = -n_ihalf + p_ihalf - a_ihalf + c_ihalf - par.dev_ihalf.NA + par.dev_ihalf.ND;
         end
 
         function Vapp = calcVapp(sol)
