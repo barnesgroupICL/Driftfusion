@@ -153,6 +153,7 @@ classdef pc
         %% Mobile ions
         % Mobile ion defect density [cm-3]
         N_ionic_species = 1;
+        N_max_variables = 5;            % Total number of allowable variables in this version of Driftfusion
         K_anion = 1;                    % Coefficients to easily accelerate ions
         K_cation = 1;                   % Coefficients to easily accelerate ions
         Nani = [1e19];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.
@@ -519,7 +520,7 @@ classdef pc
             value = zeros(1, length(par.stack));
             value = distro_fun.pfun(par.Nv, par.IP, par.E0, par.T, par.prob_distro_function);
         end
-
+        
         %% Intrinsic carrier densities (Boltzmann)
         function value = get.ni(par)
             value = ((par.Nc.*par.Nv).^0.5).*exp(-par.Eg./(2*par.kB*par.T));
