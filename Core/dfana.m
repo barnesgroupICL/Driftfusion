@@ -27,8 +27,8 @@ classdef dfana
             
             switch par.N_ionic_species
                 case 0
-                    c = 0;
-                    a = 0;
+                    c = zeros(length(t), length(x));
+                    a = zeros(length(t), length(x));
                 case 1
                     c = u(:,:,4);
                     a = repmat(dev.Nani, length(t), 1);
