@@ -121,15 +121,6 @@ if electronic_only == 0
     % Create temporary solution for appending initial conditions to
     sol = soleq_nosrh;
     
-    % Write ionic initial conditions
-    switch par.N_ionic_species
-        case 1
-            sol.u(:,:,4) = repmat(par.dev.Ncat, length(sol.t), 1);
-        case 2
-            sol.u(:,:,4) = repmat(par.dev.Ncat, length(sol.t), 1);
-            sol.u(:,:,5) = repmat(par.dev.Nani, length(sol.t), 1);
-    end
-    
     % Start without SRH or series resistance
     par.SRHset = 0;
     par.Rs = 0;
