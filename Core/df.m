@@ -84,8 +84,8 @@ mucat = device.mucat;       % Cation mobility
 muani = device.muani;       % Anion mobility
 Nc = device.Nc;             % Conduction band effective density of states
 Nv = device.Nv;             % Valence band effective density of states
-DOScat = device.DOScat;     % Cation density upper limit
-DOSani = device.DOSani;     % Anion density upper limit
+cmax = device.cmax;     % Cation density upper limit
+amax = device.amax;     % Anion density upper limit
 gradNc = device.gradNc;     % Conduction band effective density of states gradient
 gradNv = device.gradNv;     % Valence band effective density of states gradient
 gradEA = device.gradEA;     % Electron Affinity gradient
@@ -271,8 +271,8 @@ end
         F_V = (epp(i)/eppmax)*dVdx;
         F_n = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
         F_p = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F_c = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(DOScat(i)-c)))));
-        F_a = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(DOSani(i)-a)))));
+        F_c = mucat(i)*(c*dVdx + kB*T*(dcdx + (c*(dcdx/(cmax(i)-c)))));
+        F_a = muani(i)*(a*-dVdx + kB*T*(dadx+(a*(dadx/(amax(i)-a)))));
         F = [F_V; mobset*F_n; mobset*F_p; K_cation*mobseti*F_c; K_anion*mobseti*F_a];
         
         % Electron and holes recombination

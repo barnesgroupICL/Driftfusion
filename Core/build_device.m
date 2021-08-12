@@ -40,8 +40,8 @@ dev.n0 = build_property(par.n0, xmesh, par, 'exp_graded', 0);
 dev.p0 = build_property(par.p0, xmesh, par, 'exp_graded', 0);
 dev.Nani = build_property(par.Nani, xmesh, par, 'exp_graded', 0);
 dev.Ncat = build_property(par.Ncat, xmesh, par, 'exp_graded', 0);
-dev.DOSani = build_property(par.amax, xmesh, par, 'exp_graded', 0);
-dev.DOScat = build_property(par.cmax, xmesh, par, 'exp_graded', 0);
+dev.amax = build_property(par.amax, xmesh, par, 'exp_graded', 0);
+dev.cmax = build_property(par.cmax, xmesh, par, 'exp_graded', 0);
 dev.taun = build_property(par.taun, xmesh, par, 'exp_graded', 0);
 dev.taup = build_property(par.taup, xmesh, par, 'exp_graded', 0);
 

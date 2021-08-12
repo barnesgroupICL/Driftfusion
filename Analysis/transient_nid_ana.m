@@ -12,7 +12,7 @@ function nidt = transient_nid_ana(sol_OC)
 par = sol_OC(1).par;
 % Incident photon flux density at 1 Sun across device
 % Get x_halfi
-xsub = getvarsub(sol_OC(1).x);
+xsub = getvar_sub(sol_OC(1).x);
 G = trapz(xsub, par.gx1);
    
 % Extract desrired values from the solution

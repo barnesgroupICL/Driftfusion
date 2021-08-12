@@ -107,7 +107,7 @@ catch
         try
             par.amax = T{:, 'Nion'}';
         catch
-            warning('No maximum anion density array (DOSani) defined in .csv . Using default in PC')
+            warning('No maximum anion density array (amax) defined in .csv . Using default in PC')
         end
     end
 end
@@ -118,7 +118,7 @@ catch
     try
         par.cmax = T{:, 'DOScat'}';
     catch
-        warning('No maximum cation density array (DOScat) defined in .csv . Using default in PC')
+        warning('No maximum cation density array (cmax) defined in .csv . Using default in PC')
     end
 end
 % Electron mobility

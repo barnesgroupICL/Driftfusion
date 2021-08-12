@@ -438,10 +438,10 @@ generation(par, 'laser', 470);
 generation(par2, 'AM15', 470);
 generation(par2, 'laser', 470);
 
-%% Core getvarsub
+%% Core getvar_sub
 
-% varsub = getvarsub(var)
-getvarsub(par.dev.EA);
+% varsub = getvar_sub(var)
+EA_sub = getvar_sub(par.dev.EA);
 
 %% Core getx_sub
 
@@ -498,22 +498,6 @@ parx = par;
 parx.meshx_figon = true;
 parx.xmesh_type = 1;
 meshgen_x(parx);
-
-% %% Core meshgen_x 2
-%
-% x = meshgen_x(par)
-% parx = par;
-% parx.meshx_figon = true;
-% parx.xmesh_type = 2;
-% meshgen_x(parx);
-% 
-% %% Core meshgen_x 3
-% 
-% % x = meshgen_x(par)
-% parx = par;
-% parx.meshx_figon = true;
-% parx.xmesh_type = 3;
-% meshgen_x(parx);
 
 %% Core meshgen_x 4
 
