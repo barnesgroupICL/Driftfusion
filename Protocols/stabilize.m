@@ -38,9 +38,6 @@ function steadystate_struct = stabilize(struct)
 
 %------------- BEGIN CODE --------------
 
-% eliminate JV configuration
-struct.par.JV = 0;
-
 % shortcut
 par = struct.par;
 
