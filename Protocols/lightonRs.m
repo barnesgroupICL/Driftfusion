@@ -36,15 +36,13 @@ par.int1 = int1;
 par.g1_fun_type = 'sweep';
 % COEFF = [Amplitude_initial, Amplitude_final, tmax]
 par.g1_fun_arg = [0, int1, par.tmax];
-par.JV = 0;
 
 sol_ill1 = df(sol_ini, par);
-
-par.g1_fun_type = 'constant';
 
 C = par.e*par.epp(par.active_layer)*par.epp0/(par.d_active);      % Parallel plate capacitance
 tau_RC = C*Rs;
 
+par.g1_fun_type = 'constant';
 par.tmesh_type = 2;
 par.tpoints = 20;
 par.tmax = 100*par.tpoints*t_diff;
