@@ -382,7 +382,7 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             x_ihalf = par.x_ihalf;
-            r = dfana.calcr_ihalf(sol);
+            r = dfana.calcr(sol, "sub");
 
             figure(17)
             dfplot.x2d(sol, x_ihalf, {r.btb, r.srh, r.vsr, r.tot},{'rbtb', 'rsrh', 'rvsr', 'rtot'},...
@@ -393,7 +393,8 @@ classdef dfplot
             % Recombination rates as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            r = dfana.calcr(sol);
+            x = par.x_ihalf;
+            r = dfana.calcr(sol, "sub");
 
             figure(171)
             dfplot.x2d(sol, x, {r.srh},{''},...
@@ -405,7 +406,7 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             x_ihalf = par.x_ihalf;
-            r = dfana.calcr_ihalf(sol);
+            r = dfana.calcr(sol, "sub");
 
             figure(171)
             dfplot.x2d(sol, x_ihalf, {r.vsr},{''},...
