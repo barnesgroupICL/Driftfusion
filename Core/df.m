@@ -10,7 +10,7 @@ function solstruct = df(varargin)
 % it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
-% 
+%
 % Solution outputs
 % V = u(1) = electrostatic potential
 % n = u(2) = electron density
@@ -103,15 +103,17 @@ pt = device.pt;             % SRH hole trap constant
 NA = device.NA;             % Acceptor doping density
 ND = device.ND;             % Donor doping density
 Ncat = device.Ncat;         % Uniform cation density
-Nani = device.Nani;         % Uniform anion density 
+Nani = device.Nani;         % Uniform anion density
 xprime_n = device.xprime_n;         % Translated x co-ordinates for interfaces
 xprime_p = device.xprime_p;         % Translated x co-ordinates for interfaces
 sign_xn = device.sign_xn;           % 1 if xn increasing, -1 if decreasing wrt x
 sign_xp = device.sign_xp;           % 1 if xp increasing, -1 if decreasing wrt x
 alpha0_xn = device.alpha0_xn;       % alpha0_xn is alpha for F = 0 reference to xprime_n
 beta0_xp = device.beta0_xp;         % beta0_xp is beta for F = 0 referenced to xprime_p
-N_ionic_species = par.N_ionic_species;
-N_variables = par.N_ionic_species + 3;  % +3 for V, n, and p
+N_max_variables = par.N_max_variables;  % Maximum number of variables allowable in this version of Driftfusion
+N_ionic_species = par.N_ionic_species;  % Number of ionic species in this solution
+N_variables = par.N_ionic_species + 3;  % Number of variables in this solution (+3 for V, n, and p)
+
 nleft = par.nleft;
 nright = par.nright;
 pleft = par.pleft;
@@ -187,7 +189,7 @@ solstruct.par = par;
 
 %% Volumetric surface recombination error check
 if par.vsr_mode == 1 && par.vsr_check == 1
-    compare_rec_flux(solstruct, par.RelTol_vsr, par.AbsTol_vsr, 0); 
+    compare_rec_flux(solstruct, par.RelTol_vsr, par.AbsTol_vsr, 0);
 end
 
 %% Subfunctions
@@ -199,14 +201,14 @@ end
         % Get position point
         i = find(x_ihalf <= x);
         i = i(end);
-
+        
         switch g1_fun_type
             case 'constant'
                 gxt1 = int1*gx1(i);
             otherwise
                 gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
         end
-
+        
         switch g2_fun_type
             case 'constant'
                 gxt2 = int2*gx2(i);
@@ -214,8 +216,8 @@ end
                 gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
         end
         g = gxt1 + gxt2;
-
-        %% Unpack Variables       
+        
+        %% Unpack Variables
         switch N_ionic_species
             case 0
                 V = u(1);
@@ -298,77 +300,58 @@ end
         S = S(1:N_variables);
     end
 
-%% Define initial conditions.
+%% Initial conditions.
     function u0 = dfic(x)
-        if dficAnalytical
-            i = find(xmesh <= x);
-            i = i(end);
-            
-            switch N_ionic_species
-                case 0
-                    if length(par.dcell) == 1
-                        % Single layer
-                        u0 = [(x/xmesh(end))*Vbi;
-                            nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
-                            pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end))];
-                    else
-                        % Multi-layered
-                        u0 = [(x/xmesh(end))*Vbi;
-                            dev.n0(i);
-                            dev.p0(i)];
-                    end
-
-                case 1
-                    if length(par.dcell) == 1
-                        % Single layer
-                        u0 = [(x/xmesh(end))*Vbi;
-                            nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
-                            pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
-                            dev.Ncat(i);];
-                    else
-                        % Multi-layered
-                        u0 = [(x/xmesh(end))*Vbi;
-                            dev.n0(i);
-                            dev.p0(i);
-                            dev.Ncat(i);];
-                    end
-                case 2
-                    if length(par.dcell) == 1
-                        % Single layer
-                        u0 = [(x/xmesh(end))*Vbi;
-                            nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
-                            pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
-                            dev.Ncat(i);
-                            dev.Nani(i);];
-                    else
-                        % Multi-layered
-                        u0 = [(x/xmesh(end))*Vbi;
-                            dev.n0(i);
-                            dev.p0(i);
-                            dev.Ncat(i);
-                            dev.Nani(i);];
-                    end
-            end
+        i = find(xmesh <= x);
+        i = i(end);
+        
+        if length(par.dcell) == 1
+            % Single layer
+            u0_ana = [(x/xmesh(end))*Vbi;
+                nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
+                pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
+                dev.Ncat(i);
+                dev.Nani(i);];
         else
-                    u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
+            % Multi-layered
+            u0_ana = [(x/xmesh(end))*Vbi;
+                dev.n0(i);
+                dev.p0(i);
+                dev.Ncat(i);
+                dev.Nani(i);];
+        end
+        u0_ana = u0_ana(1:N_variables);
+        
+        % Organise ICs based on number of variables and SOL_IC
+        if dficAnalytical
+            u0 = u0_ana;
+        else
+            % Initial conditions taken from input solution
+            u0_in = interp1(icx,squeeze(icsol(end,:,:)),x)';
+            % If the number of variables has increased then add analytical
+            % ICs for missing variables
+            if N_variables > length(u0_in)
+                % Add initial conditions for new variables from U_ANA
+                u0(1:length(u0_in), 1) = u0_in;
+                u0(length(u0_in)+1:N_variables, 1) = u0_ana(length(u0_in)+1:N_variables);
+            else
+                u0 = u0_in;
+            end
         end
     end
 
 %% Boundary conditions
-% Define boundary condtions, refer PDEPE help for the precise meaning of p
-% and you l and r refer to left and right.
-% in this example I am controlling the flux through the boundaries using
-% the difference in concentration from equilibrium and the extraction
-% coefficient.
+% Refer to PDEPE help for the precise meaning of P and Q
+% l and r refer to left and right boundaries.
     function [Pl,Ql,Pr,Qr] = dfbc(xl,ul,xr,ur,t)
-
+        
         switch par.V_fun_type
             case 'constant'
                 Vapp = par.V_fun_arg(1);
             otherwise
                 Vapp = Vapp_fun(par.V_fun_arg, t);
-        end
-
+        end   
+        
         switch par.BC
             case 2
                 % Non- selective contacts - fixed charge densities for majority carrier
@@ -376,36 +359,29 @@ end
                 % coefficients sn_l & sp_r to set the surface recombination velocity.
                 Pl = [-ul(1);
                     -sn_l*(ul(2) - nleft);
-                    ul(3) - pleft;];
-
-                Ql = [0; 1; 0;];
-
+                    ul(3) - pleft;
+                    0;
+                    0;];
+                
+                Ql = [0;
+                    1;
+                    0;
+                    1;
+                    1;];
+                
                 Pr = [-ur(1)+Vbi-Vapp;
                     ur(2) - nright;
-                    sp_r*(ur(3) - pright);];
-
-                Qr = [0; 0; 1;];
-
-                if N_ionic_species == 1 || N_ionic_species == 2
-                    % Second element are the boundary condition
-                    % coefficients for cations
-                    Pl = [Pl; 0];
-                    Ql = [Ql; 1];
-                    Pr = [Pr; 0];
-                    Qr = [Qr; 1];
-                end
-
-                if N_ionic_species == 2
-                    % Second element are the boundary condition coefficients for anions
-                    Pl = [Pl; 0];
-                    Ql = [Ql; 1];
-                    Pr = [Pr; 0];
-                    Qr = [Qr; 1];
-                end
-
+                    sp_r*(ur(3) - pright);
+                    0;
+                    0;];
+                
+                Qr = [0;
+                    0;
+                    1;
+                    1;
+                    1;];
             case 3
                 % Flux boundary conditions for both carrier types.
-
                 % Calculate series resistance voltage Vres
                 if Rs == 0
                     Vres = 0;
@@ -417,37 +393,36 @@ end
                         Vres = -J*Rs;
                     end
                 end
-
+                
                 Pl = [-ul(1);
                     mobset*(-sn_l*(ul(2) - nleft));
-                    mobset*(-sp_l*(ul(3) - pleft));];
-
-                Ql = [0; 1; 1;];
-
+                    mobset*(-sp_l*(ul(3) - pleft));
+                    0;                              
+                    0;];
+                
+                Ql = [0;
+                    1;
+                    1;
+                    1;
+                    1;];
+                
                 Pr = [-ur(1)+Vbi-Vapp-Vres;
                     mobset*(sn_r*(ur(2) - nright));
-                    mobset*(sp_r*(ur(3) - pright));];
-
-                Qr = [0; 1; 1;];
-
-                if N_ionic_species == 1 || N_ionic_species == 2
-                    % Final elements are the boundary condition
-                    % coefficients for CATIONS
-                    Pl = [Pl; 0];
-                    Ql = [Ql; 1];
-                    Pr = [Pr; 0];
-                    Qr = [Qr; 1];
-                end
-
-                if N_ionic_species == 2
-                    % Final elements are the boundary condition
-                    % coefficients for ANIONS
-                    Pl = [Pl; 0];
-                    Ql = [Ql; 1];
-                    Pr = [Pr; 0];
-                    Qr = [Qr; 1];
-                end
+                    mobset*(sp_r*(ur(3) - pright));
+                    0;
+                    0;];
+                
+                Qr = [0;
+                    1;
+                    1;
+                    1;
+                    1;];
+                
         end
+        % Remove unused entries
+        Pl = Pl(1:N_variables);
+        Pr = Pr(1:N_variables);
+        Ql = Ql(1:N_variables);
+        Qr = Qr(1:N_variables);
     end
-
 end
