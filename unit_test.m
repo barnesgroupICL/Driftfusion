@@ -312,9 +312,9 @@ dfana.calcg(soleq.ion);
 dfana.calcr(soleq.ion, "whole");
 dfana.calcr(soleq.ion, "sub");
 
-%% Core dfana Jddxt
+%% Core dfana calcJdd
 
-% [jdd, Jdd, xout] = Jddxt(sol)
+% [Jdd, jdd, xout] = calcJdd(sol)
 dfana.Jddxt(soleq.ion);
 
 %% Core dfana calcF
@@ -339,15 +339,15 @@ dfana.calcVapp(soleq.ion);
 % stats = JVstats(JVsol)
 dfana.JVstats(JVsol);
 
-%% Core dfana PLt
+%% Core dfana calcPLt
 
-% value = PLt(sol)
-dfana.PLt(soleq.ion);
+% value = calcPLt(sol)
+dfana.calcPLt(soleq.ion);
 
-%% Core dfana calcVQFL
+%% Core dfana calcDeltaQFL
 
-% VQFL = calcVQFL(sol)
-dfana.calcVQFL(soleq.ion);
+% VQFL = calcDeltaQFL(sol)
+dfana.calcDeltaQFL(soleq.ion);
 
 %% Core dfana deltaVt
 

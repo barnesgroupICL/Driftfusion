@@ -20,7 +20,7 @@ for i = 1:length(sol_OC)
    % Split solution
    [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol_OC(i));
    
-   Voct(i,:) = dfana.calcVQFL(sol_OC(i));
+   Voct(i,:) = dfana.calcDeltaQFL(sol_OC(i));
    t = sol_OC(i).t;     
    Int(i) = sol_OC(i).par.int1;
    % Incident photon flux at Int(i)

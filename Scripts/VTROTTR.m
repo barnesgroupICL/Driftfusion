@@ -47,14 +47,14 @@ for i = 1:Ntr
     sol_VTROTTR(i) = doLightPulse(sol_temp, 1, 50e-6, 400, 2, 0, 1);
     
     % Extract Voc vs t and subtract baseline
-    Voc(i,:) = dfana.calcVQFL(sol_VTROTTR(i));
-    deltaV(i,:) = Voc(i,:) -  Voc(i,1);    
+    Voc(i,:) = dfana.calcDeltaQFL(sol_VTROTTR(i));
+    DeltaVoc(i,:) = Voc(i,:) -  Voc(i,1);    
 end
 
 %% Plot the outputs
 for i = 1:Ntr
     figure(101)
-    plot(sol_VTROTTR(i).t, deltaV(i,:));
+    plot(sol_VTROTTR(i).t, DeltaVoc(i,:));
     hold on
 end
 xlabel('Time [s]')

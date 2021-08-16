@@ -218,7 +218,7 @@ classdef dfana
             r.tot = r.btb + r.srh + r.vsr;
         end
 
-        function [jdd, Jdd, xout] = Jddxt(sol)
+        function [Jdd, jdd, xout] = calcJdd(sol)
             % Calculates drift and diffusion currents at every point and all times -
             % NOTE: UNRELIABLE FOR TOTAL CURRENT as errors in the calculation of the
             % spatial gradients mean that the currents do not cancel properly
@@ -480,32 +480,32 @@ classdef dfana
             end
         end
 
-        function value = PLt(sol)
+        function value = calcPLt(sol)
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
             Bmat = dev.B;
             value = trapz(x,(dev.B.*(n.*p-dev.ni.^2)),2);
         end
 
-        function VQFL = calcVQFL(sol)
+        function DeltaQFL = calcDeltaQFL(sol)
             % Get QFLs
             [~, ~, Efn, Efp] = dfana.QFLs(sol);
             par = sol.par;
             if par.p0_l >= par.n0_l && par.n0_r >= par.p0_r
                 % p-type left boundary, n-type right boundary
-                VQFL = Efn(:, end) - Efp(:, 1);
+                DeltaQFL = Efn(:, end) - Efp(:, 1);
             elseif par.n0_l >= par.n0_r && par.p0_r >= par.n0_r
                 % n-type left boundary, p-type right boundary
-                VQFL = Efn(:, 1) - Efp(:, end);
+                DeltaQFL = Efn(:, 1) - Efp(:, end);
             else
                 % If all equal the choose arbitrary boundaries
-                VQFL = Efn(:, end) - Efp(:, 1);
+                DeltaQFL = Efn(:, end) - Efp(:, 1);
             end
         end
 
         function deltaV = deltaVt(sol, p1, p2)
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            % Calculates the electorstatic potential difference as a function of time
+            % Calculates the electrostatic potential difference as a function of time
             % between two points P1 and P2
             deltaV = V(:,p1) - V(:,p2);
         end

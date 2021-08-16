@@ -157,7 +157,7 @@ classdef dfplot
             % drift and diffusion currents as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [~, Jdd, x] = dfana.Jddxt(sol);
+            [Jdd, ~, x] = dfana.calcJdd(sol);
             
             figure(301);
             dfplot.x2d(sol, x, {Jdd.ndiff, Jdd.ndrift, Jdd.pdiff, Jdd.pdrift,...
@@ -168,7 +168,7 @@ classdef dfplot
                 
         function Voct(sol)
             [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
-            Voc = dfana.calcVQFL(sol);
+            Voc = dfana.calcDeltaQFL(sol);
             figure(6)
             plot(t, Voc)
             xlabel('Time [s]')
@@ -177,7 +177,7 @@ classdef dfplot
         
         function PLt(sol)
             [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
-            PL = dfana.PLt(sol);
+            PL = dfana.calcPLt(sol);
             figure(7)
             plot(t, PL)
             xlabel('Time [s]')

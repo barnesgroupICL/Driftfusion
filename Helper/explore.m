@@ -126,8 +126,8 @@ classdef explore
 
                         % Write steady-state solutions into temporary
                         % variables
-                        Voc_stable(j,:) = dfana.calcVQFL(sol_Voc);
-                        PLint(j,:) = dfana.PLt(sol_Voc);
+                        Voc_stable(j,:) = dfana.calcDeltaQFL(sol_Voc);
+                        PLint(j,:) = dfana.calcPLt(sol_Voc);
                         n_av(j) = mean(sol_Voc.u(end, par.pcum(2):par.pcum(5),1));
                         p_av(j) = mean(sol_Voc.u(end, par.pcum(2):par.pcum(5),2));
 %                         n_f = explore.writevar(n_f, i, j, par.xx, sol_ill.u(end,:,1));
