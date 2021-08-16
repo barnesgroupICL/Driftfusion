@@ -315,7 +315,7 @@ dfana.calcr(soleq.ion, "sub");
 %% Core dfana calcJdd
 
 % [Jdd, jdd, xout] = calcJdd(sol)
-dfana.Jddxt(soleq.ion);
+dfana.calcJdd(soleq.ion);
 
 %% Core dfana calcF
 
@@ -663,8 +663,8 @@ doTPV(soleq.ion, 1, 10, true, 1e-2, 0.1, 1, 20, 5);
 
 %% Protocols findVocDirect
 
-% [sol_Voc, Voc] = findVocDirect(sol_ini, light_intensity, mobseti)
-findVocDirect(soleq.ion, 1, true);
+% [sol_Voc, Voc] = findVocDirect(sol_ini, light_intensity, mobseti, tpoints)
+findVocDirect(soleq.ion, 1, true, 40);
 
 %% Protocols findVoc
 
