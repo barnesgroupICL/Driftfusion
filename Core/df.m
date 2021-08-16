@@ -347,6 +347,42 @@ end
 % Refer to PDEPE help for the precise meaning of P and Q
 % l and r refer to left and right boundaries.
     function [Pl,Ql,Pr,Qr] = dfbc(xl,ul,xr,ur,t)
+
+        switch N_ionic_species
+            case 0
+                V_l = ul(1);
+                V_r = ur(1);
+                n_l = ul(2);
+                n_r = ur(2);
+                p_l = ul(3);
+                p_r = ur(3);
+                c_l = 0;
+                c_r = 0;
+                a_l = 0;
+                a_r = 0;
+            case 1
+                V_l = ul(1);
+                V_r = ur(1);
+                n_l = ul(2);
+                n_r = ur(2);
+                p_l = ul(3);
+                p_r = ur(3);
+                c_l = ul(4);    
+                c_r = ur(4);
+                a_l = 0;
+                a_r = 0;
+            case 2
+                V_l = ul(1);
+                V_r = ur(1);
+                n_l = ul(2);
+                n_r = ur(2);
+                p_l = ul(3);
+                p_r = ur(3);
+                c_l = ul(4);
+                c_r = ur(4);
+                a_l = ul(5);
+                a_r = ur(5);
+        end
         
         switch par.V_fun_type
             case 'constant'
@@ -355,35 +391,6 @@ end
                 Vapp = Vapp_fun(par.V_fun_arg, t);
         end   
         
-        switch par.BC
-            case 2
-                % Non- selective contacts - fixed charge densities for majority carrier
-                % and flux for minority carriers- use recombination
-                % coefficients sn_l & sp_r to set the surface recombination velocity.
-                Pl = [-ul(1);
-                    -sn_l*(ul(2) - nleft);
-                    ul(3) - pleft;
-                    0;
-                    0;];
-                
-                Ql = [0;
-                    1;
-                    0;
-                    1;
-                    1;];
-                
-                Pr = [-ur(1)+Vbi-Vapp;
-                    ur(2) - nright;
-                    sp_r*(ur(3) - pright);
-                    0;
-                    0;];
-                
-                Qr = [0;
-                    0;
-                    1;
-                    1;
-                    1;];
-            case 3
                 % Flux boundary conditions for both carrier types.
                 % Calculate series resistance voltage Vres
                 if Rs == 0
@@ -397,9 +404,9 @@ end
                     end
                 end
                 
-                Pl = [-ul(1);
-                    mobset*(-sn_l*(ul(2) - nleft));
-                    mobset*(-sp_l*(ul(3) - pleft));
+                Pl = [-V_l;
+                    mobset*(-sn_l*(n_l - nleft));
+                    mobset*(-sp_l*(p_l - pleft));
                     0;                              
                     0;];
                 
@@ -409,9 +416,9 @@ end
                     1;
                     1;];
                 
-                Pr = [-ur(1)+Vbi-Vapp-Vres;
-                    mobset*(sn_r*(ur(2) - nright));
-                    mobset*(sp_r*(ur(3) - pright));
+                Pr = [-V_r+Vbi-Vapp-Vres;
+                    mobset*(sn_r*(n_r - nright));
+                    mobset*(sp_r*(p_r - pright));
                     0;
                     0;];
                 
@@ -421,7 +428,7 @@ end
                     1;
                     1;];
                 
-        end
+
         % Remove unused entries
         Pl = Pl(1:N_variables);
         Pr = Pr(1:N_variables);
