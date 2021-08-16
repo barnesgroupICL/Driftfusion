@@ -61,10 +61,10 @@ t = meshgen_t(par);
 %% Dependent properties: Prevents recalculation of dependent properties by pdepe defined in Methods
 % Can also use AbortSet in class def
 Vbi = par.Vbi;
-nleft = par.nleft;
-nright = par.nright;
-pleft = par.pleft;
-pright = par.pright;
+n0_l = par.n0_l;
+n0_r = par.n0_r;
+p0_l = par.p0_l;
+p0_r = par.p0_r;
 dev = par.dev;
 
 %% Constants
@@ -116,10 +116,10 @@ N_variables = par.N_ionic_species + 3;  % Number of variables in this solution (
 
 z_c = par.z_c;
 z_a = par.z_a;
-nleft = par.nleft;
-nright = par.nright;
-pleft = par.pleft;
-pright = par.pright;
+n0_l = par.n0_l;
+n0_r = par.n0_r;
+p0_l = par.p0_l;
+p0_r = par.p0_r;
 sn_l = par.sn_l;
 sp_l = par.sp_l;
 sn_r = par.sn_r;
@@ -311,8 +311,8 @@ end
         if length(par.dcell) == 1
             % Single layer
             u0_ana = [(x/xmesh(end))*Vbi;
-                nleft*exp((x*(log(nright)-log(nleft)))/par.dcum0(end));
-                pleft*exp((x*(log(pright)-log(pleft)))/par.dcum0(end));
+                n0_l*exp((x*(log(n0_r)-log(n0_l)))/par.dcum0(end));
+                p0_l*exp((x*(log(p0_r)-log(p0_l)))/par.dcum0(end));
                 dev.Ncat(i);
                 dev.Nani(i);];
         else
@@ -396,7 +396,7 @@ end
                 if Rs == 0
                     Vres = 0;
                 else
-                    J = e*sp_r*(ur(3) - pright) - e*sn_r*(ur(2) - nright);
+                    J = e*sp_r*(ur(3) - p0_r) - e*sn_r*(ur(2) - n0_r);
                     if Rs_initial
                         Vres = -J*Rs*t/par.tmax;    % Initial linear sweep
                     else
@@ -405,8 +405,8 @@ end
                 end
                 
                 Pl = [-V_l;
-                    mobset*(-sn_l*(n_l - nleft));
-                    mobset*(-sp_l*(p_l - pleft));
+                    mobset*(-sn_l*(n_l - n0_l));
+                    mobset*(-sp_l*(p_l - p0_l));
                     0;                              
                     0;];
                 
@@ -417,8 +417,8 @@ end
                     1;];
                 
                 Pr = [-V_r+Vbi-Vapp-Vres;
-                    mobset*(sn_r*(n_r - nright));
-                    mobset*(sp_r*(p_r - pright));
+                    mobset*(sn_r*(n_r - n0_r));
+                    mobset*(sp_r*(p_r - p0_r));
                     0;
                     0;];
                 

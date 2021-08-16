@@ -138,8 +138,8 @@ classdef pc
         
         %% Electrode Fermi energies [eV]
         % Fermi energies of the metal electrode. These define the built-in voltage, Vbi
-        % and the boundary carrier concentrations nleft, pleft, nright, and
-        % pright
+        % and the boundary carrier concentrations n0_l, p0_l, n0_r, and
+        % p0_r
         Phi_left = -0.6;
         Phi_right = -0.4;
 
@@ -261,16 +261,16 @@ classdef pc
         ND
         Vbi
         n0
-        nleft
-        nright
+        n0_l
+        n0_r
         ni
         nt              % Density of CB electrons when Fermi level at trap state energy
         nt_inter
         p0
         pcum
         pcum0           % Includes first entry as zero
-        pleft
-        pright
+        p0_l
+        p0_r
         pt              % Density of VB holes when Fermi level at trap state energy
         pt_inter
         wn
@@ -539,22 +539,22 @@ classdef pc
         %% Boundary electron and hole densities
         % Uses metal Fermi energies to calculate boundary densities
         % Electrons left boundary
-        function value = get.nleft(par)
+        function value = get.n0_l(par)
             value = distro_fun.nfun(par.Nc(1), par.EA(1), par.Phi_left, par.T, par.prob_distro_function);
         end
 
         % Electrons right boundary
-        function value = get.nright(par)
+        function value = get.n0_r(par)
             value = distro_fun.nfun(par.Nc(end), par.EA(end), par.Phi_right, par.T, par.prob_distro_function);
         end
 
         % Holes left boundary
-        function value = get.pleft(par)
+        function value = get.p0_l(par)
             value = distro_fun.pfun(par.Nv(1), par.IP(1), par.Phi_left, par.T, par.prob_distro_function);
         end
 
         % holes right boundary
-        function value = get.pright(par)
+        function value = get.p0_r(par)
             value = distro_fun.pfun(par.Nv(end), par.IP(end), par.Phi_right, par.T, par.prob_distro_function);
         end
        

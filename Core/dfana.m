@@ -123,8 +123,8 @@ classdef dfana
 
             djndx = -dndt + g - r.tot;
             djpdx = -dpdt + g - r.tot;
-            djadx = -dadt;
-            djcdx = -dcdt;
+            djadx = -dadt;                  % Add source terms as necessary
+            djcdx = -dcdt;                  % Add source terms as necessary
 
             deltajn = cumtrapz(x, djndx, 2);
             deltajp = cumtrapz(x, djpdx, 2);
@@ -132,31 +132,38 @@ classdef dfana
             deltajc = cumtrapz(x, djcdx, 2);
 
             %% Currents from the boundaries
-            jn_l = -par.sn_l*(n(:, 1) - par.nleft);
-            jn_r = par.sn_r*(n(:, end) - par.nright);
+            jn_l = -par.sn_l*(n(:, 1) - par.n0_l);
+            jn_r = par.sn_r*(n(:, end) - par.n0_r);
             
-            jp_l = -par.sp_l*(p(:, 1) - par.pleft);
-            jp_r = par.sp_r*(p(:, end) - par.pright);
-
+            jp_l = -par.sp_l*(p(:, 1) - par.p0_l);
+            jp_r = par.sp_r*(p(:, end) - par.p0_r);
+            
+            jc_l = 0;
+            jc_r = 0;
+            
+            ja_l = 0;
+            ja_r = 0;
+            
             % Calculate total electron and hole currents from fluxes
             % Use the minority carrier flux as the boundary condition
-            if par.pleft >= par.nleft && par.nright >= par.pright
+            if par.p0_l >= par.n0_l && par.n0_r >= par.p0_r
                 % p-type left boundary, n-type right boundary
                 j.n = jn_l + deltajn;
                 j.p = jp_r + (deltajp - deltajp(:,end));
-            elseif par.nleft >= par.nright && par.pright >= par.nright
+            elseif par.n0_l >= par.n0_r && par.p0_r >= par.n0_r
                 % n-type left boundary, p-type right boundary
                 j.n = jn_r + (deltajn-deltajn(:,end));
                 j.p = jp_l + deltajp;
-            elseif par.pleft >= par.nleft && par.pright >= par.nright...
-                    || par.nleft >= par.pleft && par.nright >= par.pright
+            elseif par.p0_l >= par.n0_l && par.p0_r >= par.n0_r...
+                    || par.n0_l >= par.p0_l && par.n0_r >= par.p0_r
                 % p-type both boundaries or n-type both boundaries
                 j.n = jn_l + deltajn;
                 j.p = jp_l + deltajp;
             end
+            
+            j.c = jc_l + deltajc;
+            j.a = ja_l + deltaja;
 
-            j.a = 0 + deltaja;
-            j.c = 0 + deltajc;
             % displacement flux
             FV_sub = dfana.calcF(sol, "sub");
 
@@ -518,10 +525,10 @@ classdef dfana
             % Get QFLs
             [~, ~, Efn, Efp] = dfana.QFLs(sol);
             par = sol.par;
-            if par.pleft >= par.nleft && par.nright >= par.pright
+            if par.p0_l >= par.n0_l && par.n0_r >= par.p0_r
                 % p-type left boundary, n-type right boundary
                 VQFL = Efn(:, end) - Efp(:, 1);
-            elseif par.nleft >= par.nright && par.pright >= par.nright
+            elseif par.n0_l >= par.n0_r && par.p0_r >= par.n0_r
                 % n-type left boundary, p-type right boundary
                 VQFL = Efn(:, 1) - Efp(:, end);
             else
