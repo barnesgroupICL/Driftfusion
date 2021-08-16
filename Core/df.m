@@ -274,7 +274,7 @@ end
         F_n = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
         F_p = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
         F_c = mucat(i)*(z_c*c*dVdx + kB*T*(dcdx + (c*(dcdx/(cmax(i)-c)))));
-        F_a = muani(i)*(z_a*a*-dVdx + kB*T*(dadx+(a*(dadx/(amax(i)-a)))));
+        F_a = muani(i)*(z_a*a*dVdx + kB*T*(dadx+(a*(dadx/(amax(i)-a)))));
         F = [F_V; mobset*F_n; mobset*F_p; K_cation*mobseti*F_c; K_anion*mobseti*F_a];
         
         % Electron and holes recombination

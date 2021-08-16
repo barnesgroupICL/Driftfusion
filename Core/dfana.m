@@ -174,8 +174,8 @@ classdef dfana
 
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
-            J.a = j.a*-par.e;
-            J.c = j.c*par.e;
+            J.a = j.a*par.z_a*par.e;
+            J.c = j.c*par.z_c*par.e;
             J.disp = j.disp*par.e;
 
             % Total current
