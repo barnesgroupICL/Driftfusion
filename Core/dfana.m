@@ -132,20 +132,11 @@ classdef dfana
             deltajc = cumtrapz(x, djcdx, 2);
 
             %% Currents from the boundaries
-            switch par.BC
-                case 2
-                    jn_l = -par.sn_l*(n(:, 1) - par.nleft);
-                    jp_l = -deltajp(:, end) + par.sp_r*(p(:, end) - par.pright);
-
-                    jn_r = deltajn(:, end) - par.sn_l*(n(:, 1) - par.nleft);
-                    jp_r = par.sp_r*(p(:, end) - par.pright);
-                case 3
-                    jn_l = -par.sn_l*(n(:, 1) - par.nleft);
-                    jp_l = -par.sp_l*(p(:, 1) - par.pleft);
-
-                    jn_r = par.sn_r*(n(:, end) - par.nright);
-                    jp_r = par.sp_r*(p(:, end) - par.pright);
-            end
+            jn_l = -par.sn_l*(n(:, 1) - par.nleft);
+            jn_r = par.sn_r*(n(:, end) - par.nright);
+            
+            jp_l = -par.sp_l*(p(:, 1) - par.pleft);
+            jp_r = par.sp_r*(p(:, end) - par.pright);
 
             % Calculate total electron and hole currents from fluxes
             % Use the minority carrier flux as the boundary condition
@@ -174,8 +165,8 @@ classdef dfana
 
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
-            J.a = j.a*par.z_a*par.e;
             J.c = j.c*par.z_c*par.e;
+            J.a = j.a*par.z_a*par.e;
             J.disp = j.disp*par.e;
 
             % Total current
@@ -415,7 +406,7 @@ classdef dfana
                     c = getvar_sub(c_whole);
             end
             % charge density
-            rho = -n + p - a + c - dev.NA + dev.ND;
+            rho = -n + p - dev.NA + dev.ND + par.z_a*a + par.z_c*c;
         end
 
         function Vapp = calcVapp(sol)
