@@ -17,18 +17,6 @@ function par = import_properties(par, filepath)
 %% Start code
 T = readtable(filepath{1,1});   % Reads-in in the external .CSV file to a table T
 
-try
-    par.sn = T{:,'sn'}';
-catch
-    warning('No sn value defined in .csv . Using default in PC')
-end
-
-try
-    par.sp = T{:,'sp'}';
-catch
-    % warning('No sp value defined in .csv . Using default in PC')
-end
-
 % Layer type array
 try
     par.layer_type = T{:,'layer_type'}';
@@ -119,7 +107,7 @@ catch
         try
             par.amax = T{:, 'Nion'}';
         catch
-            warning('No maximum anion density array (DOSani) defined in .csv . Using default in PC')
+            warning('No maximum anion density array (amax) defined in .csv . Using default in PC')
         end
     end
 end
@@ -130,7 +118,7 @@ catch
     try
         par.cmax = T{:, 'DOScat'}';
     catch
-        warning('No maximum cation density array (DOScat) defined in .csv . Using default in PC')
+        warning('No maximum cation density array (cmax) defined in .csv . Using default in PC')
     end
 end
 % Electron mobility
@@ -202,11 +190,28 @@ try
     par.taup = T{:, 'taup'}';
 catch
     try
-    par.taup = T{:, 'taup_SRH'}';
+        par.taup = T{:, 'taup_SRH'}';
     catch
-    warning('No SRH hole lifetime array (taup) defined in .csv . Using default in PC')  
+        warning('No SRH hole lifetime array (taup) defined in .csv . Using default in PC')
     end
 end
+
+try
+    par.sn = T{:,'sn'}';
+catch
+    if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
+        warning('No sn value defined in .csv . Using default in PC')
+    end
+end
+
+try
+    par.sp = T{:,'sp'}';
+catch
+    if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
+        warning('No sp value defined in .csv . Using default in PC')
+    end
+end
+
 % Electron surface recombination velocity/extraction coefficient LHS
 try
     par.sn_l = T{1, 'sn_l'}';
@@ -292,7 +297,27 @@ try
     Blue = T{:, 'Blue'};
     par.layer_colour = [Red,Green,Blue];
 catch
-    warning('Layer colours (layer_colour) undefined in .csv. Using default in PC')
+    % warning('Layer colours (layer_colour) undefined in .csv. Using default in PC')
+end
+
+% Recombination zone location
+if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
+    vsr_zone_loc_user = cell(1, length(par.stack));
+    par.vsr_zone_loc = cell(1, length(par.stack));
+    vsr_zone_loc_auto = locate_vsr_zone(par);
+    try
+        vsr_zone_loc_user = T{:, 'vsr_zone_loc'}';
+    catch
+        warning('Recomination zone location (vsr_zone_loc) not defined in .csv . Using auto defined')
+        par.vsr_zone_loc = vsr_zone_loc_auto;
+    end
+        for i = 1:length(par.stack)
+            if any(strcmp(vsr_zone_loc_user(i), {'L','C','R'})) == 1
+                par.vsr_zone_loc(i) = vsr_zone_loc_user(i);
+            elseif strcmp(vsr_zone_loc_user(i), {'auto'}) == 1
+                par.vsr_zone_loc(i) = vsr_zone_loc_auto(i);
+            end
+        end
 end
 
 end

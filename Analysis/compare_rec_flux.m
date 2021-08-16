@@ -1,71 +1,137 @@
-function compare_rec_flux(sol_df, sol_im)
-% Script to compare the interfacial recombination fluxes from DF and IM
-% Currently only working for ETL-AL-HTL architecture
+function sigma_sum_filter = compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plot_switch)
+% Script to compare the interfacial recombination fluxes from Driftfusion.
+% The integrated recombination flux from the volumetric surface
+% recombination model is compared with the flux calculated from the
+% 2D SRH expression using the boundary carrier densities, ns and ps
+% directly
+%
+%% LICENSE
+% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+%% Input arguments
+% PLOT_SWITCH = 1 for plot outputs
+% RELTOL_VSR is the fractional difference between DF 2D and volumetric calculations above
+% which a warning is displayed
+% ABSTOL_VSR is the absolute value of the recombination flux below which
+% the difference is ignored (lower values tend to have much higher relative
+% errors)
+%
+%% Start code
 par = sol_df.par;
 u = sol_df.u;
 t = sol_df.t;
-x = sol_df.x;
-al = par.active_layer;
-ni = par.ni(al);
-sn1 = par.sn(al-1);
-sp1 = par.sp(al-1);
-sn2 = par.sn(al+1);
-sp2 = par.sp(al+1);
-nt1 = par.nt(al-1);
-pt1 = par.pt(al-1);
-nt2 = par.nt(al+1);
-pt2 = par.pt(al+1);
+pcum1 = par.pcum + 1;   % Cumulative layer points array
+dev = par.dev;
+alpha0 = dev.alpha0;
+beta0 = dev.beta0;
+xsub = par.x_sub;
 
-%% Driftfusion 2D
-ns1_df = u(:, par.pcum0(2)+1, 2);
-ps1_df = u(:, par.pcum0(3)+1, 3);
-ns2_df = u(:, par.pcum0(4)+1, 2);
-ps2_df = u(:, par.pcum0(5)+1, 3);
-
-R1_df2D = (ns1_df.*ps1_df - ni^2)./((1/sn1).*(ps1_df + pt1) + (1/sp1).*(ns1_df + nt1));
-R2_df2D = (ns2_df.*ps2_df - ni^2)./((1/sn2).*(ps2_df + pt2) + (1/sp2).*(ns2_df + nt2));
+n = u(:, :, 2);
+p = u(:, :, 3);
 
 %% Driftfusion 3D
-rx = dfana.calcr_ihalf(sol_df);
+rx = dfana.calcr(sol_df, "sub");
 
-R1_df3D = zeros(length(t), 1);
-for i=1:length(t)
-    R1_df3D(i) = trapz(x(par.pcum0(2)+1:par.pcum0(3)+1), rx.vsr(i, par.pcum0(2)+1:par.pcum0(3)+1), 2);
-    R2_df3D(i) = trapz(x(par.pcum0(4)+1:par.pcum0(5)+1), rx.vsr(i, par.pcum0(4)+1:par.pcum0(5)+1), 2);
+%% Get indexes of interfaces
+%int_index = find(contains(par.layer_type, 'interface'));   % only
+%compatible from 2016 onwards
+int_logical = strcmp(par.layer_type, 'interface');
+loc = find(int_logical); % interface layer locations
+
+ns = zeros(length(t), length(loc));     % Store time array of each ns in new column
+ps = zeros(length(t), length(loc));     % Store time array of each ps in new column
+R_abrupt = zeros(length(t), length(loc));
+R_vsr = zeros(length(t), length(loc));
+R_vsr_filter = NaN(length(t), length(loc));
+R_abrupt_filter = NaN(length(t), length(loc));
+sigma = zeros(length(t), length(loc));
+
+for i = 1:length(loc)
+    sn = par.sn(loc(i));
+    sp = par.sp(loc(i));
+    ni = par.ni(loc(i));
+    nt = par.nt(loc(i));
+    pt = par.pt(loc(i));
+    
+    % Check location of interfacial surface carrier densities
+    if alpha0(pcum1(loc(i)-1)) <= 0
+        ns(:, i) = n(:, pcum1(loc(i)-1));
+    elseif alpha0(pcum1(loc(i)-1)) > 0
+        ns(:, i) = n(:, pcum1(loc(i)));
+    end
+    
+    if beta0(pcum1(loc(i)-1)) <= 0
+        ps(:, i) = p(:, pcum1(loc(i)-1));
+    elseif beta0(pcum1(loc(i)-1)) > 0
+        ps(:, i) = p(:, pcum1(loc(i)));
+    end
+    
+    R_abrupt(:, i) = (ns(:, i).*ps(:, i) - ni^2)./((1/sn).*(ps(:, i) + pt) + (1/sp).*(ns(:, i) + nt));
+    
+    for k = 1:length(t)
+        R_vsr(k, i) = trapz(xsub(pcum1(loc(i)-1)-1:pcum1(loc(i))), rx.vsr(k, pcum1(loc(i)-1)-1:pcum1(loc(i))), 2);
+    end
+    
+    %% Fractional difference
+    sigma(:, i) = (R_abrupt(:, i)-R_vsr(:, i))./R_abrupt(:, i);
+    
+    R_vsr_filter(find(R_vsr(:, i) < AbsTol_vsr), i) = NaN;
+    R_abrupt_filter(find(R_abrupt(:, i) < AbsTol_vsr), i) = NaN;
+        
+    if plot_switch
+        figure(300)
+        semilogy(t, R_abrupt(:, i) , t, R_vsr(:, i) , 'k--')
+        xlabel('Time [s]')
+        ylabel('Recombination flux [cm-2s-1]')
+        legend('Abrupt interface', 'Discrete interface (volumetric)')
+        xlim([t(1), t(end)])
+        hold on
+        
+        figure(301)
+        semilogy(t, ns(:, i) , t, ps(:, i))
+        xlabel('Time [s]')
+        ylabel('Carrier density')
+        legend('ns', 'ps')
+        xlim([t(1), t(end)])
+        hold on
+        
+        figure(302)
+        plot(t, sigma(:, i) )
+        xlabel('Time [s]')
+        ylabel('Fractional difference')
+        xlim([t(1), t(end)])
+        hold on
+    end
 end
 
-%% IonMonger
-t_im = sol_im.time;
-ns1_im = sol_im.dstrbns.nE(:, end)*1e-6;
-ps1_im = sol_im.dstrbns.p(:, 1)*1e-6;
-ns2_im = sol_im.dstrbns.n(:, end)*1e-6;
-ps2_im = sol_im.dstrbns.pH(:, 1)*1e-6;
+sigma_sum = 1-(sum(R_vsr, 2)./sum(R_abrupt, 2));
+sigma_sum_filter = sigma_sum;
+[AbsTol_row, AbsTol_col] = find(R_vsr < AbsTol_vsr);
+sigma_sum_filter(AbsTol_row) = NaN;
 
-R1_im = (ns1_im.*ps1_im - ni^2/sol_im.params.kE)./((1/sn1).*(ps1_im + pt1) + (1/sp1).*(ns1_im + nt1));
-R2_im = (ns2_im.*ps2_im - ni^2/sol_im.params.kH)./((1/sn2).*(ps2_im + pt2) + (1/sp2).*(ns2_im + nt2));
+if max(abs(sigma_sum_filter)) > RelTol_vsr
+    warning(['The max volumetric surface recombination model fractional error (sigma_max = ', num2str(max(abs(sigma_sum))),') for recombination fluxes above ', num2str(AbsTol_vsr), ' cm-2s-1 exceeded the user-defined tolerance level (tol_vsr = ', ...
+        num2str(RelTol_vsr), '). Consider:' newline...
+        '- increasing the interface layer electronic mobilities' newline...
+        '- reducing energetic barriers' newline...
+        '- manually relocating recombination zones' newline...
+        '- reducing interfacial surface recombination velocities' newline...
+        '- switching to an alternative recombination model'])
+end
+    
+if plot_switch
+    figure(303)
+    plot(t, sigma_sum_filter)
+    xlabel('Time [s]')
+    ylabel('Fractional difference')
+    figure(300); hold off
+    figure(301); hold off
+    figure(302); hold off
+end
 
-%% Plots
-figure(200)
-semilogy(t, R1_df2D, t, R1_df3D, t_im, R1_im)
-xlabel('Time [s]')
-ylabel('Recombination flux [cm-2s-1]')
-legend('DF 2D', 'DF volumetric', 'IM 2D')
-
-figure(201)
-semilogy(t, R2_df2D, t, R2_df3D, t_im, R2_im)
-xlabel('Time [s]')
-ylabel('Recombination flux [cm-2s-1]')
-legend('DF 2D', 'DF volumetric', 'IM 2D')
-
-figure(202)
-semilogy(t, ns1_df, t, ps1_df, t_im, ns1_im, '--', t_im, ps1_im, '--')
-xlabel('Time [s]')
-ylabel('Carrier density')
-legend('ns1 DF', 'ps1 DF', 'ns1 IM', 'ps1 IM')
-
-figure(203)
-semilogy(t, ns2_df, t, ps2_df, t_im, ns2_im, '--', t_im, ps2_im, '--')
-xlabel('Time [s]')
-ylabel('Carrier density')
-legend('ns2 DF', 'ps2 DF', 'ns2 IM', 'ps2 IM')
 end

@@ -17,7 +17,7 @@ soleq_singlecar = equilibrate(par_singlecar);
 % Extract parameters
 par = soleq_singlecar.ion.par;
 
-% Set upi time mesh
+% Set up time mesh
 par.tmesh_type = 1;
 par.t0 = 0;
 par.tmax = 1e-2;

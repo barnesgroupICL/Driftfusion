@@ -12,8 +12,8 @@ function nidt = transient_nid_ana(sol_OC)
 par = sol_OC(1).par;
 % Incident photon flux density at 1 Sun across device
 % Get x_halfi
-xihalf = getvarihalf(sol_OC(1).x);
-G = trapz(xihalf, par.gx1);
+xsub = getvar_sub(sol_OC(1).x);
+G = trapz(xsub, par.gx1);
    
 % Extract desrired values from the solution
 for i = 1:length(sol_OC)
@@ -28,7 +28,7 @@ for i = 1:length(sol_OC)
    
    
    %% Get the PL
-   r = dfana.calcr(sol_OC(i));
+   r = dfana.calcr(sol_OC(i), "whole");
         for j = 1:length(t)
             PLt(i,j) = trapz(x, r.btb(j,:));
         end
@@ -56,7 +56,7 @@ semilogx(t, nidt_mean)
 xlabel('Time [s]')
 ylabel('nid')
 xlim([t(1), t(end)])
-ylim([-1,3])
+ylim([0,max(nidt_mean)*1.1])
 
 figure(402)
 for i = 1:length(sol_OC)

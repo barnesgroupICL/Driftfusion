@@ -16,6 +16,7 @@ function VappSol = genVappStructs(solini, Vapp_arr, mobseti)
 %% Start code
 % Store parameters
 par = solini.par;
+par_original = par;
 
 Vapp_arr = [solini.par.Vapp, Vapp_arr];    % include intial potential in array in case
 
@@ -78,10 +79,11 @@ for i = 1:length(Vapp_arr)-1
     
     % reset ion coeffs before storing
     if mobseti
-        sol.par.K_anion = 1;
-        sol.par.K_cation = 1;
-        sol.par.mobseti = 1;
+        sol.par.K_anion = par_original.K_anion;
+        sol.par.K_cation = par_original.K_cation;
     end
+    sol.par.mobseti = par_original.mobseti;
+    
     % if there's only one solution then duplicate sol structure
     if length(Vapp_arr)-1 == 1
         VappSol = sol;
@@ -93,4 +95,3 @@ for i = 1:length(Vapp_arr)-1
 end
 
 end
-

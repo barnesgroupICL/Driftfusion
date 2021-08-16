@@ -22,8 +22,8 @@ soleq_tio2 = equilibrate(par_tio2);
 soleq_pcbm = equilibrate(par_pcbm);
 
 %% Perform current-voltage scans
-sol_CV_100mVs_tio2_dark = doCV(soleq_tio2.ion, 0, 0, 1.2, 0, 100e-3, 1, 241);
-sol_CV_100mVs_pcbm_dark = doCV(soleq_pcbm.ion, 0, 0, 1.2, 0, 100e-3, 1, 241);
+sol_CV_100mVs_tio2_dark = doCV(soleq_tio2.ion, 0, 0, 1.0, 0, 100e-3, 1, 241);
+sol_CV_100mVs_pcbm_dark = doCV(soleq_pcbm.ion, 0, 0, 1.0, 0, 100e-3, 1, 241);
 sol_CV_100mVs_tio2_1sun = doCV(soleq_tio2.ion, 1, 0, 1.2, 0, 100e-3, 1, 241);
 sol_CV_100mVs_pcbm_1sun = doCV(soleq_pcbm.ion, 1, 0, 1.2, 0, 100e-3, 1, 241);
 

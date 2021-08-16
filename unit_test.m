@@ -1,4 +1,4 @@
-%UNIT_TEST - Runs various simulations in order to test the functioning of Driftfusion and many other implemented functions
+% UNIT_TEST - Runs various simulations in order to test the functioning of Driftfusion and many other implemented functions
 % For profiling the time spent running each function run 'profile on' before running the tests and
 % 'profile viewer' after.
 % Using Matlab's Coverage Reports, the obsolete and unused code can be easily spotted.
@@ -40,7 +40,7 @@ JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.0, 3);
 % example taken from Scripts/explore_script
 % exsol = explore2par(par_base, parnames, parvalues, JVpnts)
 exsol = explore.explore2par(par, {'d(1,3)','Int'},...
-    {[400e-7, 800e-7], logspace(-2,0,2)}, 20);
+    {[200e-7, 400e-7], logspace(-2,0,2)}, 20);
 
 %% Core df no input
 
@@ -273,8 +273,8 @@ dfplot.x2d(JVsol.ill.f, JVsol.ill.f.x, {JVsol.ill.f.u(:,:,1)}, {'test'}, ['-','.
 %% Core build_device
 
 % dev = build_device(par, meshoption)
-dev1 = build_device(par, 'iwhole');
-dev2 = build_device(par, 'ihalf');
+dev1 = build_device(par, 'whole');
+dev2 = build_device(par, 'sub');
 
 %% Core build_property
 
@@ -296,10 +296,10 @@ dfana.splitsol(soleq.ion);
 % [Ecb, Evb, Efn, Efp] = QFLs(sol)
 dfana.QFLs(soleq.ion);
 
-%% Core dfana QFL_ihalf
+%% Core dfana QFL_sub
 
-% [Ecb, Evb, Efn, Efp] = QFL_ihalf(sol)
-dfana.QFL_ihalf(soleq.ion);
+% [Ecb, Evb, Efn, Efp] = QFL_sub(sol)
+dfana.QFL_sub(soleq.ion);
 
 %% Core dfana calcJ
 
@@ -313,13 +313,9 @@ dfana.calcg(soleq.ion);
 
 %% Core dfana calcr
 
-% r = calcr(sol)
-dfana.calcr(soleq.ion);
-
-%% Core dfana calcr_ihalf
-
-% r = calcr_ihalf(sol)
-dfana.calcr_ihalf(soleq.ion);
+% r = calcr(sol, mesh_option)
+dfana.calcr(soleq.ion, "whole");
+dfana.calcr(soleq.ion, "sub");
 
 %% Core dfana Jddxt
 
@@ -328,23 +324,15 @@ dfana.Jddxt(soleq.ion);
 
 %% Core dfana calcF
 
-% [FV, Frho] = calcF(sol)
-dfana.calcF(soleq.ion);
-
-%% Core dfana calcF_ihalf
-
-% [FV, Frho] = calcF_ihalf(sol)
-dfana.calcF_ihalf(soleq.ion);
+% [FV, Frho] = calcF(sol, mesh_option)
+dfana.calcF(soleq.ion, "whole");
+dfana.calcF(soleq.ion, "sub");
 
 %% Core dfana calcrho
 
-% rho = calcrho(sol)
-dfana.calcrho(soleq.ion);
-
-%% Core dfana calcrho_ihalf
-
-% rho = calcrho_ihalf(sol)
-dfana.calcrho_ihalf(soleq.ion);
+% rho = calcrho(sol, mesh_option)
+dfana.calcrho(soleq.ion, "whole");
+dfana.calcrho(soleq.ion, "sub");
 
 %% Core dfana calcVapp
 
@@ -450,15 +438,15 @@ generation(par, 'laser', 470);
 generation(par2, 'AM15', 470);
 generation(par2, 'laser', 470);
 
-%% Core getvarihalf
+%% Core getvar_sub
 
-% varihalf = getvarihalf(var)
-getvarihalf(par.dev.EA);
+% varsub = getvar_sub(var)
+EA_sub = getvar_sub(par.dev.EA);
 
-%% Core getxihalf
+%% Core getx_sub
 
-% xsolver = getxihalf(sol)
-getxihalf(soleq.ion);
+% xsolver = getx_sub(sol)
+getx_sub(soleq.ion);
 
 %% Core import_properties
 
@@ -511,22 +499,6 @@ parx.meshx_figon = true;
 parx.xmesh_type = 1;
 meshgen_x(parx);
 
-% %% Core meshgen_x 2
-%
-% x = meshgen_x(par)
-% parx = par;
-% parx.meshx_figon = true;
-% parx.xmesh_type = 2;
-% meshgen_x(parx);
-% 
-% %% Core meshgen_x 3
-% 
-% % x = meshgen_x(par)
-% parx = par;
-% parx.meshx_figon = true;
-% parx.xmesh_type = 3;
-% meshgen_x(parx);
-
 %% Core meshgen_x 4
 
 % x = meshgen_x(par)
@@ -552,6 +524,14 @@ refresh_device(par);
 
 % y = triangle_fun(coeff, t)
 triangle_fun([0.1, 0.2, 1, 3, 5], 0:0.1:10);
+
+%% Analysis
+% sigma_sum_filter = compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plot_switch)
+sigma_sum_R_flux = compare_rec_flux(JVsol.ill.f, 1e6, 0.05, 1);
+
+%% Analysis
+% [n_ana, p_ana, jn_ana, jp_ana] = compare_carrier_interfaces(sol, tarr, plot_switch)
+[n_ana, p_ana, jn_ana, jp_ana] = compare_carrier_interfaces(JVsol.ill.f, JVsol.ill.f.t(end)*[0, 0.2, 0.4, 0.6], 1);
 
 %% Helper calcJsc, calcR0 and Eg_vs_Voc
 

@@ -44,12 +44,13 @@ par.SRHset = 0;
 par.radset = 1;
 % Start with no ionic carriers
 par.N_ionic_species = 0;
+% Switch off volumetric surface recombination check
+par.vsr_check = 0;
 
 %% General initial parameters
 par.tmesh_type = 2;
 par.tpoints = 10;
 
-par.JV = 0;
 par.Vapp = 0;
 par.int1 = 0;
 par.int2 = 0;
@@ -102,8 +103,9 @@ end
 
 soleq_nosrh = sol;
 
-disp('Switching on interfacial recombination')
+disp('Switching on SRH recombination')
 par.SRHset = 1;
+par.vsr_check = 1;
 
 par.tmax = 10*t_diff;
 par.t0 = par.tmax/1e3;
@@ -115,22 +117,13 @@ if electronic_only == 0
     %% Equilibrium solutions with ion mobility switched on
     par.N_ionic_species = par_origin.N_ionic_species;
     
-    % CReate temporary solution for appending initial conditions to
+    % Create temporary solution for appending initial conditions to
     sol = soleq_nosrh;
-    
-    % Write ionic initial conditions
-    switch par.N_ionic_species
-        case 1
-            sol.u(:,:,4) = repmat(par.dev.Ncat, length(sol.t), 1);
-        case 2
-            sol.u(:,:,4) = repmat(par.dev.Ncat, length(sol.t), 1);
-            sol.u(:,:,5) = repmat(par.dev.Nani, length(sol.t), 1);
-    end
     
     % Start without SRH or series resistance
     par.SRHset = 0;
     par.Rs = 0;
-%     
+   
     disp('Closed circuit equilibrium with ions')
     
     % Take ratio of electron and ion mobilities in the active layer
@@ -153,20 +146,18 @@ if electronic_only == 0
     par.K_cation = rat_cation;
     par.tmax = 1e3*t_diff;
     par.t0 = par.tmax/1e3;
-      
+    par.vsr_check = 1;
+    
     sol = df(sol, par);   
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     
     % loop to check ions have reached stable config- if not accelerate ions by
     % order of mag
     while any(all_stable) == 0
-        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-        
+        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]); 
         par.tmax = par.tmax*10;
         par.t0 = par.tmax/1e6;
-        
         sol = df(sol, par);
-        
         all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     end
     
@@ -181,8 +172,6 @@ if electronic_only == 0
     %% Ion equilibrium with surface recombination
     disp('Switching on SRH recombination')
     par.SRHset = 1;
-    
-    par.calcJ = 0;
     par.tmax = 1e-6;
     par.t0 = par.tmax/1e3;
     par.mobseti = 1;

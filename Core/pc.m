@@ -77,23 +77,23 @@ classdef pc
         tpoints = 100;              % Number of time points
 
         %% GENERAL CONTROL PARAMETERS
-        OC = 0;                 % Closed circuit = 0, Open Circuit = 1
-        Vapp = 0;               % Applied bias
-        BC = 3;                 % Boundary Conditions. Must be set to one for first solution
-        figson = 1;             % Toggle figures on/off
-        meshx_figon = 0;        % Toggles x-mesh figures on/off
-        mesht_figon = 0;        % Toggles t-mesh figures on/off
-        side = 1;               % illumination side 1 = left, 2 = right
-        calcJ = 0;              % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
-        mobset = 1;             % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
-        mobseti = 1;
-        SRHset = 1;
-        radset = 1;
-        JV = 0;                 % Toggle run JV scan on/off
-        prob_distro_function = 'Boltz';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
-        Fermi_limit = 0.2;      % Max allowable limit for Fermi levels beyond the bands [eV]
-        Fermi_Dn_points = 400;  % No. of points in the Fermi-Dirac look-up table
-        intgradfun = 'linear'      % Interface gradient function 'linear' = linear, 'erf' = 'error function'
+        OC = 0;                             % Closed circuit = 0, Open Circuit = 1
+        Vapp = 0;                           % Applied bias
+        BC = 3;                             % Boundary Conditions. Must be set to one for first solution
+        figson = 1;                         % Toggle figures on/off
+        meshx_figon = 0;                    % Toggles x-mesh figures on/off
+        mesht_figon = 0;                    % Toggles t-mesh figures on/off
+        side = 1;                           % illumination side 1 = left, 2 = right
+        calcJ = 0;                          % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
+        mobset = 1;                         % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
+        mobseti = 1;                        % Switch on/off ionic carrier mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
+        SRHset = 1;                         % Switch on/off SRH recombination - recommend setting to zero for initial solution
+        radset = 1;                         % Switch on/off band-to-band recombination
+        N_max_variables = 5;                % Total number of allowable variables in this version of Driftfusion
+        prob_distro_function = 'Boltz';     % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
+        Fermi_limit = 0.2;                  % Max allowable limit for Fermi levels beyond the bands [eV]
+        Fermi_Dn_points = 400;              % No. of points in the Fermi-Dirac look-up table
+        intgradfun = 'linear'               % Interface gradient function 'linear' = linear, 'erf' = 'error function'
 
         %% Generation
         % OM = Optical Model
@@ -138,8 +138,8 @@ classdef pc
         
         %% Electrode Fermi energies [eV]
         % Fermi energies of the metal electrode. These define the built-in voltage, Vbi
-        % and the boundary carrier concentrations nleft, pleft, nright, and
-        % pright
+        % and the boundary carrier concentrations n0_l, p0_l, n0_r, and
+        % p0_r
         Phi_left = -0.6;
         Phi_right = -0.4;
 
@@ -149,34 +149,34 @@ classdef pc
         % PEDOT eDOS: https://aip.scitation.org/doi/10.1063/1.4824104
         % MAPI eDOS: F. Brivio, K. T. Butler, A. Walsh and M. van Schilfgaarde, Phys. Rev. B, 2014, 89, 155204.
         % PCBM eDOS:
-
-        %% Mobile ions
-        % Mobile ion defect density [cm-3]
-        N_ionic_species = 1;
-        K_anion = 1;                    % Coefficients to easily accelerate ions
-        K_cation = 1;                   % Coefficients to easily accelerate ions
-        Nani = [1e19];                            % A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.
-        Ncat = [1e19];
-        % Approximate density of iodide sites [cm-3]
-        % Limits the density of iodide vancancies
+        
+        %% Mobile ions        
+        N_ionic_species = 1;        
+        Nani = [1e19];                  % Mobile ion defect density [cm-3] - A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.
+        Ncat = [1e19];                  % Mobile ion defect density [cm-3] - A. Walsh et al. Angewandte Chemie, 2015, 127, 1811.
+        z_c = 1;                        % Integer charge state for cations
+        z_a = -1;                       % Integer charge state for anions
+        % Limits the density of ions - Approximate density of iodide sites [cm-3]
         amax = [1.21e22];                 % P. Calado thesis
         cmax = [1.21e22];
+        
+        K_anion = 1;                    % Coefficients to easily accelerate ions
+        K_cation = 1;                   % Coefficients to easily accelerate ions
+        
         %% Mobilities   [cm2V-1s-1]
         mue = [1];         % electron mobility
         muh = [1];         % hole mobility
-
-        muani = [1e-10];          % ion mobility
-        mucat = [1e-14];
+        mucat = [1e-10];
+        muani = [1e-12]; 
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
         % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
         % TiO2 mue = 0.09 cm2V-1s-1 Bak2008
         % Spiro muh = 0.02 cm2V-1s-1 Hawash2018
-
         %% Relative dielectric constants
         epp = [10];
 
         %% Recombination
-        % Radiative recombination, U = k(np - ni^2)
+        % Radiative recombination, r_rad = k(np - ni^2)
         % [cm3 s-1] Radiative Recombination coefficient
         B = [3.6e-12];
 
@@ -184,8 +184,6 @@ classdef pc
         taun = [1e6];           % [s] SRH time constant for electrons
         taup = [1e6];           % [s] SRH time constant for holes  
         
-        sn = [0];
-        sp = [0];
         %% Surface recombination and extraction coefficients [cm s-1]
         % Descriptions given in the comments considering that holes are
         % extracted at left boundary, electrons at right boundary
@@ -193,7 +191,17 @@ classdef pc
         sn_r = 1e7;     % electron extraction velocity right boundary
         sp_l = 1e7;     % hole extraction left boundary
         sp_r = 1e7;     % hole surface recombination velocity right boundary
-
+        
+        %% Volumetric surface recombination
+        vsr_mode = 1;               % Either 1 for volumetric surface recombination approximation or 0 for off
+        vsr_check = 1;              % Perform check for self-consitency at the end of DF
+        sn = [0];                   % Electron interfacial surface recombination velocity [cm s-1]
+        sp = [0];                   % Hole interfacial surface recombination velocities [cm s-1]
+        frac_vsr_zone = 0.1;        % recombination zone thickness [fraction of interface thickness]
+        vsr_zone_loc = {'auto'};    % recombination zone location either: 'L', 'C', 'R', or 'auto'. IMPORT_PROPERTIES deals with the choice of value.
+        AbsTol_vsr = 1e10;          % The integrated interfacial recombination flux above which a warning can be flagged [cm-2 s-1]
+        RelTol_vsr = 0.05;          % Fractional error between abrupt and volumetric surface recombination models above which a warning is flagged
+        
         %% Series resistance
         Rs = 0;
         Rs_initial = 0;         % Switch to allow linear ramp of Rs on first application
@@ -207,9 +215,9 @@ classdef pc
         genspace = [];
         x = [];
         xx = [];
-        x_ihalf = [];
+        x_sub = [];
         dev = [];
-        dev_ihalf = [];
+        dev_sub = [];
         t = [];
         xpoints = [];
         gx1 = [];       % Light source 1
@@ -253,16 +261,16 @@ classdef pc
         ND
         Vbi
         n0
-        nleft
-        nright
+        n0_l
+        n0_r
         ni
         nt              % Density of CB electrons when Fermi level at trap state energy
         nt_inter
         p0
         pcum
         pcum0           % Includes first entry as zero
-        pleft
-        pright
+        p0_l
+        p0_r
         pt              % Density of VB holes when Fermi level at trap state energy
         pt_inter
         wn
@@ -282,6 +290,7 @@ classdef pc
                 par = import_properties(par, filepath);
             elseif length(varargin) > 1
                 filepath = varargin{1, 1};
+                par = import_properties(par, filepath);
                 warning('pc should have 0 or 1 input arguments- only the first argument will be used for the filepath')
             end
 
@@ -510,7 +519,7 @@ classdef pc
             value = zeros(1, length(par.stack));
             value = distro_fun.pfun(par.Nv, par.IP, par.E0, par.T, par.prob_distro_function);
         end
-
+        
         %% Intrinsic carrier densities (Boltzmann)
         function value = get.ni(par)
             value = ((par.Nc.*par.Nv).^0.5).*exp(-par.Eg./(2*par.kB*par.T));
@@ -530,22 +539,22 @@ classdef pc
         %% Boundary electron and hole densities
         % Uses metal Fermi energies to calculate boundary densities
         % Electrons left boundary
-        function value = get.nleft(par)
+        function value = get.n0_l(par)
             value = distro_fun.nfun(par.Nc(1), par.EA(1), par.Phi_left, par.T, par.prob_distro_function);
         end
 
         % Electrons right boundary
-        function value = get.nright(par)
+        function value = get.n0_r(par)
             value = distro_fun.nfun(par.Nc(end), par.EA(end), par.Phi_right, par.T, par.prob_distro_function);
         end
 
         % Holes left boundary
-        function value = get.pleft(par)
+        function value = get.p0_l(par)
             value = distro_fun.pfun(par.Nv(1), par.IP(1), par.Phi_left, par.T, par.prob_distro_function);
         end
 
         % holes right boundary
-        function value = get.pright(par)
+        function value = get.p0_r(par)
             value = distro_fun.pfun(par.Nv(end), par.IP(end), par.Phi_right, par.T, par.prob_distro_function);
         end
        
@@ -581,6 +590,7 @@ classdef pc
         function value = get.int_switch(par)
             value = ones(1, length(par.stack));
         end
+        
     end
 
     methods (Static)
