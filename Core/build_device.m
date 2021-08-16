@@ -48,8 +48,8 @@ dev.taup = build_property(par.taup, xmesh, par, 'exp_graded', 0);
 % Properties that are zeroed in the interfaces
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);
 dev.B = build_property(par.B, xmesh, par, 'zeroed', 0);
-dev.NA = build_property(par.NA, xmesh, par, 'zeroed', 0);
-dev.ND = build_property(par.ND, xmesh, par, 'zeroed', 0);
+dev.NA = build_property(par.NA, xmesh, par, 'exp_graded', 0);
+dev.ND = build_property(par.ND, xmesh, par, 'exp_graded', 0);
 
 % Gradient properties
 dev.gradEA = build_property(par.EA, xmesh, par, 'lin_graded', 1);
