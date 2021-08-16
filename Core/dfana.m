@@ -66,40 +66,6 @@ classdef dfana
 
         end
 
-        function [Ecb, Evb, Efn, Efp] = QFL_sub(sol)
-            % Calculates the QFLs on the i_half xmesh
-            % u is the solution structure
-            % Simple structure names
-            [u,t,xmesh,par,dev,n0,p0,a0,c0,V0] = dfana.splitsol(sol);
-
-            n = getvar_sub(n0);
-            p = getvar_sub(p0);
-            V = getvar_sub(V0);
-            dev_sub = par.dev_sub;
-            Ecb_sub = dev_sub.EA-V;                                 % Conduction band potential
-            Evb_sub = dev_sub.IP-V;                                 % Valence band potential
-
-            if par.prob_distro_function == 'Fermi'
-
-                for i = 1:size(n,1)           % time
-                    for j = 1:size(n,2)       % position
-                        Efn_sub(i,j) = distro_fun.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
-                        Efp_sub(i,j) = distro_fun.Efp_fd_fun(p(i,j), dev.Efp(j,:),  dev.p_fd(j,:));
-                    end
-                end
-                Efn_sub = Efn_sub - V;
-                Efp_sub = Efp_sub - V;
-
-            elseif par.prob_distro_function == 'Boltz'
-                Efn_sub = real(Ecb_sub+(par.kB*par.T/par.q)*log(n./dev_sub.Nc));        % Electron quasi-Fermi level
-                Efp_sub = real(Evb_sub-(par.kB*par.T/par.q)*log(p./dev_sub.Nv));        % Hole quasi-Fermi level
-            end
-            Efn = Efn_sub;
-            Efp = Efp_sub;
-            Ecb = Ecb_sub;
-            Evb = Evb_sub;
-        end
-
         function [J, j, x] = calcJ(sol)
             % Current, J and flux, j calculation from continuity equations
             % obtain SOL components for easy referencing

@@ -296,11 +296,6 @@ dfana.splitsol(soleq.ion);
 % [Ecb, Evb, Efn, Efp] = QFLs(sol)
 dfana.QFLs(soleq.ion);
 
-%% Core dfana QFL_sub
-
-% [Ecb, Evb, Efn, Efp] = QFL_sub(sol)
-dfana.QFL_sub(soleq.ion);
-
 %% Core dfana calcJ
 
 % [J, j, x] = calcJ(sol)
