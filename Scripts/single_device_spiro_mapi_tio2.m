@@ -13,7 +13,7 @@ initialise_df
 
 %% Create a parameters object for Spiro/MAPI/TiO2 by including a filepath to the 
 % appropriate .csv as the arugment to the parameters class PC
-par_tio2 = pc('Input_files/spiro_mapi_tio2.csv');
+par_tio2 = pc('./Input_files/spiro_mapi_tio2_vary.csv');
 
 %% Find the equilibrium solutions
 soleq_tio2 = equilibrate(par_tio2);
