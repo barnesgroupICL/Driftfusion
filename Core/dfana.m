@@ -163,7 +163,7 @@ classdef dfana
             
             j.c = jc_l + deltajc;
             j.a = ja_l + deltaja;
-
+            
             % displacement flux
             FV_sub = dfana.calcF(sol, "sub");
 

@@ -153,7 +153,7 @@ if plot_switch
     for m = 1:length(loc)
         if plotswitch == 1
             %% Plot carrier densities
-            figure(500)
+            figure(600)
             subplot(1,length(loc),m)
             dfplot.colourblocks(sol, [1e-20,1e20]);
             set(gca, 'YScale','log');
@@ -175,7 +175,7 @@ if plot_switch
             ylim([ymin*0.1, ymax*10])
             
             %% Plot fluxes
-            figure(600)
+            figure(601)
             subplot(1,length(loc),m)
             for i = 1:length(tarr)
                 k = find(sol.t <= tarr(i));
