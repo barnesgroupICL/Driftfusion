@@ -61,13 +61,6 @@ for i = 1:length(t)
     p(i,:) = 0.5*(u(i, 2:end, 3) + u(i, 1:end-1, 3));
     dVdx(i,:) = (u(i, 2:end, 1) - u(i, 1:end-1, 1))./(x(2:end) - x(1:end-1));
 end
-
-for i=1:length(t)
-    [~, dVdx(i,:)] = pdeval(0, x, u(i,:,1), x_sub);
-    [n(i,:), ~] = pdeval(0, x, u(i,:,2), x_sub);
-    [p(i,:), ~] = pdeval(0, x, u(i,:,3), x_sub);
-end
-
 alpha = par.q*dVdx./(kB*T) + alpha0;
 beta = par.q*-dVdx./(kB*T) + beta0;
 
