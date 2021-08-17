@@ -32,6 +32,7 @@ par.V_fun_arg(4) = 0;           % Phase (Rads)
 
 disp('Applying oscillating potential')
 sol_Vapp = df(soleq_singlecar.ion, par);
+disp('Complete')
 
 % Plot outputs
 dfplot.Vappt(sol_Vapp)
