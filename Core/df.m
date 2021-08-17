@@ -168,6 +168,12 @@ S_V = 0; S_n = 0; S_p = 0; S_c = 0; S_a = 0;
 r_rad = 0; r_srh = 0; r_vsr = 0; r_np = 0;
 alpha = 0; beta = 0;
 
+%% Initialise solution arrays
+u_maxvar = zeros(N_max_variables, 1);
+dudx_maxvar = zeros(N_max_variables, 1);
+ul_maxvar = zeros(N_max_variables, 1);
+ur_maxvar = zeros(N_max_variables, 1);
+
 %% Solver options
 % MaxStep = limit maximum time step size during integration
 options = odeset('MaxStep', par.MaxStepFactor*0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
@@ -220,46 +226,24 @@ end
         g = gxt1 + gxt2;
         
         %% Unpack Variables
+        u_maxvar(1:N_variables) = u;
+        dudx_maxvar(1:N_variables) = dudx;
+        V = u_maxvar(1);
+        n = u_maxvar(2);
+        p = u_maxvar(3);
+        c = u_maxvar(4);
+        a = u_maxvar(5);
+        dVdx = dudx_maxvar(1);
+        dndx = dudx_maxvar(2);
+        dpdx = dudx_maxvar(3);
+        dcdx = dudx_maxvar(4);
+        dadx = dudx_maxvar(5);
+        
         switch N_ionic_species
-            case 0
-                V = u(1);
-                n = u(2);
-                p = u(3);
-                c = 0;
-                a = 0;
-                dVdx = dudx(1);
-                dndx = dudx(2);
-                dpdx = dudx(3);
-                dcdx = 0;
-                dadx = 0;
             case 1
-                V = u(1);
-                n = u(2);
-                p = u(3);
-                c = u(4);
-                a = Nani(i);
-                dVdx = dudx(1);
-                dndx = dudx(2);
-                dpdx = dudx(3);
-                dcdx = dudx(4);
-                dadx = 0;
-            case 2
-                V = u(1);
-                n = u(2);
-                p = u(3);
-                c = u(4);
-                a = u(5);
-                dVdx = dudx(1);
-                dndx = dudx(2);
-                dpdx = dudx(3);
-                dcdx = dudx(4);
-                dadx = dudx(5);
+                a = Nani(i);        % Static anion density
         end
-        
-        % Volumetric surface recombination gradients
-        alpha = sign_xn(i)*q*dVdx/(kB*T) + alpha0_xn(i);
-        beta = sign_xp(i)*q*-dVdx/(kB*T) + beta0_xp(i);
-        
+
         %% Equation editor
         % Time-dependence prefactor term
         C_V = 0;
@@ -283,13 +267,15 @@ end
         % Bulk SRH
         r_srh = SRHset*srh_zone(i)*((n*p - ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));
         % Volumetric surface recombination
+        alpha = sign_xn(i)*q*dVdx/(kB*T) + alpha0_xn(i);
+        beta = sign_xp(i)*q*-dVdx/(kB*T) + beta0_xp(i);
         r_vsr = SRHset*vsr_zone(i)*((n*exp(-alpha*xprime_n(i))*p*exp(-beta*xprime_p(i)) - ni(i)^2)...
             /(taun_vsr(i)*(p*exp(-beta*xprime_p(i)) + pt(i)) + taup_vsr(i)*(n*exp(-alpha*xprime_n(i)) + nt(i))));
         % Total electron and hole recombination
         r_np = r_rad + r_srh + r_vsr;
         
         % Source terms
-        S_V = Field_switch(i)*(q/(eppmax*epp0))*(-n + p - NA(i) + ND(i) + z_a*a + z_c*c);
+        S_V = (q/(eppmax*epp0))*(-n + p - NA(i) + ND(i) + z_a*a + z_c*c);
         S_n = g - r_np;
         S_p = g - r_np;
         S_c = 0;
@@ -347,42 +333,20 @@ end
 % Refer to PDEPE help for the precise meaning of P and Q
 % l and r refer to left and right boundaries.
     function [Pl,Ql,Pr,Qr] = dfbc(xl,ul,xr,ur,t)
-
-        switch N_ionic_species
-            case 0
-                V_l = ul(1);
-                V_r = ur(1);
-                n_l = ul(2);
-                n_r = ur(2);
-                p_l = ul(3);
-                p_r = ur(3);
-                c_l = 0;
-                c_r = 0;
-                a_l = 0;
-                a_r = 0;
-            case 1
-                V_l = ul(1);
-                V_r = ur(1);
-                n_l = ul(2);
-                n_r = ur(2);
-                p_l = ul(3);
-                p_r = ur(3);
-                c_l = ul(4);    
-                c_r = ur(4);
-                a_l = 0;
-                a_r = 0;
-            case 2
-                V_l = ul(1);
-                V_r = ur(1);
-                n_l = ul(2);
-                n_r = ur(2);
-                p_l = ul(3);
-                p_r = ur(3);
-                c_l = ul(4);
-                c_r = ur(4);
-                a_l = ul(5);
-                a_r = ur(5);
-        end
+        
+        ul_maxvar(1:N_variables) = ul;
+        ur_maxvar(1:N_variables) = ur;
+        
+        V_l = ul_maxvar(1);
+        V_r = ur_maxvar(1);
+        n_l = ul_maxvar(2);
+        n_r = ur_maxvar(2);
+        p_l = ul_maxvar(3);
+        p_r = ur_maxvar(3);
+        c_l = ul_maxvar(4);
+        c_r = ur_maxvar(4);
+        a_l = ul_maxvar(5);
+        a_r = ur_maxvar(5);
         
         switch par.V_fun_type
             case 'constant'
@@ -428,7 +392,6 @@ end
                     1;
                     1;];
                 
-
         % Remove unused entries
         Pl = Pl(1:N_variables);
         Pr = Pr(1:N_variables);
