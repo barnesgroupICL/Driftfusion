@@ -59,7 +59,6 @@ par.g2_fun_type = 'constant';
 par.OC = 0;
 par.tmesh_type = 2;
 par.Rs = 0;
-par.BC = 3;     % To enable boundary fluxes to be switched off
 
 %% Switch off mobilities
 par.mobset = 0;
@@ -71,7 +70,6 @@ sol = df(sol, par);
 disp('Complete')
 
 % Switch on mobilities
-par.BC = par_origin.BC;
 par.mobset = 1;
 par.radset = 1;
 
@@ -144,7 +142,7 @@ if electronic_only == 0
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
     par.K_anion = rat_anion;
     par.K_cation = rat_cation;
-    par.tmax = 1e3*t_diff;
+    par.tmax = 1e4*t_diff;
     par.t0 = par.tmax/1e3;
     par.vsr_check = 1;
     
@@ -172,7 +170,7 @@ if electronic_only == 0
     %% Ion equilibrium with surface recombination
     disp('Switching on SRH recombination')
     par.SRHset = 1;
-    par.tmax = 1e-6;
+    par.tmax = 10*t_diff;
     par.t0 = par.tmax/1e3;
     par.mobseti = 1;
     par.K_anion = 1;
