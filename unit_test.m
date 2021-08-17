@@ -291,10 +291,10 @@ build_property(par.Nc, par.xx, par, 'log_graded', 1);
 % [u,t,x,par,dev,n,p,a,c,V] = splitsol(sol)
 dfana.splitsol(soleq.ion);
 
-%% Core dfana QFLs
+%% Core dfana calcEnergies
 
-% [Ecb, Evb, Efn, Efp] = QFLs(sol)
-dfana.QFLs(soleq.ion);
+% [Ecb, Evb, Efn, Efp] = calcEnergies(sol)
+dfana.calcEnergies(soleq.ion);
 
 %% Core dfana calcJ
 
@@ -392,7 +392,7 @@ distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.E0, par.T, par.prob_distro_funct
 %% Core ditro_fun Dn_fd_fun and Dnlook and Efn_fd_fun
 
 Ec = -4.95;
-[~, ~, Efn, ~] = dfana.QFLs(soleq.ion);
+[~, ~, Efn, ~] = dfana.calcEnergies(soleq.ion);
 % Dnfd = Dn_fd_fun(Nc, Ec, Efn, mue, T)
 Dnfd = distro_fun.Dn_fd_fun(par.dev.Nc(end), Ec, Efn, par.mue(end), par.T);
 
@@ -404,7 +404,7 @@ distro_fun.Efn_fd_fun(soleq.ion.u(2,1,end), Efn, Dnfd.n_fd);
 
 %% Core ditro_fun Dp_fd_fun and Dplook and Efp_fd_fun
 
-[~, ~, ~, Efp] = dfana.QFLs(soleq.ion);
+[~, ~, ~, Efp] = dfana.calcEnergies(soleq.ion);
 % Dpfd = Dp_fd_fun(Nv, Ev, Efp, muh, T)
 Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.IP(1), Efp, par.muh(1), par.T);
 

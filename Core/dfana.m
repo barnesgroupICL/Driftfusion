@@ -38,7 +38,7 @@ classdef dfana
             end
         end
 
-        function [Ecb, Evb, Efn, Efp] = QFLs(sol)
+        function [Ecb, Evb, Efn, Efp] = calcEnergies(sol)
             % u is the solution structure
             % Simple structure names
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
@@ -378,6 +378,9 @@ classdef dfana
                     a = getvar_sub(a_whole);
                     c = getvar_sub(c_whole);
             end
+            
+            NAmat = repmat(dev.NA, length(t), 1);
+            NDmat = repmat(dev.ND, length(t), 1);
             % charge density
             rho = -n + p - dev.NA + dev.ND + par.z_a*a + par.z_c*c;
         end
@@ -489,7 +492,7 @@ classdef dfana
 
         function DeltaQFL = calcDeltaQFL(sol)
             % Get QFLs
-            [~, ~, Efn, Efp] = dfana.QFLs(sol);
+            [~, ~, Efn, Efp] = dfana.calcEnergies(sol);
             par = sol.par;
             if par.p0_l >= par.n0_l && par.n0_r >= par.p0_r
                 % p-type left boundary, n-type right boundary
