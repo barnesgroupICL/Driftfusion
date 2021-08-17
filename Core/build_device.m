@@ -21,7 +21,7 @@ end
 % Constant properties
 dev.mucat = build_property(par.mucat, xmesh, par, 'constant', 0);
 dev.muani = build_property(par.muani, xmesh, par, 'constant', 0);
-dev.epp = build_property(par.epp, xmesh, par, 'constant', 0);
+dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
 
 dev.sn = build_property(par.sn, xmesh, par, 'constant', 1);
 dev.sp = build_property(par.sp, xmesh, par, 'constant', 1);
