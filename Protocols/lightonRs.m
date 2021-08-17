@@ -29,8 +29,9 @@ t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
 
 disp('Switching on illumination')
 par.mobseti = 0;
+par.tmesh_type = 1;
 par.tmax = 100*t_diff;
-par.t0 = par.tmax/1e6;
+par.t0 = 0;
 par.Rs_initial = 0;
 par.int1 = int1;
 par.g1_fun_type = 'sweep';
@@ -43,10 +44,10 @@ C = par.e*par.epp(par.active_layer)*par.epp0/(par.d_active);      % Parallel pla
 tau_RC = C*Rs;
 
 par.g1_fun_type = 'constant';
-par.tmesh_type = 2;
+par.tmesh_type = 1;
 par.tpoints = 20;
-par.tmax = 100*par.tpoints*t_diff;
-par.t0 = par.tmax/1e6;
+par.tmax = 100*t_diff;
+par.t0 = 0;
 
 if Rs > 0
     par.Rs = Rs;
