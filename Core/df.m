@@ -261,7 +261,7 @@ end
         F_a = muani(i)*(z_a*a*dVdx + kB*T*(dadx + (a*(dadx/(amax(i) - a)))));
         F = [F_V; mobset*F_n; mobset*F_p; mobseti*K_cation*F_c; mobseti*K_anion*F_a];
         
-        % Electron and holes recombination
+        % Electron and hole recombination
         % Radiative
         r_rad = radset*B(i)*(n*p - ni(i)^2);
         % Bulk SRH
