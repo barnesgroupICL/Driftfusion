@@ -243,7 +243,7 @@ end
             case 1
                 a = Nani(i);        % Static anion density
         end
-
+        
         %% Equation editor
         % Time-dependence prefactor term
         C_V = 0;
@@ -275,7 +275,7 @@ end
         r_np = r_rad + r_srh + r_vsr;
         
         % Source terms
-        S_V = (q/(eppmax*epp0))*(-n + p - NA(i) + ND(i) + z_a*a + z_c*c);
+        S_V = Field_switch(i)*(q/(eppmax*epp0))*(-n + p - NA(i) + ND(i) + z_a*a + z_c*c);
         S_n = g - r_np;
         S_p = g - r_np;
         S_c = 0;
@@ -353,45 +353,45 @@ end
                 Vapp = par.V_fun_arg(1);
             otherwise
                 Vapp = Vapp_fun(par.V_fun_arg, t);
-        end   
+        end
         
-                % Flux boundary conditions for both carrier types.
-                % Calculate series resistance voltage Vres
-                if Rs == 0
-                    Vres = 0;
-                else
-                    J = e*sp_r*(ur(3) - p0_r) - e*sn_r*(ur(2) - n0_r);
-                    if Rs_initial
-                        Vres = -J*Rs*t/par.tmax;    % Initial linear sweep
-                    else
-                        Vres = -J*Rs;
-                    end
-                end
-                
-                Pl = [-V_l;
-                    mobset*(-sn_l*(n_l - n0_l));
-                    mobset*(-sp_l*(p_l - p0_l));
-                    0;                              
-                    0;];
-                
-                Ql = [0;
-                    1;
-                    1;
-                    1;
-                    1;];
-                
-                Pr = [-V_r+Vbi-Vapp-Vres;
-                    mobset*(sn_r*(n_r - n0_r));
-                    mobset*(sp_r*(p_r - p0_r));
-                    0;
-                    0;];
-                
-                Qr = [0;
-                    1;
-                    1;
-                    1;
-                    1;];
-                
+        % Flux boundary conditions for both carrier types.
+        % Calculate series resistance voltage Vres
+        if Rs == 0
+            Vres = 0;
+        else
+            J = e*sp_r*(p_r - p0_r) - e*sn_r*(n_r - n0_r);
+            if Rs_initial
+                Vres = -J*Rs*t/par.tmax;    % Initial linear sweep
+            else
+                Vres = -J*Rs;
+            end
+        end
+        
+        Pl = [-V_l;
+            mobset*(-sn_l*(n_l - n0_l));
+            mobset*(-sp_l*(p_l - p0_l));
+            0;
+            0;];
+        
+        Ql = [0;
+            1;
+            1;
+            1;
+            1;];
+        
+        Pr = [-V_r+Vbi-Vapp-Vres;
+            mobset*(sn_r*(n_r - n0_r));
+            mobset*(sp_r*(p_r - p0_r));
+            0;
+            0;];
+        
+        Qr = [0;
+            1;
+            1;
+            1;
+            1;];
+        
         % Remove unused entries
         Pl = Pl(1:N_variables);
         Pr = Pr(1:N_variables);
