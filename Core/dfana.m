@@ -189,7 +189,7 @@ classdef dfana
             
             dVdx = zeros(length(t), length(x));
             for i=1:length(t)
-                [~, dVdx(i,:)] = pdeval(0, x, V(i,:), x);
+                [~, dVdx(i,:)] = pdeval(0, x_input, V(i,:), x);
             end
             vsr_zone = repmat(dev.vsr_zone, length(t), 1);
             srh_zone = repmat(dev.srh_zone, length(t), 1);
