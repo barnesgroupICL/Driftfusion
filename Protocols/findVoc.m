@@ -29,8 +29,8 @@ par = sol_ini.par;
 %% Initital settings
 if mobseti == 1
     % Take ratio of electron and ion mobilities in the active layer
-    rat_anion = par.mue(par.active_layer)/par.muani(par.active_layer);
-    rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+    rat_anion = par.mu_n(par.active_layer)/par.mu_a(par.active_layer);
+    rat_cation = par.mu_n(par.active_layer)/par.mu_c(par.active_layer);
     
     % If the ratio is infinity (ion mobility set to zero) then set the ratio to
     % zero instead
@@ -43,8 +43,8 @@ if mobseti == 1
     end
     
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
-    par.K_anion = rat_anion;
-    par.K_cation = rat_cation;
+    par.K_a = rat_anion;
+    par.K_c = rat_cation;
 end
 
 %% 1 Sun quasi equilibrium solution
@@ -157,8 +157,8 @@ while abs(fx1) > tol
 end
 
 sol_Voc = sol;
-sol_Voc.par.K_anion = 1;
-sol_Voc.par.K_cation = 1;
+sol_Voc.par.K_a = 1;
+sol_Voc.par.K_c = 1;
 
 Voc = x1;
 

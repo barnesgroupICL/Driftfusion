@@ -25,7 +25,7 @@ par = sol_ini.par;
 par_origin = par;
 
 % Characteristic diffusion time
-t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
+t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
 
 disp('Switching on illumination')
 par.mobseti = 0;

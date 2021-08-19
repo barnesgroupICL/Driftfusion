@@ -38,10 +38,10 @@ function [struct_voc, Voc] = findVocOptim(struct, approxVoc)
 
 
 % set an initial time for stabilization tmax
-if any(struct.par.mucat) && struct.par.mobseti
-    struct.par.tmax = min(5e0, 2^(-log10(max(struct.par.mucat))) / 10 + 2^(-log10(min(struct.par.mue))));
+if any(struct.par.mu_c) && struct.par.mobseti
+    struct.par.tmax = min(5e0, 2^(-log10(max(struct.par.mu_c))) / 10 + 2^(-log10(min(struct.par.mu_n))));
 else
-    struct.par.tmax = min(1e-2, 2^(-log10(min(struct.par.mue))));
+    struct.par.tmax = min(1e-2, 2^(-log10(min(struct.par.mu_n))));
 end
 
 struct.par.tmesh_type = 2;

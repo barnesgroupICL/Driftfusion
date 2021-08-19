@@ -92,21 +92,21 @@ for i=1:length(par.dcum)                % i is the layer index
                         else
                             devprop(j) = deff*par.frac_vsr_zone/(par.sp(i));
                         end
-                    case 'mue_vsr'
+                    case 'mu_n_vsr'
                         if alpha0 < 0
-                            devprop(j) = par.mue(i-1)*exp(abs(alpha0)*xprime_n);
+                            devprop(j) = par.mu_n(i-1)*exp(abs(alpha0)*xprime_n);
                         elseif alpha0 > 0
-                            devprop(j) = par.mue(i+1)*exp(abs(alpha0)*xprime_n);
+                            devprop(j) = par.mu_n(i+1)*exp(abs(alpha0)*xprime_n);
                         else
-                            devprop(j) = par.mue(i);
+                            devprop(j) = par.mu_n(i);
                         end
-                    case 'muh_vsr'
+                    case 'mu_p_vsr'
                         if beta0 < 0
-                            devprop(j) = par.muh(i-1)*exp(abs(beta0)*xprime_p);
+                            devprop(j) = par.mu_p(i-1)*exp(abs(beta0)*xprime_p);
                         elseif beta0 > 0
-                            devprop(j) = par.muh(i+1)*exp(abs(beta0)*xprime_p);
+                            devprop(j) = par.mu_p(i+1)*exp(abs(beta0)*xprime_p);
                         else
-                            devprop(j) = par.muh(i);
+                            devprop(j) = par.mu_p(i);
                         end
                     case 'int_switch'
                         devprop(j) = 1;

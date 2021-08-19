@@ -39,8 +39,8 @@ pcum1 = par.pcum + 1;   % Cumulative layer points array
 xprime = dev.xprime;
 alpha0 = dev.alpha0;
 beta0 = dev.beta0;
-mue = dev.mue;
-muh = dev.muh;
+mu_n = dev.mu_n;
+mu_p = dev.mu_p;
 dint = dev.dint;
 Vt = kB*T;
 kB = par.kB;
@@ -104,24 +104,24 @@ for m = 1:length(loc)
                     case 1  % Full expressions
                         if alpha(k,i) <= 0
                             X = exp(alpha(k,i)*xprime(i));
-                            n_ana(k,i) = ns(k,m)*X + (jns(k,m)/(alpha(k,i)*mue(i)*Vt))*(1 - X)...
-                                - ((jns(k,m)-jn(k,i))/(alpha(k,i)^2*mue(i)*Vt*xprime(i)))*(1 - X + alpha(k,i)*xprime(i));
+                            n_ana(k,i) = ns(k,m)*X + (jns(k,m)/(alpha(k,i)*mu_n(i)*Vt))*(1 - X)...
+                                - ((jns(k,m)-jn(k,i))/(alpha(k,i)^2*mu_n(i)*Vt*xprime(i)))*(1 - X + alpha(k,i)*xprime(i));
                             
                         elseif alpha(k,i) > 0
                             Xstar = exp(alpha(k,i)*(xprime(i)-dint(k)));
-                            n_ana(k,i) = ns(k,m)*Xstar + (jns(k,m)/(alpha(k,i)*mue(i)*Vt))*(1 - Xstar)...
-                                - ((jns(k,m)-jn(k,i))/(alpha(k,i)^2*mue(i)*Vt*xprime(i)))*(1 + alpha(k,i)*xprime(i) - (1 + alpha(k,i)*dint(k))*Xstar);
+                            n_ana(k,i) = ns(k,m)*Xstar + (jns(k,m)/(alpha(k,i)*mu_n(i)*Vt))*(1 - Xstar)...
+                                - ((jns(k,m)-jn(k,i))/(alpha(k,i)^2*mu_n(i)*Vt*xprime(i)))*(1 + alpha(k,i)*xprime(i) - (1 + alpha(k,i)*dint(k))*Xstar);
                         end
                         
                         if beta(k,i) <= 0
                             Y = exp(beta(k,i)*xprime(i));
-                            p_ana(k,i) = ps(k,m)*Y + (jps(k,m)/(beta(k,i)*muh(i)*Vt))*(1 - Y)...
-                                - ((jps(k,m)-jp(k,i))/(beta(k,i)^2*muh(i)*Vt*xprime(i)))*(1 - Y + beta(k,i)*xprime(i));
+                            p_ana(k,i) = ps(k,m)*Y + (jps(k,m)/(beta(k,i)*mu_p(i)*Vt))*(1 - Y)...
+                                - ((jps(k,m)-jp(k,i))/(beta(k,i)^2*mu_p(i)*Vt*xprime(i)))*(1 - Y + beta(k,i)*xprime(i));
                             
                         elseif beta(k,i) > 0
                             Ystar = exp(beta(k,i)*(xprime(i)-dint(k)));
-                            p_ana(k,i) = ps(k,m)*Ystar + (jps(k,m)/(beta(k,i)*muh(i)*Vt))*(1 - Ystar)...
-                                - ((jps(k,m)-jp(k,i))/(beta(k,i)^2*muh(i)*Vt*xprime(i)))*(1 + beta(k,i)*xprime(i) - (1 + beta(k,i)*dint(k))*Ystar);
+                            p_ana(k,i) = ps(k,m)*Ystar + (jps(k,m)/(beta(k,i)*mu_p(i)*Vt))*(1 - Ystar)...
+                                - ((jps(k,m)-jp(k,i))/(beta(k,i)^2*mu_p(i)*Vt*xprime(i)))*(1 + beta(k,i)*xprime(i) - (1 + beta(k,i)*dint(k))*Ystar);
                         end
                         %% Fluxes
                     case 2  % First terms only

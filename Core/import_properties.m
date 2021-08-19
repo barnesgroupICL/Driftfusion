@@ -95,59 +95,79 @@ end
 try
     par.Ncat = T{:, 'Ncat'}';
 catch
-    warning('No equilibrium cation density array (Ncat) defined in .csv . Using default in PC')
+    try
+        par.a_max = T{:, 'Nion'}';
+    catch
+        warning('No equilibrium cation density array (Ncat) defined in .csv . Using default in PC')
+    end
 end
 % Limiting density of anion states
 try
-    par.amax = T{:, 'amax'}';
+    par.a_max = T{:, 'a_max'}';
 catch
     try
-        par.amax = T{:, 'DOSani'}';
+        par.a_max = T{:, 'DOSani'}';
     catch
         try
-            par.amax = T{:, 'Nion'}';
+            par.a_max = T{:, 'amax'}';
         catch
-            warning('No maximum anion density array (amax) defined in .csv . Using default in PC')
+            warning('No maximum anion density array (a_max) defined in .csv . Using default in PC')
         end
     end
 end
 % Limiting density of cation states
 try
-    par.cmax = T{:, 'cmax'}';
+    par.c_max = T{:, 'c_max'}';
 catch
     try
-        par.cmax = T{:, 'DOScat'}';
+        par.c_max = T{:, 'DOScat'}';
     catch
-        warning('No maximum cation density array (cmax) defined in .csv . Using default in PC')
+        try
+            par.c_max = T{:, 'cmax'}';
+        catch
+            warning('No maximum cation density array (c_max) defined in .csv . Using default in PC')
+        end
     end
 end
 % Electron mobility
 try
-    par.mue = T{:, 'mue'}';
+    par.mu_n = T{:, 'mu_n'}';
 catch
-    warning('No electron mobility (mue) defined in .csv . Using default in PC')
+    try
+        par.mu_a = T{:, 'mue'}';
+    catch
+        warning('No electron mobility (mu_n) defined in .csv . Using default in PC')
+    end
 end
 % Hole mobility
 try
-    par.muh = T{:, 'muh'}';
+    par.mu_p = T{:, 'mu_p'}';
 catch
-    warning('No hole mobility (muh) defined in .csv . Using default in PC')
+    try
+        par.mu_a = T{:, 'muh'}';
+    catch
+        warning('No hole mobility (mu_p) defined in .csv . Using default in PC')
+    end
 end
 % Anion mobility
 try
-    par.muani = T{:, 'muani'}';
+    par.mu_a = T{:, 'mu_a'}';
 catch
     try
-        par.muani = T{:, 'muion'}';
+        par.mu_a = T{:, 'muani'}';
     catch
-        warning('No anion mobility (muani) defined in .csv . Using default in PC')
+        warning('No anion mobility (mu_a) defined in .csv . Using default in PC')
     end
 end
 % Cation mobility
 try
-    par.mucat = T{:, 'mucat'}';
+    par.mu_c = T{:, 'mu_c'}';
 catch
-    warning('No cation mobility (mucat) defined in .csv . Using default in PC')
+    try
+        par.mu_c = T{:, 'mucat'}';
+    catch
+        warning('No cation mobility (mu_c) defined in .csv . Using default in PC')
+    end
 end
 % Relative dielectric constant
 try

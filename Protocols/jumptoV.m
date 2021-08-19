@@ -33,7 +33,7 @@ par = sol_ini.par;
 
 %% Set up sweep
 % Characteristic diffusion time
-t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
+t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
 par.tmax = 100*t_diff;
 par.tmesh_type = 1;
 par.t0 = 0;
@@ -52,8 +52,8 @@ par = jump1.par;
 
 if accelerate
     % Take ratio of electron and ion mobilities in the active layer
-    rat_anion = par.mue(par.active_layer)/par.muani(par.active_layer);
-    rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+    rat_anion = par.mu_n(par.active_layer)/par.mu_a(par.active_layer);
+    rat_cation = par.mu_n(par.active_layer)/par.mu_c(par.active_layer);
     
     % If the ratio is infinity (ion mobility set to zero) then set the ratio to
     % zero instead
@@ -64,11 +64,11 @@ if accelerate
     if isnan(rat_cation) || isinf(rat_cation)
         rat_cation = 0;
     end
-    par.K_anion = rat_anion;
-    par.K_cation = rat_cation;
+    par.K_a = rat_anion;
+    par.K_c = rat_cation;
 else
-    par.K_anion = 1;
-    par.K_cation = 1;
+    par.K_a = 1;
+    par.K_c = 1;
 end
 
 par.V_fun_type = 'constant';
@@ -106,8 +106,8 @@ if stabilise
 end
 disp('Complete')
 sol_relax = sol;
-sol_relax.par.K_cation = 1;
-sol_relax.par.K_anion = 1;
+sol_relax.par.K_c = 1;
+sol_relax.par.K_a = 1;
 % Read out currents from LH side
 dfplot.Jt(sol_relax, sol_relax.x(end));
 

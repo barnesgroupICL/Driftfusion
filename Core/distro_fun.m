@@ -80,7 +80,7 @@ classdef distro_fun
             
         end
         
-        function Dnfd = Dn_fd_fun(Nc, Ec, Efn, mue, T)
+        function Dnfd = Dn_fd_fun(Nc, Ec, Efn, mu_n, T)
             if isnan(Ec) == 0    % ignores interfaces
                 
                 % Calculates Fermi Dirac diffusion coefficient function
@@ -110,14 +110,14 @@ classdef distro_fun
                     
                 end
                 
-                Dnfd.Dnfun = mue*(n./dndE);
+                Dnfd.Dnfun = mu_n*(n./dndE);
                 Dnfd.n_fd = n;
                 Dnfd.Efn = Efn;
                 
             end
         end
         
-        function Dpfd = Dp_fd_fun(Nv, Ev, Efp, muh, T)
+        function Dpfd = Dp_fd_fun(Nv, Ev, Efp, mu_p, T)
             if isnan(Ev) == 0    % ignores interfaces
                 
                 % Calculates Fermi Dirac diffusion coefficient function
@@ -151,7 +151,7 @@ classdef distro_fun
                     dpdE(i) = ((2*Nv)/(kT*pi^0.5))*integral(dfdE, 0, distro_fun.uplimit);
                 end
                 
-                Dpfd.Dpfun = muh*(p./dpdE);
+                Dpfd.Dpfun = mu_p*(p./dpdE);
                 Dpfd.p_fd = p;
                 Dpfd.Efp = Efp;
                 

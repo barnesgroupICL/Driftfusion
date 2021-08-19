@@ -393,8 +393,8 @@ distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.E0, par.T, par.prob_distro_funct
 
 Ec = -4.95;
 [~, ~, Efn, ~] = dfana.calcEnergies(soleq.ion);
-% Dnfd = Dn_fd_fun(Nc, Ec, Efn, mue, T)
-Dnfd = distro_fun.Dn_fd_fun(par.dev.Nc(end), Ec, Efn, par.mue(end), par.T);
+% Dnfd = Dn_fd_fun(Nc, Ec, Efn, mu_n, T)
+Dnfd = distro_fun.Dn_fd_fun(par.dev.Nc(end), Ec, Efn, par.mu_n(end), par.T);
 
 % Dsol = Dnlook(n, Dnfun, n_fd)
 distro_fun.Dnlook(soleq.ion.u(2,1,end), Dnfd.Dnfun, Dnfd.n_fd);
@@ -405,8 +405,8 @@ distro_fun.Efn_fd_fun(soleq.ion.u(2,1,end), Efn, Dnfd.n_fd);
 %% Core ditro_fun Dp_fd_fun and Dplook and Efp_fd_fun
 
 [~, ~, ~, Efp] = dfana.calcEnergies(soleq.ion);
-% Dpfd = Dp_fd_fun(Nv, Ev, Efp, muh, T)
-Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.IP(1), Efp, par.muh(1), par.T);
+% Dpfd = Dp_fd_fun(Nv, Ev, Efp, mu_p, T)
+Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.IP(1), Efp, par.mu_p(1), par.T);
 
 % Dsol = Dplook(p, Dpfun, p_fd)
 distro_fun.Dplook(soleq.ion.u(3,1,1), Dpfd.Dpfun, Dpfd.p_fd);

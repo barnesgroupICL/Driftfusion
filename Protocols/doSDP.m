@@ -43,8 +43,8 @@ par.tmesh_type = 1;
 par.V_fun_type = 'constant';
 par.V_fun_arg = Vjump;
 par.mobseti = 1;
-par.K_cation = scalefactor;
-par.K_anion = scalefactor;
+par.K_c = scalefactor;
+par.K_a = scalefactor;
 
 % Preallocate memory
 sdpsol.Jtr = zeros(tpoints, length(tdwell_arr));

@@ -76,16 +76,16 @@ epp0 = par.epp0;
 %% Device parameters
 device = par.dev_sub;
 T = par.T;
-mue = device.mue;           % Electron mobility
-muh = device.muh;           % Hole mobility
-Dn = mue*kB*T;              % Electron diffusion coefficient
-Dp = muh*kB*T;              % Hole diffusion coefficient
-mucat = device.mucat;       % Cation mobility
-muani = device.muani;       % Anion mobility
+mu_n = device.mu_n;           % Electron mobility
+mu_p = device.mu_p;           % Hole mobility
+Dn = mu_n*kB*T;              % Electron diffusion coefficient
+Dp = mu_p*kB*T;              % Hole diffusion coefficient
+mu_c = device.mu_c;       % Cation mobility
+mu_a = device.mu_a;       % Anion mobility
 Nc = device.Nc;             % Conduction band effective density of states
 Nv = device.Nv;             % Valence band effective density of states
-cmax = device.cmax;     % Cation density upper limit
-amax = device.amax;     % Anion density upper limit
+c_max = device.c_max;     % Cation density upper limit
+a_max = device.a_max;     % Anion density upper limit
 gradNc = device.gradNc;     % Conduction band effective density of states gradient
 gradNv = device.gradNv;     % Valence band effective density of states gradient
 gradEA = device.gradEA;     % Electron Affinity gradient
@@ -130,8 +130,8 @@ Rs_initial = par.Rs_initial;
 %% Switches and accelerator coefficients
 mobset = par.mobset;        % Electronic carrier transport switch
 mobseti = par.mobseti;      % Ionic carrier transport switch
-K_cation = par.K_cation;    % Cation transport rate multiplier
-K_anion = par.K_anion;      % Anion transport rate multiplier
+K_c = par.K_c;    % Cation transport rate multiplier
+K_a = par.K_a;      % Anion transport rate multiplier
 radset = par.radset;        % Radiative recombination switch
 SRHset = par.SRHset;        % SRH recombination switch
 vsr_zone = device.vsr_zone;
@@ -255,11 +255,11 @@ end
         
         % Flux terms
         F_V = (epp(i)/eppmax)*dVdx;
-        F_n = mue(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
-        F_p = muh(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
-        F_c = mucat(i)*(z_c*c*dVdx + kB*T*(dcdx + (c*(dcdx/(cmax(i) - c)))));
-        F_a = muani(i)*(z_a*a*dVdx + kB*T*(dadx + (a*(dadx/(amax(i) - a)))));
-        F = [F_V; mobset*F_n; mobset*F_p; mobseti*K_cation*F_c; mobseti*K_anion*F_a];
+        F_n = mu_n(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
+        F_p = mu_p(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
+        F_c = mu_c(i)*(z_c*c*dVdx + kB*T*(dcdx + (c*(dcdx/(c_max(i) - c)))));
+        F_a = mu_a(i)*(z_a*a*dVdx + kB*T*(dadx + (a*(dadx/(a_max(i) - a)))));
+        F = [F_V; mobset*F_n; mobset*F_p; mobseti*K_c*F_c; mobseti*K_a*F_a];
         
         % Electron and hole recombination
         % Radiative

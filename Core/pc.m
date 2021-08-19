@@ -157,21 +157,21 @@ classdef pc
         z_c = 1;                        % Integer charge state for cations
         z_a = -1;                       % Integer charge state for anions
         % Limits the density of ions - Approximate density of iodide sites [cm-3]
-        amax = [1.21e22];                 % P. Calado thesis
-        cmax = [1.21e22];
+        a_max = [1.21e22];                 % P. Calado thesis
+        c_max = [1.21e22];
         
-        K_anion = 1;                    % Coefficients to easily accelerate ions
-        K_cation = 1;                   % Coefficients to easily accelerate ions
+        K_a = 1;                    % Coefficients to easily accelerate ions
+        K_c = 1;                   % Coefficients to easily accelerate ions
         
         %% Mobilities   [cm2V-1s-1]
-        mue = [1];         % electron mobility
-        muh = [1];         % hole mobility
-        mucat = [1e-10];
-        muani = [1e-12]; 
+        mu_n = [1];         % electron mobility
+        mu_p = [1];         % hole mobility
+        mu_c = [1e-10];
+        mu_a = [1e-12]; 
         % PTPD h+ mobility: https://pubs.rsc.org/en/content/articlehtml/2014/ra/c4ra05564k
-        % PEDOT mue = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
-        % TiO2 mue = 0.09 cm2V-1s-1 Bak2008
-        % Spiro muh = 0.02 cm2V-1s-1 Hawash2018
+        % PEDOT mu_n = 0.01 cm2V-1s-1 https://aip.scitation.org/doi/10.1063/1.4824104
+        % TiO2 mu_n = 0.09 cm2V-1s-1 Bak2008
+        % Spiro mu_p = 0.02 cm2V-1s-1 Hawash2018
         %% Relative dielectric constants
         epp = [10];
 
@@ -320,20 +320,20 @@ classdef pc
                 end
             end
 
-            % Warn if amax is set to zero in any layers - leads to
+            % Warn if a_max is set to zero in any layers - leads to
             % infinite diffusion rate
-            for i = 1:length(par.amax)
-                if par.amax(i) <= 0
-                    msg = 'Maximum cation density (amax) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
+            for i = 1:length(par.a_max)
+                if par.a_max(i) <= 0
+                    msg = 'Maximum cation density (a_max) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
                     error(msg);
                 end
             end
 
-            % Warn if cmax is set to zero in any layers - leads to
+            % Warn if c_max is set to zero in any layers - leads to
             % infinite diffusion rate
-            for i = 1:length(par.cmax)
-                if par.cmax(i) <= 0
-                    msg = 'Maximum cation density (cmax) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
+            for i = 1:length(par.c_max)
+                if par.c_max(i) <= 0
+                    msg = 'Maximum cation density (c_max) cannot have zero or negative entries- choose a low value rather than zero e.g. 1';
                     error(msg);
                 end
             end
@@ -362,14 +362,14 @@ classdef pc
             elseif length(par.IP) ~= length(par.d)
                 msg = 'Ionisation Potential array (IP) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.mue) ~= length(par.d)
-                msg = 'Electron mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.mu_n) ~= length(par.d)
+                msg = 'Electron mobility array (mu_n) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.muh) ~= length(par.d)
-                msg = 'Hole mobility array (mue) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.mu_p) ~= length(par.d)
+                msg = 'Hole mobility array (mu_n) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.muani) ~= length(par.d)
-                msg = 'Ion mobility array (muh) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.mu_a) ~= length(par.d)
+                msg = 'Ion mobility array (mu_p) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.NA) ~= length(par.d)
                 msg = 'Acceptor density array (NA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
@@ -386,8 +386,8 @@ classdef pc
             elseif length(par.Nani) ~= length(par.d)
                 msg = 'Background ion density (Nani) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.amax) ~= length(par.d)
-                msg = 'Ion density of states array (amax) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.a_max) ~= length(par.d)
+                msg = 'Ion density of states array (a_max) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.epp) ~= length(par.d)
                 msg = 'Relative dielectric constant array (epp) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';

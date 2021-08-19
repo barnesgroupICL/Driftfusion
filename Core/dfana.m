@@ -130,6 +130,12 @@ classdef dfana
             j.c = jc_l + deltajc;
             j.a = ja_l + deltaja;
             
+            % Apply switches and accelerators
+            j.n = par.mobset*j.n;
+            j.p = par.mobset*j.p;
+            j.c = par.mobseti*par.K_c*j.c;
+            j.a = par.mobseti*par.K_a*j.a;
+            
             % displacement flux
             FV_sub = dfana.calcF(sol, "sub");
 
@@ -229,10 +235,10 @@ classdef dfana
 
             % Property matrices
             eppmat = dev.epp;
-            mue_mat = dev.mue;
-            muh_mat = dev.muh;
-            mu_cat = dev.mucat;
-            mu_ani = dev.muani;
+            mu_n_mat = dev.mu_n;
+            mu_p_mat = dev.mu_p;
+            mu_cat = dev.mu_c;
+            mu_ani = dev.mu_a;
             gradEA_mat = dev.gradEA;
             gradIP_mat = dev.gradIP;
             gradNc_mat = dev.gradNc;
@@ -277,14 +283,14 @@ classdef dfana
             end
         
             if par.prob_distro_function == 'Boltz'
-                Dn_mat = mue_mat*par.kB*par.T;
-                Dp_mat = muh_mat*par.kB*par.T;
+                Dn_mat = mu_n_mat*par.kB*par.T;
+                Dp_mat = mu_p_mat*par.kB*par.T;
             end
 
             % Particle fluxes (remember F = -dVdx)
-            jdd.ndrift = mue_mat.*n_sub.*(dVdx - gradEA_mat);
+            jdd.ndrift = mu_n_mat.*n_sub.*(dVdx - gradEA_mat);
             jdd.ndiff = -Dn_mat.*(dndx - ((n_sub./Nc_mat).*gradNc_mat));
-            jdd.pdrift = muh_mat.*p_sub.*(-dVdx + gradIP_mat);
+            jdd.pdrift = mu_p_mat.*p_sub.*(-dVdx + gradIP_mat);
             jdd.pdiff = -Dp_mat.*(dpdx - ((p_sub./Nv_mat).*gradNv_mat));
                      
             switch par.N_ionic_species

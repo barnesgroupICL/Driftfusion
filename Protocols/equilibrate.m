@@ -74,7 +74,7 @@ par.mobset = 1;
 par.radset = 1;
 
 % Characteristic diffusion time
-t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
+t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
 par.tmax = 100*t_diff;
 par.t0 = par.tmax/1e6;
 
@@ -125,8 +125,8 @@ if electronic_only == 0
     disp('Closed circuit equilibrium with ions')
     
     % Take ratio of electron and ion mobilities in the active layer
-    rat_anion = par.mue(par.active_layer)/par.muani(par.active_layer);
-    rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+    rat_anion = par.mu_n(par.active_layer)/par.mu_a(par.active_layer);
+    rat_cation = par.mu_n(par.active_layer)/par.mu_c(par.active_layer);
     
     % If the ratio is infinity (ion mobility set to zero) then set the ratio to
     % zero instead
@@ -140,8 +140,8 @@ if electronic_only == 0
     
     par.mobset = 1;
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
-    par.K_anion = rat_anion;
-    par.K_cation = rat_cation;
+    par.K_a = rat_anion;
+    par.K_c = rat_cation;
     par.tmax = 1e4*t_diff;
     par.t0 = par.tmax/1e3;
     par.vsr_check = 1;
@@ -162,8 +162,8 @@ if electronic_only == 0
     % write solution and reset ion mobility
     soleq_i_nosrh = sol;
     soleq_i_nosrh.par.mobseti = 1;
-    soleq_i_nosrh.par.K_anion = 1;
-    soleq_i_nosrh.par.K_cation = 1;
+    soleq_i_nosrh.par.K_a = 1;
+    soleq_i_nosrh.par.K_c = 1;
     
     disp('Ion equilibrium solution complete')
     
@@ -173,8 +173,8 @@ if electronic_only == 0
     par.tmax = 10*t_diff;
     par.t0 = par.tmax/1e3;
     par.mobseti = 1;
-    par.K_anion = 1;
-    par.K_cation = 1;
+    par.K_a = 1;
+    par.K_c = 1;
     
     soleq.ion = df(soleq_i_nosrh, par);
     disp('Complete')
