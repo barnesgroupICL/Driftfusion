@@ -283,13 +283,13 @@ classdef dfana
             switch par.prob_distro_function
                 case 'Fermi'
                     for jj = 1:length(x)
-                        Dn(i,jj) = distro_fun.D(n(i,jj), dev.Dnfun(jj,:), dev.n_fd(jj,:));
-                        Dp(i,jj) = distro_fun.D(p(i,jj), dev.Dpfun(jj,:), dev.p_fd(jj,:));
+                        Dn_mat(i,jj) = distro_fun.D(n(i,jj), dev.Dnfun(jj,:), dev.n_fd(jj,:));
+                        Dp_mat(i,jj) = distro_fun.D(p(i,jj), dev.Dpfun(jj,:), dev.p_fd(jj,:));
                     end
                     
                 case 'Blakemore'
-                    Dn_mat = mu_n_mat.*par.kB.*par.T.*(Nc_mat/(Nc_mat - par.gamma*n_sub));
-                    Dp_mat = mu_p_mat.*par.kB.*par.T.*(Nv_mat/(Nv_mat - par.gamma*p_sub));
+                    Dn_mat = mu_n_mat.*par.kB.*par.T.*(Nc_mat./(Nc_mat - par.gamma.*n_sub));
+                    Dp_mat = mu_p_mat.*par.kB.*par.T.*(Nv_mat./(Nv_mat - par.gamma.*p_sub));
                     
                 case 'Boltz'
                     Dn_mat = mu_n_mat*par.kB*par.T;

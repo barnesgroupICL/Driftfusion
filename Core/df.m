@@ -108,9 +108,9 @@ sign_xn = device.sign_xn;           % 1 if xn increasing, -1 if decreasing wrt x
 sign_xp = device.sign_xp;           % 1 if xp increasing, -1 if decreasing wrt x
 alpha0_xn = device.alpha0_xn;       % alpha0_xn is alpha for F = 0 reference to xprime_n
 beta0_xp = device.beta0_xp;         % beta0_xp is beta for F = 0 referenced to xprime_p
-N_max_variables = par.N_max_variables;  % Maximum number of variables allowable in this version of Driftfusion
 N_ionic_species = par.N_ionic_species;  % Number of ionic species in this solution
 N_variables = par.N_ionic_species + 3;  % Number of variables in this solution (+3 for V, n, and p)
+N_max_variables = par.N_max_variables;  % Maximum number of variables in this version
 
 z_c = par.z_c;
 z_a = par.z_a;

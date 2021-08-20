@@ -90,7 +90,7 @@ classdef pc
         SRHset = 1;                         % Switch on/off SRH recombination - recommend setting to zero for initial solution
         radset = 1;                         % Switch on/off band-to-band recombination
         N_max_variables = 5;                % Total number of allowable variables in this version of Driftfusion
-        prob_distro_function = 'Boltz';     % 'Fermi' = Fermi-Dirac, 'Blakemore' = Blakemore aproximation, 'Boltz' = Boltzmann statistics
+        prob_distro_function = 'Blakemore';     % 'Fermi' = Fermi-Dirac, 'Blakemore' = Blakemore aproximation, 'Boltz' = Boltzmann statistics
         gamma = 0.27;                       % Blakemore coefficient    
         Fermi_limit = 0.2;                  % Max allowable limit for Fermi levels beyond the bands [eV]
         Fermi_Dn_points = 400;              % No. of points in the Fermi-Dirac look-up table
