@@ -221,7 +221,7 @@ classdef explore
         
         function plotPL(exsol)
             figure(100)
-            surf(exsol.parval1, exsol.parval2, exsol.stats.PLint(:,:,end));
+            surf(exsol.parval2, exsol.parval1, exsol.stats.PLint(:,:,end));
             ylabel(exsol.parnames(1))
             xlabel(exsol.parnames(2))
             set(gca,'YScale','log');
