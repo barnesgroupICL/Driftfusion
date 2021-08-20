@@ -47,21 +47,26 @@ classdef dfana
             Evb = dev.IP-V;                                 % Valence band potential
             Efn = zeros(size(n,1), size(n,2));
             Efp = zeros(size(n,1), size(n,2));
-
-            if par.prob_distro_function == 'Fermi'
-
-                for i = 1:size(n,1)           % time
-                    for j = 1:size(n,2)       % position
-                        Efn(i,j) = distro_fun.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
-                        Efp(i,j) = distro_fun.Efp_fd_fun(p(i,j), dev.Efp(j,:),  dev.p_fd(j,:));
+            
+            switch par.prob_distro_function
+                case 'Fermi'
+                    
+                    for i = 1:size(n,1)           % time
+                        for j = 1:size(n,2)       % position
+                            Efn(i,j) = distro_fun.Efn_fd_fun(n(i,j), dev.Efn(j,:),  dev.n_fd(j,:));
+                            Efp(i,j) = distro_fun.Efp_fd_fun(p(i,j), dev.Efp(j,:),  dev.p_fd(j,:));
+                        end
                     end
-                end
-                Efn = Efn-V;
-                Efp = Efp-V;
-
-            elseif par.prob_distro_function == 'Boltz'
-                Efn = real(Ecb+(par.kB*par.T/par.q)*log(n./dev.Nc));        % Electron quasi-Fermi level
-                Efp = real(Evb-(par.kB*par.T/par.q)*log(p./dev.Nv));        % Hole quasi-Fermi level
+                    Efn = Efn-V;
+                    Efp = Efp-V;
+                    
+                case 'Blakemore'
+                    Efn = real(Ecb + (par.kB*par.T/par.q)*log(n./(dev.Nc - par.gamma*n)));
+                    Efp = real(Evb - (par.kB*par.T/par.q)*log(p./(dev.Nv - par.gamma*p)));
+                    
+                case 'Boltz'
+                    Efn = real(Ecb + (par.kB*par.T/par.q)*log(n./dev.Nc));        % Electron quasi-Fermi level
+                    Efp = real(Evb - (par.kB*par.T/par.q)*log(p./dev.Nv));        % Hole quasi-Fermi level
             end
 
         end
@@ -275,16 +280,20 @@ classdef dfana
             end
                 
             % Diffusion coefficients
-            if par.prob_distro_function == 'Fermi'
-                for jj = 1:length(x)
-                    Dn(i,jj) = distro_fun.D(n(i,jj), dev.Dnfun(jj,:), dev.n_fd(jj,:));
-                    Dp(i,jj) = distro_fun.D(p(i,jj), dev.Dpfun(jj,:), dev.p_fd(jj,:));
-                end
-            end
-        
-            if par.prob_distro_function == 'Boltz'
-                Dn_mat = mu_n_mat*par.kB*par.T;
-                Dp_mat = mu_p_mat*par.kB*par.T;
+            switch par.prob_distro_function
+                case 'Fermi'
+                    for jj = 1:length(x)
+                        Dn(i,jj) = distro_fun.D(n(i,jj), dev.Dnfun(jj,:), dev.n_fd(jj,:));
+                        Dp(i,jj) = distro_fun.D(p(i,jj), dev.Dpfun(jj,:), dev.p_fd(jj,:));
+                    end
+                    
+                case 'Blakemore'
+                    Dn_mat = mu_n_mat.*par.kB.*par.T.*(Nc_mat/(Nc_mat - par.gamma*n_sub));
+                    Dp_mat = mu_p_mat.*par.kB.*par.T.*(Nv_mat/(Nv_mat - par.gamma*p_sub));
+                    
+                case 'Boltz'
+                    Dn_mat = mu_n_mat*par.kB*par.T;
+                    Dp_mat = mu_p_mat*par.kB*par.T;
             end
 
             % Particle fluxes (remember F = -dVdx)

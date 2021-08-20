@@ -76,16 +76,14 @@ epp0 = par.epp0;
 %% Device parameters
 device = par.dev_sub;
 T = par.T;
-mu_n = device.mu_n;           % Electron mobility
-mu_p = device.mu_p;           % Hole mobility
-Dn = mu_n*kB*T;              % Electron diffusion coefficient
-Dp = mu_p*kB*T;              % Hole diffusion coefficient
-mu_c = device.mu_c;       % Cation mobility
-mu_a = device.mu_a;       % Anion mobility
+mu_n = device.mu_n;         % Electron mobility
+mu_p = device.mu_p;         % Hole mobility
+mu_c = device.mu_c;         % Cation mobility
+mu_a = device.mu_a;         % Anion mobility
 Nc = device.Nc;             % Conduction band effective density of states
 Nv = device.Nv;             % Valence band effective density of states
-c_max = device.c_max;     % Cation density upper limit
-a_max = device.a_max;     % Anion density upper limit
+c_max = device.c_max;       % Cation density upper limit
+a_max = device.a_max;       % Anion density upper limit
 gradNc = device.gradNc;     % Conduction band effective density of states gradient
 gradNv = device.gradNv;     % Valence band effective density of states gradient
 gradEA = device.gradEA;     % Electron Affinity gradient
@@ -125,18 +123,19 @@ sp_l = par.sp_l;
 sn_r = par.sn_r;
 sp_r = par.sp_r;
 Rs = par.Rs;
-Rs_initial = par.Rs_initial;
+prob_distro_function = par.prob_distro_function;    % Probability distribution function
+gamma = par.gamma;          % Blakemore approximation coefficient
 
 %% Switches and accelerator coefficients
 mobset = par.mobset;        % Electronic carrier transport switch
 mobseti = par.mobseti;      % Ionic carrier transport switch
-K_c = par.K_c;    % Cation transport rate multiplier
-K_a = par.K_a;      % Anion transport rate multiplier
+K_c = par.K_c;              % Cation transport rate multiplier
+K_a = par.K_a;              % Anion transport rate multiplier
 radset = par.radset;        % Radiative recombination switch
 SRHset = par.SRHset;        % SRH recombination switch
 vsr_zone = device.vsr_zone;
 srh_zone = device.vsr_zone;
-Field_switch = device.Field_switch;
+Rs_initial = par.Rs_initial;
 
 %% Generation
 g1_fun = fun_gen(par.g1_fun_type);
@@ -167,6 +166,7 @@ F_V = 0; F_n = 0; F_p = 0; F_c = 0; F_a = 0;
 S_V = 0; S_n = 0; S_p = 0; S_c = 0; S_a = 0;
 r_rad = 0; r_srh = 0; r_vsr = 0; r_np = 0;
 alpha = 0; beta = 0;
+G_n = 1; G_p = 1;
 
 %% Initialise solution arrays
 u_maxvar = zeros(N_max_variables, 1);
@@ -244,6 +244,16 @@ end
                 a = Nani(i);        % Static anion density
         end
         
+        % Diffusion enhancement
+        switch prob_distro_function
+            case 'Blakemore'
+                G_n = Nc(i)/(Nc(i) - gamma*n);
+                G_p = Nv(i)/(Nv(i) - gamma*p);
+            case 'Boltzman'
+                G_n = 1;
+                G_p = 1;
+        end   
+        
         %% Equation editor
         % Time-dependence prefactor term
         C_V = 0;
@@ -255,8 +265,8 @@ end
         
         % Flux terms
         F_V = (epp(i)/eppmax)*dVdx;
-        F_n = mu_n(i)*n*(-dVdx + gradEA(i)) + (Dn(i)*(dndx - ((n/Nc(i))*gradNc(i))));
-        F_p = mu_p(i)*p*(dVdx - gradIP(i)) + (Dp(i)*(dpdx - ((p/Nv(i))*gradNv(i))));
+        F_n = mu_n(i)*n*(-dVdx + gradEA(i)) + (G_n*mu_n(i)*kB*T*(dndx - ((n/Nc(i))*gradNc(i))));
+        F_p = mu_p(i)*p*(dVdx - gradIP(i)) + (G_p*mu_p(i)*kB*T*(dpdx - ((p/Nv(i))*gradNv(i))));
         F_c = mu_c(i)*(z_c*c*dVdx + kB*T*(dcdx + (c*(dcdx/(c_max(i) - c)))));
         F_a = mu_a(i)*(z_a*a*dVdx + kB*T*(dadx + (a*(dadx/(a_max(i) - a)))));
         F = [F_V; mobset*F_n; mobset*F_p; mobseti*K_c*F_c; mobseti*K_a*F_a];

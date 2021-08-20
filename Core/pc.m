@@ -90,7 +90,8 @@ classdef pc
         SRHset = 1;                         % Switch on/off SRH recombination - recommend setting to zero for initial solution
         radset = 1;                         % Switch on/off band-to-band recombination
         N_max_variables = 5;                % Total number of allowable variables in this version of Driftfusion
-        prob_distro_function = 'Boltz';     % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
+        prob_distro_function = 'Boltz';     % 'Fermi' = Fermi-Dirac, 'Blakemore' = Blakemore aproximation, 'Boltz' = Boltzmann statistics
+        gamma = 0.27;                       % Blakemore coefficient    
         Fermi_limit = 0.2;                  % Max allowable limit for Fermi levels beyond the bands [eV]
         Fermi_Dn_points = 400;              % No. of points in the Fermi-Dirac look-up table
         intgradfun = 'linear'               % Interface gradient function 'linear' = linear, 'erf' = 'error function'
@@ -510,14 +511,12 @@ classdef pc
 
         %% Donor densities
         function value = get.ND(par)
-            value = zeros(1, length(par.stack));
-            value = distro_fun.nfun(par.Nc, par.EA, par.E0, par.T, par.prob_distro_function);
+            value = distro_fun.nfun(par.Nc, par.EA, par.E0, par);
         end
 
         %% Acceptor densities
         function value = get.NA(par)
-            value = zeros(1, length(par.stack));
-            value = distro_fun.pfun(par.Nv, par.IP, par.E0, par.T, par.prob_distro_function);
+            value = distro_fun.pfun(par.Nv, par.IP, par.E0, par);
         end
         
         %% Intrinsic carrier densities (Boltzmann)
@@ -527,12 +526,12 @@ classdef pc
 
         %% Equilibrium electron densities
         function value = get.n0(par)
-            value = distro_fun.nfun(par.Nc, par.EA, par.E0, par.T, par.prob_distro_function);
+            value = distro_fun.nfun(par.Nc, par.EA, par.E0, par);
         end
 
         %% Equilibrium hole densities
         function value = get.p0(par)
-            value = distro_fun.pfun(par.Nv, par.IP, par.E0, par.T, par.prob_distro_function);
+            value = distro_fun.pfun(par.Nv, par.IP, par.E0, par);
 
         end
 
@@ -540,33 +539,31 @@ classdef pc
         % Uses metal Fermi energies to calculate boundary densities
         % Electrons left boundary
         function value = get.n0_l(par)
-            value = distro_fun.nfun(par.Nc(1), par.EA(1), par.Phi_left, par.T, par.prob_distro_function);
+            value = distro_fun.nfun(par.Nc(1), par.EA(1), par.Phi_left, par);
         end
 
         % Electrons right boundary
         function value = get.n0_r(par)
-            value = distro_fun.nfun(par.Nc(end), par.EA(end), par.Phi_right, par.T, par.prob_distro_function);
+            value = distro_fun.nfun(par.Nc(end), par.EA(end), par.Phi_right, par);
         end
 
         % Holes left boundary
         function value = get.p0_l(par)
-            value = distro_fun.pfun(par.Nv(1), par.IP(1), par.Phi_left, par.T, par.prob_distro_function);
+            value = distro_fun.pfun(par.Nv(1), par.IP(1), par.Phi_left, par);
         end
 
         % holes right boundary
         function value = get.p0_r(par)
-            value = distro_fun.pfun(par.Nv(end), par.IP(end), par.Phi_right, par.T, par.prob_distro_function);
+            value = distro_fun.pfun(par.Nv(end), par.IP(end), par.Phi_right, par);
         end
        
         %% SRH trap energy coefficients
         function value = get.nt(par)
-            value = zeros(1, length(par.stack));
-            value = distro_fun.nfun(par.Nc, par.EA, par.Et, par.T, par.prob_distro_function);
+            value = distro_fun.nfun(par.Nc, par.EA, par.Et, par);
         end
         
         function value = get.pt(par)
-            value = zeros(1, length(par.stack));
-            value = distro_fun.pfun(par.Nv, par.IP, par.Et, par.T, par.prob_distro_function);
+            value = distro_fun.pfun(par.Nv, par.IP, par.Et, par);
         end
         
         %% Thickness and point arrays
