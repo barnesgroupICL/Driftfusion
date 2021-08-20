@@ -37,11 +37,6 @@ soleq = equilibrate(par);
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.0, 3);
 
-% example taken from Scripts/explore_script
-% exsol = explore2par(par_base, parnames, parvalues, JVpnts)
-exsol = explore.explore2par(par, {'d(1,3)','Int'},...
-    {[200e-7, 400e-7], logspace(-2,0,2)}, 20);
-
 %% Core df no input
 
 % solstruct = df(varargin)
@@ -382,12 +377,12 @@ dfana.pdentrp(false,false,par.xx(123),soleq.ion.u(1,123,1),par.xx(124),soleq.ion
 %% Core ditro_fun nfun
 
 % n = nfun(Nc, Ec, Efn, T, prob_distro_function)
-distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.E0, par.T, par.prob_distro_function);
+distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.E0, par);
 
 %% Core ditro_fun pfun
 
 % p = pfun(Nv, Ev, Efp, T, prob_distro_function)
-distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.E0, par.T, par.prob_distro_function);
+distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.E0, par);
 
 %% Core ditro_fun Dn_fd_fun and Dnlook and Efn_fd_fun
 
@@ -535,69 +530,6 @@ sigma_sum_R_flux = compare_rec_flux(JVsol.ill.f, 1e6, 0.05, 1);
 
 % [JV_ana, r0, k_rad, Voc, g0] = calcR0(EgArr, Jsc_vs_Eg, par)
 calcR0(EgArr, Jsc_vs_Eg, par);
-
-%% Helper explore plotPL
-
-% plotPL(exsol)
-explore.plotPL(exsol);
-
-%% Helper explore plotsurf
-
-% plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
-explore.plotsurf(exsol, 'Voc_r', true, false, false)
-
-%% Helper explore getJtot
-
-% Jtot = getJtot(sol)
-explore.getJtot(soleq.ion);
-
-%% Helper explore writevar
-
-% var = writevar(var, i, j, xx, arr)
-x=0;
-explore.writevar(x, 1, 1, par.xx, soleq.ion.x);
-
-%% Helper explore helper
-
-% par = helper(par, parname, parvalue)
-explore.helper(par, 'Rs', 1);
-
-%% Helper explore plotstat_2D_parval1
-
-% plotstat_2D_parval1(exsol, yproperty, logx, logy)
-explore.plotstat_2D_parval1(exsol, 'Voc_r', true, false)
-
-%% Helper explore plotstat_2D_parval2
-
-% plotstat_2D_parval2(exsol, yproperty, logx, logy)
-explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
-
-%% Helper explore plotfinalELx
-
-% EXPLORE contains functions that plot the final time point solution but
-% this functionality is currently not working.
-% % plotfinalELx(exsol)
-% explore.plotfinalELx(exsol)
-% 
-% %% Helper explore plotprof_2D
-% 
-% % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
-% explore.plotprof_2D(exsol, 'J_f', [true,true], [true,true], true, true)
-% 
-% %% Helper explore plotU
-% 
-% % plotU(exsol, par1logical, par2logical,logx,logy)
-% explore.plotU(exsol, [true,true], [true,true],false,false)
-% 
-% %% Helper explore plotCE
-% 
-% % plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
-% explore.plotCE(exsol, exsol, false, false, false, "ciaomamma")
-
-%% Helper explore plotJV
-
-% plotJV(exsol, par1logical, par2logical)
-explore.plotJV(exsol, [true,true], [true,true])
 
 %% Helper getpointpos
 
@@ -781,7 +713,7 @@ end
 
 %% Scripts
 inputs = dir('Scripts');
-for i=1:length(inputs)
+for i = 1:length(inputs)
     input = inputs(i).name;
     if ~any(regexp(input,'^\.|^test'))
         
@@ -789,6 +721,71 @@ for i=1:length(inputs)
         run(input);
     end
 end
+
+%%
+exsol = parex_dactive_light;
+%% Helper explore plotPL
+
+% plotPL(exsol)
+explore.plotPL(exsol);
+
+%% Helper explore plotsurf
+
+% plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
+explore.plotsurf(exsol, 'Voc_r', true, false, false)
+
+%% Helper explore getJtot
+
+% Jtot = getJtot(sol)
+explore.getJtot(soleq.ion);
+
+%% Helper explore writevar
+
+% var = writevar(var, i, j, xx, arr)
+x=0;
+explore.writevar(x, 1, 1, par.xx, 1);
+
+%% Helper explore helper
+
+% par = helper(par, parname, parvalue)
+explore.helper(par, 'Rs', 1);
+
+%% Helper explore plotstat_2D_parval1
+
+% plotstat_2D_parval1(exsol, yproperty, logx, logy)
+explore.plotstat_2D_parval1(exsol, 'Voc_r', true, false)
+
+%% Helper explore plotstat_2D_parval2
+
+% plotstat_2D_parval2(exsol, yproperty, logx, logy)
+explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
+
+%% Helper explore plotfinalELx
+
+% EXPLORE contains functions that plot the final time point solution but
+% this functionality is currently not working.
+% % plotfinalELx(exsol)
+% explore.plotfinalELx(exsol)
+% 
+% %% Helper explore plotprof_2D
+% 
+% % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
+% explore.plotprof_2D(exsol, 'J_f', [true,true], [true,true], true, true)
+% 
+% %% Helper explore plotU
+% 
+% % plotU(exsol, par1logical, par2logical,logx,logy)
+% explore.plotU(exsol, [true,true], [true,true],false,false)
+% 
+% %% Helper explore plotCE
+% 
+% % plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
+% explore.plotCE(exsol, exsol, false, false, false, "ciaomamma")
+
+%% Helper explore plotJV
+
+% plotJV(exsol, par1logical, par2logical)
+explore.plotJV(exsol, [true, true, false, true], [true, false, true])
 
 %------------- END OF CODE --------------
 
