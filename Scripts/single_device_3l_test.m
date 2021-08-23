@@ -21,9 +21,9 @@ soleq_3l = equilibrate(par_3l);
 %% Perform dark and light current-voltage scan at 50 mVs-1 from 0 V to 1.2 V
 % Input arguments: 
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
-sol_CV_100mVs_3l = doCV(soleq_3l.ion, 1, 0, 1.2, -0.2, 100e-3, 1, 281);
-sol_CV_200mVs_3l = doCV(soleq_3l.ion, 1, 0, 1.2, -0.2, 200e-3, 1, 281);
-sol_CV_400mVs_3l = doCV(soleq_3l.ion, 1, 0, 1.2, -0.2, 400e-3, 1, 281);
+sol_CV_100mVs_3l = doCV(soleq_3l.ion, 1, 0, 1.4, -0.2, 100e-3, 1, 281);
+sol_CV_200mVs_3l = doCV(soleq_3l.ion, 1, 0, 1.4, -0.2, 200e-3, 1, 281);
+sol_CV_400mVs_3l = doCV(soleq_3l.ion, 1, 0, 1.4, -0.2, 400e-3, 1, 281);
 
 %% plot the current voltage curve
 dfplot.JtotVapp(sol_CV_100mVs_3l, 0)
