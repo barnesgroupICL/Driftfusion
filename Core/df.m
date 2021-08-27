@@ -159,6 +159,7 @@ Vres = 0;
 J = 0;
 
 %% Solver variables
+i = 1;
 V = 0; n = 0; p = 0; a = 0; c = 0;
 dVdx = 0; dndx = 0; dpdx = 0; dadx = 0; dcdx = 0;
 C_V = 0; C_n = 0; C_p = 0; C_c = 0; C_a = 0;
@@ -207,8 +208,9 @@ end
 % S = Source terms
     function [C,F,S] = dfpde(x,t,u,dudx)
         % Get position point
-        i = find(x_sub <= x);
-        i = i(end);
+        if x == x_sub(1)
+            i = 1;
+        end
         
         switch g1_fun_type
             case 'constant'
@@ -297,6 +299,8 @@ end
         C = C(1:N_variables);
         F = F(1:N_variables);
         S = S(1:N_variables);
+        
+        i = i+1;
     end
 
 %% Initial conditions.
