@@ -168,13 +168,7 @@ r_rad = 0; r_srh = 0; r_vsr = 0; r_np = 0;
 alpha = 0; beta = 0;
 G_n = 1;    % Diffusion enhancement prefactor electrons
 G_p = 1;    % Diffusion enhancement prefactor holes
-% Time-dependence prefactor term
-C_V = 0;
-C_n = 1;
-C_p = 1;
-C_c = 1;
-C_a = 1;
-C_pre = [C_V; C_n; C_p; C_c; C_a];
+
 
 % Statistical distribution function - convert to Boolean for faster
 % execution in PDEPE - concept by IG
@@ -269,7 +263,13 @@ end
         
         %% Equation editor
         % Time-dependence pre-factor (pre-allocated above)
-        C = C_pre;
+        % Time-dependence prefactor term
+        C_V = 0;
+        C_n = 1;
+        C_p = 1;
+        C_c = 1;
+        C_a = 1;
+        C = [C_V; C_n; C_p; C_c; C_a];
         
         % Flux terms
         F_V = (epp(i)/eppmax)*dVdx;
