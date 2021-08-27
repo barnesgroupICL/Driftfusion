@@ -169,10 +169,9 @@ alpha = 0; beta = 0;
 G_n = 1;    % Diffusion enhancement prefactor electrons
 G_p = 1;    % Diffusion enhancement prefactor holes
 
-
 % Statistical distribution function - convert to Boolean for faster
 % execution in PDEPE - concept by IG
-if prob_distro_function == 'Blakemore'
+if strcmp(prob_distro_function, 'Blakemore')
     prob_distro_Blakemore = 1;
 else
     prob_distro_Blakemore = 0;
