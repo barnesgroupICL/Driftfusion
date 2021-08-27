@@ -22,19 +22,13 @@ soleq_pn_hetero = equilibrate(par_pn_hetero);
 % Input arguments: 
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 sol_CV_100mVs_pn_hetero = doCV(soleq_pn_hetero.el, 0, 0, 0.6, -0.2, 100e-3, 1, 281);
-sol_CV_200mVs_pn_hetero = doCV(soleq_pn_hetero.el, 0, 0, 0.6, -0.2, 200e-3, 1, 281);
-sol_CV_400mVs_pn_hetero = doCV(soleq_pn_hetero.el, 0, 0, 0.6, -0.2, 400e-3, 1, 281);
 
 %% plot the current voltage curve
 dfplot.JtotVapp(sol_CV_100mVs_pn_hetero, 0)
 hold on
-dfplot.JtotVapp(sol_CV_200mVs_pn_hetero, 0)
-hold on
-dfplot.JtotVapp(sol_CV_400mVs_pn_hetero, 0)
-hold off
-ylim([-30e-3,10e-3])
-xlim([-0.2, 1.2])
-legend('100 mVs-1', '200 mVs-1', '400 mVs-1') 
+set(gca, 'YScale', 'log')
+xlim([-0.2, 0.6])
+legend('100 mVs-1') 
 
 %% plot the energy level diagram and carrier densities for the device at
 % 1 V (t= 10s) during the illuminated forward scan
