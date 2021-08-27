@@ -24,7 +24,7 @@ function [n_ana, p_ana, jn_ana, jp_ana] = compare_carrier_interfaces(sol, tarr, 
 % vX2 Generalised for any number of interfaces and recombination zone
 % TARR = array of time points
 plotswitch = 1;     % 1 = plot n(x), p(x), 2 = plot ns, ps, 3 = 4x panels
-calc_option = 1;    %1 = all terms of expression, 2 = first term only
+calc_option = 2;    %1 = all terms of expression, 2 = first term only
 
 par = sol.par;
 T = par.T;
