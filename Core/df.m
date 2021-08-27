@@ -285,7 +285,7 @@ end
         r_np = r_rad + r_srh + r_vsr;
         
         % Source terms
-        S_V = (q/(eppmax*epp0))*(-n + p - NA(i) + ND(i) + z_a*a + z_c*c);
+        S_V = (q/(eppmax*epp0))*(-n + p - NA(i) + ND(i) + z_a*a + z_c*c - z_a*Nani(i) - z_c*Ncat(i));
         S_n = g - r_np;
         S_p = g - r_np;
         S_c = 0;

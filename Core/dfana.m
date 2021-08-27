@@ -394,10 +394,12 @@ classdef dfana
                     c = getvar_sub(c_whole);
             end
             
-            NAmat = repmat(dev.NA, length(t), 1);
-            NDmat = repmat(dev.ND, length(t), 1);
+            NA = repmat(dev.NA, length(t), 1);
+            ND = repmat(dev.ND, length(t), 1);
+            Nani = repmat(dev.Nani, length(t), 1);
+            Ncat = repmat(dev.Ncat, length(t), 1);
             % charge density
-            rho = -n + p - dev.NA + dev.ND + par.z_a*a + par.z_c*c;
+            rho = -n + p - dev.NA + dev.ND + par.z_a*a + par.z_c*c - par.z_a*Nani - par.z_c*Ncat;
         end
 
         function Vapp = calcVapp(sol)
