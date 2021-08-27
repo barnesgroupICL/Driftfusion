@@ -162,12 +162,27 @@ J = 0;
 i = 1;
 V = 0; n = 0; p = 0; a = 0; c = 0;
 dVdx = 0; dndx = 0; dpdx = 0; dadx = 0; dcdx = 0;
-C_V = 0; C_n = 0; C_p = 0; C_c = 0; C_a = 0;
 F_V = 0; F_n = 0; F_p = 0; F_c = 0; F_a = 0;
 S_V = 0; S_n = 0; S_p = 0; S_c = 0; S_a = 0;
 r_rad = 0; r_srh = 0; r_vsr = 0; r_np = 0;
 alpha = 0; beta = 0;
-G_n = 1; G_p = 1;
+G_n = 1;    % Diffusion enhancement prefactor electrons
+G_p = 1;    % Diffusion enhancement prefactor holes
+% Time-dependence prefactor term
+C_V = 0;
+C_n = 1;
+C_p = 1;
+C_c = 1;
+C_a = 1;
+C_pre = [C_V; C_n; C_p; C_c; C_a];
+
+% Statistical distribution function - convert to Boolean for faster
+% execution in PDEPE - concept by IG
+if prob_distro_function == 'Blakemore'
+    prob_distro_Blakemore = 1;
+else
+    prob_distro_Blakemore = 0;
+end
 
 %% Initialise solution arrays
 u_maxvar = zeros(N_max_variables, 1);
@@ -207,7 +222,7 @@ end
 % F = Flux terms
 % S = Source terms
     function [C,F,S] = dfpde(x,t,u,dudx)
-        % Get position point
+        % reset position point
         if x == x_sub(1)
             i = 1;
         end
@@ -246,24 +261,15 @@ end
                 a = Nani(i);        % Static anion density
         end
         
-        % Diffusion enhancement
-        switch prob_distro_function
-            case 'Blakemore'
-                G_n = Nc(i)/(Nc(i) - gamma*n);
-                G_p = Nv(i)/(Nv(i) - gamma*p);
-            case 'Boltzman'
-                G_n = 1;
-                G_p = 1;
-        end   
+        % Diffusion enhancement prefactors
+        if prob_distro_Blakemore
+            G_n = Nc(i)/(Nc(i) - gamma*n);
+            G_p = Nv(i)/(Nv(i) - gamma*p);
+        end
         
         %% Equation editor
-        % Time-dependence prefactor term
-        C_V = 0;
-        C_n = 1;
-        C_p = 1;
-        C_c = 1;
-        C_a = 1;
-        C = [C_V; C_n; C_p; C_c; C_a];
+        % Time-dependence pre-factor (pre-allocated above)
+        C = C_pre;
         
         % Flux terms
         F_V = (epp(i)/eppmax)*dVdx;
@@ -305,8 +311,9 @@ end
 
 %% Initial conditions.
     function u0 = dfic(x)
-        i = find(xmesh <= x);
-        i = i(end);
+        if x == x_sub(1)
+            i = 1;
+        end
         
         if length(par.dcell) == 1
             % Single layer
@@ -341,6 +348,8 @@ end
                 u0 = u0_in;
             end
         end
+        
+        i = i+1;
     end
 
 %% Boundary conditions
