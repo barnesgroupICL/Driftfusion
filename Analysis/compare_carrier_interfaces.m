@@ -194,7 +194,3 @@ if plot_switch
     end
 end
 end
-
-
-
-
