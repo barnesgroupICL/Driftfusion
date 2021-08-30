@@ -295,8 +295,8 @@ classdef dfplot
         function xmesh(sol)
             figure(11)
             plot(sol.x)
-            xlabel('Position [cm]')
-            ylabel('Point')
+            xlabel('Point')
+            ylabel('Position [cm]')
         end
 
         function Vx(varargin)
