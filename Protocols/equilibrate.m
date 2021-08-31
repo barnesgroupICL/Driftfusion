@@ -102,6 +102,7 @@ while any(all_stable) == 0
 end
 
 soleq.el = sol;
+disp('Electronic carrier equilibration complete')
 
 if electronic_only == 0
     %% Equilibrium solutions with ion mobility switched on
@@ -156,19 +157,7 @@ if electronic_only == 0
     soleq.ion.par.K_a = 1;
     soleq.ion.par.K_c = 1;
     
-    disp('Ion equilibrium solution complete')
-    
-    %% Ion equilibrium with surface recombination
-%     disp('Switching on SRH recombination')
-%     par.SRHset = 1;
-%     par.tmax = 10*t_diff;
-%     par.t0 = par.tmax/1e3;
-%     par.mobseti = 1;
-%     par.K_a = 1;
-%     par.K_c = 1;
-%     
-%     soleq.ion = df(soleq_i_nosrh, par);
-    disp('Complete')
+    disp('Ionic carrier equilibration complete')
 end
 
 disp('EQUILIBRATION COMPLETE')
