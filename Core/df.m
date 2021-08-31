@@ -169,12 +169,34 @@ alpha = 0; beta = 0;
 G_n = 1;    % Diffusion enhancement prefactor electrons
 G_p = 1;    % Diffusion enhancement prefactor holes
 
+% Time-dependence prefactor term
+C_V = 0;
+C_n = 1;
+C_p = 1;
+C_c = 1;
+C_a = 1;
+Cpre = [C_V; C_n; C_p; C_c; C_a];
+Cpre = Cpre(1:N_variables);
+
 % Statistical distribution function - convert to Boolean for faster
 % execution in PDEPE - concept by IG
 if strcmp(prob_distro_function, 'Blakemore')
     prob_distro_Blakemore = 1;
 else
     prob_distro_Blakemore = 0;
+end
+
+% Illumination type g1_fun_type and g2_fun_type - convert to Boolean for
+% faster execution in PDEPE
+if strcmp(g1_fun_type, 'constant')
+    g1_fun_type_constant = 1;
+else
+    g1_fun_type_constant = 0;
+end
+if strcmp(g2_fun_type, 'constant')
+    g2_fun_type_constant = 1;
+else
+    g2_fun_type_constant = 0;
 end
 
 %% Initialise solution arrays
@@ -220,18 +242,15 @@ end
             i = 1;
         end
         
-        switch g1_fun_type
-            case 'constant'
-                gxt1 = int1*gx1(i);
-            otherwise
-                gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
+        if g1_fun_type_constant
+            gxt1 = int1*gx1(i);
+        else
+            gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
         end
-        
-        switch g2_fun_type
-            case 'constant'
-                gxt2 = int2*gx2(i);
-            otherwise
-                gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
+        if g2_fun_type_constant
+            gxt2 = int2*gx2(i);
+        else
+            gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
         end
         g = gxt1 + gxt2;
         
@@ -262,13 +281,7 @@ end
         
         %% Equation editor
         % Time-dependence pre-factor (pre-allocated above)
-        % Time-dependence prefactor term
-        C_V = 0;
-        C_n = 1;
-        C_p = 1;
-        C_c = 1;
-        C_a = 1;
-        C = [C_V; C_n; C_p; C_c; C_a];
+        C = Cpre;
         
         % Flux terms
         F_V = (epp(i)/eppmax)*dVdx;
@@ -301,7 +314,6 @@ end
         
         % Remove unused variables - faster and tidier than using conditional
         % statements
-        C = C(1:N_variables);
         F = F(1:N_variables);
         S = S(1:N_variables);
         
