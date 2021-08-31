@@ -72,6 +72,8 @@ disp('Complete')
 % Switch on mobilities
 par.mobset = 1;
 par.radset = 1;
+par.SRHset = 1;
+par.vsr_check = 1;
 
 % Characteristic diffusion time
 t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
@@ -99,27 +101,17 @@ while any(all_stable) == 0
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 end
 
-soleq_nosrh = sol;
-
-disp('Switching on SRH recombination')
-par.SRHset = 1;
-par.vsr_check = 1;
-
-par.tmax = 10*t_diff;
-par.t0 = par.tmax/1e3;
-
-soleq.el = df(soleq_nosrh, par);
-disp('Complete')
+soleq.el = sol;
 
 if electronic_only == 0
     %% Equilibrium solutions with ion mobility switched on
     par.N_ionic_species = par_origin.N_ionic_species;
     
     % Create temporary solution for appending initial conditions to
-    sol = soleq_nosrh;
+    sol = soleq.el;
     
     % Start without SRH or series resistance
-    par.SRHset = 0;
+    %par.SRHset = 0;
     par.Rs = 0;
    
     disp('Closed circuit equilibrium with ions')
@@ -144,7 +136,6 @@ if electronic_only == 0
     par.K_c = rat_cation;
     par.tmax = 1e4*t_diff;
     par.t0 = par.tmax/1e3;
-    par.vsr_check = 1;
     
     sol = df(sol, par);   
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
@@ -160,23 +151,23 @@ if electronic_only == 0
     end
     
     % write solution and reset ion mobility
-    soleq_i_nosrh = sol;
-    soleq_i_nosrh.par.mobseti = 1;
-    soleq_i_nosrh.par.K_a = 1;
-    soleq_i_nosrh.par.K_c = 1;
+    soleq.ion = sol;
+    soleq.ion.par.mobseti = 1;
+    soleq.ion.par.K_a = 1;
+    soleq.ion.par.K_c = 1;
     
     disp('Ion equilibrium solution complete')
     
     %% Ion equilibrium with surface recombination
-    disp('Switching on SRH recombination')
-    par.SRHset = 1;
-    par.tmax = 10*t_diff;
-    par.t0 = par.tmax/1e3;
-    par.mobseti = 1;
-    par.K_a = 1;
-    par.K_c = 1;
-    
-    soleq.ion = df(soleq_i_nosrh, par);
+%     disp('Switching on SRH recombination')
+%     par.SRHset = 1;
+%     par.tmax = 10*t_diff;
+%     par.t0 = par.tmax/1e3;
+%     par.mobseti = 1;
+%     par.K_a = 1;
+%     par.K_c = 1;
+%     
+%     soleq.ion = df(soleq_i_nosrh, par);
     disp('Complete')
 end
 
