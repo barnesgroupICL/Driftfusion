@@ -74,6 +74,10 @@ e = par.e;
 epp0 = par.epp0;
 
 %% Device parameters
+N_ionic_species = par.N_ionic_species;  % Number of ionic species in this solution
+N_variables = par.N_ionic_species + 3;  % Number of variables in this solution (+3 for V, n, and p)
+N_max_variables = par.N_max_variables;  % Maximum number of variables in this version
+
 device = par.dev_sub;
 T = par.T;
 mu_n = device.mu_n;         % Electron mobility
@@ -101,16 +105,23 @@ pt = device.pt;             % SRH hole trap constant
 NA = device.NA;             % Acceptor doping density
 ND = device.ND;             % Donor doping density
 Ncat = device.Ncat;         % Uniform cation density
-Nani = device.Nani;         % Uniform anion density
+switch N_ionic_species
+    case 0                  % Nani, Ncat, a, and c set to zero for Poisson
+        Ncat = zeros(1, length(x_sub));
+        Nani = zeros(1, length(x_sub));
+    case 1                  % Nani and a both set to zero for Poisson
+        Ncat = device.Ncat;   
+        Nani = zeros(1, length(x_sub));
+    case 2
+        Ncat = device.Ncat;
+        Nani = device.Nani;
+end
 xprime_n = device.xprime_n;         % Translated x co-ordinates for interfaces
 xprime_p = device.xprime_p;         % Translated x co-ordinates for interfaces
 sign_xn = device.sign_xn;           % 1 if xn increasing, -1 if decreasing wrt x
 sign_xp = device.sign_xp;           % 1 if xp increasing, -1 if decreasing wrt x
 alpha0_xn = device.alpha0_xn;       % alpha0_xn is alpha for F = 0 reference to xprime_n
 beta0_xp = device.beta0_xp;         % beta0_xp is beta for F = 0 referenced to xprime_p
-N_ionic_species = par.N_ionic_species;  % Number of ionic species in this solution
-N_variables = par.N_ionic_species + 3;  % Number of variables in this solution (+3 for V, n, and p)
-N_max_variables = par.N_max_variables;  % Maximum number of variables in this version
 
 z_c = par.z_c;
 z_a = par.z_a;
@@ -249,10 +260,7 @@ end
         dcdx = dudx_maxvar(4);
         dadx = dudx_maxvar(5);
         
-        switch N_ionic_species
-            case 1
-                a = Nani(i);        % Static anion density
-        end
+
         
         % Diffusion enhancement prefactors
         if prob_distro_Blakemore
@@ -336,15 +344,15 @@ end
             u0 = u0_ana;
         else
             % Initial conditions taken from input solution
-            u0_in = interp1(icx,squeeze(icsol(end,:,:)),x)';
+            u0_input = interp1(icx,squeeze(icsol(end,:,:)),x)';
             % If the number of variables has increased then add analytical
             % ICs for missing variables
-            if N_variables > length(u0_in)
+            if N_variables > length(u0_input)
                 % Add initial conditions for new variables from U_ANA
-                u0(1:length(u0_in), 1) = u0_in;
-                u0(length(u0_in)+1:N_variables, 1) = u0_ana(length(u0_in)+1:N_variables);
+                u0(1:length(u0_input), 1) = u0_input;
+                u0(length(u0_input)+1:N_variables, 1) = u0_ana(length(u0_input)+1:N_variables);
             else
-                u0 = u0_in;
+                u0 = u0_input;
             end
         end
         

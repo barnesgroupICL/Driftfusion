@@ -29,9 +29,15 @@ classdef dfana
                 case 0
                     c = zeros(length(t), length(x));
                     a = zeros(length(t), length(x));
+                    dev.Ncat = zeros(length(t), length(x));
+                    dev.Nani = zeros(length(t), length(x));
+                    par.dev.Ncat = zeros(length(t), length(x));
+                    par.dev.Nani = zeros(length(t), length(x));
                 case 1
                     c = u(:,:,4);
-                    a = repmat(dev.Nani, length(t), 1);
+                    a = zeros(length(t), length(x));
+                    dev.Nani = zeros(length(t), length(x));
+                    par.dev.Nani = zeros(length(t), length(x));
                 case 2
                     c = u(:,:,4);
                     a = u(:,:,5);
