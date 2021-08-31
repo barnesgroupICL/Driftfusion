@@ -110,7 +110,7 @@ switch N_ionic_species
         Ncat = zeros(1, length(x_sub));
         Nani = zeros(1, length(x_sub));
     case 1                  % Nani and a both set to zero for Poisson
-        Ncat = device.Ncat;   
+        Ncat = device.Ncat;
         Nani = zeros(1, length(x_sub));
     case 2
         Ncat = device.Ncat;
@@ -259,8 +259,6 @@ end
         dpdx = dudx_maxvar(3);
         dcdx = dudx_maxvar(4);
         dadx = dudx_maxvar(5);
-        
-
         
         % Diffusion enhancement prefactors
         if prob_distro_Blakemore
