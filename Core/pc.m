@@ -91,7 +91,7 @@ classdef pc
         radset = 1;                         % Switch on/off band-to-band recombination
         N_max_variables = 5;                % Total number of allowable variables in this version of Driftfusion
         prob_distro_function = 'Blakemore'; % 'Fermi' = Fermi-Dirac, 'Blakemore' = Blakemore aproximation, 'Boltz' = Boltzmann statistics
-        gamma = 0.27;                       % Blakemore coefficient    
+        gamma_Blakemore = 0.27;                       % Blakemore coefficient    
         Fermi_limit = 0.2;                  % Max allowable limit for Fermi levels beyond the bands [eV]
         Fermi_Dn_points = 400;              % No. of points in the Fermi-Dirac look-up table
         intgradfun = 'linear'               % Interface gradient function 'linear' = linear, 'erf' = 'error function'
@@ -254,6 +254,7 @@ classdef pc
         dIPdx
         dNcdx
         dNvdx
+        gamma
         int_switch
         Dn
         Eg
@@ -445,6 +446,15 @@ classdef pc
                 error('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
             end
         end
+        
+        function value = get.gamma(par)
+            switch par.prob_distro_function
+                case 'Boltz'
+                    value = 0;
+                case 'Blakemore'
+                    value = par.gamma_Blakemore;
+            end
+        end
 
         function par = set.ND(par, value)
             for i = 1:length(par.ND)
@@ -470,7 +480,7 @@ classdef pc
                 value = round(length(par.layer_type)/2);
             end
         end
-
+        
         %% Active layer thickness
         function value = get.d_active(par)
             value = sum(par.dcell(par.active_layer(1):par.active_layer(end)));

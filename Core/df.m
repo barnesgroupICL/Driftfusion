@@ -260,11 +260,9 @@ end
         dcdx = dudx_maxvar(4);
         dadx = dudx_maxvar(5);
         
-        % Diffusion enhancement prefactors
-        if prob_distro_Blakemore
-            G_n = Nc(i)/(Nc(i) - gamma*n);
-            G_p = Nv(i)/(Nv(i) - gamma*p);
-        end
+        % Diffusion enhancement prefactors (gamma = 0 for Boltz)
+        G_n = Nc(i)/(Nc(i) - gamma*n);
+        G_p = Nv(i)/(Nv(i) - gamma*p);
         
         %% Equation editor
         % Time-dependence pre-factor (pre-allocated above)
