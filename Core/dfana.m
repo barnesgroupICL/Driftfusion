@@ -386,10 +386,10 @@ classdef dfana
 
         function rho = calcrho(sol, mesh_option)
             % Calculates the space charge density
-            [u,t,x,par,dev,n_whole,p_whole,a_whole,c_whole,V_whole] = dfana.splitsol(sol);
+            [u,t,x,par,dev_in,n_whole,p_whole,a_whole,c_whole,V_whole] = dfana.splitsol(sol);
             
             switch mesh_option
-                case "whole"  
+                case "whole"
                     dev = par.dev;
                     n = n_whole;
                     p = p_whole;
@@ -408,7 +408,7 @@ classdef dfana
             Nani = repmat(dev.Nani, length(t), 1);
             Ncat = repmat(dev.Ncat, length(t), 1);
             % charge density
-            rho = -n + p - dev.NA + dev.ND + par.z_a*a + par.z_c*c - par.z_a*Nani - par.z_c*Ncat;
+            rho = -n + p - NA + ND + par.z_a*a + par.z_c*c - par.z_c*c - par.z_c*Ncat;
         end
 
         function Vapp = calcVapp(sol)
