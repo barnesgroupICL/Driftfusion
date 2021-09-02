@@ -196,7 +196,7 @@ ur_maxvar = zeros(N_max_variables, 1);
 
 %% Solver options
 % MaxStep = limit maximum time step size during integration
-options = odeset('MaxStep', par.MaxStepFactor*0.1*abs(par.tmax - par.t0), 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
+options = odeset('MaxStep', par.MaxStepFactor*0.1*par.tmax, 'RelTol', par.RelTol, 'AbsTol', par.AbsTol);
 
 %% Call solver
 % inputs with '@' are function handles to the subfunctions
