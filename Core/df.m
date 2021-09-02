@@ -104,7 +104,7 @@ nt = device.nt;             % SRH electron trap constant
 pt = device.pt;             % SRH hole trap constant
 NA = device.NA;             % Acceptor doping density
 ND = device.ND;             % Donor doping density
-Ncat = device.Ncat;         % Uniform cation density
+% Set up counter ion density arrays
 switch N_ionic_species
     case 0                  % Nani, Ncat, a, and c set to zero for Poisson
         Ncat = zeros(1, length(x_sub));
@@ -134,8 +134,7 @@ sp_l = par.sp_l;
 sn_r = par.sn_r;
 sp_r = par.sp_r;
 Rs = par.Rs;
-prob_distro_function = par.prob_distro_function;    % Probability distribution function
-gamma = par.gamma;          % Blakemore approximation coefficient
+gamma = par.gamma;          % Blakemore approximation coefficient, 0 for Boltzmann stats
 
 %% Switches and accelerator coefficients
 mobset = par.mobset;        % Electronic carrier transport switch
@@ -163,6 +162,25 @@ g2_fun_type = par.g2_fun_type;
 g1_fun_arg = par.g1_fun_arg;
 g2_fun_arg = par.g2_fun_arg;
 
+% Illumination type g1_fun_type and g2_fun_type - convert to Boolean for
+% faster execution in PDEPE
+if strcmp(g1_fun_type, 'constant')
+    g1_fun_type_constant = 1;
+else
+    g1_fun_type_constant = 0;
+end
+if strcmp(g2_fun_type, 'constant')
+    g2_fun_type_constant = 1;
+else
+    g2_fun_type_constant = 0;
+end
+
+% Check for negative generation and deal error if present
+gM = g1_fun(g1_fun_arg, t')*gx1 + g2_fun(g2_fun_arg, t')*gx2;
+if any(any(gM < 0))
+    error('Generation cannot be negative - please check your generation function and associated inputs')
+end
+
 %% Voltage function
 Vapp_fun = fun_gen(par.V_fun_type);
 Vapp = 0;
@@ -179,14 +197,6 @@ r_rad = 0; r_srh = 0; r_vsr = 0; r_np = 0;
 alpha = 0; beta = 0;
 G_n = 1;    % Diffusion enhancement prefactor electrons
 G_p = 1;    % Diffusion enhancement prefactor holes
-
-% Statistical distribution function - convert to Boolean for faster
-% execution in PDEPE - concept by IG
-if strcmp(prob_distro_function, 'Blakemore')
-    prob_distro_Blakemore = 1;
-else
-    prob_distro_Blakemore = 0;
-end
 
 %% Initialise solution arrays
 u_maxvar = zeros(N_max_variables, 1);
@@ -231,18 +241,17 @@ end
             i = 1;
         end
         
-        switch g1_fun_type
-            case 'constant'
-                gxt1 = int1*gx1(i);
-            otherwise
-                gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
+        % Generation
+        if g1_fun_type_constant
+            gxt1 = int1*gx1(i);
+        else
+            gxt1 = g1_fun(g1_fun_arg, t)*gx1(i);
         end
         
-        switch g2_fun_type
-            case 'constant'
-                gxt2 = int2*gx2(i);
-            otherwise
-                gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
+        if g2_fun_type_constant
+            gxt2 = int2*gx2(i);
+        else
+            gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
         end
         g = gxt1 + gxt2;
         
