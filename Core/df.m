@@ -93,7 +93,7 @@ gradNv = device.gradNv;     % Valence band effective density of states gradient
 gradEA = device.gradEA;     % Electron Affinity gradient
 gradIP = device.gradIP;     % Ionisation Potential gradient
 epp = device.epp;           % Dielectric constant
-eppmax = max(par.epp);      % Maximum dielectric constant (for normalisation)
+epp_factor = par.epp_factor;      % Maximum dielectric constant (for normalisation)
 B = device.B;               % Radiative recombination rate coefficient
 ni = device.ni;             % Intrinsic carrier density
 taun = device.taun;         % Electron SRH time constant
@@ -275,7 +275,7 @@ end
         C = [C_V; C_n; C_p; C_c; C_a];
         
         % Flux terms
-        F_V = (epp(i)/eppmax)*dVdx;
+        F_V = (epp(i)/epp_factor)*dVdx;
         F_n = mu_n(i)*n*(-dVdx + gradEA(i)) + (G_n*mu_n(i)*kB*T*(dndx - ((n/Nc(i))*gradNc(i))));
         F_p = mu_p(i)*p*(dVdx - gradIP(i)) + (G_p*mu_p(i)*kB*T*(dpdx - ((p/Nv(i))*gradNv(i))));
         F_c = mu_c(i)*(z_c*c*dVdx + kB*T*(dcdx + (c*(dcdx/(c_max(i) - c)))));
@@ -296,7 +296,7 @@ end
         r_np = r_rad + r_srh + r_vsr;
         
         % Source terms
-        S_V = (q/(eppmax*epp0))*(-n + p - NA(i) + ND(i) + z_a*a + z_c*c - z_a*Nani(i) - z_c*Ncat(i));
+        S_V = (1/(epp_factor*epp0))*(-n + p - NA(i) + ND(i) + z_a*a + z_c*c - z_a*Nani(i) - z_c*Ncat(i));
         S_n = g - r_np;
         S_p = g - r_np;
         S_c = 0;

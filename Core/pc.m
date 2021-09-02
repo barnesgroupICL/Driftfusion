@@ -175,7 +175,7 @@ classdef pc
         % Spiro mu_p = 0.02 cm2V-1s-1 Hawash2018
         %% Relative dielectric constants
         epp = [10];
-
+        epp_factor = 1e6;    % a factor required to a prevent singular matrix- still under investigation
         %% Recombination
         % Radiative recombination, r_rad = k(np - ni^2)
         % [cm3 s-1] Radiative Recombination coefficient
