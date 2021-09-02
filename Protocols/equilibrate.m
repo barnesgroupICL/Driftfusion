@@ -73,7 +73,6 @@ disp('Complete')
 par.mobset = 1;
 par.radset = 1;
 par.SRHset = 1;
-par.vsr_check = 1;
 
 % Characteristic diffusion time
 t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
@@ -102,6 +101,9 @@ while any(all_stable) == 0
 end
 
 soleq.el = sol;
+% Manually check solution for VSR self-consitency
+compare_rec_flux(soleq.el, par.RelTol_vsr, par.AbsTol_vsr, 0);
+
 disp('Electronic carrier equilibration complete')
 
 if electronic_only == 0
@@ -151,14 +153,20 @@ if electronic_only == 0
         all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     end
     
-    % write solution and reset ion mobility
+    % write solution 
     soleq.ion = sol;
+    % Manually check solution for VSR self-consitency
+    compare_rec_flux(soleq.ion, par.RelTol_vsr, par.AbsTol_vsr, 0);
+    % Reset switches
     soleq.ion.par.mobseti = 1;
     soleq.ion.par.K_a = 1;
     soleq.ion.par.K_c = 1;
+    soleq.ion.par.vsr_check = 1;
     
     disp('Ionic carrier equilibration complete')
 end
+soleq.el.par.vsr_check = 1;
+
 
 disp('EQUILIBRATION COMPLETE')
 toc
