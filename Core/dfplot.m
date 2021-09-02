@@ -347,9 +347,12 @@ classdef dfplot
             % Ionic carrier densities as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            
+            Nani = repmat(dev.Nani, length(t), 1);
+            Ncat = repmat(dev.Ncat, length(t), 1);
+            
             figure(14)
-            dfplot.x2d(sol, x, {a,c},{'anion','cation'}, {'-','-'},...
+            dfplot.x2d(sol, x, {a,c,Ncat,Nani},{'anion','cation','static cation','static anion'}, {'-','-','--','-.'},...
                 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
         end
 
@@ -646,32 +649,39 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
             [Ecb, Evb, Efn, Efp] = dfana.calcEnergies(sol);
-
+            NA = repmat(dev.NA, length(t), 1);
+            ND = repmat(dev.ND, length(t), 1);
+            
+            Nani = repmat(dev.Nani, length(t), 1);
+            Ncat = repmat(dev.Ncat, length(t), 1);
+            
             figure(1);
             subplot(3,1,1);
             dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'}, {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
 
             subplot(3,1,2);
-            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'El carrier density [cm-3]', tarr, xrange, 0, 1)
-
-            figure(1);
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'Density [cm-3]', tarr, xrange, 0, 1)
+            
             subplot(3,1,3);
-            dfplot.x2d(sol, x, {a, c}, {'a', 'c'}, {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0)
+            dfplot.x2d(sol, x, {a,c,Ncat,Nani},{'anion','cation','static cation','static anion'}, {'-','-','--','-.'},...
+                'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
         end
 
         function Vxacx(varargin)
             % Potential and ionic charges as a function of position
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-
+            Nani = repmat(dev.Nani, length(t), 1);
+            Ncat = repmat(dev.Ncat, length(t), 1);
+            
             figure(24)
             subplot(2,1,1);
             dfplot.x2d(sol, x, {V}, {'V'},...
                 {'-'}, 'Electro. potential [V]', tarr, xrange, 0, 0);
 
             subplot(2,1,2);
-            dfplot.x2d(sol, x, {a, c}, {'a', 'c'},...
-                {'-', '-'}, 'Ionic carrier density [cm-3]', tarr, xrange , 0, 0);
+            dfplot.x2d(sol, x, {a,c,Ncat,Nani},{'anion','cation','static cation','static anion'}, {'-','-','--','-.'},...
+                'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
         end
 
         function Vionxacx(varargin)
