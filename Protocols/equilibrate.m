@@ -37,7 +37,6 @@ sol.u = 0;
 
 % Store the original parameter set
 par_origin = par;
-
 % Start with zero SRH recombination
 par.SRHset = 0;
 % Radiative rec could initially be set to zero in addition if required
@@ -101,8 +100,9 @@ while any(all_stable) == 0
 end
 
 soleq.el = sol;
-% Manually check solution for VSR self-consitency
-compare_rec_flux(soleq.el, par.RelTol_vsr, par.AbsTol_vsr, 0);
+% Manually check final section of solution for VSR self-consitency
+sol_ic = extract_IC(soleq.el, [soleq.el.t(end)*0.7, soleq.el.t(end)]);
+compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
 % Switch VSR check on for future use
 soleq.el.par.vsr_check = 1;
 
@@ -158,7 +158,8 @@ if electronic_only == 0
     % write solution 
     soleq.ion = sol;
     % Manually check solution for VSR self-consitency
-    compare_rec_flux(soleq.ion, par.RelTol_vsr, par.AbsTol_vsr, 0);
+    sol_ic = extract_IC(soleq.ion, [soleq.ion.t(end)*0.7, soleq.ion.t(end)]);
+    compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
     % Reset switches
     soleq.ion.par.vsr_check = 1;
     soleq.ion.par.mobseti = 1;
