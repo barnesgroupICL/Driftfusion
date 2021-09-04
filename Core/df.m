@@ -144,7 +144,7 @@ K_a = par.K_a;              % Anion transport rate multiplier
 radset = par.radset;        % Radiative recombination switch
 SRHset = par.SRHset;        % SRH recombination switch
 vsr_zone = device.vsr_zone;
-srh_zone = device.vsr_zone;
+srh_zone = device.srh_zone;
 Rs_initial = par.Rs_initial;
 
 %% Generation
