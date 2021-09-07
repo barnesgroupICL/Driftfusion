@@ -5,6 +5,10 @@ function sigma_sum_filter = compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plo
 % 2D SRH expression using the boundary carrier densities, ns and ps
 % directly
 %
+% The sum of the fractional differences SIGMA_SUM is calculated by first
+% summing the recombination fluxes for all interfaces and then calculating
+% the fraction.
+%
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
@@ -40,16 +44,19 @@ rx = dfana.calcr(sol_df, "sub");
 %% Get indexes of interfaces
 %int_index = find(contains(par.layer_type, 'interface'));   % only
 %compatible from 2016 onwards
-int_logical = strcmp(par.layer_type, 'interface');
+int_logical = zeros(1, length(par.layer_type));
+for i = 1:length(par.layer_type)
+    int_logical(i) = any(any(strcmp(par.layer_type(i), {'interface', 'junction'})));
+end
 loc = find(int_logical); % interface layer locations
 
 ns = zeros(length(t), length(loc));     % Store time array of each ns in new column
 ps = zeros(length(t), length(loc));     % Store time array of each ps in new column
 R_abrupt = zeros(length(t), length(loc));
 R_vsr = zeros(length(t), length(loc));
-R_vsr_filter = NaN(length(t), length(loc));
-R_abrupt_filter = NaN(length(t), length(loc));
 sigma = zeros(length(t), length(loc));
+legstr_R = cell(2*length(loc)+1, 1);
+legstr_sigma = cell(length(loc)+1, 1);
 
 for i = 1:length(loc)
     sn = par.sn(loc(i));
@@ -78,18 +85,16 @@ for i = 1:length(loc)
     end
     
     %% Fractional difference
-    sigma(:, i) = (R_abrupt(:, i)-R_vsr(:, i))./R_abrupt(:, i);
-    
-    R_vsr_filter(find(R_vsr(:, i) < AbsTol_vsr), i) = NaN;
-    R_abrupt_filter(find(R_abrupt(:, i) < AbsTol_vsr), i) = NaN;
+    sigma(:, i) = abs((R_abrupt(:, i)-R_vsr(:, i))./R_abrupt(:, i));
         
     if plot_switch
         figure(300)
-        semilogy(t, R_abrupt(:, i) , t, R_vsr(:, i) , 'k--')
+        semilogy(t, R_abrupt(:, i) , t, R_vsr(:, i) , '-.')
         xlabel('Time [s]')
         ylabel('Recombination flux [cm-2s-1]')
-        legend('Abrupt interface', 'Discrete interface (volumetric)')
         xlim([t(1), t(end)])
+        legstr_R{2*i - 1} = ['Interface', num2str(i), '- abrupt'];
+        legstr_R{2*i} = ['Interface', num2str(i), '- discrete'];
         hold on
         
         figure(301)
@@ -105,14 +110,21 @@ for i = 1:length(loc)
         xlabel('Time [s]')
         ylabel('Fractional difference')
         xlim([t(1), t(end)])
+        legstr_sigma{i} = ['Interface', num2str(i)];
         hold on
     end
 end
 
-sigma_sum = 1-(sum(R_vsr, 2)./sum(R_abrupt, 2));
-sigma_sum_filter = sigma_sum;
-[AbsTol_row, AbsTol_col] = find(R_vsr < AbsTol_vsr);
-sigma_sum_filter(AbsTol_row) = NaN;
+if plot_switch
+
+end
+
+R_vsr_sum = sum(R_vsr, 2);
+R_vsr_filter = R_vsr_sum;
+R_vsr_filter(R_vsr_filter < AbsTol_vsr) = NaN;
+R_abrupt_sum = sum(R_abrupt, 2);
+sigma_sum = abs(1-(R_vsr_sum./R_abrupt_sum));
+sigma_sum_filter = abs(1-(R_vsr_filter./R_abrupt_sum));
 
 if max(abs(sigma_sum_filter)) > RelTol_vsr
     warning(['The max volumetric surface recombination model fractional error (sigma_max = ', num2str(max(abs(sigma_sum))),') for recombination fluxes above ', num2str(AbsTol_vsr), ' cm-2s-1 exceeded the user-defined tolerance level (tol_vsr = ', ...
@@ -125,13 +137,22 @@ if max(abs(sigma_sum_filter)) > RelTol_vsr
 end
     
 if plot_switch
-    figure(303)
-    plot(t, sigma_sum_filter)
+    
+    figure(300)
+    semilogy(t, AbsTol_vsr*ones(1, length(t)), 'k--')
+    legstr_R{end} = 'AbsTol';
+    legend(legstr_R);
+    
+    figure(302)
+    plot(t, sigma_sum_filter, 'k--')
     xlabel('Time [s]')
-    ylabel('Fractional difference')
+    ylabel('Absolute fractional difference')
+    xlim([t(1), t(end)])
+    legstr_sigma{end} = 'Sum (filtered)';
+    legend(legstr_sigma)
+    
     figure(300); hold off
     figure(301); hold off
     figure(302); hold off
 end
-
 end
