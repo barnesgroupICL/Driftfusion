@@ -85,7 +85,7 @@ for i = 1:length(loc)
     end
     
     %% Fractional difference
-    sigma(:, i) = abs((R_abrupt(:, i)-R_vsr(:, i))./R_abrupt(:, i));
+    sigma(:, i) = ((R_abrupt(:, i)-R_vsr(:, i))./R_abrupt(:, i));
         
     if plot_switch
         figure(300)
@@ -123,8 +123,8 @@ R_vsr_sum = sum(R_vsr, 2);
 R_vsr_filter = R_vsr_sum;
 R_vsr_filter(R_vsr_filter < AbsTol_vsr) = NaN;
 R_abrupt_sum = sum(R_abrupt, 2);
-sigma_sum = abs(1-(R_vsr_sum./R_abrupt_sum));
-sigma_sum_filter = abs(1-(R_vsr_filter./R_abrupt_sum));
+sigma_sum = (1-(R_vsr_sum./R_abrupt_sum));
+sigma_sum_filter = (1-(R_vsr_filter./R_abrupt_sum));
 
 if max(abs(sigma_sum_filter)) > RelTol_vsr
     warning(['The max volumetric surface recombination model fractional error (sigma_max = ', num2str(max(abs(sigma_sum))),') for recombination fluxes above ', num2str(AbsTol_vsr), ' cm-2s-1 exceeded the user-defined tolerance level (tol_vsr = ', ...
