@@ -19,9 +19,8 @@ par_pn_hetero = pc('Input_files/pn_heterojunction.csv');
 soleq_pn_hetero = equilibrate(par_pn_hetero);
 
 %% Perform dark and light current-voltage scan at 50 mVs-1 from 0 V to 1.2 V
-% Input arguments: 
-% JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
-sol_CV_100mVs_pn_hetero = doCV(soleq_pn_hetero.el, 0, 0, 0.6, -0.2, 100e-3, 1, 281);
+% sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
+sol_CV_100mVs_pn_hetero = doCV(soleq_pn_hetero.el, 1, 0, 0.6, -0.2, 100e-3, 1, 281);
 
 %% plot the current voltage curve
 dfplot.JtotVapp(sol_CV_100mVs_pn_hetero, 0)
@@ -33,6 +32,10 @@ legend('100 mVs-1')
 %% plot the energy level diagram and carrier densities for the device at
 % 1 V (t= 10s) during the illuminated forward scan
 dfplot.ELxnpxacx(sol_CV_100mVs_pn_hetero, 10)
+
+%% plot J-V
+dfplot.JtotVapp(sol_CV_100mVs_pn_hetero, 0)
+ylim([-20e-3, 20e-3])
 
 %% Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in
