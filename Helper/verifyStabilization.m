@@ -55,7 +55,7 @@ all_stable = true;
 
 if time_fraction >= 1 || time_fraction < 0 || ~isnumeric(time_fraction)
     warning('Driftfusion:verifyStabilizationSkip', [mfilename...
-        ' - time_fraction is out of [0,1) range: skipping stabilization check']);
+        ' - time_fraction is out of [0,1] range: skipping stabilization check']);
     return
 end
 
@@ -86,7 +86,7 @@ for i = 1:length(sol_matrix(1, 1, :))
     stable = difference <= threshold;
 
     if stable
-        %display(['variable ', num2str(i), ' stabilisation verified']);        
+        display(['variable ', num2str(i), ' stabilisation verified']);        
     else
         warning('Driftfusion:verifyStabilization',...
             'Comparing final solutions at %s s and %s s showed that the %s distribution did not reach stability. Consider trying with a greater tmax.',...
