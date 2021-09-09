@@ -5,7 +5,7 @@ function export_solution(output_filename, sol, tplot)
 % t is the time desired for output
 
 % Calculate energy levels as a function of x and t
-[Ecb, Evb, Efn, Efp] = dfana.QFLs(sol);
+[Ecb, Evb, Efn, Efp] = dfana.calcEnergies(sol);
 
 % find the time point
 p1 = find(sol.t <= tplot);
