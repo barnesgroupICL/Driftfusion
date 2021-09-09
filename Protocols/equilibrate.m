@@ -37,19 +37,19 @@ sol.u = 0;
 
 % Store the original parameter set
 par_origin = par;
-
 % Start with zero SRH recombination
 par.SRHset = 0;
 % Radiative rec could initially be set to zero in addition if required
 par.radset = 1;
 % Start with no ionic carriers
 par.N_ionic_species = 0;
+% Switch off volumetric surface recombination check
+par.vsr_check = 0;
 
 %% General initial parameters
 par.tmesh_type = 2;
 par.tpoints = 10;
 
-par.JV = 0;
 par.Vapp = 0;
 par.int1 = 0;
 par.int2 = 0;
@@ -58,7 +58,6 @@ par.g2_fun_type = 'constant';
 par.OC = 0;
 par.tmesh_type = 2;
 par.Rs = 0;
-par.BC = 3;     % To enable boundary fluxes to be switched off
 
 %% Switch off mobilities
 par.mobset = 0;
@@ -70,12 +69,12 @@ sol = df(sol, par);
 disp('Complete')
 
 % Switch on mobilities
-par.BC = par_origin.BC;
 par.mobset = 1;
 par.radset = 1;
+par.SRHset = 1;
 
 % Characteristic diffusion time
-t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
+t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
 par.tmax = 100*t_diff;
 par.t0 = par.tmax/1e6;
 
@@ -100,42 +99,31 @@ while any(all_stable) == 0
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 end
 
-soleq_nosrh = sol;
+soleq.el = sol;
+% Manually check final section of solution for VSR self-consitency
+sol_ic = extract_IC(soleq.el, [soleq.el.t(end)*0.7, soleq.el.t(end)]);
+compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
+% Switch VSR check on for future use
+soleq.el.par.vsr_check = 1;
 
-disp('Switching on interfacial recombination')
-par.SRHset = 1;
-
-par.tmax = 10*t_diff;
-par.t0 = par.tmax/1e3;
-
-soleq.el = df(soleq_nosrh, par);
-disp('Complete')
+disp('Electronic carrier equilibration complete')
 
 if electronic_only == 0
     %% Equilibrium solutions with ion mobility switched on
     par.N_ionic_species = par_origin.N_ionic_species;
     
-    % CReate temporary solution for appending initial conditions to
-    sol = soleq_nosrh;
-    
-    % Write ionic initial conditions
-    switch par.N_ionic_species
-        case 1
-            sol.u(:,:,4) = repmat(par.dev.Ncat, length(sol.t), 1);
-        case 2
-            sol.u(:,:,4) = repmat(par.dev.Ncat, length(sol.t), 1);
-            sol.u(:,:,5) = repmat(par.dev.Nani, length(sol.t), 1);
-    end
+    % Create temporary solution for appending initial conditions to
+    sol = soleq.el;
     
     % Start without SRH or series resistance
-    par.SRHset = 0;
+    %par.SRHset = 0;
     par.Rs = 0;
-%     
+   
     disp('Closed circuit equilibrium with ions')
     
     % Take ratio of electron and ion mobilities in the active layer
-    rat_anion = par.mue(par.active_layer)/par.muani(par.active_layer);
-    rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+    rat_anion = par.mu_n(par.active_layer)/par.mu_a(par.active_layer);
+    rat_cation = par.mu_n(par.active_layer)/par.mu_c(par.active_layer);
     
     % If the ratio is infinity (ion mobility set to zero) then set the ratio to
     % zero instead
@@ -149,56 +137,36 @@ if electronic_only == 0
     
     par.mobset = 1;
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
-    par.K_anion = rat_anion;
-    par.K_cation = rat_cation;
-    par.tmax = 100*t_diff;
+    par.K_a = rat_anion;
+    par.K_c = rat_cation;
+    par.tmax = 1e4*t_diff;
     par.t0 = par.tmax/1e3;
-      
-    sol = df(sol, par);
     
-%     % Longer second solution
-%     par.calcJ = 0;
-%     par.tmax = 10*t_diff;
-%     par.t0 = par.tmax/1e3;
-    
-%     sol = df(sol, par);
-    
+    sol = df(sol, par);   
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     
     % loop to check ions have reached stable config- if not accelerate ions by
     % order of mag
     while any(all_stable) == 0
-        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-        
+        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]); 
         par.tmax = par.tmax*10;
         par.t0 = par.tmax/1e6;
-        
         sol = df(sol, par);
-        
         all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     end
     
-    % write solution and reset ion mobility
-    soleq_i_nosrh = sol;
-    soleq_i_nosrh.par.mobseti = 1;
-    soleq_i_nosrh.par.K_anion = 1;
-    soleq_i_nosrh.par.K_cation = 1;
+    % write solution 
+    soleq.ion = sol;
+    % Manually check solution for VSR self-consitency
+    sol_ic = extract_IC(soleq.ion, [soleq.ion.t(end)*0.7, soleq.ion.t(end)]);
+    compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
+    % Reset switches
+    soleq.ion.par.vsr_check = 1;
+    soleq.ion.par.mobseti = 1;
+    soleq.ion.par.K_a = 1;
+    soleq.ion.par.K_c = 1;
     
-    disp('Ion equilibrium solution complete')
-    
-    %% Ion equilibrium with surface recombination
-    disp('Switching on SRH recombination')
-    par.SRHset = 1;
-    
-    par.calcJ = 0;
-    par.tmax = 1e-6;
-    par.t0 = par.tmax/1e3;
-    par.mobseti = 1;
-    par.K_anion = 1;
-    par.K_cation = 1;
-    
-    soleq.ion = df(soleq_i_nosrh, par);
-    disp('Complete')
+    disp('Ionic carrier equilibration complete')
 end
 
 disp('EQUILIBRATION COMPLETE')

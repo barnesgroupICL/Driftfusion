@@ -38,9 +38,6 @@ function steadystate_struct = stabilize(struct)
 
 %------------- BEGIN CODE --------------
 
-% eliminate JV configuration
-struct.par.JV = 0;
-
 % shortcut
 par = struct.par;
 
@@ -51,17 +48,16 @@ par.tmesh_type = 2; % log spaced time mesh
 %% estimate a good tmax
 % a tmax too short would make the solution look stable even
 % if it's not; too large and the simulation could fail
-
 min_tmax_ions = 10;
 min_tmax_freecharges = 1e-3;
 
 % if both mobilities are set
-if max(par.mucat) && par.mue(1)
-    par.tmax = min([min_tmax_ions, par.tmax*1e4, 2^(-log10(max(par.mucat))) / 10 + 2^(-log10(par.mue(1)))]);
+if max(par.mu_c) && par.mu_n(1)
+    par.tmax = min([min_tmax_ions, par.tmax*1e4, 2^(-log10(max(par.mu_c))) / 10 + 2^(-log10(par.mu_n(1)))]);
     min_tmax = min_tmax_ions;
 % if ionic mobility is zero but free charges mobility is set
-elseif par.mue(1)
-    par.tmax = min([min_tmax_freecharges, par.tmax*1e4, 2^(-log10(par.mue(1)))]);
+elseif par.mu_n(1)
+    par.tmax = min([min_tmax_freecharges, par.tmax*1e4, 2^(-log10(par.mu_n(1)))]);
     min_tmax = min_tmax_freecharges;
 end
 

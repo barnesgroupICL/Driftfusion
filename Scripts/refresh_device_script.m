@@ -24,7 +24,7 @@ par_tio2_low_rec = par_tio2_base;
 par_tio2_low_rec.sn(4) = 1;
 par_tio2_low_rec.sp(4) = 1;
 
-%% Refresh the device- rebuilds the device structures par.dev and par.dev_ihalf etc.
+%% Refresh the device- rebuilds the device structures par.dev and par.dev_sub etc.
 par_tio2_low_rec = refresh_device(par_tio2_low_rec);
 
 %% Get equilibrium solutions

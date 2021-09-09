@@ -21,66 +21,70 @@ classdef distro_fun
     
     methods (Static)
         
-        function n = nfun(Nc, Ec, Efn, T, prob_distro_function)
+        function n = nfun(Nc, Ec, Efn, par)
+            kT = par.kB*par.T;
             
-            kT = distro_fun.kB*T;
-            
-            if prob_distro_function == 'Fermi'
-                % Fermi dirac integral for obtaining electron densities
-                % Nc = conduction band density of states
-                % Ec = conduction band energy
-                % Ef = Fermi level
-                % T = temperature
-                % See Schubert 2015, pp. 130
-                n = zeros(1, length(Nc));
-                
-                for i=1:length(Nc)
-                    if isnan(Nc(i)) == 0    % ignores interfaces
-                        fn = @(E) ((E/kT).^0.5)./(1 + exp((E-Efn(i)+Ec(i))/kT));
-                        n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(fn, 0, distro_fun.uplimit));
+            switch par.prob_distro_function
+                case 'Fermi'
+                    % Fermi dirac integral for obtaining electron densities
+                    % Nc = conduction band density of states
+                    % Ec = conduction band energy
+                    % Ef = Fermi level
+                    % T = temperature
+                    % See Schubert 2015, pp. 130
+                    n = zeros(1, length(Nc));
+                    for i=1:length(Nc)
+                        if isnan(Nc(i)) == 0    % ignores interfaces
+                            fn = @(E) ((E/kT).^0.5)./(1 + exp((E-Efn(i)+Ec(i))/kT));
+                            n(i) = real(((2*Nc(i))/(kT*pi^0.5))*integral(fn, 0, distro_fun.uplimit));
+                        end
                     end
-                end
-                
-            elseif prob_distro_function == 'Boltz'
-                n = Nc.*exp((Efn-Ec)./kT);
+                    
+                case 'Blakemore'
+                    eta_n = (Efn-Ec)./kT;
+                    n = Nc.*(1./(exp(-eta_n) + par.gamma));
+                    
+                case 'Boltz'
+                    n = Nc.*exp((Efn-Ec)./kT);
             end
             
         end
         
-        function p = pfun(Nv, Ev, Efp, T, prob_distro_function)
+        function p = pfun(Nv, Ev, Efp, par)
+            kT = par.kB*par.T;
             
-            kT = distro_fun.kB*T;
-            
-            if prob_distro_function == 'Fermi'
-                % Fermi dirac integral for obtaining electron densities
-                % Nc = conduction band density of states
-                % Ec = conduction band energy
-                % Ef = Fermi level
-                % T = temperature
-                % See Schubert 2015, pp. 130
-                p = zeros(1, length(Nv));
-                
-                % Reflecting the energy makes the integral easier for some
-                % reason- doesn't seem to like integrating from negative
-                % infinitiy...
-                Efp = Ev-(Efp-Ev);
-                
-                for i=1:length(Nv)
-                    if isnan(Nv(i)) == 0        % ignores interfaces
-                        fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));
-                        p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, 0, distro_fun.uplimit));
+            switch par.prob_distro_function
+                case 'Fermi'
+                    % Fermi dirac integral for obtaining electron densities
+                    % Nc = conduction band density of states
+                    % Ec = conduction band energy
+                    % Ef = Fermi level
+                    % T = temperature
+                    % See Schubert 2015, pp. 130
+                    p = zeros(1, length(Nv));
+                    % Reflecting the energy makes the integral easier for some
+                    % reason- doesn't seem to like integrating from negative
+                    % infinitiy...
+                    Efp = Ev-(Efp-Ev);
+                    
+                    for i=1:length(Nv)
+                        if isnan(Nv(i)) == 0        % ignores interfaces
+                            fp = @(E) ((E/kT).^0.5)./(1 + exp((E-Efp(i)+Ev(i))/kT));
+                            p(i) = real(((2*Nv(i))/(kT*pi^0.5))*integral(fp, 0, distro_fun.uplimit));
+                        end
                     end
-                end
-                
-            elseif prob_distro_function == 'Boltz'
-                
-                p = Nv.*exp((Ev-Efp)./kT);
-                
+                    
+                case 'Blakemore'
+                    eta_p = (Ev - Efp)./kT;
+                    p = Nv.*(1./(exp(-eta_p) + par.gamma));
+                    
+                case 'Boltz'
+                    p = Nv.*exp((Ev-Efp)./kT);
             end
             
         end
         
-        function Dnfd = Dn_fd_fun(Nc, Ec, Efn, mue, T)
+        function Dnfd = Dn_fd_fun(Nc, Ec, Efn, mu_n, T)
             if isnan(Ec) == 0    % ignores interfaces
                 
                 % Calculates Fermi Dirac diffusion coefficient function
@@ -110,14 +114,14 @@ classdef distro_fun
                     
                 end
                 
-                Dnfd.Dnfun = mue*(n./dndE);
+                Dnfd.Dnfun = mu_n*(n./dndE);
                 Dnfd.n_fd = n;
                 Dnfd.Efn = Efn;
                 
             end
         end
         
-        function Dpfd = Dp_fd_fun(Nv, Ev, Efp, muh, T)
+        function Dpfd = Dp_fd_fun(Nv, Ev, Efp, mu_p, T)
             if isnan(Ev) == 0    % ignores interfaces
                 
                 % Calculates Fermi Dirac diffusion coefficient function
@@ -151,7 +155,7 @@ classdef distro_fun
                     dpdE(i) = ((2*Nv)/(kT*pi^0.5))*integral(dfdE, 0, distro_fun.uplimit);
                 end
                 
-                Dpfd.Dpfun = muh*(p./dpdE);
+                Dpfd.Dpfun = mu_p*(p./dpdE);
                 Dpfd.p_fd = p;
                 Dpfd.Efp = Efp;
                 

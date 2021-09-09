@@ -10,39 +10,19 @@
 % (at your option) any later version.
 % 
 %% Start code
-par_singlecar = pc('Input_files/1_layer_single_carrier.csv');
+par_mim = pc('Input_files/mim.csv');
+soleq_mim = equilibrate(par_mim);
 
-soleq_singlecar = equilibrate(par_singlecar);
+%% Cyclic voltammogram
+% sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
+sol_CV = doCV(soleq_mim.el, 0, 0, 0.4, -0.4, 1e5, 1, 401);
 
-% Extract parameters
-par = soleq_singlecar.ion.par;
+%% Plots
+dfplot.Jt(sol_CV, par_mim.dcum(end)/2);
 
-% Set up time mesh
-par.tmesh_type = 1;
-par.t0 = 0;
-par.tmax = 1e-2;
-par.tpoints = 200;
-
-%% Define the voltage function
-par.V_fun_type = 'sin';         % Voltage function type
-par.V_fun_arg(1) = 0;           % DC offset voltage (V)
-par.V_fun_arg(2) = 20e-3;       % AC voltage amplitude (V)
-par.V_fun_arg(3) = 1e3;         % Frequency (Hz)
-par.V_fun_arg(4) = 0;           % Phase (Rads)
-
-disp('Applying oscillating potential')
-sol_Vapp = df(soleq_singlecar.ion, par);
-disp('Complete')
-
-% Plot outputs
-dfplot.Vappt(sol_Vapp)
-% Current at mid-point
-dfplot.Jt(sol_Vapp, par_singlecar.dcum(end)/2);
-%ylim([-2e-4, 2e-4])
-% JV plot
-dfplot.JVapp(sol_Vapp, par_singlecar.dcum(end)/2);
+dfplot.JVapp(sol_CV, par_mim.dcum(end)/2);
 % Energy level diagrams at t=0 and max amplitude
-dfplot.ELxnpxacx(sol_Vapp, 0);
+dfplot.ELxnpxacx(sol_CV, 0);
 
 % Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in

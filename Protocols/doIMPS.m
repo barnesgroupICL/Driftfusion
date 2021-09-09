@@ -15,6 +15,9 @@ function sol_IMPS = doIMPS(sol_ini, int_base, int_delta, frequency, tmax, tpoint
 %% Start code
 disp(['Starting IMPS, base intensity ', num2str(int_base), ', delta intensity ', num2str(int_delta),...
     ', at frequency ', num2str(frequency), ' Hz']);
+if int_base < int_delta
+    error('Constant bias intensity cannot be less than the AC intensity magnitude')
+end
 par = sol_ini.par;
 
 % Setup time mesh

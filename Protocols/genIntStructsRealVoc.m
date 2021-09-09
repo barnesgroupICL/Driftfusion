@@ -88,7 +88,7 @@ for i = 1:nsolutions
     % residual current
     disp([mfilename ' - finding real Voc for illumination intensity ' num2str(badVocStructCell{1, i}.par.int1)])
     light_intensity = asymstruct_Int.par.int1;
-    [asymstruct_Int_Voc, VOC] = findVocDirect(asymstruct_Int, light_intensity, 1);
+    [asymstruct_Int_Voc, VOC] = findVocDirect(asymstruct_Int, light_intensity, 1, 101);
     % restore figson before saving
     asymstruct_Int_Voc.par.figson = 1;
     % replace the solution at the bad VOC with the new one

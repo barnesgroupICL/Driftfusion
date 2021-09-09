@@ -25,30 +25,29 @@ par = sol_ini.par;
 par_origin = par;
 
 % Characteristic diffusion time
-t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
+t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
 
 disp('Switching on illumination')
 par.mobseti = 0;
+par.tmesh_type = 1;
 par.tmax = 100*t_diff;
-par.t0 = par.tmax/1e6;
+par.t0 = 0;
 par.Rs_initial = 0;
 par.int1 = int1;
 par.g1_fun_type = 'sweep';
 % COEFF = [Amplitude_initial, Amplitude_final, tmax]
 par.g1_fun_arg = [0, int1, par.tmax];
-par.JV = 0;
 
 sol_ill1 = df(sol_ini, par);
-
-par.g1_fun_type = 'constant';
 
 C = par.e*par.epp(par.active_layer)*par.epp0/(par.d_active);      % Parallel plate capacitance
 tau_RC = C*Rs;
 
-par.tmesh_type = 2;
+par.g1_fun_type = 'constant';
+par.tmesh_type = 1;
 par.tpoints = 20;
-par.tmax = 100*par.tpoints*t_diff;
-par.t0 = par.tmax/1e6;
+par.tmax = 100*t_diff;
+par.t0 = 0;
 
 if Rs > 0
     par.Rs = Rs;
@@ -88,7 +87,7 @@ sol = df(sol_Rs, par);
 par.Vapp = 0;
 
 % Stable time is enetered as negative then run to stable solution
-if stable_time < 0
+if stable_time < 0   
     warning('off', 'Driftfusion:verifyStabilization');
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     

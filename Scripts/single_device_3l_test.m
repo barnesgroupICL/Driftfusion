@@ -1,4 +1,3 @@
-%
 %% LICENSE
 % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
@@ -21,24 +20,24 @@ soleq_3l = equilibrate(par_3l);
 %% Perform dark and light current-voltage scan at 50 mVs-1 from 0 V to 1.2 V
 % Input arguments: 
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
-sol_CV_100mVs = doCV(soleq_3l.ion, 1, 0, 1.2, -0.2, 100e-3, 1, 281);
-sol_CV_200mVs = doCV(soleq_3l.ion, 1, 0, 1.2, -0.2, 200e-3, 1, 281);
-sol_CV_400mVs = doCV(soleq_3l.ion, 1, 0, 1.2, -0.2, 400e-3, 1, 281);
+sol_CV_100mVs_3l = doCV(soleq_3l.ion, 1, 0, 1.4, -0.2, 100e-3, 1, 281);
+sol_CV_200mVs_3l = doCV(soleq_3l.ion, 1, 0, 1.4, -0.2, 200e-3, 1, 281);
+sol_CV_400mVs_3l = doCV(soleq_3l.ion, 1, 0, 1.4, -0.2, 400e-3, 1, 281);
 
 %% plot the current voltage curve
-dfplot.JtotVapp(sol_CV_100mVs, 0)
+dfplot.JtotVapp(sol_CV_100mVs_3l, 0)
 hold on
-dfplot.JtotVapp(sol_CV_200mVs, 0)
+dfplot.JtotVapp(sol_CV_200mVs_3l, 0)
 hold on
-dfplot.JtotVapp(sol_CV_400mVs, 0)
+dfplot.JtotVapp(sol_CV_400mVs_3l, 0)
 hold off
 ylim([-30e-3,10e-3])
 xlim([-0.2, 1.2])
 legend('100 mVs-1', '200 mVs-1', '400 mVs-1') 
 
-%% plot the energy level diagram and carrier densities for the tio2 device at
+%% plot the energy level diagram and carrier densities for the device at
 % 1 V (t= 10s) during the illuminated forward scan
-dfplot.ELxnpxacx(sol_CV_100mVs, 10)
+dfplot.ELxnpxacx(sol_CV_100mVs_3l, 4)
 
 %% Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in

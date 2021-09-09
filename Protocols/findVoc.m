@@ -1,4 +1,4 @@
-function [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints)
+function [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints, plot)
 % FINDVOC finds the open cicuit voltage of a device using a
 % Newton-Raphson iteration
 
@@ -29,8 +29,8 @@ par = sol_ini.par;
 %% Initital settings
 if mobseti == 1
     % Take ratio of electron and ion mobilities in the active layer
-    rat_anion = par.mue(par.active_layer)/par.muani(par.active_layer);
-    rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+    rat_anion = par.mu_n(par.active_layer)/par.mu_a(par.active_layer);
+    rat_cation = par.mu_n(par.active_layer)/par.mu_c(par.active_layer);
     
     % If the ratio is infinity (ion mobility set to zero) then set the ratio to
     % zero instead
@@ -43,8 +43,8 @@ if mobseti == 1
     end
     
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
-    par.K_anion = rat_anion;
-    par.K_cation = rat_cation;
+    par.K_a = rat_anion;
+    par.K_c = rat_cation;
 end
 
 %% 1 Sun quasi equilibrium solution
@@ -126,20 +126,22 @@ while abs(fx1) > tol
     % approximation to the gradient
     fgrad = (fx1 - fx0)/(x1-x0);
     
-    xplot = 0.6:0.01:1.6;
-    yplot = fgrad*xplot + fx0- fgrad*x0;
-    
-    xrun = [xrun, x1];
-    yrun = [yrun, fx1];
-    
-    plot(xrun, yrun, 'o', xplot, yplot);
-    xlim([0.6, 1.2]);
-    %ylim([-2e-6, 2e-6])
-    xlabel('x');
-    ylabel('fx');
-    grid on;
-    
-    drawnow update
+    if plot
+        xplot = 0:0.01:3.0;
+        yplot = fgrad*xplot + fx0- fgrad*x0;
+        
+        xrun = [xrun, x1];
+        yrun = [yrun, fx1];
+        
+        plot(xrun, yrun, 'o', xplot, yplot);
+        xlim([0.6, 1.2]);
+        %ylim([-2e-6, 2e-6])
+        xlabel('x');
+        ylabel('fx');
+        grid on;
+        
+        drawnow update
+    end
     % New initial guesses
     x0 = x1;
     
@@ -155,8 +157,8 @@ while abs(fx1) > tol
 end
 
 sol_Voc = sol;
-sol_Voc.par.K_anion = 1;
-sol_Voc.par.K_cation = 1;
+sol_Voc.par.K_a = 1;
+sol_Voc.par.K_c = 1;
 
 Voc = x1;
 

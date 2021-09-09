@@ -1,4 +1,4 @@
-%UNIT_TEST - Runs various simulations in order to test the functioning of Driftfusion and many other implemented functions
+% UNIT_TEST - Runs various simulations in order to test the functioning of Driftfusion and many other implemented functions
 % For profiling the time spent running each function run 'profile on' before running the tests and
 % 'profile viewer' after.
 % Using Matlab's Coverage Reports, the obsolete and unused code can be easily spotted.
@@ -25,9 +25,9 @@
 % functions
 initialise_df
 
-% for testing a real structure
-%input_csv = 'Input_files/ptpd_mapi_pcbm.csv';
-% a structure written for testing puroposes
+% for testing more realistic parameters
+%input_csv = 'Input_files/pedotpss_mapi_pcbm.csv';
+% a structure written for testing purposes
 input_csv = 'Input_files/3_layer_unit_test.csv';
 
 % par = pc(varargin)
@@ -35,12 +35,7 @@ par = pc(input_csv);
 % soleq = equilibrate(varargin)
 soleq = equilibrate(par);
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
-JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.2, 3);
-
-% example taken from Scripts/explore_script
-% exsol = explore2par(par_base, parnames, parvalues, JVpnts)
-exsol = explore.explore2par(par, {'d(1,3)','Int'},...
-    {[400e-7, 800e-7], logspace(-2,0,2)}, 20);
+JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.0, 3);
 
 %% Core df no input
 
@@ -273,8 +268,8 @@ dfplot.x2d(JVsol.ill.f, JVsol.ill.f.x, {JVsol.ill.f.u(:,:,1)}, {'test'}, ['-','.
 %% Core build_device
 
 % dev = build_device(par, meshoption)
-dev1 = build_device(par, 'iwhole');
-dev2 = build_device(par, 'ihalf');
+dev1 = build_device(par, 'whole');
+dev2 = build_device(par, 'sub');
 
 %% Core build_property
 
@@ -291,20 +286,10 @@ build_property(par.Nc, par.xx, par, 'log_graded', 1);
 % [u,t,x,par,dev,n,p,a,c,V] = splitsol(sol)
 dfana.splitsol(soleq.ion);
 
-%% Core dfana QFLs
+%% Core dfana calcEnergies
 
-% [Ecb, Evb, Efn, Efp] = QFLs(sol)
-dfana.QFLs(soleq.ion);
-
-%% Core dfana QFL_ihalf
-
-% [Ecb, Evb, Efn, Efp] = QFL_ihalf(sol)
-dfana.QFL_ihalf(soleq.ion);
-
-%% Core dfana QFL_J
-
-% [Ecb, Evb, Efn, Efp] = QFL_J(sol)
-dfana.QFL_J(soleq.ion);
+% [Ecb, Evb, Efn, Efp] = calcEnergies(sol)
+dfana.calcEnergies(soleq.ion);
 
 %% Core dfana calcJ
 
@@ -318,38 +303,26 @@ dfana.calcg(soleq.ion);
 
 %% Core dfana calcr
 
-% r = calcr(sol)
-dfana.calcr(soleq.ion);
+% r = calcr(sol, mesh_option)
+dfana.calcr(soleq.ion, "whole");
+dfana.calcr(soleq.ion, "sub");
 
-%% Core dfana calcr_ihalf
+%% Core dfana calcJdd
 
-% r = calcr_ihalf(sol)
-dfana.calcr_ihalf(soleq.ion);
-
-%% Core dfana Jddxt
-
-% [jdd, Jdd, xout] = Jddxt(sol)
-dfana.Jddxt(soleq.ion);
+% [Jdd, jdd, xout] = calcJdd(sol)
+dfana.calcJdd(soleq.ion);
 
 %% Core dfana calcF
 
-% [FV, Frho] = calcF(sol)
-dfana.calcF(soleq.ion);
-
-%% Core dfana calcF_ihalf
-
-% [FV, Frho] = calcF_ihalf(sol)
-dfana.calcF_ihalf(soleq.ion);
+% [FV, Frho] = calcF(sol, mesh_option)
+dfana.calcF(soleq.ion, "whole");
+dfana.calcF(soleq.ion, "sub");
 
 %% Core dfana calcrho
 
-% rho = calcrho(sol)
-dfana.calcrho(soleq.ion);
-
-%% Core dfana calcrho_ihalf
-
-% rho = calcrho_ihalf(sol)
-dfana.calcrho_ihalf(soleq.ion);
+% rho = calcrho(sol, mesh_option)
+dfana.calcrho(soleq.ion, "whole");
+dfana.calcrho(soleq.ion, "sub");
 
 %% Core dfana calcVapp
 
@@ -361,15 +334,15 @@ dfana.calcVapp(soleq.ion);
 % stats = JVstats(JVsol)
 dfana.JVstats(JVsol);
 
-%% Core dfana PLt
+%% Core dfana calcPLt
 
-% value = PLt(sol)
-dfana.PLt(soleq.ion);
+% value = calcPLt(sol)
+dfana.calcPLt(soleq.ion);
 
-%% Core dfana calcVQFL
+%% Core dfana calcDeltaQFL
 
-% VQFL = calcVQFL(sol)
-dfana.calcVQFL(soleq.ion);
+% VQFL = calcDeltaQFL(sol)
+dfana.calcDeltaQFL(soleq.ion);
 
 %% Core dfana deltaVt
 
@@ -404,19 +377,19 @@ dfana.pdentrp(false,false,par.xx(123),soleq.ion.u(1,123,1),par.xx(124),soleq.ion
 %% Core ditro_fun nfun
 
 % n = nfun(Nc, Ec, Efn, T, prob_distro_function)
-distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.E0, par.T, par.prob_distro_function);
+distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.E0, par);
 
 %% Core ditro_fun pfun
 
 % p = pfun(Nv, Ev, Efp, T, prob_distro_function)
-distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.E0, par.T, par.prob_distro_function);
+distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.E0, par);
 
 %% Core ditro_fun Dn_fd_fun and Dnlook and Efn_fd_fun
 
 Ec = -4.95;
-[~, ~, Efn, ~] = dfana.QFLs(soleq.ion);
-% Dnfd = Dn_fd_fun(Nc, Ec, Efn, mue, T)
-Dnfd = distro_fun.Dn_fd_fun(par.dev.Nc(end), Ec, Efn, par.mue(end), par.T);
+[~, ~, Efn, ~] = dfana.calcEnergies(soleq.ion);
+% Dnfd = Dn_fd_fun(Nc, Ec, Efn, mu_n, T)
+Dnfd = distro_fun.Dn_fd_fun(par.dev.Nc(end), Ec, Efn, par.mu_n(end), par.T);
 
 % Dsol = Dnlook(n, Dnfun, n_fd)
 distro_fun.Dnlook(soleq.ion.u(2,1,end), Dnfd.Dnfun, Dnfd.n_fd);
@@ -426,9 +399,9 @@ distro_fun.Efn_fd_fun(soleq.ion.u(2,1,end), Efn, Dnfd.n_fd);
 
 %% Core ditro_fun Dp_fd_fun and Dplook and Efp_fd_fun
 
-[~, ~, ~, Efp] = dfana.QFLs(soleq.ion);
-% Dpfd = Dp_fd_fun(Nv, Ev, Efp, muh, T)
-Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.IP(1), Efp, par.muh(1), par.T);
+[~, ~, ~, Efp] = dfana.calcEnergies(soleq.ion);
+% Dpfd = Dp_fd_fun(Nv, Ev, Efp, mu_p, T)
+Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.IP(1), Efp, par.mu_p(1), par.T);
 
 % Dsol = Dplook(p, Dpfun, p_fd)
 distro_fun.Dplook(soleq.ion.u(3,1,1), Dpfd.Dpfun, Dpfd.p_fd);
@@ -455,15 +428,15 @@ generation(par, 'laser', 470);
 generation(par2, 'AM15', 470);
 generation(par2, 'laser', 470);
 
-%% Core getvarihalf
+%% Core getvar_sub
 
-% varihalf = getvarihalf(var)
-getvarihalf(par.dev.EA);
+% varsub = getvar_sub(var)
+EA_sub = getvar_sub(par.dev.EA);
 
-%% Core getxihalf
+%% Core getx_sub
 
-% xsolver = getxihalf(sol)
-getxihalf(soleq.ion);
+% xsolver = getx_sub(sol)
+getx_sub(soleq.ion);
 
 %% Core import_properties
 
@@ -516,22 +489,6 @@ parx.meshx_figon = true;
 parx.xmesh_type = 1;
 meshgen_x(parx);
 
-% %% Core meshgen_x 2
-%
-% x = meshgen_x(par)
-% parx = par;
-% parx.meshx_figon = true;
-% parx.xmesh_type = 2;
-% meshgen_x(parx);
-% 
-% %% Core meshgen_x 3
-% 
-% % x = meshgen_x(par)
-% parx = par;
-% parx.meshx_figon = true;
-% parx.xmesh_type = 3;
-% meshgen_x(parx);
-
 %% Core meshgen_x 4
 
 % x = meshgen_x(par)
@@ -558,6 +515,14 @@ refresh_device(par);
 % y = triangle_fun(coeff, t)
 triangle_fun([0.1, 0.2, 1, 3, 5], 0:0.1:10);
 
+%% Analysis
+% sigma_sum_filter = compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plot_switch)
+sigma_sum_R_flux = compare_rec_flux(JVsol.ill.f, 1e6, 0.05, 1);
+
+%% Analysis
+% [n_ana, p_ana, jn_ana, jp_ana] = compare_carrier_interfaces(sol, tarr, plot_switch)
+[n_ana, p_ana, jn_ana, jp_ana] = compare_carrier_interfaces(JVsol.ill.f, JVsol.ill.f.t(end)*[0, 0.2, 0.4, 0.6], 1);
+
 %% Helper calcJsc, calcR0 and Eg_vs_Voc
 
 % [EgArr, Jsc_vs_Eg] = calcJsc
@@ -565,69 +530,6 @@ triangle_fun([0.1, 0.2, 1, 3, 5], 0:0.1:10);
 
 % [JV_ana, r0, k_rad, Voc, g0] = calcR0(EgArr, Jsc_vs_Eg, par)
 calcR0(EgArr, Jsc_vs_Eg, par);
-
-%% Helper explore plotPL
-
-% plotPL(exsol)
-explore.plotPL(exsol);
-
-%% Helper explore plotsurf
-
-% plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
-explore.plotsurf(exsol, 'Voc_r', true, false, false)
-
-%% Helper explore getJtot
-
-% Jtot = getJtot(sol)
-explore.getJtot(soleq.ion);
-
-%% Helper explore writevar
-
-% var = writevar(var, i, j, xx, arr)
-x=0;
-explore.writevar(x, 1, 1, par.xx, soleq.ion.x);
-
-%% Helper explore helper
-
-% par = helper(par, parname, parvalue)
-explore.helper(par, 'Rs', 1);
-
-%% Helper explore plotstat_2D_parval1
-
-% plotstat_2D_parval1(exsol, yproperty, logx, logy)
-explore.plotstat_2D_parval1(exsol, 'Voc_r', true, false)
-
-%% Helper explore plotstat_2D_parval2
-
-% plotstat_2D_parval2(exsol, yproperty, logx, logy)
-explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
-
-%% Helper explore plotfinalELx
-
-% EXPLORE contains functions that plot the final time point solution but
-% this functionality is currently not working.
-% % plotfinalELx(exsol)
-% explore.plotfinalELx(exsol)
-% 
-% %% Helper explore plotprof_2D
-% 
-% % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
-% explore.plotprof_2D(exsol, 'J_f', [true,true], [true,true], true, true)
-% 
-% %% Helper explore plotU
-% 
-% % plotU(exsol, par1logical, par2logical,logx,logy)
-% explore.plotU(exsol, [true,true], [true,true],false,false)
-% 
-% %% Helper explore plotCE
-% 
-% % plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
-% explore.plotCE(exsol, exsol, false, false, false, "ciaomamma")
-
-%% Helper explore plotJV
-
-% plotJV(exsol, par1logical, par2logical)
-explore.plotJV(exsol, [true,true], [true,true])
 
 %% Helper getpointpos
 
@@ -693,13 +595,13 @@ doTPV(soleq.ion, 1, 10, true, 1e-2, 0.1, 1, 20, 5);
 
 %% Protocols findVocDirect
 
-% [sol_Voc, Voc] = findVocDirect(sol_ini, light_intensity, mobseti)
-findVocDirect(soleq.ion, 1, true);
+% [sol_Voc, Voc] = findVocDirect(sol_ini, light_intensity, mobseti, tpoints)
+findVocDirect(soleq.ion, 1, true, 40);
 
 %% Protocols findVoc
 
-% [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints)
-findVoc(soleq.ion, 1, true, 0.9, 1.3, 1e-5, 50)
+% [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, tpoints, plot)
+findVoc(soleq.ion, 1, true, 0.9, 1.3, 1e-5, 50, 0)
 
 %% Protocols genIntStructs
 
@@ -782,12 +684,11 @@ lightsource('AM15', 500);
 % [n_interp, k_interp] = LoadRefrIndex(name,wavelengths)
 LoadRefrIndex(par.stack{1},300:767);
 
-
 %% Input_files
-
 inputs = dir('Input_files');
 for i=1:length(inputs)
     input = inputs(i).name;
+    disp(input);
     if ~any(regexp(input,'^\.'))
         par = pc(input);
         xpoints = round(1 + sum(par.layer_points));
@@ -811,9 +712,8 @@ for i=1:length(inputs)
 end
 
 %% Scripts
-
 inputs = dir('Scripts');
-for i=1:length(inputs)
+for i = 1:length(inputs)
     input = inputs(i).name;
     if ~any(regexp(input,'^\.|^test'))
         
@@ -821,6 +721,71 @@ for i=1:length(inputs)
         run(input);
     end
 end
+
+%%
+exsol = parex_dactive_light;
+%% Helper explore plotPL
+
+% plotPL(exsol)
+explore.plotPL(exsol);
+
+%% Helper explore plotsurf
+
+% plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
+explore.plotsurf(exsol, 'Voc_r', true, false, false)
+
+%% Helper explore getJtot
+
+% Jtot = getJtot(sol)
+explore.getJtot(soleq.ion);
+
+%% Helper explore writevar
+
+% var = writevar(var, i, j, xx, arr)
+x=0;
+explore.writevar(x, 1, 1, par.xx, 1);
+
+%% Helper explore helper
+
+% par = helper(par, parname, parvalue)
+explore.helper(par, 'Rs', 1);
+
+%% Helper explore plotstat_2D_parval1
+
+% plotstat_2D_parval1(exsol, yproperty, logx, logy)
+explore.plotstat_2D_parval1(exsol, 'Voc_r', true, false)
+
+%% Helper explore plotstat_2D_parval2
+
+% plotstat_2D_parval2(exsol, yproperty, logx, logy)
+explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
+
+%% Helper explore plotfinalELx
+
+% EXPLORE contains functions that plot the final time point solution but
+% this functionality is currently not working.
+% % plotfinalELx(exsol)
+% explore.plotfinalELx(exsol)
+% 
+% %% Helper explore plotprof_2D
+% 
+% % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
+% explore.plotprof_2D(exsol, 'J_f', [true,true], [true,true], true, true)
+% 
+% %% Helper explore plotU
+% 
+% % plotU(exsol, par1logical, par2logical,logx,logy)
+% explore.plotU(exsol, [true,true], [true,true],false,false)
+% 
+% %% Helper explore plotCE
+% 
+% % plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
+% explore.plotCE(exsol, exsol, false, false, false, "ciaomamma")
+
+%% Helper explore plotJV
+
+% plotJV(exsol, par1logical, par2logical)
+explore.plotJV(exsol, [true, true, false, true], [true, false, true])
 
 %------------- END OF CODE --------------
 

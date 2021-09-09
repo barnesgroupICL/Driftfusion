@@ -16,6 +16,7 @@ function VappSol = genVappStructs(solini, Vapp_arr, mobseti)
 %% Start code
 % Store parameters
 par = solini.par;
+par_original = par;
 
 Vapp_arr = [solini.par.Vapp, Vapp_arr];    % include intial potential in array in case
 
@@ -29,8 +30,8 @@ for i = 1:length(Vapp_arr)-1
     
     if mobseti
         % Take ratio of electron and ion mobilities in the active layer
-        rat_anion = par.mue(par.active_layer)/par.muani(par.active_layer);
-        rat_cation = par.mue(par.active_layer)/par.mucat(par.active_layer);
+        rat_anion = par.mu_n(par.active_layer)/par.mu_a(par.active_layer);
+        rat_cation = par.mu_n(par.active_layer)/par.mu_c(par.active_layer);
         
         % If the ratio is infinity (ion mobility set to zero) then set the ratio to
         % zero instead
@@ -42,8 +43,8 @@ for i = 1:length(Vapp_arr)-1
             rat_cation = 0;
         end
         par.mobseti = 1;           % Ions are accelerated to reach equilibrium
-        par.K_anion = rat_anion;
-        par.K_cation = rat_cation;
+        par.K_a = rat_anion;
+        par.K_c = rat_cation;
     else
         par.mobseti = 0;
     end
@@ -78,10 +79,11 @@ for i = 1:length(Vapp_arr)-1
     
     % reset ion coeffs before storing
     if mobseti
-        sol.par.K_anion = 1;
-        sol.par.K_cation = 1;
-        sol.par.mobseti = 1;
+        sol.par.K_a = par_original.K_a;
+        sol.par.K_c = par_original.K_c;
     end
+    sol.par.mobseti = par_original.mobseti;
+    
     % if there's only one solution then duplicate sol structure
     if length(Vapp_arr)-1 == 1
         VappSol = sol;
@@ -93,4 +95,3 @@ for i = 1:length(Vapp_arr)-1
 end
 
 end
-
