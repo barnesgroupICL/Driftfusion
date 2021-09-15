@@ -619,7 +619,7 @@ classdef dfplot
             [Ecb, Evb, Efn, Efp] = dfana.calcEnergies(sol);
 
             figure(22);
-            dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'},...
+            dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'E_{CB}', 'E_{VB}'},...
                 {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
         end
 
@@ -660,11 +660,11 @@ classdef dfplot
             dfplot.x2d(sol, x, {Efn, Efp, Ecb, Evb}, {'E_{fn}', 'E_{fp}', 'CB', 'VB'}, {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
 
             subplot(3,1,2);
-            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-', '-'}, 'Density [cm-3]', tarr, xrange, 0, 1)
+            dfplot.x2d(sol, x, {n, p}, {'electrons, \it{n}', 'holes, \it{p}'}, {'-', '-'}, 'Density [cm-3]', tarr, xrange, 0, 1)
             
             subplot(3,1,3);
             dfplot.x2d(sol, x, {a,c,Ncat,Nani},{'anion','cation','static cation','static anion'}, {'-','-','--','-.'},...
-                'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
+                'Density [cm-3]', tarr, xrange, 0, 0);
         end
 
         function Vxacx(varargin)
