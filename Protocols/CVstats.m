@@ -36,8 +36,8 @@ function stats = CVstats(sol)
     change_sweep_direction_index = find(Vapp == max(Vapp),1);    
     J_f = J(1:change_sweep_direction_index);
     V_f = Vapp(1:change_sweep_direction_index);
-    J_r = J(change_sweep_direction_index+1:length(sol.t));
-    V_r = Vapp(change_sweep_direction_index+1:length(sol.t));
+    J_r = J(change_sweep_direction_index:length(sol.t));
+    V_r = Vapp(change_sweep_direction_index:length(sol.t));
 
 %% Find stats for forward scan   
     try
