@@ -13,8 +13,8 @@ function stats = CVstats(sol)
     if num_cycles > 1
         Vapp = dfana.calcVapp(sol);
         index = find(Vapp == sol.par.V_fun_arg(1),2);
-        one_sweep_index = index(2);                  % Index of last element of first cycle
-        start = find(Vapp == min(Vapp),1);              % Index where V = V_min
+        one_sweep_index = index(2)-1;                  % Index of last element of first cycle
+        start = find(Vapp == min(Vapp),1);             % Index where V = V_min
         Vapp = Vapp(start:start+one_sweep_index)';      
         sol.u = sol.u(start:start+one_sweep_index,:,:);
         sol.t = sol.t(start:start+one_sweep_index);
@@ -26,11 +26,18 @@ function stats = CVstats(sol)
         J = dfana.calcJ(sol);
         J = J.tot(:,1);
         J_half = J(start:end);
-        J_other_half = J(1:start);
+        J_other_half = J(1:start-1);
         V_half = Vapp(start:end);
-        V_other_half = Vapp(1:start);
-        J = [J_half J_other_half];
-        Vapp = [V_half V_other_half]';
+        V_other_half = Vapp(1:start-1);
+        if length(J_other_half) == 1
+            J_half(end+1) = J_other_half;
+            J = J_half;
+            V_half(end+1) = V_other_half;
+            Vapp = V_half;
+        else
+            J = [J_half J_other_half];
+            Vapp = [V_half V_other_half]';
+        end
     end
                
 %% Define which data points correspond to forward and reverse scan directions
@@ -41,16 +48,14 @@ function stats = CVstats(sol)
     V_r = Vapp(change_sweep_direction_index:length(sol.t));
 
 %% Find stats for forward scan   
-    try
-        stats.Jsc_f = interp1(V_f, J_f, 0, 'linear');
-    catch
+    stats.Jsc_f = interp1(V_f, J_f, 0, 'linear');
+    if isnan(stats.Jsc_f)
         warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
         stats.Jsc_f = 0;
     end
 
-    try
-        stats.Voc_f = interp1(J_f, V_f, 0, 'linear');
-    catch
+    stats.Voc_f = interp1(J_f, V_f, 0, 'linear');
+    if isnan(stats.Voc_f)
         warning('No Voc available- try increasing applied voltage range')
         stats.Voc_f = 0;
     end
@@ -66,16 +71,15 @@ function stats = CVstats(sol)
     end
 
 %% Find stats for reverse scan
-    try
-        stats.Jsc_r = interp1(V_r, J_r, 0, 'pchip');
-    catch
+    
+    stats.Jsc_r = interp1(V_r, J_r, 0, 'linear');
+    if isnan(stats.Jsc_r)
         warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
         stats.Jsc_r = 0;
     end
 
-    try
-        stats.Voc_r = interp1(J_r, V_r, 0, 'pchip');
-    catch
+    stats.Voc_r = interp1(J_r, V_r, 0, 'linear');
+    if isnan(stats.Voc_r)
         warning('No Voc available- try increasing applied voltage range')
         stats.Voc_r = 0;
     end
