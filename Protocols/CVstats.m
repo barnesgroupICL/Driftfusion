@@ -3,6 +3,7 @@ function stats = CVstats(sol)
 % If multiple cycles have been performed, stats are taken from the first
 % cycle
 % sol - a solution from doCV
+% HELLO LUCY!!!
 
 %Check number of cycles
     num_cycles = sol.par.V_fun_arg(4);
