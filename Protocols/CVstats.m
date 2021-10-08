@@ -12,7 +12,7 @@ function stats = CVstats(sol)
     if num_cycles > 1
         Vapp = dfana.calcVapp(sol);
         index = find(Vapp == sol.par.V_fun_arg(1),2);
-        one_sweep_index = index(2)- 1;                  % Index of last element of first cycle
+        one_sweep_index = index(2);                  % Index of last element of first cycle
         start = find(Vapp == min(Vapp),1);              % Index where V = V_min
         Vapp = Vapp(start:start+one_sweep_index)';      
         sol.u = sol.u(start:start+one_sweep_index,:,:);
@@ -25,9 +25,9 @@ function stats = CVstats(sol)
         J = dfana.calcJ(sol);
         J = J.tot(:,1);
         J_half = J(start:end);
-        J_other_half = J(1:start-1);
+        J_other_half = J(1:start);
         V_half = Vapp(start:end);
-        V_other_half = Vapp(1:start-1);
+        V_other_half = Vapp(1:start);
         J = [J_half J_other_half];
         Vapp = [V_half V_other_half]';
     end
@@ -41,14 +41,14 @@ function stats = CVstats(sol)
 
 %% Find stats for forward scan   
     try
-        stats.Jsc_f = interp1(V_f, J_f, 0, 'pchip');
+        stats.Jsc_f = interp1(V_f, J_f, 0, 'linear');
     catch
         warning('No Jsc available- Vapp must pass through 0 to obtain Jsc')
         stats.Jsc_f = 0;
     end
 
     try
-        stats.Voc_f = interp1(J_f, V_f, 0, 'pchip');
+        stats.Voc_f = interp1(J_f, V_f, 0, 'linear');
     catch
         warning('No Voc available- try increasing applied voltage range')
         stats.Voc_f = 0;
