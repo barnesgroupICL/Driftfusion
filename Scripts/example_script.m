@@ -13,11 +13,11 @@
 tic
 initialise_df
 
-% Create parameters objects for Spiro/MAPI/TiO2 and PEDOT/MAPI/PCBM devices
+%% Create parameters objects for Spiro/MAPI/TiO2 and PEDOT/MAPI/PCBM devices
 par_tio2 = pc('Input_files/spiro_mapi_tio2.csv');
 par_pcbm = pc('Input_files/pedotpss_mapi_pcbm.csv');
 
-% Find equilibrium solutions
+%% Find equilibrium solutions
 soleq_tio2 = equilibrate(par_tio2);
 soleq_pcbm = equilibrate(par_pcbm);
 
