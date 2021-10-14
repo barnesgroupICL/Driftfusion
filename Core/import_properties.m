@@ -96,7 +96,7 @@ try
     par.Ncat = T{:, 'Ncat'}';
 catch
     try
-        par.a_max = T{:, 'Nion'}';
+        par.Ncat = T{:, 'Nion'}';
     catch
         warning('No equilibrium cation density array (Ncat) defined in .csv . Using default in PC')
     end
@@ -134,7 +134,7 @@ try
     par.mu_n = T{:, 'mu_n'}';
 catch
     try
-        par.mu_a = T{:, 'mue'}';
+        par.mu_n = T{:, 'mue'}';
     catch
         warning('No electron mobility (mu_n) defined in .csv . Using default in PC')
     end
@@ -144,7 +144,7 @@ try
     par.mu_p = T{:, 'mu_p'}';
 catch
     try
-        par.mu_a = T{:, 'muh'}';
+        par.mu_p = T{:, 'muh'}';
     catch
         warning('No hole mobility (mu_p) defined in .csv . Using default in PC')
     end
