@@ -19,29 +19,43 @@ T = readtable(filepath{1,1});   % Reads-in in the external .CSV file to a table 
 
 % Layer type array
 try
-    par.layer_type = T{:,'layer_type'}';
+    layer_type = T{:,'layer_type'}';
+    if strcmp(layer_type{1}, 'electrode')
+        start_row = 2;
+        end_row = length(layer_type) - 1;
+        par.layer_type = layer_type(start_row:end_row);
+    else
+        start_row = 1;
+        end_row = length(layer_type);
+    end
+    par.layer_type = layer_type(start_row:end_row);
 catch
-    warning('No layer type (layer_type) defined in .csv . Using default in PC')
+    error('No layer type (layer_type) defined in .csv . layer_type must be defined when using .csv input file')
 end
 % Layer name array
 try
-    stack = T{:,'stack'}';
-    par.stack = stack(2:end-1);
+    material = T{:,'material'}';
+    par.material = material(start_row:end_row);
 catch
-    warning('No stack (stack) defined in .csv . Using default in PC')
+    try
+        material = T{:,'stack'}';
+        par.material = material(start_row:end_row);
+    catch
+        warning('No material array (material) defined in .csv . Using default in PC')
+    end
 end
 % Layer thickness array
 try
     d = T{:, 'dcell'}';
-    par.d = d(2:end-1);
+    par.d = d(start_row:end_row);
 catch
     try
         d = T{:, 'd'}';
-        par.d = d(2:end-1);
+        par.d = d(start_row:end_row);
     catch
         try
             d = T{:, 'thickness'}';
-            par.d = d(2:end-1);
+            par.d = d(start_row:end_row);
         catch
             warning('No thickness array (thickness) defined in .csv . Using default in PC')
         end
@@ -50,67 +64,71 @@ end
 % Layer points array
 try
     layer_points = T{:, 'layer_points'}';
-    par.layer_points = layer_points(2:end-1);
+    par.layer_points = layer_points(start_row:end_row);
 catch
     warning('No layer points array (points) defined in .csv . Using default in PC')
 end
 % Spatial mesh coefficient for non-linear meshes
 try
     xmesh_coeff = T{:, 'xmesh_coeff'}';
-    par.xmesh_coeff = xmesh_coeff(2:end-1);
+    par.xmesh_coeff = xmesh_coeff(start_row:end_row);
 catch
     warning('No xmesh coefficient array (xmesh_coeff) defined in .csv . Using default in PC')
 end
 % Electron affinity array
 try
     EA = T{:, 'EA'}';
-    par.EA = par.EA(2:end-1);
+    par.EA = EA(start_row:end_row);
 catch
     warning('No electron affinity array (EA) defined in .csv . Using default in PC')
 end
 % Ionisation potential array
 try
     IP = T{:, 'IP'}';
-    par.IP = par.IP(2:end-1);
+    par.IP = IP(start_row:end_row);
 catch
     warning('No ionisation potential array (IP) defined in .csv . Using default in PC')
 end
 % Equilibrium Fermi energy array
 try
     E0 = T{:, 'E0'}';
-    par.E0 = E0;
+    par.E0 = E0(start_row:end_row);
+    if strcmp(layer_type{1}, 'electrode')
+        par.Phi_left = E0(1);
+        par.Phi_right = E0(end);
+    end
 catch
     warning('No equilibrium Fermi level array (E0) defined in .csv . Using default in PC')
 end
 % Conduction band effective density of states
 try
     Nc = T{:, 'Nc'}';
-    par.Nc = Nc(2:end-1);
+    par.Nc = Nc(start_row:end_row);
 catch
     warning('No conduction band eDOS array (Nc) defined in .csv . Using default in PC')
 end
 % Valence band effective density of states
 try
     Nv = T{:, 'Nv'}';
-    par.Nv = Nv(2:end-1);
+    par.Nv = Nv(start_row:end_row);
 catch
     warning('No valence band eDOS array (Nv) defined in .csv . Using default in PC')
 end
 % Intrinsic anion density
 try
     Nani = T{:, 'Nani'}';
-    par.Nani = Nani(2:end-1);
+    par.Nani = Nani(start_row:end_row);
 catch
     warning('No equilibrium anion density array (Nani) defined in .csv . Using default in PC')
 end
 % Intrinsic cation density
 try
     Ncat = T{:, 'Ncat'}';
-    par.Ncat = Ncat(2:end-1);
+    par.Ncat = Ncat(start_row:end_row);
 catch
     try
         Ncat = T{:, 'Nion'}';
-        par.Ncat = Ncat(2:end-1);
+        par.Ncat = Ncat(start_row:end_row);
     catch
         warning('No equilibrium cation density array (Ncat) defined in .csv . Using default in PC')
     end
@@ -118,15 +136,15 @@ end
 % Limiting density of anion states
 try
     a_max = T{:, 'a_max'}';
-    par.a_max = a_max(2:end-1);
+    par.a_max = a_max(start_row:end_row);
 catch
     try
         a_max = T{:, 'DOSani'}';
-        par.a_max = a_max(2:end-1);
+        par.a_max = a_max(start_row:end_row);
     catch
         try
             a_max = T{:, 'amax'}';
-            par.a_max = a_max(2:end-1);
+            par.a_max = a_max(start_row:end_row);
         catch
             warning('No maximum anion density array (a_max) defined in .csv . Using default in PC')
         end
@@ -135,11 +153,11 @@ end
 % Limiting density of cation states
 try
     c_max = T{:, 'c_max'}';
-    par.c_max = c_max(2:end-1);
+    par.c_max = c_max(start_row:end_row);
 catch
     try
         c_max = T{:, 'DOScat'}';
-        par.c_max = c_max(2:end-1);
+        par.c_max = c_max(start_row:end_row);
     catch
         warning('No maximum cation density array (c_max) defined in .csv . Using default in PC')
     end
@@ -147,11 +165,11 @@ end
 % Electron mobility
 try
     mu_n = T{:, 'mu_n'}';
-    par.mu_n = mu_n(2:end-1);
+    par.mu_n = mu_n(start_row:end_row);
 catch
     try
         mu_n = T{:, 'mue'}';
-        par.mu_n = mu_n(2:end-1);
+        par.mu_n = mu_n(start_row:end_row);
     catch
         warning('No electron mobility (mu_n) defined in .csv . Using default in PC')
     end
@@ -159,11 +177,11 @@ end
 % Hole mobility
 try
     mu_p = T{:, 'mu_p'}';
-    par.mu_p = mu_p(2:end-1);
+    par.mu_p = mu_p(start_row:end_row);
 catch
     try
         mu_p = T{:, 'muh'}';
-        par.mu_p = mu_p(2:end-1);
+        par.mu_p = mu_p(start_row:end_row);
     catch
         warning('No hole mobility (mu_p) defined in .csv . Using default in PC')
     end
@@ -171,11 +189,11 @@ end
 % Anion mobility
 try
     mu_a = T{:, 'mu_a'}';
-    par.mu_a = mu_a(2:end-1);
+    par.mu_a = mu_a(start_row:end_row);
 catch
     try
         mu_a = T{:, 'muani'}';
-        par.mu_a = mu_a(2:end-1);
+        par.mu_a = mu_a(start_row:end_row);
     catch
         warning('No anion mobility (mu_a) defined in .csv . Using default in PC')
     end
@@ -183,11 +201,11 @@ end
 % Cation mobility
 try
     mu_c = T{:, 'mu_c'}';
-    par.mu_c = mu_c(2:end-1);
+    par.mu_c = mu_c(start_row:end_row);
 catch
     try
         mu_c = T{:, 'mucat'}';
-        par.mu_c = mu_c(2:end-1);
+        par.mu_c = mu_c(start_row:end_row);
     catch
         warning('No cation mobility (mu_c) defined in .csv . Using default in PC')
     end
@@ -195,18 +213,18 @@ end
 % Relative dielectric constant
 try
     epp = T{:, 'epp'}';
-    par.epp = epp(2:end-1);
+    par.epp = epp(start_row:end_row);
 catch
     warning('No relative dielectric constant (epp) defined in .csv . Using default in PC')
 end
 % Uniform volumetric generation rate
 try
     g0 = T{:, 'g0'}';
-    par.g0 = g0(2:end-1);
+    par.g0 = g0(start_row:end_row);
 catch
     try
         g0 = T{:, 'G0'}';
-        par.g0 = g0(2:end-1);
+        par.g0 = g0(start_row:end_row);
     catch
         warning('No uniform generation rate (g0) defined in .csv . Using default in PC')
     end
@@ -214,11 +232,11 @@ end
 % Band-to-band recombination coefficient
 try
     B = T{:, 'krad'}';
-    par.B = B(2:end-1);
+    par.B = B(start_row:end_row);
 catch
     try
         B = T{:, 'B'}';
-        par.B = B(2:end-1);
+        par.B = B(start_row:end_row);
     catch
         warning('No radiative recombinaiton coefficient array (B) defined in .csv . Using default in PC')
     end
@@ -226,28 +244,35 @@ end
 % Electron SRH time constant
 try
     taun = T{:, 'taun'}';
-    par.taun = taun(2:end-1);
+    par.taun = taun(start_row:end_row);
 catch
     try
         taun = T{:, 'taun_SRH'}';
-        par.taun = taun(2:end-1);
+        par.taun = taun(start_row:end_row);
     catch
         warning('No SRH electron lifetime array (taun) defined in .csv . Using default in PC')
     end
 end
 % Hole SRH time constant
 try
-    par.taup = T{:, 'taup'}';
+    taup = T{:, 'taup'}';
+    par.taup = taup(start_row:end_row);
 catch
     try
-        par.taup = T{:, 'taup_SRH'}';
+        taup = T{:, 'taup_SRH'}';
+        par.taup = taup(start_row:end_row);
     catch
         warning('No SRH hole lifetime array (taup) defined in .csv . Using default in PC')
     end
 end
 
 try
-    par.sn = T{:,'sn'}';
+    sn = T{:,'sn'}';
+    par.sn = sn(start_row:end_row);
+    if strcmp(layer_type{1}, 'electrode')
+        par.sn_l = sn(1);
+        par.sn_r = sn(end);
+    end
 catch
     if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
         warning('No sn value defined in .csv . Using default in PC')
@@ -255,63 +280,80 @@ catch
 end
 
 try
-    par.sp = T{:,'sp'}';
+    sp = T{:,'sp'}';
+    par.sp = sp(start_row:end_row);
+    if strcmp(layer_type{1}, 'electrode')
+        par.sp_l = sp(1);
+        par.sp_r = sp(end);
+    end
 catch
     if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
         warning('No sp value defined in .csv . Using default in PC')
     end
 end
 
+if strcmp(layer_type{1}, 'electrode') == 0
 % Electron surface recombination velocity/extraction coefficient LHS
 try
-    par.sn_l = T{1, 'sn_l'}';
+    sn_l = T{1, 'sn_l'}';
+    par.sn_l = sn_l;
 catch
     warning('No sn_l defined in .csv . Using default in PC')
 end
 % Hole surface recombination velocity/extraction coefficient LHS
 try
-    par.sp_l = T{1, 'sp_l'}';
+    sp_l = T{1, 'sp_l'}';
+    par.sp_l = sp_l;
 catch
     warning('No sp_l defined in .csv . Using default in PC')
 end
 % Electron surface recombination velocity/extraction coefficient RHS
 try
-    par.sn_r = T{1, 'sn_r'}';
+    sn_r = T{1, 'sn_r'}';
+    par.sn_r = sn_r;
 catch
     warning('No sn_r defined in .csv . Using default in PC')
 end
 % Hole surface recombination velocity/extraction coefficient RHS
 try
-    par.sp_r = T{1, 'sp_r'}';
+    sp_r = T{1, 'sp_r'}';
+    par.sp_r = sp_r;
 catch
     warning('No sp_r defined in .csv . Using default in PC')
 end
 % Electrode workfunction LHS
 try
-    par.Phi_left = T{1, 'Phi_left'};
+    Phi_left = T{1, 'Phi_left'};
+    par.Phi_left = Phi_left;
 catch
     try
-        par.Phi_left = T{1, 'PhiA'};
+        Phi_left = T{1, 'PhiA'};
+        par.Phi_left = Phi_left;
     catch
         warning('No Phi_left defined in .csv . Using default in PC')
     end
 end
 % Electrode workfunction RHS
 try
-    par.Phi_right = T{1, 'Phi_right'};
+    Phi_right = T{1, 'Phi_right'};
+    par.Phi_right = Phi_right;
 catch
     try
-        par.Phi_right = T{1, 'PhiC'};
+        Phi_right = T{1, 'PhiC'};
+        par.Phi_right = Phi_right;
     catch
         warning('No Phi_right defined in .csv . Using default in PC')
     end
 end
+end
 % SRH Trap energy
 try
-    par.Et = T{:,'Et'}';
+    Et = T{:,'Et'}';
+    par.Et = Et(start_row:end_row);
 catch
     try
-        par.Et = T{:,'Et_bulk'}';
+        Et = T{:,'Et_bulk'}';
+        par.Et = Et(start_row:end_row);
     catch
         warning('No trap energy array (Et) defined in .csv . Using default in PC')
     end
@@ -345,23 +387,24 @@ try
     Red = T{:, 'Red'};
     Green = T{:, 'Green'};
     Blue = T{:, 'Blue'};
-    par.layer_colour = [Red,Green,Blue];
+    par.layer_colour = [Red(start_row:end_row),Green(start_row:end_row),Blue(start_row:end_row)];
 catch
     % warning('Layer colours (layer_colour) undefined in .csv. Using default in PC')
 end
 
 % Recombination zone location
 if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
-    vsr_zone_loc_user = cell(1, length(par.stack));
-    par.vsr_zone_loc = cell(1, length(par.stack));
+    vsr_zone_loc_user = cell(1, length(par.material));
+    par.vsr_zone_loc = cell(1, length(par.material));
     vsr_zone_loc_auto = locate_vsr_zone(par);
     try
         vsr_zone_loc_user = T{:, 'vsr_zone_loc'}';
+        vsr_zone_loc_user = vsr_zone_loc_user(start_row:end_row);
     catch
         warning('Recomination zone location (vsr_zone_loc) not defined in .csv . Using auto defined')
         par.vsr_zone_loc = vsr_zone_loc_auto;
     end
-        for i = 1:length(par.stack)
+        for i = 1:length(par.material)
             if any(strcmp(vsr_zone_loc_user(i), {'L','C','R'})) == 1
                 par.vsr_zone_loc(i) = vsr_zone_loc_user(i);
             elseif strcmp(vsr_zone_loc_user(i), {'auto'}) == 1

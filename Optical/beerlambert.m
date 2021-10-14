@@ -29,13 +29,13 @@ lambda = 300:767;  % wavelength range - currently limited by database MUST BE IN
 
 switch par.side
     case 1
-        layers = par.stack;
+        layers = par.material;
         layer_type = par.layer_type;
         pcum1 = [1,par.pcum+1];
         layer_points = par.layer_points;
     case 2
         % Flip properties for side 2
-        layers = fliplr(par.stack);
+        layers = fliplr(par.material);
         layer_type = fliplr(par.layer_type);
         x = x(end)-fliplr(par.xx);
         pcum1 = fliplr([1,par.pcum+1]);
@@ -83,7 +83,7 @@ try
         end
     end
 catch
-    warning(['Material name ', layers{i} ,' in stack does not match that in the Index of Refraction Library. Please check the names contained in the ''stack'' cell of the parameters object are correct.'])
+    warning(['Material name ', layers{i} ,' in material does not match that in the Index of Refraction Library. Please check the names contained in the ''material'' cell of the parameters object are correct.'])
 end
 
 xcum = par.pcum;

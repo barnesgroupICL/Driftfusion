@@ -4,7 +4,7 @@ function vsr_zone_loc = locate_vsr_zone(par)
 % intelligent location
 int_logical = strcmp(par.layer_type, 'interface');
 loc = find(int_logical); % interface layer locations
-vsr_zone_loc = cell(1, length(par.stack));
+vsr_zone_loc = cell(1, length(par.material));
 
 for j = 1:length(loc)
 

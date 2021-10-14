@@ -36,17 +36,17 @@ classdef dfplot
     % DFPLOT.RHOX = Volumetric charge density as a function of position
     % DFPLOT.DELTARHOX = Change in volumetric charge density as a function of position
     % DFPLOT.RHOXFXVX = Volumetric charge density, Electric field and Electrostatic potential
-    % as a function of position- stacked plot
+    % as a function of position- materialed plot
     % DFPLOT.RHOXVX = Volumetric charge density and Electrostatic potential as a function
-    % of position- stacked plot
+    % of position- materialed plot
     % DFPLOT.ELX = Energy level diagram as a function of position
     % DFPLOT.ELXNPX = Energy level diagram, electron and hole densities
     % DFPLOT.ELXNPXACX = Energy level diagram, electron and hole densities,
-    % and anion and cation densities, 3 panel, stacked
+    % and anion and cation densities, 3 panel, materialed
     % DFPLOT.VXACX = Electrostatic potential and anion and cation densities, 2
-    % panel, stacked
+    % panel, materialed
     % DFPLOT.VIONXACX = Electrostatic potential due to ionic charge and anion and cation densities, 2
-    % panel, stacked
+    % panel, materialed
     % DFPLOT.FIONT = Electric field due to the ionic charge as a function of
     % time
 

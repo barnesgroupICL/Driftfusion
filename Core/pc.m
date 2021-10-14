@@ -51,7 +51,7 @@ classdef pc
         % The names here do not influence the electrical properties of the
         % device. See INDEX OF REFRACTION LIBRARY for choices- names must be entered
         % exactly as given in the column headings with the '_n', '_k' omitted
-        stack = {'MAPICl'}
+        material = {'MAPICl'}
         layer_colour = [1,1,1;1,1,1;1,1,1;1,1,1;1,1,1;1,1,1];
         % Define spatial cordinate system- typically this will be kept at
         % 0 for most applications
@@ -595,7 +595,7 @@ classdef pc
         
         % interface switch for zeroing field in interfaces
         function value = get.int_switch(par)
-            value = ones(1, length(par.stack));
+            value = ones(1, length(par.material));
         end
         
     end

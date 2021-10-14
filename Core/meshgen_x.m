@@ -26,7 +26,7 @@ switch par.xmesh_type
         dcum0 = par.dcum0;
         
         xcell = cell(1,length(p));
-        for i=1:length(par.layer_points)
+        for i = 1:length(par.layer_points)
             linarr = linspace(dcum0(i), dcum0(i+1)-(d(i)/p(i)), p(i));
             xcell{i} = linarr;
         end
@@ -46,12 +46,12 @@ switch par.xmesh_type
             xmesh_coeff = par.xmesh_coeff;
         end
         
-        xcell = cell(1,length(p));
-        for i = 1:length(p)
+        xcell = cell(1,length(p)); 
+        for i = 1:length(par.layer_type)
             if any(strcmp(par.layer_type{1,i}, {'layer', 'active'}))
                 parr = -0.5 : (1/p(i)) : 0.5;
                 x_layer = erf(2*pi*xmesh_coeff(i)*parr);
-                x_layer = x_layer-x_layer(1);       % Subtract base to get zero
+                x_layer = x_layer - x_layer(1);       % Subtract base to get zero
                 x_layer  = x_layer./max(x_layer);   % Normalise the funciton
                 x_layer = dcum0(i) + x_layer * d(i);
                 xcell{i} = x_layer(1:end-1);

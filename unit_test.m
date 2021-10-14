@@ -20,7 +20,7 @@
 % (at your option) any later version.
 
 %------------- BEGIN CODE --------------
-
+clear all
 % prepare solutions and indirectly test equilibrate and genIntStructs
 % functions
 initialise_df
@@ -682,7 +682,7 @@ lightsource('AM15', 500);
 %% Optical LoadRefrIndex
 
 % [n_interp, k_interp] = LoadRefrIndex(name,wavelengths)
-LoadRefrIndex(par.stack{1},300:767);
+LoadRefrIndex(par.material{1},300:767);
 
 %% Input_files
 inputs = dir('Input_files');
