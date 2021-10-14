@@ -33,14 +33,14 @@ classdef dfana
                     dev.Nani = zeros(1, length(x));
                     par.dev.Ncat = zeros(1, length(x));
                     par.dev.Nani = zeros(1, length(x));
-                    par.dev_sub.Ncat = zeros(1, length(x));
-                    par.dev_sub.Nani = zeros(1, length(x));
+                    par.dev_sub.Ncat = zeros(1, length(x) - 1);
+                    par.dev_sub.Nani = zeros(1, length(x) - 1);
                 case 1
                     c = u(:,:,4);
                     a = zeros(length(t), length(x));
                     dev.Nani = zeros(1, length(x));
                     par.dev.Nani = zeros(1, length(x));
-                    par.dev_sub.Nani = zeros(1, length(x));
+                    par.dev_sub.Nani = zeros(1, length(x) - 1);
                 case 2
                     c = u(:,:,4);
                     a = u(:,:,5);
