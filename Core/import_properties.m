@@ -25,19 +25,23 @@ catch
 end
 % Layer name array
 try
-    par.stack = T{:,'stack'}';
+    stack = T{:,'stack'}';
+    par.stack = stack(2:end-1);
 catch
     warning('No stack (stack) defined in .csv . Using default in PC')
 end
 % Layer thickness array
 try
-    par.d = T{:, 'dcell'}';
+    d = T{:, 'dcell'}';
+    par.d = d(2:end-1);
 catch
     try
-        par.d = T{:, 'd'}';
+        d = T{:, 'd'}';
+        par.d = d(2:end-1);
     catch
         try
-            par.d = T{:, 'thickness'}';
+            d = T{:, 'thickness'}';
+            par.d = d(2:end-1);
         catch
             warning('No thickness array (thickness) defined in .csv . Using default in PC')
         end
@@ -45,71 +49,84 @@ catch
 end
 % Layer points array
 try
-    par.layer_points = T{:, 'layer_points'}';
+    layer_points = T{:, 'layer_points'}';
+    par.layer_points = layer_points(2:end-1);
 catch
     warning('No layer points array (points) defined in .csv . Using default in PC')
 end
 % Spatial mesh coefficient for non-linear meshes
 try
-    par.xmesh_coeff = T{:, 'xmesh_coeff'}';
+    xmesh_coeff = T{:, 'xmesh_coeff'}';
+    par.xmesh_coeff = xmesh_coeff(2:end-1);
 catch
     warning('No xmesh coefficient array (xmesh_coeff) defined in .csv . Using default in PC')
 end
 % Electron affinity array
 try
-    par.EA = T{:, 'EA'}';
+    EA = T{:, 'EA'}';
+    par.EA = par.EA(2:end-1);
 catch
     warning('No electron affinity array (EA) defined in .csv . Using default in PC')
 end
 % Ionisation potential array
 try
-    par.IP = T{:, 'IP'}';
+    IP = T{:, 'IP'}';
+    par.IP = par.IP(2:end-1);
 catch
     warning('No ionisation potential array (IP) defined in .csv . Using default in PC')
 end
 % Equilibrium Fermi energy array
 try
-    par.E0 = T{:, 'E0'}';
+    E0 = T{:, 'E0'}';
+    par.E0 = E0;
 catch
     warning('No equilibrium Fermi level array (E0) defined in .csv . Using default in PC')
 end
 % Conduction band effective density of states
 try
-    par.Nc = T{:, 'Nc'}';
+    Nc = T{:, 'Nc'}';
+    par.Nc = Nc(2:end-1);
 catch
     warning('No conduction band eDOS array (Nc) defined in .csv . Using default in PC')
 end
 % Valence band effective density of states
 try
-    par.Nv = T{:, 'Nv'}';
+    Nv = T{:, 'Nv'}';
+    par.Nv = Nv(2:end-1);
 catch
     warning('No valence band eDOS array (Nv) defined in .csv . Using default in PC')
 end
 % Intrinsic anion density
 try
-    par.Nani = T{:, 'Nani'}';
+    Nani = T{:, 'Nani'}';
+    par.Nani = Nani(2:end-1);
 catch
     warning('No equilibrium anion density array (Nani) defined in .csv . Using default in PC')
 end
 % Intrinsic cation density
 try
-    par.Ncat = T{:, 'Ncat'}';
+    Ncat = T{:, 'Ncat'}';
+    par.Ncat = Ncat(2:end-1);
 catch
     try
-        par.a_max = T{:, 'Nion'}';
+        Ncat = T{:, 'Nion'}';
+        par.Ncat = Ncat(2:end-1);
     catch
         warning('No equilibrium cation density array (Ncat) defined in .csv . Using default in PC')
     end
 end
 % Limiting density of anion states
 try
-    par.a_max = T{:, 'a_max'}';
+    a_max = T{:, 'a_max'}';
+    par.a_max = a_max(2:end-1);
 catch
     try
-        par.a_max = T{:, 'DOSani'}';
+        a_max = T{:, 'DOSani'}';
+        par.a_max = a_max(2:end-1);
     catch
         try
-            par.a_max = T{:, 'amax'}';
+            a_max = T{:, 'amax'}';
+            par.a_max = a_max(2:end-1);
         catch
             warning('No maximum anion density array (a_max) defined in .csv . Using default in PC')
         end
@@ -117,90 +134,103 @@ catch
 end
 % Limiting density of cation states
 try
-    par.c_max = T{:, 'c_max'}';
+    c_max = T{:, 'c_max'}';
+    par.c_max = c_max(2:end-1);
 catch
     try
-        par.c_max = T{:, 'DOScat'}';
+        c_max = T{:, 'DOScat'}';
+        par.c_max = c_max(2:end-1);
     catch
-        try
-            par.c_max = T{:, 'cmax'}';
-        catch
-            warning('No maximum cation density array (c_max) defined in .csv . Using default in PC')
-        end
+        warning('No maximum cation density array (c_max) defined in .csv . Using default in PC')
     end
 end
 % Electron mobility
 try
-    par.mu_n = T{:, 'mu_n'}';
+    mu_n = T{:, 'mu_n'}';
+    par.mu_n = mu_n(2:end-1);
 catch
     try
-        par.mu_a = T{:, 'mue'}';
+        mu_n = T{:, 'mue'}';
+        par.mu_n = mu_n(2:end-1);
     catch
         warning('No electron mobility (mu_n) defined in .csv . Using default in PC')
     end
 end
 % Hole mobility
 try
-    par.mu_p = T{:, 'mu_p'}';
+    mu_p = T{:, 'mu_p'}';
+    par.mu_p = mu_p(2:end-1);
 catch
     try
-        par.mu_a = T{:, 'muh'}';
+        mu_p = T{:, 'muh'}';
+        par.mu_p = mu_p(2:end-1);
     catch
         warning('No hole mobility (mu_p) defined in .csv . Using default in PC')
     end
 end
 % Anion mobility
 try
-    par.mu_a = T{:, 'mu_a'}';
+    mu_a = T{:, 'mu_a'}';
+    par.mu_a = mu_a(2:end-1);
 catch
     try
-        par.mu_a = T{:, 'muani'}';
+        mu_a = T{:, 'muani'}';
+        par.mu_a = mu_a(2:end-1);
     catch
         warning('No anion mobility (mu_a) defined in .csv . Using default in PC')
     end
 end
 % Cation mobility
 try
-    par.mu_c = T{:, 'mu_c'}';
+    mu_c = T{:, 'mu_c'}';
+    par.mu_c = mu_c(2:end-1);
 catch
     try
-        par.mu_c = T{:, 'mucat'}';
+        mu_c = T{:, 'mucat'}';
+        par.mu_c = mu_c(2:end-1);
     catch
         warning('No cation mobility (mu_c) defined in .csv . Using default in PC')
     end
 end
 % Relative dielectric constant
 try
-    par.epp = T{:, 'epp'}';
+    epp = T{:, 'epp'}';
+    par.epp = epp(2:end-1);
 catch
     warning('No relative dielectric constant (epp) defined in .csv . Using default in PC')
 end
 % Uniform volumetric generation rate
 try
-    par.g0 = T{:, 'g0'}';
+    g0 = T{:, 'g0'}';
+    par.g0 = g0(2:end-1);
 catch
     try
-        par.g0 = T{:, 'G0'}';
+        g0 = T{:, 'G0'}';
+        par.g0 = g0(2:end-1);
     catch
         warning('No uniform generation rate (g0) defined in .csv . Using default in PC')
     end
 end
 % Band-to-band recombination coefficient
 try
-    par.B = T{:, 'krad'}';
+    B = T{:, 'krad'}';
+    par.B = B(2:end-1);
 catch
     try
-        par.B = T{:, 'B'}';
+        B = T{:, 'B'}';
+        par.B = B(2:end-1);
     catch
         warning('No radiative recombinaiton coefficient array (B) defined in .csv . Using default in PC')
     end
 end
 % Electron SRH time constant
 try
-    par.taun = T{:, 'taun'}';
+    taun = T{:, 'taun'}';
+    par.taun = taun(2:end-1);
 catch
     try
-        par.taun = T{:, 'taun_SRH'}';
+        taun = T{:, 'taun_SRH'}';
+        par.taun = taun(2:end-1);
     catch
         warning('No SRH electron lifetime array (taun) defined in .csv . Using default in PC')
     end
