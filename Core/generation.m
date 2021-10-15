@@ -14,7 +14,7 @@ function gx = generation(par, source_type, laserlambda)
 %
 %% Start code
 xsolver = par.x_sub;
-switch par.OM
+switch par.optical_model
     case 0
         % This currently results in the generation profile being stored twice and could be optimised
         gx = build_property(par.g0, xsolver, par, 'zeroed', 0);    

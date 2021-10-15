@@ -97,10 +97,10 @@ classdef pc
         intgradfun = 'linear'               % Interface gradient function 'linear' = linear, 'erf' = 'error function'
 
         %% Generation
-        % OM = Optical Model
+        % optical_model = Optical Model
         % 0 = Uniform Generation
         % 1 = Beer Lambert
-        OM = 1;
+        optical_model = 1;
         Int = 0;                % Bias Light intensity (multiples of g0 or 1 sun for Beer-Lambert)
         int1 = 0;
         int2 = 0;
@@ -123,12 +123,12 @@ classdef pc
         % entries equal to the number of layers specified in STACK
 
         %% Energy levels [eV]
-        EA = [0];           % Electron affinity
-        IP = [-1];           % Ionisation potential
+        Phi_EA = [0];           % Electron affinity
+        Phi_IP = [-1];           % Ionisation potential
 
         %% Equilibrium Fermi energies [eV]
         % These define the doping density in each layer- see NA and ND calculations in methods
-        E0 = [-0.5];
+        EF0 = [-0.5];
 
         %% SRH trap energies [eV]
         % These must exist within the energy gap of the appropriate layers
@@ -316,7 +316,7 @@ classdef pc
 
             % Warn if trap energies are outside of band gap energies
             for i = 1:length(par.Et)
-                if par.Et(i) >= par.EA(i) || par.Et(i) <= par.IP(i)
+                if par.Et(i) >= par.Phi_EA(i) || par.Et(i) <= par.Phi_IP(i)
                     msg = 'Trap energies must exist within layer band gap.';
                     error(msg);
                 end
@@ -342,12 +342,12 @@ classdef pc
             
             % Warn if electrode workfunctions are outside of boundary layer
             % bandgap
-            if par.Phi_left < par.IP(1) || par.Phi_left > par.EA(1)
+            if par.Phi_left < par.Phi_IP(1) || par.Phi_left > par.Phi_EA(1)
                 msg = 'Left-hand workfunction (Phi_left) out of range: value must exist within left-hand layer band gap';
                 error(msg)
             end
 
-            if par.Phi_right < par.IP(end) || par.Phi_right > par.EA(end)
+            if par.Phi_right < par.Phi_IP(end) || par.Phi_right > par.Phi_EA(end)
                 msg = 'Right-hand workfunction (Phi_right) out of range: value must exist within right-hand layer band gap';
                 error(msg)
             end
@@ -358,11 +358,11 @@ classdef pc
             if length(par.parr) ~= length(par.d)
                 msg = 'Points array (parr) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.EA) ~= length(par.d)
-                msg = 'Electron Affinity array (EA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.Phi_EA) ~= length(par.d)
+                msg = 'Electron Affinity array (Phi_EA) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.IP) ~= length(par.d)
-                msg = 'Ionisation Potential array (IP) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.Phi_IP) ~= length(par.d)
+                msg = 'Ionisation Potential array (Phi_IP) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.mu_n) ~= length(par.d)
                 msg = 'Electron mobility array (mu_n) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
@@ -397,8 +397,8 @@ classdef pc
             elseif length(par.B) ~= length(par.d)
                 msg = 'Radiative recombination coefficient array (B) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
-            elseif length(par.E0) ~= length(par.d)
-                msg = 'Equilibrium Fermi level array (E0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
+            elseif length(par.EF0) ~= length(par.d)
+                msg = 'Equilibrium Fermi level array (EF0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
                 error(msg);
             elseif length(par.g0) ~= length(par.d)
                 msg = 'Uniform generation array (g0) does not have the correct number of elements. Property arrays must have the same number of elements as the thickness array (d), except SRH properties for interfaces which should have length(d)-1 elements.';
@@ -505,7 +505,7 @@ classdef pc
 
         %% Band gap energies    [eV]
         function value = get.Eg(par)
-            value = par.EA - par.IP;
+            value = par.Phi_EA - par.Phi_IP;
         end
 
         %% Built-in voltage Vbi based on difference in boundary workfunctions
@@ -516,17 +516,17 @@ classdef pc
         %% Intrinsic Fermi Energies
         % Currently uses Boltzmann stats as approximation should always be
         function value = get.Efi(par)
-            value = 0.5.*(par.EA+par.IP)+par.kB*par.T*log(par.Nc./par.Nv);
+            value = 0.5.*(par.Phi_EA+par.Phi_IP)+par.kB*par.T*log(par.Nc./par.Nv);
         end
 
         %% Donor densities
         function value = get.ND(par)
-            value = distro_fun.nfun(par.Nc, par.EA, par.E0, par);
+            value = distro_fun.nfun(par.Nc, par.Phi_EA, par.EF0, par);
         end
 
         %% Acceptor densities
         function value = get.NA(par)
-            value = distro_fun.pfun(par.Nv, par.IP, par.E0, par);
+            value = distro_fun.pfun(par.Nv, par.Phi_IP, par.EF0, par);
         end
         
         %% Intrinsic carrier densities (Boltzmann)
@@ -536,12 +536,12 @@ classdef pc
 
         %% Equilibrium electron densities
         function value = get.n0(par)
-            value = distro_fun.nfun(par.Nc, par.EA, par.E0, par);
+            value = distro_fun.nfun(par.Nc, par.Phi_EA, par.EF0, par);
         end
 
         %% Equilibrium hole densities
         function value = get.p0(par)
-            value = distro_fun.pfun(par.Nv, par.IP, par.E0, par);
+            value = distro_fun.pfun(par.Nv, par.Phi_IP, par.EF0, par);
 
         end
 
@@ -549,31 +549,31 @@ classdef pc
         % Uses metal Fermi energies to calculate boundary densities
         % Electrons left boundary
         function value = get.n0_l(par)
-            value = distro_fun.nfun(par.Nc(1), par.EA(1), par.Phi_left, par);
+            value = distro_fun.nfun(par.Nc(1), par.Phi_EA(1), par.Phi_left, par);
         end
 
         % Electrons right boundary
         function value = get.n0_r(par)
-            value = distro_fun.nfun(par.Nc(end), par.EA(end), par.Phi_right, par);
+            value = distro_fun.nfun(par.Nc(end), par.Phi_EA(end), par.Phi_right, par);
         end
 
         % Holes left boundary
         function value = get.p0_l(par)
-            value = distro_fun.pfun(par.Nv(1), par.IP(1), par.Phi_left, par);
+            value = distro_fun.pfun(par.Nv(1), par.Phi_IP(1), par.Phi_left, par);
         end
 
         % holes right boundary
         function value = get.p0_r(par)
-            value = distro_fun.pfun(par.Nv(end), par.IP(end), par.Phi_right, par);
+            value = distro_fun.pfun(par.Nv(end), par.Phi_IP(end), par.Phi_right, par);
         end
        
         %% SRH trap energy coefficients
         function value = get.nt(par)
-            value = distro_fun.nfun(par.Nc, par.EA, par.Et, par);
+            value = distro_fun.nfun(par.Nc, par.Phi_EA, par.Et, par);
         end
         
         function value = get.pt(par)
-            value = distro_fun.pfun(par.Nv, par.IP, par.Et, par);
+            value = distro_fun.pfun(par.Nv, par.Phi_IP, par.Et, par);
         end
         
         %% Thickness and point arrays

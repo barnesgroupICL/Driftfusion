@@ -77,28 +77,47 @@ catch
 end
 % Electron affinity array
 try
-    EA = T{:, 'EA'}';
-    par.EA = EA(start_row:end_row);
+    Phi_EA = T{:, 'Phi_EA'}';
+    par.Phi_EA = Phi_EA(start_row:end_row);
 catch
-    warning('No electron affinity array (EA) defined in .csv . Using default in PC')
+    try
+        Phi_EA = T{:, 'EA'}';
+        par.Phi_EA = Phi_EA(start_row:end_row);
+    catch
+        warning('No electron affinity array (Phi_EA) defined in .csv . Using default in PC')
+    end
 end
 % Ionisation potential array
 try
-    IP = T{:, 'IP'}';
-    par.IP = IP(start_row:end_row);
+    Phi_IP = T{:, 'Phi_IP'}';
+    par.Phi_IP = Phi_IP(start_row:end_row);
 catch
-    warning('No ionisation potential array (IP) defined in .csv . Using default in PC')
+    try
+        Phi_IP = T{:, 'IP'}';
+        par.Phi_IP = Phi_IP(start_row:end_row);
+    catch
+        warning('No ionisation potential array (Phi_IP) defined in .csv . Using default in PC')
+    end
 end
 % Equilibrium Fermi energy array
 try
-    E0 = T{:, 'E0'}';
-    par.E0 = E0(start_row:end_row);
+    EF0 = T{:, 'EF0'}';
+    par.EF0 = EF0(start_row:end_row);
     if strcmp(layer_type{1}, 'electrode')
-        par.Phi_left = E0(1);
-        par.Phi_right = E0(end);
+        par.Phi_left = EF0(1);
+        par.Phi_right = EF0(end);
     end
 catch
-    warning('No equilibrium Fermi level array (E0) defined in .csv . Using default in PC')
+    try
+        EF0 = T{:, 'E0'}';
+        par.EF0 = EF0(start_row:end_row);
+        if strcmp(layer_type{1}, 'electrode')
+            par.Phi_left = EF0(1);
+            par.Phi_right = EF0(end);
+        end
+    catch
+        warning('No equilibrium Fermi level array (EF0) defined in .csv . Using default in PC')
+    end
 end
 % Conduction band effective density of states
 try
@@ -360,9 +379,13 @@ catch
 end
 % Optical model
 try
-    par.OM = T{1, 'OM'};
+    par.optical_model = T{1, 'optical_model'};
 catch
-    warning('No optical model (OM) specified in .csv Using default in PC')
+    try
+        par.optical_model = T{1, 'OM'};
+    catch
+        warning('No optical model (optical_model) specified in .csv Using default in PC')
+    end
 end
 % Spatial mesh type
 try

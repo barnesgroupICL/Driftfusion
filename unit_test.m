@@ -275,10 +275,10 @@ dev2 = build_device(par, 'sub');
 
 % devprop = build_property(property, xmesh, par, interface_switch, gradient_property)
 build_property(par.taun, par.xx, par, 'constant', 0);
-build_property(par.EA, par.xx, par, 'lin_graded', 0);
+build_property(par.Phi_EA, par.xx, par, 'lin_graded', 0);
 build_property(par.NA, par.xx, par, 'log_graded', 0);
 build_property(par.g0, par.xx, par, 'zeroed', 0);
-build_property(par.EA, par.xx, par, 'lin_graded', 1);
+build_property(par.Phi_EA, par.xx, par, 'lin_graded', 1);
 build_property(par.Nc, par.xx, par, 'log_graded', 1);
 
 %% Core dfana splitsol
@@ -377,12 +377,12 @@ dfana.pdentrp(false,false,par.xx(123),soleq.ion.u(1,123,1),par.xx(124),soleq.ion
 %% Core ditro_fun nfun
 
 % n = nfun(Nc, Ec, Efn, T, prob_distro_function)
-distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.E0, par);
+distro_fun.nfun(par.dev.Nc, par.dev.Phi_EA, par.dev.EF0, par);
 
 %% Core ditro_fun pfun
 
 % p = pfun(Nv, Ev, Efp, T, prob_distro_function)
-distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.E0, par);
+distro_fun.pfun(par.dev.Nv, par.dev.Phi_IP, par.dev.EF0, par);
 
 %% Core ditro_fun Dn_fd_fun and Dnlook and Efn_fd_fun
 
@@ -401,7 +401,7 @@ distro_fun.Efn_fd_fun(soleq.ion.u(2,1,end), Efn, Dnfd.n_fd);
 
 [~, ~, ~, Efp] = dfana.calcEnergies(soleq.ion);
 % Dpfd = Dp_fd_fun(Nv, Ev, Efp, mu_p, T)
-Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.IP(1), Efp, par.mu_p(1), par.T);
+Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.Phi_IP(1), Efp, par.mu_p(1), par.T);
 
 % Dsol = Dplook(p, Dpfun, p_fd)
 distro_fun.Dplook(soleq.ion.u(3,1,1), Dpfd.Dpfun, Dpfd.p_fd);
@@ -422,7 +422,7 @@ fun_gen('tri');
 
 % gx = generation(par, source_type, laserlambda)
 par2 = par;
-par2.OM = ~par.OM;
+par2.optical_model = ~par.optical_model;
 generation(par, 'AM15', 470);
 generation(par, 'laser', 470);
 generation(par2, 'AM15', 470);
@@ -431,7 +431,7 @@ generation(par2, 'laser', 470);
 %% Core getvar_sub
 
 % varsub = getvar_sub(var)
-EA_sub = getvar_sub(par.dev.EA);
+EA_sub = getvar_sub(par.dev.Phi_EA);
 
 %% Core getx_sub
 

@@ -52,8 +52,8 @@ classdef dfana
             % Simple structure names
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            Ecb = dev.EA-V;                                 % Conduction band potential
-            Evb = dev.IP-V;                                 % Valence band potential
+            Ecb = dev.Phi_EA-V;                                 % Conduction band potential
+            Evb = dev.Phi_IP-V;                                 % Valence band potential
             Efn = zeros(size(n,1), size(n,2));
             Efp = zeros(size(n,1), size(n,2));
             
