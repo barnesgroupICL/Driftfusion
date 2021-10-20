@@ -10,11 +10,17 @@ function x = meshgen_x(par)
 % (at your option) any later version.
 %
 %% Start code
-x_mesh_type = par.xmesh_type;
+dcum = par.dcum;
 
-switch x_mesh_type
+switch par.xmesh_type
     % Linearly spaced
-    case 'linear'
+    case 1
+        x = linspace(0,dcum(end),par.parr(1)+par.parr(2)+par.parr(3));
+    case 2
+        error('xmesh_type = 2 not currently available. Please select another mesh type.')      
+    case 3
+        error('xmesh_type = 3 not currently available. Please select another mesh type.') 
+    case 4
         d = par.dcell;
         p = par.layer_points;
         dcum0 = par.dcum0;
@@ -27,7 +33,7 @@ switch x_mesh_type
         x = [xcell{:}];
         x = [x, dcum0(end)];
         
-    case 'erf-linear'
+    case 5
         % Error function for each layer
         d = par.dcell;
         p = par.layer_points;
@@ -58,7 +64,7 @@ switch x_mesh_type
         x = [x, dcum0(end)];
 
     otherwise
-        error('xmesh_type not recognized')
+        error('DrIFtFUSION:xmesh_type', [mfilename ' - xmesh_type not recognized'])
 end
 
 px = length(x);
