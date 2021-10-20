@@ -389,7 +389,19 @@ catch
 end
 % Spatial mesh type
 try
-    par.xmesh_type = T{1, 'xmesh_type'};
+    xmesh_type = T{1, 'xmesh_type'};
+    if isa(xmesh_type, 'double')
+        switch xmesh_type
+            case 4
+                par.xmesh_type = 'linear';
+            case 5
+                par.xmesh_type = 'erf-linear';
+            otherwise
+                error('xmesh_type not recognized')
+        end
+    else
+        par.xmesh_type = xmesh_type;
+    end
 catch
     warning('No spatial mesh type (xmesh_type) defined in .csv . Using default in PC')
 end
