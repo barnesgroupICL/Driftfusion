@@ -325,8 +325,7 @@ classdef dfplot
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
             figure(13);
-            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-','-'},...
-                'Carrier density [cm-3]', tarr, xrange, 0, 1)
+            dfplot.x2d(sol, x, {n, p}, {'n', 'p'}, {'-','-'},'Carrier density [cm-3]', tarr, xrange, 0, 1)
         end
         
         function nspsx(varargin)

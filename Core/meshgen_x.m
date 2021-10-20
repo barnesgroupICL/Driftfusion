@@ -10,9 +10,9 @@ function x = meshgen_x(par)
 % (at your option) any later version.
 %
 %% Start code
-x_mesh_type = par.xmesh_type;
+xmesh_type = par.xmesh_type;
 
-switch x_mesh_type
+switch xmesh_type
     % Linearly spaced
     case 'linear'
         d = par.dcell;

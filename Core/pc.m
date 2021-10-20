@@ -62,7 +62,7 @@ classdef pc
 
         %% Spatial mesh
         % xmesh_type specification - see MESHGEN_X.
-        xmesh_type = {'erf-linear'};
+        xmesh_type = 'erf-linear';
         xmesh_coeff = [0.7];        % Coefficient array for defining point spacing
         
         %% Time mesh

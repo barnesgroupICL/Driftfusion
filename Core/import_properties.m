@@ -400,7 +400,7 @@ try
                 error('xmesh_type not recognized')
         end
     else
-        par.xmesh_type = xmesh_type;
+        par.xmesh_type = xmesh_type{1};
     end
 catch
     warning('No spatial mesh type (xmesh_type) defined in .csv . Using default in PC')
