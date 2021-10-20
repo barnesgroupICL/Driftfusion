@@ -62,7 +62,7 @@ classdef pc
 
         %% Spatial mesh
         % xmesh_type specification - see MESHGEN_X.
-        xmesh_type = 5;
+        xmesh_type = {'erf-linear'};
         xmesh_coeff = [0.7];        % Coefficient array for defining point spacing
         
         %% Time mesh
@@ -298,12 +298,12 @@ classdef pc
 
             % Warn if tmesh_type is not correct
             if ~ any([1 2 3 4] == par.tmesh_type)
-                warning('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
+                warning('PAR.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
             end
 
             % Warn if xmesh_type is not correct
-            if ~ any(1:1:5 == par.xmesh_type)
-                warning('PARAMS.xmesh_type should be an integer from 1 to 5 inclusive. MESHGEN_X cannot generate a mesh if this is not the case.')
+            if ~ any(strcmp(par.xmesh_type, {'linear', 'erf-linear'}))
+                error('PAR.xmesh_type should either be ''linear'' or ''erf-linear''. MESHGEN_X cannot generate a mesh if this is not the case.')
             end
 
             % Warn if doping density exceeds eDOS
@@ -425,25 +425,25 @@ classdef pc
 
         function par = set.xmesh_type(par, value)
             %   SET.xmesh_type(PARAMS, VALUE) checks if VALUE is an integer
-            %   from 1 to 3, and if so, changes PARAMS.xmesh_type to VALUE.
+            %   from 1 to 3, and if so, changes PAR.xmesh_type to VALUE.
             %   Otherwise, a warning is shown. Runs automatically whenever
             %   xmesh_type is changed.
-            if any(1:1:5 == value)
+            if any(strcmp(par.xmesh_type, {'linear', 'erf-linear'}))
                 par.xmesh_type = value;
             else
-                error('PARAMS.xmesh_type should be an integer from 1 to 3 inclusive. MESHGEN_X cannot generate a mesh if this is not the case.')
+                error('PAR.xmesh_type should either be ''linear'' or ''erf-linear''. MESHGEN_X cannot generate a mesh if this is not the case.')
             end
         end
 
         function par = set.tmesh_type(par, value)
             %   SET.tmesh_type(PARAMS, VALUE) checks if VALUE is an integer
-            %   from 1 to 2, and if so, changes PARAMS.tmesh_type to VALUE.
+            %   from 1 to 2, and if so, changes PAR.tmesh_type to VALUE.
             %   Otherwise, a warning is shown. Runs automatically whenever
             %   tmesh_type is changed.
             if any(1:1:4 == value)
                 par.tmesh_type = value;
             else
-                error('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
+                error('PAR.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
             end
         end
         
