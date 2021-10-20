@@ -21,7 +21,7 @@ end
 % Constant properties
 dev.mu_c = build_property(par.mu_c, xmesh, par, 'constant', 0);
 dev.mu_a = build_property(par.mu_a, xmesh, par, 'constant', 0);
-dev.epp = build_property(par.epp, xmesh, par, 'constant', 0);
+
 
 dev.sn = build_property(par.sn, xmesh, par, 'constant', 1);
 dev.sp = build_property(par.sp, xmesh, par, 'constant', 1);
@@ -48,8 +48,8 @@ dev.taup = build_property(par.taup, xmesh, par, 'exp_graded', 0);
 % Properties that are zeroed in the interfaces
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);
 dev.B = build_property(par.B, xmesh, par, 'zeroed', 0);
-dev.NA = build_property(par.NA, xmesh, par, 'zeroed', 0);
-dev.ND = build_property(par.ND, xmesh, par, 'zeroed', 0);
+dev.NA = build_property(par.NA, xmesh, par, 'exp_graded', 0);
+dev.ND = build_property(par.ND, xmesh, par, 'exp_graded', 0);
 
 % Gradient properties
 dev.gradEA = build_property(par.Phi_EA, xmesh, par, 'lin_graded', 1);
@@ -74,6 +74,9 @@ if par.vsr_mode
     dev.srh_zone = dev.bulk_switch;
     dev.Field_switch = dev.bulk_switch;
     
+    dev.NA = build_property(par.NA, xmesh, par, 'zeroed', 0);
+    dev.ND = build_property(par.ND, xmesh, par, 'zeroed', 0);
+    dev.epp = build_property(par.epp, xmesh, par, 'constant', 0); 
     dev.ni = build_property(par.ni, xmesh, par, 'constant', 0);
     dev.nt = build_property(par.nt, xmesh, par, 'constant', 0);
     dev.pt = build_property(par.pt, xmesh, par, 'constant', 0);
@@ -82,6 +85,9 @@ else
     dev.srh_zone = ones(1, length(xmesh));
     dev.Field_switch = ones(1, length(xmesh));
     
+    dev.NA = build_property(par.NA, xmesh, par, 'exp_graded', 0);
+    dev.ND = build_property(par.ND, xmesh, par, 'exp_graded', 0);
+    dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
     dev.ni = build_property(par.ni, xmesh, par, 'exp_graded', 0);
     dev.nt = build_property(par.nt, xmesh, par, 'exp_graded', 0);
     dev.pt = build_property(par.pt, xmesh, par, 'exp_graded', 0);
