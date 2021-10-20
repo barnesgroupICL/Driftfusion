@@ -100,10 +100,9 @@ classdef pc
         % optical_model = Optical Model
         % 0 = Uniform Generation
         % 1 = Beer Lambert
-        optical_model = 1;
-        Int = 0;                % Bias Light intensity (multiples of g0 or 1 sun for Beer-Lambert)
-        int1 = 0;
-        int2 = 0;
+        optical_model = 'beer-lambert';
+        int1 = 0;               % Light intensity source 1 (multiples of g0 or 1 sun for Beer-Lambert)
+        int2 = 0;               % Light intensity source 2 (multiples of g0 or 1 sun for Beer-Lambert)
         g0 = [2.6409e+21];      % Uniform generation rate [cm-3s-1]
         light_source1 = 'AM15';
         light_source2 = 'laser';

@@ -419,14 +419,16 @@ fun_gen('sin');
 fun_gen('tri');
 
 %% Core generation
-
 % gx = generation(par, source_type, laserlambda)
-par2 = par;
-par2.optical_model = ~par.optical_model;
-generation(par, 'AM15', 470);
-generation(par, 'laser', 470);
-generation(par2, 'AM15', 470);
-generation(par2, 'laser', 470);
+par_om1 = par;
+par_om1.optical_model = 'uniform';
+generation(par_om1, 'AM15', 470);
+generation(par_om1, 'laser', 470);
+
+par_om2 = par;
+par_om2.optical_model = 'beer-lambert';
+generation(par_om2, 'AM15', 470);
+generation(par_om2, 'laser', 470);
 
 %% Core getvar_sub
 
@@ -481,20 +483,12 @@ parx = par;
 parx.meshx_figon = true;
 meshgen_x(par);
 
-%% Core meshgen_x 1
-
-% x = meshgen_x(par)
-parx = par;
-parx.meshx_figon = true;
-parx.xmesh_type = 1;
-meshgen_x(parx);
-
 %% Core meshgen_x 4
 
 % x = meshgen_x(par)
 parx = par;
 parx.meshx_figon = true;
-parx.xmesh_type = 4;
+parx.xmesh_type = 'linear';
 meshgen_x(parx);
 
 %% Core meshgen_x 5
@@ -502,7 +496,7 @@ meshgen_x(parx);
 % x = meshgen_x(par)
 parx = par;
 parx.meshx_figon = true;
-parx.xmesh_type = 5;
+parx.xmesh_type = 'erf-linear';
 meshgen_x(parx);
 
 %% Core refresh_device
@@ -666,13 +660,12 @@ VappFunction(soleq.ion, 'tri', [0, 0.6, -0.1, 3, 5], 15, 60, false);
 
 %% Optical beerlambert
 
-par2 = par;
-par2.side = 3 - par.side;
 % Gentot = beerlambert(par, x, source_type, laserlambda, figson)
-beerlambert(par, par.xx, 'AM15', 0, true);
-beerlambert(par, par.xx, 'laser', 500, true);
-beerlambert(par2, par2.xx, 'AM15', 0, true);
-beerlambert(par2, par2.xx, 'laser', 500, true);
+beerlambert(par_om2, par_om2.xx, 'AM15', 0, true);
+beerlambert(par_om2, par_om2.xx, 'laser', 500, true);
+par_om2.side = 3 - par.side;
+beerlambert(par_om2, par_om2.xx, 'AM15', 0, true);
+beerlambert(par_om2, par_om2.xx, 'laser', 500, true);
 
 %% Optical lightsource
 

@@ -32,13 +32,11 @@ try
 catch
     error('No layer type (layer_type) defined in .csv . layer_type must be defined when using .csv input file')
 end
-% Layer name array
-try
-    material = T{:,'material'}';
-    par.material = material(start_row:end_row);
-catch
+% Material name array
+names = {'material', 'stack'};
+for i = 1:length(names)
     try
-        material = T{:,'stack'}';
+        material = T{: , names(i)}';
         par.material = material(start_row:end_row);
     catch
         warning('No material array (material) defined in .csv . Using default in PC')
@@ -47,20 +45,20 @@ end
 % Layer thickness array
 try
     d = T{:, 'dcell'}';
-    par.d = d(start_row:end_row);
+   
 catch
     try
         d = T{:, 'd'}';
-        par.d = d(start_row:end_row);
     catch
         try
             d = T{:, 'thickness'}';
-            par.d = d(start_row:end_row);
         catch
             warning('No thickness array (thickness) defined in .csv . Using default in PC')
         end
     end
 end
+par.d = d(start_row:end_row);
+
 % Layer points array
 try
     layer_points = T{:, 'layer_points'}';
@@ -379,7 +377,17 @@ catch
 end
 % Optical model
 try
-    par.optical_model = T{1, 'optical_model'};
+    optical_model = T{1, 'optical_model'};
+        if isa(optical_model, 'double')
+            switch optical_model
+                case 0
+                   par.optical_model = 'uniform';
+                case 1
+                   par.optical_model = 'beer-lambert';
+            end
+        else
+            par.optical_model = optical_model{1};
+        end
 catch
     try
         par.optical_model = T{1, 'OM'};
