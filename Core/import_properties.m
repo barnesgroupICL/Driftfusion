@@ -312,58 +312,58 @@ catch
 end
 
 if strcmp(layer_type{1}, 'electrode') == 0
-% Electron surface recombination velocity/extraction coefficient LHS
-try
-    sn_l = T{1, 'sn_l'}';
-    par.sn_l = sn_l;
-catch
-    warning('No sn_l defined in .csv . Using default in PC')
-end
-% Hole surface recombination velocity/extraction coefficient LHS
-try
-    sp_l = T{1, 'sp_l'}';
-    par.sp_l = sp_l;
-catch
-    warning('No sp_l defined in .csv . Using default in PC')
-end
-% Electron surface recombination velocity/extraction coefficient RHS
-try
-    sn_r = T{1, 'sn_r'}';
-    par.sn_r = sn_r;
-catch
-    warning('No sn_r defined in .csv . Using default in PC')
-end
-% Hole surface recombination velocity/extraction coefficient RHS
-try
-    sp_r = T{1, 'sp_r'}';
-    par.sp_r = sp_r;
-catch
-    warning('No sp_r defined in .csv . Using default in PC')
-end
-% Electrode workfunction LHS
-try
-    Phi_left = T{1, 'Phi_left'};
-    par.Phi_left = Phi_left;
-catch
+    % Electron surface recombination velocity/extraction coefficient LHS
     try
-        Phi_left = T{1, 'PhiA'};
+        sn_l = T{1, 'sn_l'}';
+        par.sn_l = sn_l;
+    catch
+        warning('No sn_l defined in .csv . Using default in PC')
+    end
+    % Hole surface recombination velocity/extraction coefficient LHS
+    try
+        sp_l = T{1, 'sp_l'}';
+        par.sp_l = sp_l;
+    catch
+        warning('No sp_l defined in .csv . Using default in PC')
+    end
+    % Electron surface recombination velocity/extraction coefficient RHS
+    try
+        sn_r = T{1, 'sn_r'}';
+        par.sn_r = sn_r;
+    catch
+        warning('No sn_r defined in .csv . Using default in PC')
+    end
+    % Hole surface recombination velocity/extraction coefficient RHS
+    try
+        sp_r = T{1, 'sp_r'}';
+        par.sp_r = sp_r;
+    catch
+        warning('No sp_r defined in .csv . Using default in PC')
+    end
+    % Electrode workfunction LHS
+    try
+        Phi_left = T{1, 'Phi_left'};
         par.Phi_left = Phi_left;
     catch
-        warning('No Phi_left defined in .csv . Using default in PC')
+        try
+            Phi_left = T{1, 'PhiA'};
+            par.Phi_left = Phi_left;
+        catch
+            warning('No Phi_left defined in .csv . Using default in PC')
+        end
     end
-end
-% Electrode workfunction RHS
-try
-    Phi_right = T{1, 'Phi_right'};
-    par.Phi_right = Phi_right;
-catch
+    % Electrode workfunction RHS
     try
-        Phi_right = T{1, 'PhiC'};
+        Phi_right = T{1, 'Phi_right'};
         par.Phi_right = Phi_right;
     catch
-        warning('No Phi_right defined in .csv . Using default in PC')
+        try
+            Phi_right = T{1, 'PhiC'};
+            par.Phi_right = Phi_right;
+        catch
+            warning('No Phi_right defined in .csv . Using default in PC')
+        end
     end
-end
 end
 % SRH Trap energy
 try
