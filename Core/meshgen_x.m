@@ -63,24 +63,4 @@ end
 
 px = length(x);
 
-if par.meshx_figon == 1
-    
-    parr = 1:1:px;
-    dpdx = gradient(parr, x);
-    xmir = x;
-    pxmir = 1:1:length(x);
-    
-    figure(1010);
-    plot(xmir, pxmir,'.')
-    xlabel('Position');
-    ylabel('Point');
-    
-    figure(1011)
-    plot(xmir, dpdx);
-    xlabel('Position');
-    ylabel('dpdx');
-    
-    drawnow
-end
-
 end

@@ -449,14 +449,12 @@ import_properties(par, {input_csv});
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
 meshgen_t(part);
 
 %% Core meshgen_t 1
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
 part.tmesh_type = 1;
 meshgen_t(part);
 
@@ -464,7 +462,6 @@ meshgen_t(part);
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
 part.tmesh_type = 2;
 meshgen_t(part);
 
@@ -472,7 +469,6 @@ meshgen_t(part);
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
 part.tmesh_type = 3;
 meshgen_t(part);
 
@@ -480,14 +476,12 @@ meshgen_t(part);
 
 % x = meshgen_x(par)
 parx = par;
-parx.meshx_figon = true;
 meshgen_x(par);
 
 %% Core meshgen_x 4
 
 % x = meshgen_x(par)
 parx = par;
-parx.meshx_figon = true;
 parx.xmesh_type = 'linear';
 meshgen_x(parx);
 
@@ -495,7 +489,6 @@ meshgen_x(parx);
 
 % x = meshgen_x(par)
 parx = par;
-parx.meshx_figon = true;
 parx.xmesh_type = 'erf-linear';
 meshgen_x(parx);
 
@@ -661,9 +654,10 @@ VappFunction(soleq.ion, 'tri', [0, 0.6, -0.1, 3, 5], 15, 60, false);
 %% Optical beerlambert
 
 % Gentot = beerlambert(par, x, source_type, laserlambda, figson)
+par_om2.side = 'left';
 beerlambert(par_om2, par_om2.xx, 'AM15', 0, true);
 beerlambert(par_om2, par_om2.xx, 'laser', 500, true);
-par_om2.side = 3 - par.side;
+par_om2.side = 'right';
 beerlambert(par_om2, par_om2.xx, 'AM15', 0, true);
 beerlambert(par_om2, par_om2.xx, 'laser', 500, true);
 

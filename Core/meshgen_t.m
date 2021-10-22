@@ -30,14 +30,4 @@ switch par.tmesh_type
         t = [t1, t2];
 end
 
-if par.mesht_figon == 1
-    
-    ptmir = 1:1:length(t);
-    
-    figure(200);
-    plot(t, ptmir, '.');
-    xlabel('Position');
-    ylabel('Time'); 
-end
-
 end

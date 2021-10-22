@@ -77,13 +77,7 @@ classdef pc
         tpoints = 100;              % Number of time points
 
         %% GENERAL CONTROL PARAMETERS
-        OC = 0;                             % Closed circuit = 0, Open Circuit = 1
         Vapp = 0;                           % Applied bias
-        BC = 3;                             % Boundary Conditions. Must be set to one for first solution
-        figson = 1;                         % Toggle figures on/off
-        meshx_figon = 0;                    % Toggles x-mesh figures on/off
-        mesht_figon = 0;                    % Toggles t-mesh figures on/off
-        side = 1;                           % illumination side 1 = left, 2 = right
         calcJ = 0;                          % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
         mobset = 1;                         % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
         mobseti = 1;                        % Switch on/off ionic carrier mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
@@ -112,6 +106,7 @@ classdef pc
         g2_fun_type = 'constant'
         g1_fun_arg = 0;
         g2_fun_arg = 0;
+        side = 'left';                           % illumination side 1 = left, 2 = right
         % default: Approximate Uniform generation rate @ 1 Sun for 510 nm active layer thickness
 
         %% Pulse settings

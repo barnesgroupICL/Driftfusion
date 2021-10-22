@@ -86,7 +86,6 @@ sol_ill = sol;
 %% Clear parameters
 spvsol.ill = sol_ill;
 spvsol.ill.par.mobseti = 1;
-spvsol.ill.par.figson = 1;
 
 %% Dark step
 par.int1 = 0;
@@ -96,7 +95,6 @@ sol_dk = df(sol_ill, par);
 
 spvsol.dk = sol_dk;
 spvsol.dk.par.mobseti = 1;
-spvsol.dk.par.figson = 1;
 spvsol.int1 = Int;
 
 %spvsol.dat = spvana5(spvsol);
