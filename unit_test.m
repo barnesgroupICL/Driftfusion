@@ -37,6 +37,11 @@ soleq = equilibrate(par);
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.0, 3);
 
+% example taken from Scripts/explore_script
+% exsol = explore2par(par_base, parnames, parvalues, JVpnts)
+exsol = explore.explore2par(par, {'d(1,3)','Int'},...
+    {[400e-7, 800e-7], logspace(-2,0,2)}, 20);
+
 %% Core df no input
 
 % solstruct = df(varargin)
@@ -722,8 +727,6 @@ for i = 1:length(inputs)
     end
 end
 
-%%
-exsol = parex_dactive_light;
 %% Helper explore plotPL
 
 % plotPL(exsol)
