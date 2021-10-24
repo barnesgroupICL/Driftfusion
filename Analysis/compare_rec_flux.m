@@ -50,11 +50,11 @@ for i = 1:length(par.layer_type)
 end
 loc = find(int_logical); % interface layer locations
 
-ns = zeros(length(t), length(loc));     % Store time array of each ns in new column
-ps = zeros(length(t), length(loc));     % Store time array of each ps in new column
-R_abrupt = zeros(length(t), length(loc));
-R_vsr = zeros(length(t), length(loc));
-sigma = zeros(length(t), length(loc));
+ns = zeros(size(u,1), length(loc));     % Store time array of each ns in new column
+ps = zeros(size(u,1), length(loc));     % Store time array of each ps in new column
+R_abrupt = zeros(size(u,1), length(loc));
+R_vsr = zeros(size(u,1), length(loc));
+sigma = zeros(size(u,1), length(loc));
 legstr_R = cell(2*length(loc)+1, 1);
 legstr_sigma = cell(length(loc)+1, 1);
 
@@ -80,7 +80,7 @@ for i = 1:length(loc)
     
     R_abrupt(:, i) = (ns(:, i).*ps(:, i) - ni^2)./((1/sn).*(ps(:, i) + pt) + (1/sp).*(ns(:, i) + nt));
     
-    for k = 1:length(t)
+    for k = 1:size(u,1)
         R_vsr(k, i) = trapz(xsub(pcum1(loc(i)-1)-1:pcum1(loc(i))), rx.vsr(k, pcum1(loc(i)-1)-1:pcum1(loc(i))), 2);
     end
     
