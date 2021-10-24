@@ -91,10 +91,11 @@ j = 1;
 if stabilise
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     % loop to check ions have reached stable config- if not accelerate ions by
-    while any(all_stable) == 0       
+    while any(all_stable) == 0
+        assert(j < 20, 'Could not reach stability, check the validity of your input');
         par.tmax = par.tmax*10;
         
-        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
+        disp(['increasing equilibration time, tmax = ', num2str(par.tmax)]);
         
         par.t0 = par.tmax/1e6;
         
