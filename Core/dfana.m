@@ -221,8 +221,8 @@ classdef dfana
             alpha0_xn = repmat(dev.alpha0_xn, length(t), 1);
             beta0_xp = repmat(dev.beta0_xp, length(t), 1);
 
-            alpha = sign(sign_xn).*par.q.*dVdx./(par.kB*par.T) + alpha0_xn;
-            beta = sign(sign_xp).*par.q.*-dVdx./(par.kB*par.T) + beta0_xp;
+            alpha = (sign(sign_xn).*par.q.*dVdx./(par.kB*par.T)) + alpha0_xn;
+            beta = (sign(sign_xp).*par.q.*-dVdx./(par.kB*par.T)) + beta0_xp;
 
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);

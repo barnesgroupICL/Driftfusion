@@ -146,6 +146,7 @@ SRHset = par.SRHset;        % SRH recombination switch
 vsr_zone = device.vsr_zone;
 srh_zone = device.srh_zone;
 Rs_initial = par.Rs_initial;
+Field_switch = dev.Field_switch;
 
 %% Generation
 g1_fun = fun_gen(par.g1_fun_type);
@@ -297,8 +298,8 @@ end
         % Bulk SRH
         r_srh = SRHset*srh_zone(i)*((n*p - ni(i)^2)/(taun(i)*(p + pt(i)) + taup(i)*(n + nt(i))));
         % Volumetric surface recombination
-        alpha = sign_xn(i)*q*dVdx/(kB*T) + alpha0_xn(i);
-        beta = sign_xp(i)*q*-dVdx/(kB*T) + beta0_xp(i);
+        alpha = (sign_xn(i)*q*dVdx/(kB*T)) + alpha0_xn(i);
+        beta = (sign_xp(i)*q*-dVdx/(kB*T)) + beta0_xp(i);
         r_vsr = SRHset*vsr_zone(i)*((n*exp(-alpha*xprime_n(i))*p*exp(-beta*xprime_p(i)) - ni(i)^2)...
             /(taun_vsr(i)*(p*exp(-beta*xprime_p(i)) + pt(i)) + taup_vsr(i)*(n*exp(-alpha*xprime_n(i)) + nt(i))));
         % Total electron and hole recombination

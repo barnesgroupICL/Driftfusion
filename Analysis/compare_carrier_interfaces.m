@@ -85,12 +85,14 @@ jps = zeros(length(t), length(loc));     % Store time array of each ps in new co
 r_vsr = zeros(length(t), length(x_sub));
 
 for m = 1:length(loc)
+    p_L = pcum1(loc(m)-1);
+    p_R = pcum1(loc(m));
     % Check location of interfacial surface carrier densities
-    ns(:, m) = n(:, pcum1(loc(m)-1));
-    jns(:, m) = jn(:, pcum1(loc(m)-1));     % jns and jps always from LH boundary
-    ps(:, m) = p(:, pcum1(loc(m)-1));
-    jps(:, m) = jp(:, pcum1(loc(m)-1));      % jns and jps always from LH boundary
-    r_vsr(:, pcum1(loc(m)-1):pcum1(loc(m))) = cumtrapz(x_sub(pcum1(loc(m)-1): pcum1(loc(m))), r.vsr(:, pcum1(loc(m)-1): pcum1(loc(m))), 2);
+    ns(:, m) = n(:, p_L);
+    jns(:, m) = jn(:, p_L);     % jns and jps always from LH boundary
+    ps(:, m) = p(:, p_L);
+    jps(:, m) = jp(:, p_L);      % jns and jps always from LH boundary
+    r_vsr(:, p_L:p_R) = cumtrapz(x_sub(p_L:p_R), r.vsr(:, p_L:p_R), 2);
     
     for kk = 1:length(tarr)
         k = find(sol.t <= tarr(kk));

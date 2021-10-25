@@ -195,7 +195,7 @@ classdef pc
         frac_vsr_zone = 0.1;        % recombination zone thickness [fraction of interface thickness]
         vsr_zone_loc = {'auto'};    % recombination zone location either: 'L', 'C', 'R', or 'auto'. IMPORT_PROPERTIES deals with the choice of value.
         AbsTol_vsr = 1e10;          % The integrated interfacial recombination flux above which a warning can be flagged [cm-2 s-1]
-        RelTol_vsr = 0.05;          % Fractional error between abrupt and volumetric surface recombination models above which a warning is flagged
+        RelTol_vsr = 0.1;          % Fractional error between abrupt and volumetric surface recombination models above which a warning is flagged
         
         %% Series resistance
         Rs = 0;

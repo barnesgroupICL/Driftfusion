@@ -22,7 +22,6 @@ end
 dev.mu_c = build_property(par.mu_c, xmesh, par, 'constant', 0);
 dev.mu_a = build_property(par.mu_a, xmesh, par, 'constant', 0);
 
-
 dev.sn = build_property(par.sn, xmesh, par, 'constant', 1);
 dev.sp = build_property(par.sp, xmesh, par, 'constant', 1);
 dev.mu_n = build_property(par.mu_n, xmesh, par, 'constant', 0);
