@@ -30,10 +30,20 @@ par = sol.par;
 u = sol.u;
 t = sol.t;
 pcum1 = par.pcum + 1;   % Cumulative layer points array
-dev = par.dev;
-alpha0 = dev.alpha0;
-beta0 = dev.beta0;
+dev = par.dev_sub;
+x = par.xx;
 xsub = par.x_sub;
+
+% Calculate alpha and beta- note these are referenced to the direction of x
+% NOT x_n and x_p
+dVdx = zeros(length(t), length(x_sub));
+for i = 1:length(t)
+    dVdx(i,:) = (u(i, 2:end, 1) - u(i, 1:end-1, 1))./(x(2:end) - x(1:end-1));
+end
+alpha0 = repmat(dev.alpha0, length(t), 1);
+beta0 = repmat(dev.beta0, length(t), 1);
+alpha = par.q.*dVdx./(par.kB*par.T) + alpha0;
+beta = par.q.*-dVdx./(par.kB*par.T) + beta0;
 
 n = u(:, :, 2);
 p = u(:, :, 3);
@@ -68,23 +78,23 @@ for i = 1:length(loc)
     % Check location of interfacial surface carrier densities
     p_L = pcum1(loc(i)-1);
     p_R = pcum1(loc(i));
-    if alpha0(p_L) <= 0
-        ns(:, i) = n(:, p_L);
-    elseif alpha0(p_L) > 0
-        ns(:, i) = n(:, p_R);
-    end
     
-    if beta0(p_L) <= 0
-        ps(:, i) = p(:, p_L);
-    elseif beta0(p_L) > 0
-        ps(:, i) = p(:, p_R);
+    for k = 1:length(t)
+        if alpha(k, p_L) <= 0
+            ns(k, i) = n(k, p_L);
+        elseif alpha(k, p_L) > 0
+            ns(k, i) = n(k, p_R);
+        end
+        
+        if beta(k, p_L) <= 0
+            ps(k, i) = p(k, p_L);
+        elseif beta(k, p_L) > 0
+            ps(k, i) = p(k, p_R);
+        end
+        R_vsr(k, i) = trapz(xsub(p_L-1:p_R+1), rx.vsr(k, p_L-1:p_R+1), 2);
     end
     
     R_abrupt(:, i) = (ns(:, i).*ps(:, i) - ni^2)./((1/sn).*(ps(:, i) + pt) + (1/sp).*(ns(:, i) + nt));
-    
-    for k = 1:length(t)
-        R_vsr(k, i) = trapz(xsub(p_L:p_R), rx.vsr(k, p_L:p_R), 2);
-    end
     
     %% Fractional difference
     sigma(:, i) = ((R_abrupt(:, i) - R_vsr(:, i))./R_abrupt(:, i));
