@@ -71,7 +71,7 @@ classdef pc
         % are read out and so does not influence convergence. Defining an
         % unecessarily high number of points however can be expensive owing
         % to interpolation of the solution.
-        tmesh_type = 2;             % Mesh type- for use with meshgen_t
+        tmesh_type = 'log10';             % Mesh type- for use with meshgen_t
         t0 = 1e-16;                 % Initial log mesh time value
         tmax = 1e-12;               % Max time value
         tpoints = 100;              % Number of time points
@@ -290,11 +290,6 @@ classdef pc
                 warning('pc should have 0 or 1 input arguments- only the first argument will be used for the filepath')
             end
 
-            % Warn if tmesh_type is not correct
-            if ~ any([1 2 3 4] == par.tmesh_type)
-                warning('PAR.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
-            end
-
             % Warn if xmesh_type is not correct
             if ~ any(strcmp(par.xmesh_type, {'linear', 'erf-linear'}))
                 error('PAR.xmesh_type should either be ''linear'' or ''erf-linear''. MESHGEN_X cannot generate a mesh if this is not the case.')
@@ -434,10 +429,23 @@ classdef pc
             %   from 1 to 2, and if so, changes PAR.tmesh_type to VALUE.
             %   Otherwise, a warning is shown. Runs automatically whenever
             %   tmesh_type is changed.
-            if any(1:1:4 == value)
-                par.tmesh_type = value;
-            else
-                error('PAR.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')
+            if isa(value, 'double')
+                switch value
+                    case 1
+                        par.tmesh_type = 'linear';
+                    case 2
+                        par.tmesh_type = 'log10';
+                    otherwise
+                        par.tmesh_type = 'linear';
+                        warning('tmesh_type not recognised- defaulting to ''linear'' mesh');
+                end
+            elseif isa(value, 'char')
+                if any(strcmp(value, {'linear', 'log10'}))
+                    par.tmesh_type = value;
+                else
+                    par.tmesh_type = 'linear';
+                    warning('tmesh_type not recognised- defaulting to ''linear'' mesh');
+                end
             end
         end
         
