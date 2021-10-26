@@ -94,7 +94,7 @@ classdef pc
         % optical_model = Optical Model
         % 0 = Uniform Generation
         % 1 = Beer Lambert
-        optical_model = 'beer-lambert';
+        optical_model = 'Beer-Lambert';
         int1 = 0;               % Light intensity source 1 (multiples of g0 or 1 sun for Beer-Lambert)
         int2 = 0;               % Light intensity source 2 (multiples of g0 or 1 sun for Beer-Lambert)
         g0 = [2.6409e+21];      % Uniform generation rate [cm-3s-1]
@@ -195,7 +195,7 @@ classdef pc
         frac_vsr_zone = 0.1;        % recombination zone thickness [fraction of interface thickness]
         vsr_zone_loc = {'auto'};    % recombination zone location either: 'L', 'C', 'R', or 'auto'. IMPORT_PROPERTIES deals with the choice of value.
         AbsTol_vsr = 1e10;          % The integrated interfacial recombination flux above which a warning can be flagged [cm-2 s-1]
-        RelTol_vsr = 0.1;          % Fractional error between abrupt and volumetric surface recombination models above which a warning is flagged
+        RelTol_vsr = 0.05;          % Fractional error between abrupt and volumetric surface recombination models above which a warning is flagged
         
         %% Series resistance
         Rs = 0;
@@ -411,7 +411,7 @@ classdef pc
             % continuously called.
             par = refresh_device(par);
         end
-
+                
         function par = set.xmesh_type(par, value)
             if isa(value, 'double')
                 % Backwards compat values
@@ -456,15 +456,50 @@ classdef pc
             end
         end
         
-        function value = get.gamma(par)
-            switch par.prob_distro_function
-                case 'Boltz'
-                    value = 0;
-                case 'Blakemore'
-                    value = par.gamma_Blakemore;
+        function par = set.optical_model(par, value)
+            % Backwards compat values
+            if isa(value, 'double')
+                switch value
+                    case 0
+                        par.optical_model = 'uniform';
+                    case 1
+                        par.optical_model = 'Beer-Lambert';
+                    otherwise
+                        par.optical_model = 'Beer-Lambert';
+                        warning('optical_model not recognised- defaulting to ''Beer-Lambert''');
+                end
+            elseif isa(value, 'char')
+                if any(strcmp(value, {'uniform', 'Beer-Lambert'}))
+                    par.optical_model = value;
+                else
+                    par.optical_model = 'Beer-Lambert';
+                    warning('optical_model not recognised- defaulting to ''Beer-Lambert''');
+                end
             end
         end
-
+        
+        function par = set.side(par, value)
+            % Backwards compat values
+            if isa(value, 'double')
+                switch value
+                    case 1
+                        par.side = 'left';
+                    case 2
+                        par.side = 'right';
+                    otherwise
+                        par.side = 'left';
+                        warning('illumination SIDE not recognised- defaulting to ''left''');
+                end
+            elseif isa(value, 'char')
+                if any(strcmp(value, {'left', 'right'}))
+                    par.side = value;
+                else
+                    par.side = 'left';
+                    warning('illumination side not recognised- defaulting to ''left''');
+                end
+            end
+        end
+        
         function par = set.ND(par, value)
             for i = 1:length(par.ND)
                 if value(i) >= par.Nc(i)
@@ -480,13 +515,22 @@ classdef pc
                 end
             end
         end
-
+        
+        function value = get.gamma(par)
+            switch par.prob_distro_function
+                case 'Boltz'
+                    value = 0;
+                case 'Blakemore'
+                    value = par.gamma_Blakemore;
+            end
+        end
         %% Get active layer indexes from layer_type
         function value = get.active_layer(par)
-            value = find(strncmp('active', par.layer_type,6));
+            value = find(strncmp('active', par.layer_type, 6));
             if length(value) == 0
                 % If no flag is give assume active layer is middle
                 value = round(length(par.layer_type)/2);
+                warning('No designated ''active'' layer- assigning middle layer to be active')
             end
         end
         

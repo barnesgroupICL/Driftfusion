@@ -107,43 +107,11 @@ else
     par.sp = import_single_property(par.sp, T, {'sp'}, start_row, end_row);
 end
 
-optical_model = import_single_property(par.optical_model, T, {'optical_model', 'OM'}, 1, 1);
-if isa(optical_model, 'double')
-    switch optical_model
-        case 0
-            par.optical_model = 'uniform';
-        case 1
-            par.optical_model = 'beer-lambert';
-    end
-else
-    par.optical_model = optical_model{1};
-end
+par.optical_model = import_single_property(par.optical_model, T, {'optical_model', 'OM'}, 1, 1);
 % Illumination side
-side = import_single_property(par.side, T, {'side'}, 1, 1);
-if isa(side, 'double')
-    switch side
-        case 1
-            par.side = 'left';
-        case 2
-            par.side = 'right';
-    end
-else
-    par.side = side{1};
-end
-
-xmesh_type = import_single_property(par.xmesh_type, T, {'xmesh_type'}, 1, 1);
-if isa(xmesh_type, 'double')
-    switch xmesh_type
-        case 4
-            par.xmesh_type = 'linear';
-        case 5
-            par.xmesh_type = 'erf-linear';
-        otherwise
-            error('xmesh_type not recognized')
-    end
-else
-    par.xmesh_type = xmesh_type{1};
-end
+par.side = import_single_property(par.side, T, {'side'}, 1, 1);
+% Spatial mesh
+par.xmesh_type = import_single_property(par.xmesh_type, T, {'xmesh_type'}, 1, 1);
 % Number of ionic species
 par.N_ionic_species = import_single_property(par.N_ionic_species, T, {'N_ionic_species'}, 1, 1);
 % Layer colours
