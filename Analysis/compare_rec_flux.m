@@ -32,7 +32,7 @@ t = sol.t;
 pcum1 = par.pcum + 1;   % Cumulative layer points array
 dev = par.dev_sub;
 x = par.xx;
-xsub = par.x_sub;
+x_sub = par.x_sub;
 
 % Calculate alpha and beta- note these are referenced to the direction of x
 % NOT x_n and x_p
@@ -91,7 +91,7 @@ for i = 1:length(loc)
         elseif beta(k, p_L) > 0
             ps(k, i) = p(k, p_R);
         end
-        R_vsr(k, i) = trapz(xsub(p_L-1:p_R+1), rx.vsr(k, p_L-1:p_R+1), 2);
+        R_vsr(k, i) = trapz(x_sub(p_L-1:p_R+1), rx.vsr(k, p_L-1:p_R+1), 2);
     end
     
     R_abrupt(:, i) = (ns(:, i).*ps(:, i) - ni^2)./((1/sn).*(ps(:, i) + pt) + (1/sp).*(ns(:, i) + nt));
