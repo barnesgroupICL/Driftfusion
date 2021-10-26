@@ -18,7 +18,7 @@ switch par.optical_model
     case 'uniform'
         % This currently results in the generation profile being stored twice and could be optimised
         gx = build_property(par.g0, xsolver, par, 'zeroed', 0);    
-    case 'beer-lambert'
+    case 'Beer-Lambert'
         % beerlambert(par, x, source_type, laserlambda, figson)
         gx = beerlambert(par, par.xx, source_type, laserlambda, 0);
         % interpolate for i+0.5 mesh
