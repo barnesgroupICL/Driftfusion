@@ -413,22 +413,29 @@ classdef pc
         end
 
         function par = set.xmesh_type(par, value)
-            %   SET.xmesh_type(PARAMS, VALUE) checks if VALUE is an integer
-            %   from 1 to 3, and if so, changes PAR.xmesh_type to VALUE.
-            %   Otherwise, a warning is shown. Runs automatically whenever
-            %   xmesh_type is changed.
-            if any(strcmp(par.xmesh_type, {'linear', 'erf-linear'}))
-                par.xmesh_type = value;
-            else
-                error('PAR.xmesh_type should either be ''linear'' or ''erf-linear''. MESHGEN_X cannot generate a mesh if this is not the case.')
+            if isa(value, 'double')
+                % Backwards compat values
+                switch value
+                    case 4
+                        par.xmesh_type = 'linear';
+                    case 5
+                        par.xmesh_type = 'erf-linear';
+                    otherwise
+                        par.xmesh_type = 'erf-linear';
+                        warning('xmesh_type not recognised- defaulting to ''erf-linear'' spatial mesh');
+                end
+            elseif isa(value, 'char')
+                if any(strcmp(par.xmesh_type, {'linear', 'erf-linear'}))
+                    par.xmesh_type = value;
+                else
+                    par.xmesh_type = 'erf-linear';
+                    warning('xmesh_type not recognised- defaulting to ''erf-linear'' spatial mesh');
+                end
             end
         end
 
         function par = set.tmesh_type(par, value)
-            %   SET.tmesh_type(PARAMS, VALUE) checks if VALUE is an integer
-            %   from 1 to 2, and if so, changes PAR.tmesh_type to VALUE.
-            %   Otherwise, a warning is shown. Runs automatically whenever
-            %   tmesh_type is changed.
+            % Backwards compat values
             if isa(value, 'double')
                 switch value
                     case 1
