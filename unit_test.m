@@ -426,7 +426,7 @@ generation(par_om1, 'AM15', 470);
 generation(par_om1, 'laser', 470);
 
 par_om2 = par;
-par_om2.optical_model = 'beer-lambert';
+par_om2.optical_model = 'Beer-Lambert';
 generation(par_om2, 'AM15', 470);
 generation(par_om2, 'laser', 470);
 
@@ -455,28 +455,28 @@ meshgen_t(part);
 
 % [t] = meshgen_t(par)
 part = par;
-part.tmesh_type = 1;
+part.tmesh_type = 'linear';
 meshgen_t(part);
 
 %% Core meshgen_t 2
 
 % [t] = meshgen_t(par)
 part = par;
-part.tmesh_type = 2;
+part.tmesh_type = 'log10';
 meshgen_t(part);
 
 %% Core meshgen_t 3
 
 % [t] = meshgen_t(par)
 part = par;
-part.tmesh_type = 3;
+part.tmesh_type = 'log10-double';
 meshgen_t(part);
 
 %% Core meshgen_x default
 
 % x = meshgen_x(par)
 parx = par;
-meshgen_x(par);
+meshgen_x(parx);
 
 %% Core meshgen_x 4
 
