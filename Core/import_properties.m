@@ -6,6 +6,12 @@ function par = import_properties(par, filepath)
 % variable names stored in .csv files. The object properties will still be
 % imported with the latest nomenclature.
 %
+% IMPORT_SINGLE_PROPERTY checks for the existence of column headers in the .CSV
+% with POSSIBLE_HEADERS. Multiple names for variables in the .CSV are given
+% for backwards compatibility, however once read-in the properties take the
+% naming convention of the current version i.e. this is simply to allow old
+% parameter files to be read-in.
+%
 %% LICENSE
 % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
@@ -19,319 +25,117 @@ T = readtable(filepath{1,1});   % Reads-in in the external .CSV file to a table 
 
 % Layer type array
 try
-    par.layer_type = T{:,'layer_type'}';
-catch
-    warning('No layer type (layer_type) defined in .csv . Using default in PC')
-end
-% Layer name array
-try
-    par.stack = T{:,'stack'}';
-catch
-    warning('No stack (stack) defined in .csv . Using default in PC')
-end
-% Layer thickness array
-try
-    par.d = T{:, 'dcell'}';
-catch
-    try
-        par.d = T{:, 'd'}';
-    catch
-        try
-            par.d = T{:, 'thickness'}';
-        catch
-            warning('No thickness array (thickness) defined in .csv . Using default in PC')
-        end
+    layer_type = T{:,'layer_type'}';
+    if strcmp(layer_type{1}, 'electrode')
+        start_row = 2;
+        end_row = length(layer_type) - 1;
+        par.layer_type = layer_type(start_row:end_row);
+    else
+        start_row = 1;
+        end_row = length(layer_type);
     end
+    par.layer_type = layer_type(start_row:end_row);
+catch
+    error('No layer type (layer_type) defined in .csv . layer_type must be defined when using .csv input file')
 end
+% Material name array
+par.material = import_single_property(par.material, T, {'material', 'stack'}, start_row, end_row);
+% Layer thickness array
+par.d = import_single_property(par.d, T, {'dcell', 'd', 'thickness'}, start_row, end_row);
 % Layer points array
-try
-    par.layer_points = T{:, 'layer_points'}';
-catch
-    warning('No layer points array (points) defined in .csv . Using default in PC')
-end
+par.layer_points = import_single_property(par.layer_points, T, {'layer_points', 'points'}, start_row, end_row);
 % Spatial mesh coefficient for non-linear meshes
-try
-    par.xmesh_coeff = T{:, 'xmesh_coeff'}';
-catch
-    warning('No xmesh coefficient array (xmesh_coeff) defined in .csv . Using default in PC')
-end
+par.xmesh_coeff = import_single_property(par.xmesh_coeff, T, {'xmesh_coeff'}, start_row, end_row);
 % Electron affinity array
-try
-    par.EA = T{:, 'EA'}';
-catch
-    warning('No electron affinity array (EA) defined in .csv . Using default in PC')
-end
+par.Phi_EA = import_single_property(par.Phi_EA, T, {'Phi_EA', 'EA'}, start_row, end_row);
 % Ionisation potential array
-try
-    par.IP = T{:, 'IP'}';
-catch
-    warning('No ionisation potential array (IP) defined in .csv . Using default in PC')
-end
+par.Phi_IP = import_single_property(par.Phi_IP, T, {'Phi_IP', 'IP'}, start_row, end_row);
+% SRH Trap energy
+par.Et = import_single_property(par.Et, T, {'Et', 'Et_bulk'}, start_row, end_row);
 % Equilibrium Fermi energy array
-try
-    par.E0 = T{:, 'E0'}';
-catch
-    warning('No equilibrium Fermi level array (E0) defined in .csv . Using default in PC')
+if strcmp(layer_type{1}, 'electrode')
+    EF0 = import_single_property(par.EF0, T, {'EF0', 'E0'}, 1, length(layer_type));
+    par.EF0 = EF0(start_row:end_row);
+    par.Phi_left = EF0(1);
+    par.Phi_right = EF0(end);
+else
+    par.EF0 = import_single_property(par.EF0, T, {'EF0', 'E0'}, start_row, end_row);
 end
 % Conduction band effective density of states
-try
-    par.Nc = T{:, 'Nc'}';
-catch
-    warning('No conduction band eDOS array (Nc) defined in .csv . Using default in PC')
-end
+par.Nc = import_single_property(par.Nc, T, {'Nc', 'Ncb', 'NC', 'NCB'}, start_row, end_row);
 % Valence band effective density of states
-try
-    par.Nv = T{:, 'Nv'}';
-catch
-    warning('No valence band eDOS array (Nv) defined in .csv . Using default in PC')
-end
+par.Nv = import_single_property(par.Nv, T, {'Nv', 'Nvb', 'NV', 'NVB'}, start_row, end_row);
 % Intrinsic anion density
-try
-    par.Nani = T{:, 'Nani'}';
-catch
-    warning('No equilibrium anion density array (Nani) defined in .csv . Using default in PC')
-end
+par.Nani = import_single_property(par.Nani, T, {'Nani'}, start_row, end_row);
 % Intrinsic cation density
-try
-    par.Ncat = T{:, 'Ncat'}';
-catch
-    try
-        par.Ncat = T{:, 'Nion'}';
-    catch
-        warning('No equilibrium cation density array (Ncat) defined in .csv . Using default in PC')
-    end
-end
+par.Ncat = import_single_property(par.Ncat, T, {'Ncat', 'Nion'}, start_row, end_row);
 % Limiting density of anion states
-try
-    par.a_max = T{:, 'a_max'}';
-catch
-    try
-        par.a_max = T{:, 'DOSani'}';
-    catch
-        try
-            par.a_max = T{:, 'amax'}';
-        catch
-            warning('No maximum anion density array (a_max) defined in .csv . Using default in PC')
-        end
-    end
-end
+par.a_max = import_single_property(par.a_max, T, {'a_max', 'amax', 'DOSani'}, start_row, end_row);
 % Limiting density of cation states
-try
-    par.c_max = T{:, 'c_max'}';
-catch
-    try
-        par.c_max = T{:, 'DOScat'}';
-    catch
-        try
-            par.c_max = T{:, 'cmax'}';
-        catch
-            warning('No maximum cation density array (c_max) defined in .csv . Using default in PC')
-        end
-    end
-end
+par.c_max = import_single_property(par.c_max, T, {'c_max', 'cmax', 'DOScat'}, start_row, end_row);
 % Electron mobility
-try
-    par.mu_n = T{:, 'mu_n'}';
-catch
-    try
-        par.mu_n = T{:, 'mue'}';
-    catch
-        warning('No electron mobility (mu_n) defined in .csv . Using default in PC')
-    end
-end
+par.mu_n = import_single_property(par.mu_n, T, {'mu_n', 'mun', 'mue', 'mu_e'}, start_row, end_row);
 % Hole mobility
-try
-    par.mu_p = T{:, 'mu_p'}';
-catch
-    try
-        par.mu_p = T{:, 'muh'}';
-    catch
-        warning('No hole mobility (mu_p) defined in .csv . Using default in PC')
-    end
-end
+par.mu_p = import_single_property(par.mu_p, T, {'mu_p', 'mup', 'muh', 'mu_h'}, start_row, end_row);
 % Anion mobility
-try
-    par.mu_a = T{:, 'mu_a'}';
-catch
-    try
-        par.mu_a = T{:, 'muani'}';
-    catch
-        warning('No anion mobility (mu_a) defined in .csv . Using default in PC')
-    end
-end
+par.mu_a = import_single_property(par.mu_a, T, {'mu_a', 'mua',  'mu_ani', 'muani'}, start_row, end_row);
 % Cation mobility
-try
-    par.mu_c = T{:, 'mu_c'}';
-catch
-    try
-        par.mu_c = T{:, 'mucat'}';
-    catch
-        warning('No cation mobility (mu_c) defined in .csv . Using default in PC')
-    end
-end
+par.mu_c = import_single_property(par.mu_c, T, {'mu_c', 'muc',  'mu_cat', 'mucat'}, start_row, end_row);
 % Relative dielectric constant
-try
-    par.epp = T{:, 'epp'}';
-catch
-    warning('No relative dielectric constant (epp) defined in .csv . Using default in PC')
-end
+par.epp = import_single_property(par.epp, T, {'epp', 'eppr'}, start_row, end_row);
 % Uniform volumetric generation rate
-try
-    par.g0 = T{:, 'g0'}';
-catch
-    try
-        par.g0 = T{:, 'G0'}';
-    catch
-        warning('No uniform generation rate (g0) defined in .csv . Using default in PC')
-    end
-end
+par.g0 = import_single_property(par.g0, T, {'g0', 'G0'}, start_row, end_row);
 % Band-to-band recombination coefficient
-try
-    par.B = T{:, 'krad'}';
-catch
-    try
-        par.B = T{:, 'B'}';
-    catch
-        warning('No radiative recombinaiton coefficient array (B) defined in .csv . Using default in PC')
-    end
-end
+par.B = import_single_property(par.B, T, {'B', 'krad', 'kbtb'}, start_row, end_row);
 % Electron SRH time constant
-try
-    par.taun = T{:, 'taun'}';
-catch
-    try
-        par.taun = T{:, 'taun_SRH'}';
-    catch
-        warning('No SRH electron lifetime array (taun) defined in .csv . Using default in PC')
-    end
-end
+par.taun = import_single_property(par.taun, T, {'taun', 'taun_SRH'}, start_row, end_row);
 % Hole SRH time constant
-try
-    par.taup = T{:, 'taup'}';
-catch
-    try
-        par.taup = T{:, 'taup_SRH'}';
-    catch
-        warning('No SRH hole lifetime array (taup) defined in .csv . Using default in PC')
-    end
+par.taup = import_single_property(par.taup, T, {'taup', 'taup_SRH'}, start_row, end_row);
+% Electron and hole surface recombination velocities
+if strcmp(layer_type{1}, 'electrode')
+    sn = import_single_property(par.sn, T, {'sn'}, 1, length(layer_type));
+    par.sn = sn(start_row:end_row);
+    par.sn_l = sn(1);
+    par.sn_r = sn(end);
+
+    sp = import_single_property(par.sp, T, {'sp'}, 1, length(layer_type));
+    par.sp = sp(start_row:end_row);
+    par.sp_l = sp(1);
+    par.sp_r = sp(end);
+else
+    par.sn = import_single_property(par.sn, T, {'sn'}, start_row, end_row);
+    par.sp = import_single_property(par.sp, T, {'sp'}, start_row, end_row);
 end
 
-try
-    par.sn = T{:,'sn'}';
-catch
-    if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
-        warning('No sn value defined in .csv . Using default in PC')
-    end
-end
-
-try
-    par.sp = T{:,'sp'}';
-catch
-    if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
-        warning('No sp value defined in .csv . Using default in PC')
-    end
-end
-
-% Electron surface recombination velocity/extraction coefficient LHS
-try
-    par.sn_l = T{1, 'sn_l'}';
-catch
-    warning('No sn_l defined in .csv . Using default in PC')
-end
-% Hole surface recombination velocity/extraction coefficient LHS
-try
-    par.sp_l = T{1, 'sp_l'}';
-catch
-    warning('No sp_l defined in .csv . Using default in PC')
-end
-% Electron surface recombination velocity/extraction coefficient RHS
-try
-    par.sn_r = T{1, 'sn_r'}';
-catch
-    warning('No sn_r defined in .csv . Using default in PC')
-end
-% Hole surface recombination velocity/extraction coefficient RHS
-try
-    par.sp_r = T{1, 'sp_r'}';
-catch
-    warning('No sp_r defined in .csv . Using default in PC')
-end
-% Electrode workfunction LHS
-try
-    par.Phi_left = T{1, 'Phi_left'};
-catch
-    try
-        par.Phi_left = T{1, 'PhiA'};
-    catch
-        warning('No Phi_left defined in .csv . Using default in PC')
-    end
-end
-% Electrode workfunction RHS
-try
-    par.Phi_right = T{1, 'Phi_right'};
-catch
-    try
-        par.Phi_right = T{1, 'PhiC'};
-    catch
-        warning('No Phi_right defined in .csv . Using default in PC')
-    end
-end
-% SRH Trap energy
-try
-    par.Et = T{:,'Et'}';
-catch
-    try
-        par.Et = T{:,'Et_bulk'}';
-    catch
-        warning('No trap energy array (Et) defined in .csv . Using default in PC')
-    end
-end
-% Optical model
-try
-    par.OM = T{1, 'OM'};
-catch
-    warning('No optical model (OM) specified in .csv Using default in PC')
-end
-% Spatial mesh type
-try
-    par.xmesh_type = T{1, 'xmesh_type'};
-catch
-    warning('No spatial mesh type (xmesh_type) defined in .csv . Using default in PC')
-end
+par.optical_model = import_single_property(par.optical_model, T, {'optical_model', 'OM'}, 1, 1);
 % Illumination side
-try
-    par.side = T{1, 'side'};
-catch
-    warning('Illumination side (side) undefined in .csv . Using default in PC')
-end
+par.side = import_single_property(par.side, T, {'side'}, 1, 1);
+% Spatial mesh
+par.xmesh_type = import_single_property(par.xmesh_type, T, {'xmesh_type'}, 1, 1);
 % Number of ionic species
-try
-    par.N_ionic_species = T{1, 'N_ionic_species'};
-catch
-    warning('No of ionic species (N_ionic_species) undefined in .csv. Using default in PC')
-end
+par.N_ionic_species = import_single_property(par.N_ionic_species, T, {'N_ionic_species'}, 1, 1);
 % Layer colours
+Red = import_single_property(par.layer_colour(:,1)', T, {'Red'}, start_row, end_row);
+Green = import_single_property(par.layer_colour(:,2)', T, {'Green'}, start_row, end_row);
+Blue = import_single_property(par.layer_colour(:,3)', T, {'Blue'}, start_row, end_row);
 try
-    Red = T{:, 'Red'};
-    Green = T{:, 'Green'};
-    Blue = T{:, 'Blue'};
-    par.layer_colour = [Red,Green,Blue];
+    par.layer_colour = [Red', Green', Blue'];
 catch
-    % warning('Layer colours (layer_colour) undefined in .csv. Using default in PC')
+    warning('Layer colours not correctly specified, using default in PC.')
 end
-
 % Recombination zone location
 if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junction'))
-    vsr_zone_loc_user = cell(1, length(par.stack));
-    par.vsr_zone_loc = cell(1, length(par.stack));
+    vsr_zone_loc_user = cell(1, length(par.material));
+    par.vsr_zone_loc = cell(1, length(par.material));
     vsr_zone_loc_auto = locate_vsr_zone(par);
     try
         vsr_zone_loc_user = T{:, 'vsr_zone_loc'}';
+        vsr_zone_loc_user = vsr_zone_loc_user(start_row:end_row);
     catch
         warning('Recomination zone location (vsr_zone_loc) not defined in .csv . Using auto defined')
         par.vsr_zone_loc = vsr_zone_loc_auto;
     end
-        for i = 1:length(par.stack)
+        for i = 1:length(par.material)
             if any(strcmp(vsr_zone_loc_user(i), {'L','C','R'})) == 1
                 par.vsr_zone_loc(i) = vsr_zone_loc_user(i);
             elseif strcmp(vsr_zone_loc_user(i), {'auto'}) == 1
@@ -340,4 +144,36 @@ if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junct
         end
 end
 
+%% Backward compatibility
+if strcmp(layer_type{1}, 'electrode') == 0
+    % Electron surface recombination velocity/extraction coefficient LHS
+    par.sn_l = import_single_property(par.sn_l, T, {'sn_l', 'snl'}, 1, 1);
+    par.sn_r = import_single_property(par.sn_r, T, {'sn_r', 'snr'}, 1, 1);
+    % Hole surface recombination velocity/extraction coefficient LHS
+    par.sp_l = import_single_property(par.sp_l, T, {'sp_l', 'spl'}, 1, 1);
+    par.sp_r = import_single_property(par.sp_r, T, {'sp_r', 'spr'}, 1, 1);
+    % Electrode workfunction LHS
+    par.Phi_left = import_single_property(par.Phi_left, T, {'Phi_left', 'Phi_l', 'PhiA'}, 1, 1);
+    % Electrode workfunction RHS
+    par.Phi_right = import_single_property(par.Phi_right, T, {'Phi_right', 'Phi_r', 'PhiC'}, 1, 1);
+end
+
+%% Sub functions
+    function property = import_single_property(property_in, T, possible_headers, start_row, end_row)
+        error_checker = zeros(1, length(possible_headers));
+
+        for j = 1:length(possible_headers)
+            try
+                temp_param = T{: , possible_headers(j)}';
+                property = temp_param(start_row:end_row);
+            catch
+                error_checker(j) = 1;
+            end
+        end
+
+        if all(error_checker)
+            warning(['No column headings match ''', char(possible_headers), ''', using default in PC.'])
+            property = ones(1, end_row - start_row + 1)*property_in(1);
+        end
+    end
 end

@@ -1,4 +1,4 @@
-function sigma_sum_filter = compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plot_switch)
+function sigma_sum_filter = compare_rec_flux(sol, RelTol_vsr, AbsTol_vsr, plot_switch)
 % Script to compare the interfacial recombination fluxes from Driftfusion.
 % The integrated recombination flux from the volumetric surface
 % recombination model is compared with the flux calculated from the
@@ -26,20 +26,30 @@ function sigma_sum_filter = compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plo
 % errors)
 %
 %% Start code
-par = sol_df.par;
-u = sol_df.u;
-t = sol_df.t;
+par = sol.par;
+u = sol.u;
+t = sol.t;
 pcum1 = par.pcum + 1;   % Cumulative layer points array
-dev = par.dev;
-alpha0 = dev.alpha0;
-beta0 = dev.beta0;
-xsub = par.x_sub;
+dev = par.dev_sub;
+x = par.xx;
+x_sub = par.x_sub;
+
+% Calculate alpha and beta- note these are referenced to the direction of x
+% NOT x_n and x_p
+dVdx = zeros(length(t), length(x_sub));
+for i = 1:length(t)
+    dVdx(i,:) = (u(i, 2:end, 1) - u(i, 1:end-1, 1))./(x(2:end) - x(1:end-1));
+end
+alpha0 = repmat(dev.alpha0, length(t), 1);
+beta0 = repmat(dev.beta0, length(t), 1);
+alpha = par.q.*dVdx./(par.kB*par.T) + alpha0;
+beta = par.q.*-dVdx./(par.kB*par.T) + beta0;
 
 n = u(:, :, 2);
 p = u(:, :, 3);
 
 %% Driftfusion 3D
-rx = dfana.calcr(sol_df, "sub");
+rx = dfana.calcr(sol, "sub");
 
 %% Get indexes of interfaces
 %int_index = find(contains(par.layer_type, 'interface'));   % only
@@ -55,8 +65,8 @@ ps = zeros(length(t), length(loc));     % Store time array of each ps in new col
 R_abrupt = zeros(length(t), length(loc));
 R_vsr = zeros(length(t), length(loc));
 sigma = zeros(length(t), length(loc));
-legstr_R = cell(2*length(loc)+1, 1);
-legstr_sigma = cell(length(loc)+1, 1);
+legstr_R = cell(2*length(loc) + 1, 1);
+legstr_sigma = cell(length(loc) + 1, 1);
 
 for i = 1:length(loc)
     sn = par.sn(loc(i));
@@ -66,26 +76,28 @@ for i = 1:length(loc)
     pt = par.pt(loc(i));
     
     % Check location of interfacial surface carrier densities
-    if alpha0(pcum1(loc(i)-1)) <= 0
-        ns(:, i) = n(:, pcum1(loc(i)-1));
-    elseif alpha0(pcum1(loc(i)-1)) > 0
-        ns(:, i) = n(:, pcum1(loc(i)));
-    end
+    p_L = pcum1(loc(i)-1);
+    p_R = pcum1(loc(i));
     
-    if beta0(pcum1(loc(i)-1)) <= 0
-        ps(:, i) = p(:, pcum1(loc(i)-1));
-    elseif beta0(pcum1(loc(i)-1)) > 0
-        ps(:, i) = p(:, pcum1(loc(i)));
+    for k = 1:length(t)
+        if alpha(k, p_L) <= 0
+            ns(k, i) = n(k, p_L);
+        elseif alpha(k, p_L) > 0
+            ns(k, i) = n(k, p_R);
+        end
+        
+        if beta(k, p_L) <= 0
+            ps(k, i) = p(k, p_L);
+        elseif beta(k, p_L) > 0
+            ps(k, i) = p(k, p_R);
+        end
+        R_vsr(k, i) = trapz(x_sub(p_L-1:p_R+1), rx.vsr(k, p_L-1:p_R+1), 2);
     end
     
     R_abrupt(:, i) = (ns(:, i).*ps(:, i) - ni^2)./((1/sn).*(ps(:, i) + pt) + (1/sp).*(ns(:, i) + nt));
     
-    for k = 1:length(t)
-        R_vsr(k, i) = trapz(xsub(pcum1(loc(i)-1)-1:pcum1(loc(i))), rx.vsr(k, pcum1(loc(i)-1)-1:pcum1(loc(i))), 2);
-    end
-    
     %% Fractional difference
-    sigma(:, i) = ((R_abrupt(:, i)-R_vsr(:, i))./R_abrupt(:, i));
+    sigma(:, i) = ((R_abrupt(:, i) - R_vsr(:, i))./R_abrupt(:, i));
         
     if plot_switch
         figure(300)
@@ -101,7 +113,8 @@ for i = 1:length(loc)
         semilogy(t, ns(:, i) , t, ps(:, i))
         xlabel('Time [s]')
         ylabel('Carrier density')
-        legend('ns', 'ps')
+        legstr_nsps{2*i - 1} = ['Interface', num2str(i), '- ns'];
+        legstr_nsps{2*i} = ['Interface', num2str(i), '- ps'];
         xlim([t(1), t(end)])
         hold on
         
@@ -113,10 +126,6 @@ for i = 1:length(loc)
         legstr_sigma{i} = ['Interface', num2str(i)];
         hold on
     end
-end
-
-if plot_switch
-
 end
 
 R_vsr_sum = sum(R_vsr, 2);
@@ -137,11 +146,13 @@ if max(abs(sigma_sum_filter)) > RelTol_vsr
 end
     
 if plot_switch
-    
     figure(300)
     semilogy(t, AbsTol_vsr*ones(1, length(t)), 'k--')
     legstr_R{end} = 'AbsTol';
     legend(legstr_R);
+    
+    figure(301)
+    legend(legstr_nsps)
     
     figure(302)
     plot(t, sigma_sum_filter, 'k--')

@@ -55,7 +55,6 @@ par.int1 = 0;
 par.int2 = 0;
 par.g1_fun_type = 'constant';
 par.g2_fun_type = 'constant';
-par.OC = 0;
 par.tmesh_type = 2;
 par.Rs = 0;
 

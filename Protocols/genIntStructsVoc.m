@@ -35,7 +35,7 @@ function [structs_oc, VOCs] = genIntStructsVoc(struct_eq, startInt, endInt, poin
 % it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
-% 
+%
 % Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
 % Research Group Prof. Emilio Palomares
@@ -61,15 +61,13 @@ structs_oc = structs_sc;
 
 %% generate solutions
 for i = 1:nsolutions
-    
-    % decrease annoiance by figures popping up
-    %SCStructCell{1, i}.par.figson = 0;
-    
+  
+
     struct_Int = structs_sc{1, i};
     % the asymmetricized solution could require some stabilization after
     % breaking
     %struct_Int = stabilize(struct_Int);
-    
+
     % use findVocOptim for finding the applied voltage that minimizes the
     % residual current
     disp([mfilename ' - finding real Voc for illumination intensity ' num2str(structs_sc{1, i}.par.int1)])
