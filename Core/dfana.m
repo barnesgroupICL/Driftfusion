@@ -187,7 +187,7 @@ classdef dfana
             g = g1 + g2;
         end
 
-        function [r, ns, ps] = calcr(sol, mesh_option)
+        function [r, ns, ps, alpha_xn, beta_xp] = calcr(sol, mesh_option)
             % Calculate the recombination rate on i-half mesh
             % obtain SOL components for easy referencing
             % MESH_OPTION = "whole" for input mesh or "sub" for subinetrval
@@ -221,8 +221,8 @@ classdef dfana
             alpha0_xn = repmat(dev.alpha0_xn, length(t), 1);
             beta0_xp = repmat(dev.beta0_xp, length(t), 1);
 
-            alpha = (sign(sign_xn).*par.q.*dVdx./(par.kB*par.T)) + alpha0_xn;
-            beta = (sign(sign_xp).*par.q.*-dVdx./(par.kB*par.T)) + beta0_xp;
+            alpha_xn = (sign_xn.*par.q.*dVdx./(par.kB*par.T)) + alpha0_xn;
+            beta_xp = (sign_xp.*par.q.*-dVdx./(par.kB*par.T)) + beta0_xp;
 
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
@@ -230,8 +230,8 @@ classdef dfana
             r.srh = srh_zone.*(n.*p - dev.ni.^2)...
                 ./(dev.taun.*(p+dev.pt) + dev.taup.*(n+dev.nt));
             % Volumetric surface SRH
-            ns = n.*exp(-alpha.*xprime_n); % Projected electron surface density
-            ps = p.*exp(-beta.*xprime_p);  % Projected hole surface density
+            ns = n.*exp(-alpha_xn.*xprime_n); % Projected electron surface density
+            ps = p.*exp(-beta_xp.*xprime_p);  % Projected hole surface density
             r.vsr = vsr_zone.*(ns.*ps - dev.ni.^2)...
                 ./(dev.taun_vsr.*(ps + dev.pt) + dev.taup_vsr.*(ns + dev.nt));
             % Total
