@@ -20,7 +20,7 @@ function EA_script_plot_phase(EA_results, savefig_dir)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also EA_script, IS_script_ana_phase, EA_script_ana_Efield.
+% See also EA_script, IS_script_ana_phase, EA_script_ana_Efield, EA_list_plot.
 
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes

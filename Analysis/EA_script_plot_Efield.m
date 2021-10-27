@@ -23,7 +23,7 @@ function EA_script_plot_Efield(EA_results, savefig_dir)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also EA_script.
+% See also EA_script, EA_script_plot_phase, EA_list_plot.
 
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
@@ -103,8 +103,8 @@ fig_2h = figure('Name', 'Amplitude of EA second harmonic E_{AC}^2', 'NumberTitle
             'MarkerFaceColor', Int_colors(i, :), 'Marker', 's',...
             'MarkerSize', 3, 'LineWidth', 1.3);
         hold on
-       % plot(EA_results.Freq(i, :), EA_results.AC_Efield_amp_squared_mean(i, :)',...
-       %     'Color', Int_colors(i, :), 'LineStyle', '-.');
+        plot(EA_results.Freq(i, :), EA_results.AC_Efield_amp_squared_mean(i, :)',...
+            'Color', Int_colors(i, :), 'LineStyle', '-.');
         if ~isnan(EA_results.AC_Efield2_i_amp(1))
             % due to ions
             %plot(EA_results.Freq(i, :), EA_results.AC_Efield2_i_amp(i, :)', 'Color', Int_colors(i, :), 'LineStyle', '--');

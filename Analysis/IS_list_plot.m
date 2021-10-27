@@ -1,8 +1,8 @@
-function IS_script_plot(type, dir_file_name, varargin)
-%IS_SCRIPT_PLOT - Plots a list of impedance spectroscopy (IS) results with explicit line makeup
+function IS_list_plot(type, dir_file_name, varargin)
+%IS_LIST_PLOT - Plots a list of impedance spectroscopy (IS) results with explicit line makeup
 % The plots can be saved to files if the dir_file_name option is provided
 %
-% Syntax:  IS_script_plot(type, dir_file_name, varargin)
+% Syntax:  IS_list_plot(type, dir_file_name, varargin)
 %
 % Inputs:
 %   TYPE - char array, which quantity to plot, can be either
@@ -21,7 +21,7 @@ function IS_script_plot(type, dir_file_name, varargin)
 %         the plot command (e.g. specifying the color of the line).
 %
 % Example:
-%   IS_script_plot('capacitance', '20210302_spiro',...
+%   IS_list_plot('capacitance', '20210302_spiro',...
 %       IS_spiro_sc_20mV_1sun, ' 1 sun',{'--r'},...
 %       IS_spiro_10x_sc_20mV_1sun, '10x 1 sun',{':r','LineWidth',3},...
 %       IS_spiro_100x_sc_20mV_1sun, '100x 1 sun',{'-r'})
@@ -32,7 +32,7 @@ function IS_script_plot(type, dir_file_name, varargin)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also IS_script.
+% See also IS_script, IS_script_plot_phase, IS_script_plot_impedance, IS_script_plot_nyquist.
 
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes

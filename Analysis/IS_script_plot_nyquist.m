@@ -18,7 +18,7 @@ function IS_script_plot_nyquist(IS_results)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also IS_script, IS_script_ana_phase, IS_script_ana_impedance.
+% See also IS_script, IS_script_ana_phase, IS_script_ana_impedance, IS_list_plot.
 
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes

@@ -1,8 +1,8 @@
-function EA_script_plot(type, dir_file_name, varargin)
-%EA_SCRIPT_PLOT - Plots a list of Stark spectroscopy a.k.a. electroabsorbance (EA) results with explicit line makeup
+function EA_list_plot(type, dir_file_name, varargin)
+%EA_LIST_PLOT - Plots a list of electroabsorbance (EA, Stark spectroscopy) results with explicit line makeup
 % The plots can be saved to files if the dir_file_name option is provided
 %
-% Syntax:  IS_script_plot(type, dir_file_name, varargin)
+% Syntax:  EA_list_plot(type, dir_file_name, varargin)
 %
 % Inputs:
 %   TYPE - char array, which quantity to plot, can be either
@@ -20,7 +20,7 @@ function EA_script_plot(type, dir_file_name, varargin)
 %         the plot command (e.g. specifying the color of the line).
 %
 % Example:
-%   EA_script_plot('2h', '20210409_spiro',...
+%   EA_list_plot('2h', '20210409_spiro',...
 %       EA_spiro_10000x_sc_800mV_1sun, '10000x 1 sun',{':r','LineWidth',3},...
 %       EA_spiro_1000x_sc_800mV_1sun, '1000x 1 sun',{'-r'},...
 %       EA_spiro_sc_800mV_1sun, ' 1 sun',{'--r'})
@@ -31,7 +31,7 @@ function EA_script_plot(type, dir_file_name, varargin)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also EA_script.
+% See also EA_script, EA_script_plot_Efield, EA_script_plot_phase.
 
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
