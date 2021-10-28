@@ -447,7 +447,7 @@ classdef pc
                         warning('tmesh_type not recognised- defaulting to ''linear'' mesh');
                 end
             elseif isa(value, 'char')
-                if any(strcmp(value, {'linear', 'log10'}))
+                if any(strcmp(value, {'linear', 'log10', 'log10-double'}))
                     par.tmesh_type = value;
                 else
                     par.tmesh_type = 'linear';
