@@ -18,27 +18,26 @@ function Framefile = makemovie(sol, plotfun, xrange, yrange, movie_name, Vcounte
 Vapp = dfana.calcVapp(sol);
 
 for i = 1:length(sol.t)
-    %figure(600)
     clf
     plotfun(sol, sol.t(i))
     fig1 = gca;
-    
+
 %% You can include limits for subplots here
 %     subplot(2,1,1);
 %     ylim([-2, 0.2])
-%     
+%
 %     subplot(2,1,2);
 %     ylim([0, 3.5e16])
-    
+
     if xrange ~= 0
         xlim([xrange(1)*1e7, xrange(2)*1e7])
     end
-    
+
     if yrange ~= 0
         ylim([yrange(1), yrange(2)])
     end
     set(gcf,'color','w');
-    
+
     % Voltage counter
     if Vcounter
         dim = [.2 0 .3 .2];
@@ -49,7 +48,7 @@ for i = 1:length(sol.t)
         T.FontSize = 16;
         drawnow
     end
-    
+
     % Time counter
     if tcounter
         dim = [.2 0 .3 .3];
@@ -60,7 +59,7 @@ for i = 1:length(sol.t)
         T.FontSize = 16;
         drawnow
     end
-    
+
     Framefile(i) = getframe(gcf);
 end
 
