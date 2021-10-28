@@ -81,7 +81,8 @@ Vapp_arr = dfana.calcVapp(struct_Int);
 % take current voltage, as defined in dfana
 Vstart = Vapp_arr(end);
 
-% applied voltage profile
+% applied voltage profile, check out the definition of the functions in
+% Core/fun_gen.m
 Vapp_func = 'sin';
 Vapp_coeff = [Vstart, deltaV, freq, 0];
 
