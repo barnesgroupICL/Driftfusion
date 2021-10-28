@@ -34,6 +34,10 @@ input_csv = 'Input_files/unit_test_ptpd_mapi_pcbm.csv';
 par = pc(input_csv);
 % soleq = equilibrate(varargin)
 soleq = equilibrate(par);
+
+% [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
+structs_sc = genIntStructs(soleq.ion, 1e-2, 1, 2, true);
+
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.2, 3);
 
@@ -583,13 +587,105 @@ end
 inputs = dir('Scripts');
 for i=1:length(inputs)
     input = inputs(i).name;
-    % IS and EA scripts require arguments and will be tested separately
-    if ~any(regexp(input,'^\.|^test|^IS_|^EA_'))
+    % IS, EA and SDP scripts require arguments and will be tested separately
+    if ~any(regexp(input,'^\.|^test|^IS_|^EA_|^SDP_'))
         
         disp(['### running script ' input]);
         run(input);
     end
 end
+
+%% Scripts IS, helper and analysis
+
+% IS_results = IS_script(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, demodulation, do_graphics)
+% one input
+IS_script(soleq.ion, 1e9, 1e-2, 3, 2e-3, false, true, true);
+% many inputs
+IS_sc = IS_script(structs_sc, 1e9, 1e-2, 2, 2e-3, false, true, true);
+
+% IS_script_exporter(prefix, IS_results)
+IS_script_exporter('unit_testing_deleteme', IS_sc)
+
+% IS_script_plot_impedance(IS_results)
+IS_script_plot_impedance(IS_sc)
+
+% IS_script_plot_nyquist(IS_results)
+IS_script_plot_nyquist(IS_sc)
+
+% IS_script_plot_phase(IS_results)
+IS_script_plot_phase(IS_sc)
+
+%% Scripts IS non parallel and analysis
+
+% IS_results = IS_script_nonparallel(structs, startFreq, endFreq, Freq_points, deltaV, sequential, frozen_ions, demodulation, do_graphics, save_solutions)
+% one input
+IS_dark1 = IS_script_nonparallel(soleq.ion, 1e9, 1e-2, 3, 2e-3, false, true, true, true, true);
+IS_dark2 = IS_script_nonparallel(soleq.ion, 1e9, 1e-2, 3, 2e-3, true, false, false, false, false);
+% many inputs
+IS_script_nonparallel(structs_sc, 1e9, 1e-2, 2, 2e-3, false, false, true, true, false);
+
+% IS_list_plot(type, dir_file_name, varargin)
+IS_list_plot('capacitance', 'unit_testing_deleteme',...
+    IS_dark1, 'frozen ions',{'--r'},...
+    IS_dark2, 'sequential',{':k','LineWidth',3});
+IS_list_plot('impedance_re', 'unit_testing_deleteme',...
+    IS_dark1, 'frozen ions',{'--r'},...
+    IS_dark2, 'sequential',{':k','LineWidth',3});
+IS_list_plot('impedance_im', 'unit_testing_deleteme',...
+    IS_dark1, 'frozen ions',{'--r'},...
+    IS_dark2, 'sequential',{':k','LineWidth',3});
+IS_list_plot('impedance_abs', 'unit_testing_deleteme',...
+    IS_dark1, 'frozen ions',{'--r'},...
+    IS_dark2, 'sequential',{':k','LineWidth',3});
+IS_list_plot('phase', 'unit_testing_deleteme',...
+    IS_dark1, 'frozen ions',{'--r'},...
+    IS_dark2, 'sequential',{':k','LineWidth',3});
+IS_list_plot('nyquist', 'unit_testing_deleteme',...
+    IS_dark1, 'frozen ions',{'--r'},...
+    IS_dark2, 'sequential',{':k','LineWidth',3});
+
+%% Scripts EA, helper and analysis
+
+% EA_results = EA_script(structs, startFreq, endFreq, Freq_points, deltaV, frozen_ions, do_graphics)
+% one input
+EA_dark1 = EA_script(soleq.ion, 1e9, 1e-2, 3, 1e-3, true, false);
+EA_dark2 = EA_script(soleq.ion, 1e9, 1e-2, 3, 1e-3, false, true);
+% many inputs
+EA_sc = EA_script(structs_sc, 1e9, 1e-2, 2, 1e-3, false, true);
+
+% EA_script_exporter(prefix, EA_results)
+EA_script_exporter('unit_testing_deleteme', EA_sc);
+
+% EA_list_plot(type, dir_file_name, varargin)
+EA_list_plot('2h', 'unit_testing_deleteme',...
+    EA_dark1, 'frozen_ions',{':r','LineWidth',3},...
+    EA_dark2, 'mobile ions',{'-k'});
+EA_list_plot('1h', 'unit_testing_deleteme',...
+    EA_dark1, 'frozen_ions',{':r','LineWidth',3},...
+    EA_dark2, 'mobile ions',{'-k'});
+EA_list_plot('phase', 'unit_testing_deleteme',...
+    EA_dark1, 'frozen_ions',{':r','LineWidth',3},...
+    EA_dark2, 'mobile ions',{'-k'});
+
+% EA_script_plot_Efield(EA_results, savefig_dir)
+EA_script_plot_Efield(EA_sc, "unit_testing_deleteme")
+
+% EA_script_plot_phase(EA_results, savefig_dir)
+EA_script_plot_phase(EA_sc, "unit_testing_deleteme");
+
+%% Scripts SDP and helper
+
+% sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions, solver_split_pulse)
+sdpsol1 = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, true, true);
+sdpsol2 = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, false, false);
+
+% SDP_script_exporter(prefix, varargin)
+SDP_script_exporter('unit_testing_deleteme', sdpsol1, sdpsol2);
+
+% SDP_script_plot(Jtr_time, dir_file_name, varargin)
+SDP_script_plot(1e-7, 'unit_testing_deleteme',...
+    sdpsol1, 'pulse mobile ions', {':r','LineWidth',3},...
+    sdpsol2, 'pulse frozen ions', {'-k'})
 
 %% Helper calcJsc, calcR0 and Eg_vs_Voc
 
@@ -703,6 +799,32 @@ doIMPS(soleq.ion, 0.2, 0.2, 1, 10, 50);
 % sol_IMVS = doIMVS(sol_ini, int_base, int_delta, frequency, tmax, tpoints)
 doIMVS(soleq.ion, 0.2, 0.2, 1, 10, 50);
 
+%% Protocols doIS_EA, helper and analysis
+
+% struct_IS = doIS_EA(struct_Int, deltaV, freq, periods, tpoints_per_period, stability_timefraction, RelTol)
+is_ea_10mHz_100mV = doIS_EA(soleq.ion, 0.1, 1e-3, 20, 40, 0.5, 1e-6);
+
+% IS_EA_struct_exporter(prefix, struct)
+IS_EA_struct_exporter('unit_testing_deleteme', is_ea_10mHz_100mV);
+
+% coeff = EA_ana_plot(struct_IS_EA, do_graphics, local_field, demodulation, savefig_dir)
+EA_ana_plot(is_ea_10mHz_100mV, true, true, true, "unit_testing_deleteme");
+EA_ana_plot(is_ea_10mHz_100mV, false, false, false, missing);
+
+% coeff = IS_ana_plot(s, do_graphics, demodulation)
+IS_ana_plot(is_ea_10mHz_100mV, true, true);
+IS_ana_plot(is_ea_10mHz_100mV, false, false);
+
+J = dfana.calcJ(is_ea_10mHz_100mV).tot(:,end);
+% coeff = IS_EA_ana_demodulation(t, y, fun_type, freq)
+IS_EA_ana_demodulation(is_ea_10mHz_100mV.t', J, 'sin', is_ea_10mHz_100mV.par.V_fun_arg(3));
+
+% coeff = IS_EA_ana_fit(t, y, fun_type, freq)
+IS_EA_ana_fit(is_ea_10mHz_100mV.t', J, 'sin', is_ea_10mHz_100mV.par.V_fun_arg(3))
+
+% [subtracting_q_t, subtracting_q_intr_t] = IS_ana_subtracting(struct_IS)
+IS_ana_subtracting(is_ea_10mHz_100mV);
+
 %% Protocols doLightPulse
 
 % [sol_pulse] = doLightPulse(sol_ini, pulse_int, tmax, tpoints, duty, mobseti, log_timemesh)
@@ -716,6 +838,14 @@ sdpsol = doSDP(soleq.ion, [1e-3,1], 0.9, 1, 1, 5, 50, 1);
 
 % anasdp(sdpsol, Jtr_time)
 anasdp(sdpsol, 1);
+
+%% Protocols doSDP_alt
+
+% sdp = doSDP_alt(sol_ini, sol_jump_is_given, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions, solver_split_pulse)
+sdpsol = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, true, true);
+
+% anasdp(sdpsol, Jtr_time)
+anasdp(sdpsol, 1e-4);
 
 %% Protocols doSPV and Analysis spvana
 
@@ -744,11 +874,6 @@ findVoc(soleq.ion, 1, true, 0.9, 1.3, 1e-5)
 
 % [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
 genIntStructs(soleq.ion, 1e-4, 1, 5, true);
-
-%% Protocols genIntStructsRealVoc
-
-% [goodVocAsymStructCell, VOCs] = genIntStructsRealVoc(struct_eq, startInt, endInt, points, include_dark)
-genIntStructsRealVoc(soleq.ion, 1e-4, 1e-3, 2, false);
 
 %% Protocols genVappStructs
 
@@ -792,14 +917,14 @@ VappFunction(soleq.ion, 'constant', 0.2, 10, 30, false);
 VappFunction(soleq.ion, 'sweep', [0.1, 1, 5], 10, 30, false);
 
 % coeff(1) + (coeff(2)-coeff(1))*lt(mod(t,coeff(3))*1/coeff(3),coeff(4)/100);
-VappFunction(soleq.ion, 'square', [0, 1, 5, 30], 10, 30, false);
+VappFunction(soleq.ion, 'square', [0, 0.005, 5, 30], 10, 30, false);
 
 % coeff(1) + coeff(2)*(sin(2*pi*coeff(3)*t + coeff(4)));
 VappFunction(soleq.ion, 'sin', [0.01, 1e-2, 1, 0], 10, 30, false);
 
 % COEFF = [OFFSET, V1, V2, periods, tperiod]
 % triangle_fun(coeff, t);
-VappFunction(soleq.ion, 'tri', [0.1, 0.2, 1, 3, 5], 10, 30, false);
+VappFunction(soleq.ion, 'tri', [0, 0.2, 1, 3, 5], 10, 30, false);
 
 
 %% Optical beerlambert
@@ -821,6 +946,8 @@ lightsource('AM15', 500);
 
 % [n_interp, k_interp] = LoadRefrIndex(name,wavelengths)
 LoadRefrIndex(par.stack{1},300:767);
+
+
 
 %------------- END OF CODE --------------
 
