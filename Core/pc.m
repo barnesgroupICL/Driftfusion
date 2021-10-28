@@ -424,9 +424,9 @@ classdef pc
                         par.xmesh_type = 'erf-linear';
                         warning('xmesh_type not recognised- defaulting to ''erf-linear'' spatial mesh');
                 end
-            elseif isa(value, 'char')
+            elseif isa(value, 'cell')
                 if any(strcmp(par.xmesh_type, {'linear', 'erf-linear'}))
-                    par.xmesh_type = value;
+                    par.xmesh_type = value{1};
                 else
                     par.xmesh_type = 'erf-linear';
                     warning('xmesh_type not recognised- defaulting to ''erf-linear'' spatial mesh');
@@ -446,9 +446,9 @@ classdef pc
                         par.tmesh_type = 'linear';
                         warning('tmesh_type not recognised- defaulting to ''linear'' mesh');
                 end
-            elseif isa(value, 'char')
+            elseif isa(value, 'cell')
                 if any(strcmp(value, {'linear', 'log10', 'log10-double'}))
-                    par.tmesh_type = value;
+                    par.tmesh_type = value{1};
                 else
                     par.tmesh_type = 'linear';
                     warning('tmesh_type not recognised- defaulting to ''linear'' mesh');
@@ -468,9 +468,9 @@ classdef pc
                         par.optical_model = 'Beer-Lambert';
                         warning('optical_model not recognised- defaulting to ''Beer-Lambert''');
                 end
-            elseif isa(value, 'char')
+            elseif isa(value, 'cell')
                 if any(strcmp(value, {'uniform', 'Beer-Lambert'}))
-                    par.optical_model = value;
+                    par.optical_model = value{1};
                 else
                     par.optical_model = 'Beer-Lambert';
                     warning('optical_model not recognised- defaulting to ''Beer-Lambert''');
@@ -490,9 +490,9 @@ classdef pc
                         par.side = 'left';
                         warning('illumination SIDE not recognised- defaulting to ''left''');
                 end
-            elseif isa(value, 'char')
+            elseif isa(value, 'cell')
                 if any(strcmp(value, {'left', 'right'}))
-                    par.side = value;
+                    par.side = value{1};
                 else
                     par.side = 'left';
                     warning('illumination side not recognised- defaulting to ''left''');
