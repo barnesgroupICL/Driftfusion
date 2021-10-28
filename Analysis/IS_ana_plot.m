@@ -178,6 +178,8 @@ if s.par.mobseti && any(s.par.mucat) % if there was ion mobility, current due to
 
 else % if no ionic mobility is present, report NaNs
     coeff.ion_disp = [NaN, NaN, NaN];
+    coeff.cat_disp = coeff.ion_disp;
+    coeff.ani_disp = coeff.ion_disp;
 %     Jn_noionic = NaN;
 end
 
