@@ -425,6 +425,10 @@ classdef pc
                 if any(strcmp(par.xmesh_type, {'linear', 'erf-linear'}))
                     par.xmesh_type = value{1};
                 end
+            elseif isa(value, 'char')
+                if any(strcmp(par.xmesh_type, {'linear', 'erf-linear'}))
+                    par.xmesh_type = value;
+                end
             else
                 par.xmesh_type = 'erf-linear';
                 warning('xmesh_type not recognised- defaulting to ''erf-linear'' spatial mesh');
@@ -443,6 +447,10 @@ classdef pc
             elseif isa(value, 'cell')
                 if any(strcmp(value, {'linear', 'log10', 'log10-double'}))
                     par.tmesh_type = value{1};
+                end
+            elseif isa(value, 'char')
+                if any(strcmp(value, {'linear', 'log10', 'log10-double'}))
+                    par.tmesh_type = value;
                 end
             else
                 par.tmesh_type = 'linear';
@@ -463,6 +471,10 @@ classdef pc
                 if any(strcmp(value, {'uniform', 'Beer-Lambert'}))
                     par.optical_model = value{1};
                 end
+            elseif isa(value, 'char')
+                if any(strcmp(value, {'uniform', 'Beer-Lambert'}))
+                    par.optical_model = value;
+                end
             else
                 par.optical_model = 'Beer-Lambert';
                 warning('optical_model not recognised- defaulting to ''Beer-Lambert''');
@@ -481,6 +493,10 @@ classdef pc
             elseif isa(value, 'cell')
                 if any(strcmp(value, {'left', 'right'}))
                     par.side = value{1};
+                end
+            elseif isa(value, 'char')
+                if any(strcmp(value, {'left', 'right'}))
+                    par.side = value;
                 end
             else
                 par.side = 'left';
