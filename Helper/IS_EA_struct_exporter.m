@@ -1,17 +1,17 @@
-function IS_EA_struct_exporter(struct, prefix)
+function IS_EA_struct_exporter(prefix, struct)
 %IS_EA_STRUCT_EXPORTER - Exports single impedance simulation data to text file
 % Saves the main data from a oscillating solution created by doIS_EA to text files
 % for easing the import with Origin (from OriginLab).
 %
-% Syntax:  IS_EA_struct_exporter(struct, prefix)
+% Syntax:  IS_EA_struct_exporter(prefix, struct)
 %
 % Inputs:
+%   PREFIX - char array, prefix to be used for the text files names
 %   STRUCT - a struct with a solution being perturbed by an
 %     oscillating voltage, as generated from IS_EA_single_exec
-%   PREFIX - char array, prefix to be used for the text files names
 %
 % Example:
-%   IS_EA_struct_exporter(asymssol_i_1S_SR_is_100mHz_2mV, 'asymssol_i_1S_SR_is_100mHz_2mV')
+%   IS_EA_struct_exporter('asymssol_i_1S_SR_is_100mHz_2mV', asymssol_i_1S_SR_is_100mHz_2mV)
 %     save single simulation data to text files
 %
 % Other m-files required: none
