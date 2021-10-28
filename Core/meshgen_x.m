@@ -62,5 +62,4 @@ switch xmesh_type
 end
 
 px = length(x);
-
 end
