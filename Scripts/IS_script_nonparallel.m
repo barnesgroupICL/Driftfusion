@@ -384,9 +384,9 @@ IS_results.impedance_np_dt_re = impedance_np_dt_re;
 %% plot results
 
 if do_graphics
-    IS_script_ana_phase(IS_results);
-    IS_script_ana_impedance(IS_results);
-    IS_script_ana_nyquist(IS_results);
+    IS_script_plot_phase(IS_results);
+    IS_script_plot_impedance(IS_results);
+    IS_script_plot_nyquist(IS_results);
 end
 
 % make the figures appear, all at the end of the script
