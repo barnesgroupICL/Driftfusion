@@ -93,53 +93,54 @@ data_band = [xnm', Ecb_Vmax', Evb_Vmax', Efn_Vmax', Efp_Vmax', Ecb_V0decr', Evb_
 
 time = struct.t; % row
 
-Vapp = p.Vapp_func(p.Vapp_params, struct.t); % row
+Vapp_fun = fun_gen(p.V_fun_type);
+Vapp = Vapp_fun(p.V_fun_arg, struct.t); % row
 
-Jn = struct.Jn; % in mA, column
+J = dfana.calcJ(struct); % in mA, column
+Jn = J.tot(:,end);
 
 % try to calculate the accumulated charge
-[dQ_t, ~] = IS_subtracting_analysis(struct);
+[dQ_t, ~] = IS_ana_subtracting(struct);
 
 J_accumulating = -dQ_t * 1000; % mA, row
 
-% taken from IS_single_analysis
-[n_coeff, ~, ~, ~, n_noionic_coeff] = IS_single_analysis(struct, false, true);
+coeff = IS_ana_plot(struct, false, true);
+cJ = coeff.Jtot;
 % in phase electronic current
-Jn_inphase = p.J_E_func([n_coeff(1)*cos(n_coeff(3)), n_coeff(2)*cos(n_coeff(3)), 0], struct.t);
+Jn_inphase = p.J_E_func([cJ(1)*cos(cJ(3)), cJ(2)*cos(cJ(3)), 0], struct.t);
 % out of phase electronic current
-Jn_quadrature = p.J_E_func([n_coeff(1)*sin(n_coeff(3)), n_coeff(2)*sin(n_coeff(3)), pi/2], struct.t);
+Jn_quadrature = p.J_E_func([cJ(1)*sin(cJ(3)), cJ(2)*sin(cJ(3)), pi/2], struct.t);
 
 % recombination current
-[~, ~, U] = pinana(struct); % mA
+r = dfana.calcr(struct); % mA
 
-data_current = [time', Vapp', Jn, J_accumulating', 1000*Jn_inphase', 1000*Jn_quadrature', U];
+data_current = [time', Vapp', Jn, J_accumulating', 1000*Jn_inphase', 1000*Jn_quadrature', r.tot(:,end)];
 
 if struct.par.mobseti && any(struct.par.mucat)
-    headerCurrentIonic = ["ionic", "nonionic", "nonionic_inphase", "nonionic_outofphase"];
+    headerCurrentIonic = "ionic";%, "nonionic", "nonionic_inphase", "nonionic_outofphase"];
     headerCurrent = [headerCurrent, headerCurrentIonic];
     unitsCurrent = [unitsCurrent, repelem("mA/cm\+(2)", length(headerCurrentIonic))];
 
     % block taken from IS_single_analysis
     % Intrinsic points logical array
-    itype_points= (struct.x >= p.tp & struct.x <= p.tp + p.ti);
-    % subtract background ion concentration, for having less noise in trapz
-    i_matrix = struct.u(:, :, 4) - p.NI;
-    % calculate electric field due to ions
-    Efield_i = p.e * cumtrapz(struct.x, i_matrix, 2) / p.eppi;
-    % an average would be enough if the spatial mesh was homogeneous in the
-    % intrinsic, indeed I have to use trapz for considering the spatial mesh
-    Efield_i_mean = trapz(struct.x(itype_points), Efield_i(:, itype_points), 2) / p.ti;
-    % calculate displacement current due to ions
-    Ji_disp = -p.eppi * gradient(Efield_i_mean, struct.t) * 1000; % in mA, column
+%     itype_points= (struct.x >= p.tp & struct.x <= p.tp + p.ti);
+%     % subtract background ion concentration, for having less noise in trapz
+%     i_matrix = struct.u(:, :, 4) - p.NI;
+%     % calculate electric field due to ions
+%     Efield_i = p.e * cumtrapz(struct.x, i_matrix, 2) / p.eppi;
+%     % an average would be enough if the spatial mesh was homogeneous in the
+%     % intrinsic, indeed I have to use trapz for considering the spatial mesh
+%     Efield_i_mean = trapz(struct.x(itype_points), Efield_i(:, itype_points), 2) / p.ti;
+%     % calculate displacement current due to ions
+%     Ji_disp = -p.eppi * gradient(Efield_i_mean, struct.t) * 1000; % in mA, column
 
-    J_noionic = Jn - Ji_disp; % in mA, column
+    %J_noionic = Jn - Ji_disp; % in mA, column
     
     % in phase electronic current
-    Jn_noionic_inphase =  p.J_E_func([n_noionic_coeff(1)*cos(n_noionic_coeff(3)), n_noionic_coeff(2)*cos(n_noionic_coeff(3)), 0], struct.t);
+    %Jn_noionic_inphase =  p.J_E_func([n_noionic_coeff(1)*cos(n_noionic_coeff(3)), n_noionic_coeff(2)*cos(n_noionic_coeff(3)), 0], struct.t);
     % out of phase electronic current
-    Jn_noionic_quadrature = p.J_E_func([n_noionic_coeff(1)*sin(n_noionic_coeff(3)), n_noionic_coeff(2)*sin(n_noionic_coeff(3)), pi/2], struct.t);
-
-    data_current = [data_current, Ji_disp, J_noionic, 1000*Jn_noionic_inphase', 1000*Jn_noionic_quadrature'];
+    %Jn_noionic_quadrature = p.J_E_func([n_noionic_coeff(1)*sin(n_noionic_coeff(3)), n_noionic_coeff(2)*sin(n_noionic_coeff(3)), pi/2], struct.t);
+    data_current = [data_current, J.c(:,end) + J.a(:,end)];%, J_noionic, 1000*Jn_noionic_inphase', 1000*Jn_noionic_quadrature'];
 end
 
 
