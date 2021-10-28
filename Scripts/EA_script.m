@@ -179,8 +179,8 @@ EA_results.AC_Efield_amp_squared_mean = AC_Efield_amp_squared_mean;
 %% plot results
 
 if do_graphics
-    EA_script_ana_phase(EA_results);
-    EA_script_ana_Efield(EA_results);
+    EA_script_plot_phase(EA_results);
+    EA_script_plot_Efield(EA_results);
 end
 
 % make the figures appear, all at the end of the script
