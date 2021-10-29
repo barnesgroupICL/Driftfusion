@@ -62,3 +62,4 @@ Evidence_for_ion_ws.mat
 
 # Movie files
 *.avi
+.DS_Store

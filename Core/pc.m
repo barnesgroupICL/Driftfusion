@@ -420,17 +420,18 @@ classdef pc
                         par.xmesh_type = 'linear';
                     case 5
                         par.xmesh_type = 'erf-linear';
-                    otherwise
-                        par.xmesh_type = 'erf-linear';
-                        warning('xmesh_type not recognised- defaulting to ''erf-linear'' spatial mesh');
+                end
+            elseif isa(value, 'cell')
+                if any(strcmp(par.xmesh_type, {'linear', 'erf-linear'}))
+                    par.xmesh_type = value{1};
                 end
             elseif isa(value, 'char')
                 if any(strcmp(par.xmesh_type, {'linear', 'erf-linear'}))
                     par.xmesh_type = value;
-                else
-                    par.xmesh_type = 'erf-linear';
-                    warning('xmesh_type not recognised- defaulting to ''erf-linear'' spatial mesh');
                 end
+            else
+                par.xmesh_type = 'erf-linear';
+                warning('xmesh_type not recognised- defaulting to ''erf-linear'' spatial mesh');
             end
         end
 
@@ -442,17 +443,18 @@ classdef pc
                         par.tmesh_type = 'linear';
                     case 2
                         par.tmesh_type = 'log10';
-                    otherwise
-                        par.tmesh_type = 'linear';
-                        warning('tmesh_type not recognised- defaulting to ''linear'' mesh');
+                end
+            elseif isa(value, 'cell')
+                if any(strcmp(value, {'linear', 'log10', 'log10-double'}))
+                    par.tmesh_type = value{1};
                 end
             elseif isa(value, 'char')
-                if any(strcmp(value, {'linear', 'log10'}))
+                if any(strcmp(value, {'linear', 'log10', 'log10-double'}))
                     par.tmesh_type = value;
-                else
-                    par.tmesh_type = 'linear';
-                    warning('tmesh_type not recognised- defaulting to ''linear'' mesh');
                 end
+            else
+                par.tmesh_type = 'linear';
+                warning('tmesh_type not recognised- defaulting to ''linear'' mesh');
             end
         end
         
@@ -464,17 +466,18 @@ classdef pc
                         par.optical_model = 'uniform';
                     case 1
                         par.optical_model = 'Beer-Lambert';
-                    otherwise
-                        par.optical_model = 'Beer-Lambert';
-                        warning('optical_model not recognised- defaulting to ''Beer-Lambert''');
+                end
+            elseif isa(value, 'cell')
+                if any(strcmp(value, {'uniform', 'Beer-Lambert'}))
+                    par.optical_model = value{1};
                 end
             elseif isa(value, 'char')
                 if any(strcmp(value, {'uniform', 'Beer-Lambert'}))
                     par.optical_model = value;
-                else
-                    par.optical_model = 'Beer-Lambert';
-                    warning('optical_model not recognised- defaulting to ''Beer-Lambert''');
                 end
+            else
+                par.optical_model = 'Beer-Lambert';
+                warning('optical_model not recognised- defaulting to ''Beer-Lambert''');
             end
         end
         
@@ -486,17 +489,18 @@ classdef pc
                         par.side = 'left';
                     case 2
                         par.side = 'right';
-                    otherwise
-                        par.side = 'left';
-                        warning('illumination SIDE not recognised- defaulting to ''left''');
+                end
+            elseif isa(value, 'cell')
+                if any(strcmp(value, {'left', 'right'}))
+                    par.side = value{1};
                 end
             elseif isa(value, 'char')
                 if any(strcmp(value, {'left', 'right'}))
                     par.side = value;
-                else
-                    par.side = 'left';
-                    warning('illumination side not recognised- defaulting to ''left''');
                 end
+            else
+                par.side = 'left';
+                warning('illumination side not recognised- defaulting to ''left''');
             end
         end
         

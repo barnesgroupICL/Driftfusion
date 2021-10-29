@@ -26,7 +26,7 @@ sol_CV_100mVs_pn_hetero = doCV(soleq_pn_hetero.el, 0, 0, 0.8, -0.2, 100e-3, 1, 2
 dfplot.ELxnpxacx(sol_CV_100mVs_pn_hetero, 10)
 
 %% plot J-V
-dfplot.JVapp(sol_CV_100mVs_pn_hetero, 0)
+dfplot.JVapp(sol_CV_100mVs_pn_hetero, par_pn_hetero.d_midactive)
 %ylim([-20e-3, 20e-3])
 
 %% Save the workspace- this is commented out as the filepath should lead to

@@ -5,13 +5,13 @@ function par = import_properties(par, filepath)
 % nested try-ctach statements for backwards compatibility with older
 % variable names stored in .csv files. The object properties will still be
 % imported with the latest nomenclature.
-% 
+%
 % IMPORT_SINGLE_PROPERTY checks for the existence of column headers in the .CSV
 % with POSSIBLE_HEADERS. Multiple names for variables in the .CSV are given
 % for backwards compatibility, however once read-in the properties take the
 % naming convention of the current version i.e. this is simply to allow old
 % parameter files to be read-in.
-% 
+%
 %% LICENSE
 % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
@@ -97,11 +97,11 @@ if strcmp(layer_type{1}, 'electrode')
     par.sn = sn(start_row:end_row);
     par.sn_l = sn(1);
     par.sn_r = sn(end);
-    
+
     sp = import_single_property(par.sp, T, {'sp'}, 1, length(layer_type));
     par.sp = sp(start_row:end_row);
     par.sp_l = sp(1);
-    par.sp_r = sp(end); 
+    par.sp_r = sp(end);
 else
     par.sn = import_single_property(par.sn, T, {'sn'}, start_row, end_row);
     par.sp = import_single_property(par.sp, T, {'sp'}, start_row, end_row);
@@ -161,7 +161,7 @@ end
 %% Sub functions
     function property = import_single_property(property_in, T, possible_headers, start_row, end_row)
         error_checker = zeros(1, length(possible_headers));
-        
+
         for j = 1:length(possible_headers)
             try
                 temp_param = T{: , possible_headers(j)}';
@@ -170,7 +170,7 @@ end
                 error_checker(j) = 1;
             end
         end
-        
+
         if all(error_checker)
             warning(['No column headings match ''', char(possible_headers), ''', using default in PC.'])
             property = ones(1, end_row - start_row + 1)*property_in(1);
