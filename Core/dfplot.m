@@ -220,7 +220,7 @@ classdef dfplot
             J = dfana.calcJ(sol);
             Vapp = dfana.calcVapp(sol);
 
-            figure(91)
+            %figure(91)
             plot(Vapp, J.tot(:, ppos));
             xlabel('Applied Voltage, Vapp [V]');
             ylabel('Current Density, J [A cm^{-2}]');
@@ -304,8 +304,8 @@ classdef dfplot
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            figure(12);
-            dfplot.x2d(sol, x, {V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
+            %figure(12);
+            dfplot.x2d(sol, x, {-V},{'V'},{'-'},'Electrostatic potential [V]', tarr, xrange, 0, 0);
         end
 
         function Fx(varargin)
@@ -832,10 +832,12 @@ classdef dfplot
             if logx == 1
                 set(gca, 'XScale','log');
             end
+
             if length(variables) == 1
                 mystr = [];
                 for i = 1:length(tarr)
-                    mystr = [mystr, string(['t = ', num2str(tarr(i)), ' s'])];
+                    mystr = [mystr, string(['V = ', num2str(tarr(i)*0.1), ' V'])];
+                    %mystr = [mystr, string(['t = ', num2str(tarr(i)), ' s'])];
                 end
                 lgd = legend(h, mystr);
             else
