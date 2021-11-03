@@ -32,7 +32,7 @@ sol_CV_ion = doCV(soleq_tio2.ion, 1, 0, 1.0, 0, 100e-3, 1, 201);
 
 %% plot the current voltage curve
 Vbi_yplot = -50e-3:1e-3:50e-3;
-Vbi_xplot = 0.6*ones(1, length(Vbi_yplot));
+Vbi_xplot = par_tio2.Vbi*ones(1, length(Vbi_yplot));
 
 figure(1)
 dfplot.JtotVapp(sol_CV_el, 0)
