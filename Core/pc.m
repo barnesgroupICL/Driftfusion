@@ -520,6 +520,13 @@ classdef pc
             end
         end
         
+        function par = set.Vapp(par, value)
+            % To ensure backwards compat
+            if strcmp(par.V_fun_type, 'constant')
+                par.V_fun_arg(1) = value;
+            end
+        end
+        
         function value = get.gamma(par)
             switch par.prob_distro_function
                 case 'Boltz'

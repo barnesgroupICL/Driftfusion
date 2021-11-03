@@ -33,7 +33,7 @@ sol_ic.u = sol.u(index, :, :);
 
 % Overwrite Vapp
 Vappt = dfana.calcVapp(sol);
-sol_ic.par.Vapp = Vappt(index);
+sol_ic.par.Vapp = Vappt(index(end));
 % Overwrite time array
 sol_ic.t = sol.t(index);
 
