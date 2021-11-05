@@ -145,16 +145,57 @@ if any(strcmp(par.layer_type, 'interface')) || any(strcmp(par.layer_type, 'junct
 end
 
 %% Backward compatibility
-if strcmp(layer_type{1}, 'electrode') == 0
-    % Electron surface recombination velocity/extraction coefficient LHS
+% PC: I am sure there is a better way to write this but quite tired right
+% now
+if exist('sn')
+    if isempty(sn(1)) || isnan(sn(1))
+        % Electron surface recombination velocity/extraction coefficient LHS
+        par.sn_l = import_single_property(par.sn_l, T, {'sn_l', 'snl'}, 1, 1);
+    end
+else
     par.sn_l = import_single_property(par.sn_l, T, {'sn_l', 'snl'}, 1, 1);
+end
+
+if exist('sn')
+    if isempty(sn(end)) || isnan(sn(end))
+        par.sn_r = import_single_property(par.sn_r, T, {'sn_r', 'snr'}, 1, 1);
+    end
+else
     par.sn_r = import_single_property(par.sn_r, T, {'sn_r', 'snr'}, 1, 1);
-    % Hole surface recombination velocity/extraction coefficient LHS
+end
+
+if exist('sp')
+    if isempty(sp(1)) || isnan(sp(1))
+        % Hole surface recombination velocity/extraction coefficient LHS
+        par.sp_l = import_single_property(par.sp_l, T, {'sp_l', 'spl'}, 1, 1);
+    end
+else
     par.sp_l = import_single_property(par.sp_l, T, {'sp_l', 'spl'}, 1, 1);
+end
+
+if exist('sp')
+    if isempty(sp(end)) || isnan(sp(end))
+        par.sp_r = import_single_property(par.sp_r, T, {'sp_r', 'spr'}, 1, 1);
+    end
+else
     par.sp_r = import_single_property(par.sp_r, T, {'sp_r', 'spr'}, 1, 1);
-    % Electrode workfunction LHS
+end
+
+if exist('EF0')
+    if isempty(EF0(1)) || isnan(EF0(1))
+        % Electrode workfunction LHS
+        par.Phi_left = import_single_property(par.Phi_left, T, {'Phi_left', 'Phi_l', 'PhiA'}, 1, 1);
+    end
+else
     par.Phi_left = import_single_property(par.Phi_left, T, {'Phi_left', 'Phi_l', 'PhiA'}, 1, 1);
-    % Electrode workfunction RHS
+end
+
+if exist('EF0')
+    if isempty(EF0(end)) || isnan(EF0(end)) || abs(1 - exists('EF0'))
+        % Electrode workfunction RHS
+        par.Phi_right = import_single_property(par.Phi_right, T, {'Phi_right', 'Phi_r', 'PhiC'}, 1, 1);
+    end
+else
     par.Phi_right = import_single_property(par.Phi_right, T, {'Phi_right', 'Phi_r', 'PhiC'}, 1, 1);
 end
 
