@@ -158,22 +158,4 @@ if strcmp(layer_type{1}, 'electrode') == 0
     par.Phi_right = import_single_property(par.Phi_right, T, {'Phi_right', 'Phi_r', 'PhiC'}, 1, 1);
 end
 
-%% Sub functions
-    function property = import_single_property(property_in, T, possible_headers, start_row, end_row)
-        error_checker = zeros(1, length(possible_headers));
-
-        for j = 1:length(possible_headers)
-            try
-                temp_param = T{: , possible_headers(j)}';
-                property = temp_param(start_row:end_row);
-            catch
-                error_checker(j) = 1;
-            end
-        end
-
-        if all(error_checker)
-            warning(['No column headings match ''', char(possible_headers), ''', using default in PC.'])
-            property = ones(1, end_row - start_row + 1)*property_in(1);
-        end
-    end
 end
