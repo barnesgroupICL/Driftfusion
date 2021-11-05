@@ -551,7 +551,7 @@ classdef pc
         end
     
         function value = get.d_midactive(par)
-           value = par.dcum(par.active_layer(1)-1) + par.d_active/2;
+           value = par.dcum(par.active_layer(1)) + par.d_active/2;
         end
         %% Layer thicknesses [cm]
         function value = get.dcell(par)

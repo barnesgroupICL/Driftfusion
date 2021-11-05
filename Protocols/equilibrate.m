@@ -40,7 +40,7 @@ par_origin = par;
 % Start with zero SRH recombination
 par.SRHset = 0;
 % Radiative rec could initially be set to zero in addition if required
-par.radset = 1;
+par.radset = 0;
 % Start with no ionic carriers
 par.N_ionic_species = 0;
 % Switch off volumetric surface recombination check
@@ -107,7 +107,7 @@ soleq.el.par.vsr_check = 1;
 
 disp('Electronic carrier equilibration complete')
 
-if electronic_only == 0
+if electronic_only == 0 && par_origin.N_ionic_species > 0
     %% Equilibrium solutions with ion mobility switched on
     par.N_ionic_species = par_origin.N_ionic_species;
     
