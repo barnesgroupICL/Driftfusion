@@ -20,7 +20,7 @@
 % (at your option) any later version.
 
 %------------- BEGIN CODE --------------
-clear all
+% clear all
 % prepare solutions and indirectly test equilibrate and genIntStructs
 % functions
 initialise_df

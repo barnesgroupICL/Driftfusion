@@ -72,7 +72,7 @@ else
 end
 
 par.V_fun_type = 'constant';
-par.V_fun_arg(1) = par.Vapp;    % For future proof
+par.V_fun_arg(1) = Vjump;
 
 par.g1_fun_type = 'constant';
 par.g1_fun_arg(1) = Int;        % For future proof
