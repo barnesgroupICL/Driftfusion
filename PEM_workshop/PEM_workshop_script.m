@@ -5,7 +5,7 @@
 % Nov 2020
 
 %% Input parameters
-params_filepath = './PEM_workshop_Input_files/3_layer_device.csv';     % Filepath to the parameters file
+params_filepath = './PEM_workshop_Input_files/ohmic_intrinsic.csv';     % Filepath to the parameters file
 output_filename = 'name_for_outputs_here';                                    % Filename for output file
 light_intensity = 0;            % Suns equivalent
 Vmax = 0.8;                     % Maximum voltage for cyclic voltammogram
