@@ -20,7 +20,7 @@
 % (at your option) any later version.
 
 %------------- BEGIN CODE --------------
-clear all
+% clear all
 % prepare solutions and indirectly test equilibrate and genIntStructs
 % functions
 initialise_df
@@ -689,12 +689,14 @@ for i=1:length(inputs)
         assert(all(el_s == exp_el_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
         assert(~any(isnan(el.u(:))))
         
-        ion = soleq.ion;
-        ion_s = size(ion.u);
-        
-        exp_ion_s = [ion.par.tpoints, xpoints, round(3+par.N_ionic_species)];
-        assert(all(ion_s == exp_ion_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
-        assert(~any(isnan(ion.u(:))))
+        if par.N_ionic_species > 0
+            ion = soleq.ion;
+            ion_s = size(ion.u);
+            
+            exp_ion_s = [ion.par.tpoints, xpoints, round(3+par.N_ionic_species)];
+            assert(all(ion_s == exp_ion_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
+            assert(~any(isnan(ion.u(:))))
+        end
     end
 end
 

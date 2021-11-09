@@ -41,32 +41,32 @@ par.V_fun_arg(2) = Vend;
 par.V_fun_arg(3) = par.tmax;
 
 if option ==1 || option ==3
-    
+
     %% Dark forward scan
-    
+
     disp('Dark forward scan...')
     JVsol.dk.f = df(sol_ini, par);
     disp('Complete.')
-    
+
     %% Dark reverse scan
     disp('Dark reverse scan...')
-    
+
     % Sweep settings
-    par.V_fun_arg(1) = Vend;
+    par.V_fun_arg(1) = getVend(JVsol.dk.f);
     par.V_fun_arg(2) = Vstart;
     par.V_fun_arg(3) = par.tmax;
-    
+
     JVsol.dk.r = df(JVsol.dk.f, par);
     disp('Complete.')
-    
+
 end
 
 if option ==2 || option ==3
-    
+
     if Intensity == 0
         error('Intensity cannot be zero- use option 1 for dark scan instead')
     end
-    
+
     par = sol_ini.par;      % reset parameters
     %% 1 Sun quasi equilibrium solution
     disp('Illuminated quasi-equilibrium solution')
@@ -74,53 +74,53 @@ if option ==2 || option ==3
     par.tmax = 1e-3;
     par.t0 = 0;
     par.tpoints = 10;
-    
+
     par.mobseti = 0;          % Switch ion mobility off for illumination step
     % Set up light sweep
     par.g1_fun_type = 'sweep';
     % COEFF = [Amplitude_initial, Amplitude_final, tmax]
     par.g1_fun_arg = [0, Intensity, par.tmax];
-    
+
     par.V_fun_type = 'constant';
-    par.V_fun_arg(1) = par.Vapp;
-    
+    par.V_fun_arg(1) = Vstart;
+
     sol_i_1S = df(sol_ini, par);
     disp('Complete.')
-    
+
     %% Light forward
     par.g1_fun_type = 'constant';
     % COEFF = [Amplitude_initial, Amplitude_final, tmax]
     par.g1_fun_arg = Intensity;
     par.int1 = Intensity;
-    
+
     disp('Illuminated forward scan...')
     par.mobseti = mobseti;
-    
+
     %% JV settings
     par.tmesh_type = 1;
     par.t0 = 0;
     par.tmax = abs(Vend- Vstart)/JVscan_rate;           % Scan time determined by mobility- ensures cell is stable at each point
     par.tpoints = JVscan_pnts;
-    
+
     % Sweep settings
     par.V_fun_type = 'sweep';
     par.V_fun_arg(1) = Vstart;
     par.V_fun_arg(2) = Vend;
     par.V_fun_arg(3) = par.tmax;
-    
+
     JVsol.ill.f = df(sol_i_1S, par);
     disp('Complete.')
-    
+
     %% Light reverse
     disp('Illuminated reverse scan...')
-    par.V_fun_arg(1) = Vend;
+    par.V_fun_arg(1) = getVend(JVsol.ill.f);
     par.V_fun_arg(2) = Vstart;
-    
+
     JVsol.ill.r = df(JVsol.ill.f, par);
     disp('Complete.')
-    
+
     disp('JV scan complete.')
-    
+
     JVsol.stats = dfana.JVstats(JVsol);
 end
 toc

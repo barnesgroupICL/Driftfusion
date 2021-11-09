@@ -61,7 +61,7 @@ structs_oc = structs_sc;
 
 %% generate solutions
 for i = 1:nsolutions
-  
+
 
     struct_Int = structs_sc{1, i};
     % the asymmetricized solution could require some stabilization after
@@ -74,7 +74,7 @@ for i = 1:nsolutions
 
     % if solution seems at short circuit, estimate a voltage based on int1
     % illumination
-    if abs(struct_Int.par.Vapp) < 0.1
+    if abs(getVend(struct_Int)) < 0.1
         % findVocDirect could be used but it's slow
         %[~, guessVoc] = findVocDirect(struct_Int, struct_Int.par.int1, 1);
 

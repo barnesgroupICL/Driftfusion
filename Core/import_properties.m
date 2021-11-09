@@ -172,7 +172,8 @@ end
         end
 
         if all(error_checker)
-            warning(['No column headings match ''', char(possible_headers), ''', using default in PC.'])
+            message = ['No column headings match:', possible_headers, ', using default in PC.'];
+            warning(char(message)')
             property = ones(1, end_row - start_row + 1)*property_in(1);
         end
     end

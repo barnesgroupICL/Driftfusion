@@ -77,8 +77,6 @@ classdef pc
         tpoints = 100;              % Number of time points
 
         %% GENERAL CONTROL PARAMETERS
-        Vapp = 0;                           % Applied bias
-        calcJ = 0;                          % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
         mobset = 1;                         % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
         mobseti = 1;                        % Switch on/off ionic carrier mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
         SRHset = 1;                         % Switch on/off SRH recombination - recommend setting to zero for initial solution
@@ -520,6 +518,13 @@ classdef pc
             end
         end
         
+%         function par = set.Vapp(par, value)
+%             % To ensure backwards compat
+%             if strcmp(par.V_fun_type, 'constant')
+%                 par.V_fun_arg(1) = value;
+%             end
+%         end
+        
         function value = get.gamma(par)
             switch par.prob_distro_function
                 case 'Boltz'
@@ -544,7 +549,7 @@ classdef pc
         end
     
         function value = get.d_midactive(par)
-           value = par.dcum(par.active_layer(1)-1) + par.d_active/2;
+           value = par.dcum(par.active_layer(1)) + par.d_active/2;
         end
         %% Layer thicknesses [cm]
         function value = get.dcell(par)

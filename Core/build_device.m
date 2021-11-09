@@ -41,8 +41,6 @@ dev.Nani = build_property(par.Nani, xmesh, par, 'exp_graded', 0);
 dev.Ncat = build_property(par.Ncat, xmesh, par, 'exp_graded', 0);
 dev.a_max = build_property(par.a_max, xmesh, par, 'exp_graded', 0);
 dev.c_max = build_property(par.c_max, xmesh, par, 'exp_graded', 0);
-dev.taun = build_property(par.taun, xmesh, par, 'exp_graded', 0);
-dev.taup = build_property(par.taup, xmesh, par, 'exp_graded', 0);
 
 % Properties that are zeroed in the interfaces
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);
@@ -73,6 +71,8 @@ if par.vsr_mode
     dev.srh_zone = dev.bulk_switch;
     dev.Field_switch = dev.bulk_switch;
     
+    dev.taun = build_property(par.taun, xmesh, par, 'exp_graded', 0);
+    dev.taup = build_property(par.taup, xmesh, par, 'exp_graded', 0);
     dev.NA = build_property(par.NA, xmesh, par, 'zeroed', 0);
     dev.ND = build_property(par.ND, xmesh, par, 'zeroed', 0);
     dev.epp = build_property(par.epp, xmesh, par, 'constant', 0); 
@@ -84,6 +84,8 @@ else
     dev.srh_zone = ones(1, length(xmesh));
     dev.Field_switch = ones(1, length(xmesh));
     
+    dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
+    dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
     dev.NA = build_property(par.NA, xmesh, par, 'exp_graded', 0);
     dev.ND = build_property(par.ND, xmesh, par, 'exp_graded', 0);
     dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);

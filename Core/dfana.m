@@ -126,7 +126,21 @@ classdef dfana
 
             % Calculate total electron and hole currents from fluxes
             % Use the minority carrier flux as the boundary condition
-            if par.p0_l >= par.n0_l && par.n0_r >= par.p0_r
+            if par.p0_l == par.n0_l && par.n0_r == par.p0_r
+                % Intrinsic both sides then integrate from side with lowest
+                % density
+                if par.n0_r > par.n0_l
+                    j.n = jn_l + deltajn;
+                else
+                    j.n = jn_r + (deltajn-deltajn(:,end));
+                end
+
+                if par.p0_r > par.p0_l
+                    j.p = jp_l + deltajp;
+                else
+                    j.p = jp_r + (deltajp - deltajp(:,end));
+                end
+            elseif par.p0_l >= par.n0_l && par.n0_r >= par.p0_r
                 % p-type left boundary, n-type right boundary
                 j.n = jn_l + deltajn;
                 j.p = jp_r + (deltajp - deltajp(:,end));
@@ -415,7 +429,7 @@ classdef dfana
             [~,t,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
             switch par.V_fun_type
                 case 'constant'
-                    Vapp = ones(1,length(t))*par.Vapp;
+                    Vapp = ones(1,length(t))*par.V_fun_arg(1);
                 otherwise
                     Vapp_fun = fun_gen(par.V_fun_type);
                     Vapp = Vapp_fun(par.V_fun_arg, t);

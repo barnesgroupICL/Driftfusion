@@ -31,9 +31,15 @@ par.radset = 1;
 par.tmesh_type = 2;
 par.tpoints = 40;
 
-par.Vapp = 0;
+% Set applied bias to zero
+par.V_fun_type = 'constant';
+par.V_fun_arg(1) = 0;
+
+% Set light intensities to zero
 par.int1 = 0;
 par.int2 = 0;
+
+% Time mesh
 par.tmesh_type = 2;
 par.tmax = 1e-9;
 par.t0 = par.tmax/1e4;
