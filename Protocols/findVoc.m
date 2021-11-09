@@ -63,7 +63,7 @@ disp('Complete.')
 %% Run JV to new potential
 par.mobseti = mobseti;
 par.V_fun_type = 'sweep';
-par.V_fun_arg(1) = par.Vapp;
+par.V_fun_arg(1) = getVend(sol);
 par.V_fun_arg(2) = x0;
 par.V_fun_arg(3) = par.tmax;
 par.t0 = 0;
