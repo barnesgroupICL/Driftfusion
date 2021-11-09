@@ -502,6 +502,26 @@ classdef pc
             end
         end
         
+        function par = set.taun(par, value)
+            for i = 1:length(value)
+                if isnan(value(i))
+                    par.taun(i) = 1e100;
+                else
+                    par.taun(i) = value(i);
+                end
+            end
+        end
+
+        function par = set.taup(par, value)
+            for i = 1:length(value)
+                if isnan(value(i))
+                    par.taup(i) = 1e100;
+                else
+                    par.taup(i) = value(i);
+                end
+            end
+        end
+        
         function par = set.ND(par, value)
             for i = 1:length(par.ND)
                 if value(i) >= par.Nc(i)
@@ -517,14 +537,7 @@ classdef pc
                 end
             end
         end
-        
-%         function par = set.Vapp(par, value)
-%             % To ensure backwards compat
-%             if strcmp(par.V_fun_type, 'constant')
-%                 par.V_fun_arg(1) = value;
-%             end
-%         end
-        
+
         function value = get.gamma(par)
             switch par.prob_distro_function
                 case 'Boltz'

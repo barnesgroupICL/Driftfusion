@@ -71,8 +71,8 @@ if par.vsr_mode
     dev.srh_zone = dev.bulk_switch;
     dev.Field_switch = dev.bulk_switch;
     
-    dev.taun = build_property(par.taun, xmesh, par, 'exp_graded', 0);
-    dev.taup = build_property(par.taup, xmesh, par, 'exp_graded', 0);
+    dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
+    dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
     dev.NA = build_property(par.NA, xmesh, par, 'zeroed', 0);
     dev.ND = build_property(par.ND, xmesh, par, 'zeroed', 0);
     dev.epp = build_property(par.epp, xmesh, par, 'constant', 0); 
