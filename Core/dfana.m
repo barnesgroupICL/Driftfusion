@@ -134,7 +134,7 @@ classdef dfana
                 else
                     j.n = jn_r + (deltajn-deltajn(:,end));
                 end
-                
+
                 if par.p0_r > par.p0_l
                     j.p = jp_l + deltajp;
                 else
@@ -429,7 +429,7 @@ classdef dfana
             [~,t,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
             switch par.V_fun_type
                 case 'constant'
-                    Vapp = ones(1,length(t))*par.Vapp;
+                    Vapp = ones(1,length(t))*par.V_fun_arg(1);
                 otherwise
                     Vapp_fun = fun_gen(par.V_fun_type);
                     Vapp = Vapp_fun(par.V_fun_arg, t);

@@ -184,7 +184,6 @@ end
 
 %% Voltage function
 Vapp_fun = fun_gen(par.V_fun_type);
-Vapp = 0;
 Vres = 0;
 J = 0;
 
@@ -215,9 +214,6 @@ options = odeset('MaxStep', par.MaxStepFactor*0.1*par.tmax, 'RelTol', par.RelTol
 u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
 %% Ouputs
-% Store final voltage reading
-par.Vapp = Vapp;
-
 % Solutions and meshes to structure
 solstruct.u = u;
 solstruct.x = x;

@@ -12,8 +12,8 @@ par.tpoints = 100;
 % Sweep coefficients
 % COEFF = [Amplitude_initial, Amplitude_final, tmax]
 par.V_fun_type = 'sweep';
-V0 = par.Vapp;
-Vend = par.Vapp + deltaV;
+V0 = getVend(sol_in);
+Vend = V0 + deltaV;
 par.V_fun_arg(1) = V0;
 par.V_fun_arg(2) = Vend;
 par.V_fun_arg(3) = t_ramp;

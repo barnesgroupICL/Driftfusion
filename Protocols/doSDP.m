@@ -28,9 +28,8 @@ par.tmesh_type = 1;
 par.tpoints = 10;
 par.mobseti = 0;
 
-V0 = par.Vapp;
 par.V_fun_type = 'sweep';
-par.V_fun_arg(1) = V0;        % Start at input solution Vapp
+par.V_fun_arg(1) = getVend(sol_ini);        % Start at input solution Vapp
 par.V_fun_arg(2) = Vjump;
 par.V_fun_arg(3) = par.tmax;
 

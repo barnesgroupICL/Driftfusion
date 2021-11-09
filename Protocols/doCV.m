@@ -34,7 +34,7 @@ end
 %% Switch to V0 if different from initial conditions
 % Trying to do this within the triangular wave function resulted in
 % convergence issues so safer to do this here.
-if V0 ~= par.Vapp
+if V0 ~= par.V_fun_arg(1)
     sol = genVappStructs(sol, V0, 0);
 end
 
