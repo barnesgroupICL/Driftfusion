@@ -5,12 +5,12 @@
 % Nov 2020
 
 %% Input parameters
-params_filepath = './PEM_workshop_Input_files/ohmic_intrinsic.csv';     % Filepath to the parameters file
-output_filename = 'name_for_outputs_here';                                    % Filename for output file
+params_filepath = './PEM_workshop_Input_files/MIS.csv';     % Filepath to the parameters file
+output_filename = 'MIS';                                    % Filename for output file
 light_intensity = 0;            % Suns equivalent
 Vmax = 0.8;                     % Maximum voltage for cyclic voltammogram
 Vmin = -0.8;                    % Minimum voltage for cyclic voltammogram
-scan_rate = 1e-3;               % Current-voltage scan rate [Vs-1] 
+scan_rate = 1e-2;               % Current-voltage scan rate [Vs-1] 
 
 %% Load in parameters
 par = pc(params_filepath);
