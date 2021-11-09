@@ -10,7 +10,7 @@ output_filename = 'MIS';                                    % Filename for outpu
 light_intensity = 0;            % Suns equivalent
 Vmax = 0.8;                     % Maximum voltage for cyclic voltammogram
 Vmin = -0.8;                    % Minimum voltage for cyclic voltammogram
-scan_rate = 1e-2;               % Current-voltage scan rate [Vs-1] 
+scan_rate = 1e-3;               % Current-voltage scan rate [Vs-1] 
 
 %% Load in parameters
 par = pc(params_filepath);
