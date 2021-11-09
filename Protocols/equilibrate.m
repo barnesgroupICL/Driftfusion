@@ -40,7 +40,7 @@ par_origin = par;
 % Start with zero SRH recombination
 par.SRHset = 0;
 % Radiative rec could initially be set to zero in addition if required
-par.radset = 0;
+par.radset = 1;
 % Start with no ionic carriers
 par.N_ionic_species = 0;
 % Switch off volumetric surface recombination check
