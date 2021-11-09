@@ -52,7 +52,7 @@ if option ==1 || option ==3
     disp('Dark reverse scan...')
 
     % Sweep settings
-    par.V_fun_arg(1) = Vend;
+    par.V_fun_arg(1) = getVend(JVsol.dk.f);
     par.V_fun_arg(2) = Vstart;
     par.V_fun_arg(3) = par.tmax;
 
@@ -113,7 +113,7 @@ if option ==2 || option ==3
 
     %% Light reverse
     disp('Illuminated reverse scan...')
-    par.V_fun_arg(1) = Vend;
+    par.V_fun_arg(1) = getVend(JVsol.ill.f);
     par.V_fun_arg(2) = Vstart;
 
     JVsol.ill.r = df(JVsol.ill.f, par);

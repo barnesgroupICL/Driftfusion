@@ -213,7 +213,7 @@ options = odeset('MaxStep', par.MaxStepFactor*0.1*par.tmax, 'RelTol', par.RelTol
 % below for the: equation, initial conditions, boundary conditions
 u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
-%% Ouputs
+%% Outputs
 % Solutions and meshes to structure
 solstruct.u = u;
 solstruct.x = x;

@@ -77,8 +77,6 @@ classdef pc
         tpoints = 100;              % Number of time points
 
         %% GENERAL CONTROL PARAMETERS
-        Vapp = 0;                           % Applied bias
-        calcJ = 0;                          % Calculates Currents- slows down solving calcJ = 1, calculates DD currents at every position
         mobset = 1;                         % Switch on/off electron hole mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
         mobseti = 1;                        % Switch on/off ionic carrier mobility- MUST BE SET TO ZERO FOR INITIAL SOLUTION
         SRHset = 1;                         % Switch on/off SRH recombination - recommend setting to zero for initial solution
