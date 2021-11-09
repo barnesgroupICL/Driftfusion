@@ -1,6 +1,0 @@
-layer_type,stack,thickness,layer_points,xmesh_coeff,EA,IP,E0,Et,Nc,Nv,mu_n,mu_p,epp,g0,B,taun,taup,sn,sp,vsr_zone_loc,Red,Green,Blue,Phi_left,Phi_right,OM,xmesh_type,side,N_ionic_species
-electrode,,,,,,,,,,,,,,,,,,1.00E+07,1.00E+07,,,,,-4.5,-4.5,uniform,erf-linear,left,0
-active,MAPICl,4.00E-05,300,0.7,-3,-6,-4.5,-4.5,1.00E+19,1.00E+19,1.00E+00,1.00E+00,2.00E+01,1.00E+21,1.00E-12,1.00E+02,1.00E+02,,,,0.85,0.95,0.7,,,,,,
-junction,,2.00E-07,120,0.7,-4,-5,-4.5,-4.5,1.00E+19,1.00E+19,1.00E+00,1.00E+00,2.00E+01,1.00E+21,1.00E-12,1.00E+02,1.00E+02,1.00E-20,1.00E-20,C,1,0.9,0.7,,,,,,
-layer,MAPICl,4.00E-05,300,0.7,-4,-5,-4.5,-4.5,1.00E+19,1.00E+19,1.00E+00,1.00E+00,2.00E+01,1.00E+21,1.00E-12,1.00E+02,1.00E+02,,,,0.8,0.9,1,,,,,,
-electrode,,,,,,,,,,,,,,,,,,1.00E+07,1.00E+07,,,,,,,,,,
