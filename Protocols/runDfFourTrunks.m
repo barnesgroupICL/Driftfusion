@@ -138,7 +138,7 @@ function [sol, sol_sofar] = check_and_recurse(sol_in, sol_sofar, maxDepth, paren
         suggestedTimes_arr = [suggestedTime,suggestedTime,suggestedTime];
     else
         Jtot_endx = dfana.calcJ(sol_in).tot(:,end);
-        outliers = isoutlier(Jtot_endx,'ThresholdFactor',30);
+        outliers = isoutlier(Jtot_endx,'ThresholdFactor',100);
         % set to false all the points in where the change is ridicolously
         % small
         outliers((Jtot_endx - mean(Jtot_endx))./Jtot_endx < 0.001) = false;
