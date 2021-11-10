@@ -105,11 +105,13 @@ while any(all_stable) == 0
 end
 
 soleq.el = sol;
-% Manually check final section of solution for VSR self-consitency
-sol_ic = extract_IC(soleq.el, [soleq.el.t(end)*0.7, soleq.el.t(end)]);
-compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
-% Switch VSR check on for future use
-soleq.el.par.vsr_check = 1;
+if par.vsr_mode
+    % Manually check final section of solution for VSR self-consitency
+    sol_ic = extract_IC(soleq.el, [soleq.el.t(end)*0.7, soleq.el.t(end)]);
+    compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
+    % Switch VSR check on for future use
+    soleq.el.par.vsr_check = 1;
+end
 
 disp('Electronic carrier equilibration complete')
 
@@ -162,11 +164,14 @@ if electronic_only == 0 && par_origin.N_ionic_species > 0
 
     % write solution
     soleq.ion = sol;
-    % Manually check solution for VSR self-consitency
-    sol_ic = extract_IC(soleq.ion, [soleq.ion.t(end)*0.7, soleq.ion.t(end)]);
-    compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
+    if par.vsr_mode
+        % Manually check solution for VSR self-consitency
+        sol_ic = extract_IC(soleq.ion, [soleq.ion.t(end)*0.7, soleq.ion.t(end)]);
+        compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
+        % Switch VSR check on for future use
+        soleq.ion.par.vsr_check = 1;
+    end
     % Reset switches
-    soleq.ion.par.vsr_check = 1;
     soleq.ion.par.mobseti = 1;
     soleq.ion.par.K_a = 1;
     soleq.ion.par.K_c = 1;
