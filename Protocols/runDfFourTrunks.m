@@ -58,11 +58,13 @@ function sol = runDfFourTrunks(sol_in, par, maxDepth, parentStepID, accumulatedT
         end
     end
         
-    suggestedTimes_arr = [Inf, Inf, Inf];
+    suggestedTimes_arr = [0, Inf, Inf];
+
     if nargin == 7
         suggestedTimes_arr(1:length(suggestedTimes)) = suggestedTimes;
     end
-    
+    assert(suggestedTimes_arr(1) < par.tmax, [mfilename ' - The first suggested time cannot be larger than the maximum time.']);
+
     %%
     ID = '1';
     par1 = par;
@@ -71,7 +73,7 @@ function sol = runDfFourTrunks(sol_in, par, maxDepth, parentStepID, accumulatedT
     else
         refMinTime = par.tmax/10;
     end
-    if isfinite(suggestedTimes_arr(1))
+    if suggestedTimes_arr(1)
         par1.tmax = suggestedTimes_arr(1);
     else
         par1.tmax = (refMinTime^1.5*par.tmax^0.5)^0.5;
@@ -147,7 +149,7 @@ function [sol, sol_sofar] = check_and_recurse(sol_in, sol_sofar, maxDepth, paren
         if any(outliers_tail) % can be tuned with 'ThresholdFactor', 'movmedian' or 'movmean'
             disp([mfilename ' - ' char(datetime('now')) ' - Further breaking the solution in four trunks due to suspicious current.'])
             recurse = true;
-            suggestedTimes_arr = Inf;
+            suggestedTimes_arr = 0;
         else
             recurse = false;
         end
