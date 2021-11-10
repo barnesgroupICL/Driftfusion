@@ -79,7 +79,7 @@ par.radset = 1;
 par.SRHset = 1;
 
 % Characteristic diffusion time
-t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
+t_diff = max((par.d.^2)./(2*par.kB*par.T*min(par.mu_n, par.mu_p)));
 par.tmax = 100*t_diff;
 par.t0 = par.tmax/1e6;
 
