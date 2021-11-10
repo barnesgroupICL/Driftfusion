@@ -26,7 +26,7 @@ function steadystate_struct = stabilize(struct)
 % it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
-% 
+%
 %% Start code
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -38,9 +38,6 @@ function steadystate_struct = stabilize(struct)
 
 %------------- BEGIN CODE --------------
 
-% eliminate JV configuration
-struct.par.JV = 0;
-
 % shortcut
 par = struct.par;
 
@@ -51,17 +48,16 @@ par.tmesh_type = 2; % log spaced time mesh
 %% estimate a good tmax
 % a tmax too short would make the solution look stable even
 % if it's not; too large and the simulation could fail
-
 min_tmax_ions = 10;
 min_tmax_freecharges = 1e-3;
 
 % if both mobilities are set
-if max(par.mucat) && par.mue(1)
-    par.tmax = min([min_tmax_ions, par.tmax*1e4, 2^(-log10(max(par.mucat))) / 10 + 2^(-log10(par.mue(1)))]);
+if max(par.mu_c) && par.mu_n(1)
+    par.tmax = min([min_tmax_ions, par.tmax*1e4, 2^(-log10(max(par.mu_c))) / 10 + 2^(-log10(par.mu_n(1)))]);
     min_tmax = min_tmax_ions;
 % if ionic mobility is zero but free charges mobility is set
-elseif par.mue(1)
-    par.tmax = min([min_tmax_freecharges, par.tmax*1e4, 2^(-log10(par.mue(1)))]);
+elseif par.mu_n(1)
+    par.tmax = min([min_tmax_freecharges, par.tmax*1e4, 2^(-log10(par.mu_n(1)))]);
     min_tmax = min_tmax_freecharges;
 end
 
@@ -98,7 +94,7 @@ while forceStabilization || ~verifyStabilization(steadystate_struct.u, steadysta
         break
     end
 
-    disp([mfilename ' - Stabilizing ' inputname(1) ' over ' num2str(par.tmax) ' s with an applied voltage of ' num2str(par.Vapp) ' V']);
+    disp([mfilename ' - Stabilizing ' inputname(1) ' over ' num2str(par.tmax) ' s with an applied voltage of ' num2str(getVend(struct)) ' V']);
     % every cycle starts from the last timepoint of the previous cycle
     steadystate_struct = df(steadystate_struct, par);
     if size(steadystate_struct.u, 1) ~= steadystate_struct.par.tpoints % simulation failed

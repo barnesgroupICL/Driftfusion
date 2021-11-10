@@ -13,17 +13,17 @@
 tic
 initialise_df
 
-% Create parameters objects for Spiro/MAPI/TiO2 and PEDOT/MAPI/PCBM devices
+%% Create parameters objects for Spiro/MAPI/TiO2 and PEDOT/MAPI/PCBM devices
 par_tio2 = pc('Input_files/spiro_mapi_tio2.csv');
 par_pcbm = pc('Input_files/pedotpss_mapi_pcbm.csv');
 
-% Find equilibrium solutions
+%% Find equilibrium solutions
 soleq_tio2 = equilibrate(par_tio2);
 soleq_pcbm = equilibrate(par_pcbm);
 
 %% Perform current-voltage scans
-sol_CV_100mVs_tio2_dark = doCV(soleq_tio2.ion, 0, 0, 1.2, 0, 100e-3, 1, 241);
-sol_CV_100mVs_pcbm_dark = doCV(soleq_pcbm.ion, 0, 0, 1.2, 0, 100e-3, 1, 241);
+sol_CV_100mVs_tio2_dark = doCV(soleq_tio2.ion, 0, 0, 1.0, 0, 100e-3, 1, 241);
+sol_CV_100mVs_pcbm_dark = doCV(soleq_pcbm.ion, 0, 0, 1.0, 0, 100e-3, 1, 241);
 sol_CV_100mVs_tio2_1sun = doCV(soleq_tio2.ion, 1, 0, 1.2, 0, 100e-3, 1, 241);
 sol_CV_100mVs_pcbm_1sun = doCV(soleq_pcbm.ion, 1, 0, 1.2, 0, 100e-3, 1, 241);
 

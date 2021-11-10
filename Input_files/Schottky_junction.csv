@@ -1,0 +1,4 @@
+layer_type,material,thickness,layer_points,xmesh_coeff,Phi_EA,Phi_IP,EF0,Et,Nc,Nv,Ncat,Nani,c_max,a_max,mu_n,mu_p,mu_c,mu_a,epp,g0,B,taun,taup,sn,sp,Red,Green,Blue,optical_model,xmesh_type,side,N_ionic_species
+electrode,,,,,,,-4.6,,,,,,,,,,,,,,,,,1.00E+07,1.00E+07,,,,Beer-Lambert,erf-linear,left,2.00E+00
+active,MAPICl,4.00E-05,300,0.7,-3.8,-5.4,-3.9,-4.6,1.00E+19,1.00E+19,1.00E+18,1.00E+18,1.21E+22,1.21E+22,2.00E+01,2.00E+01,1.00E-10,1.00E-14,2.30E+01,2.64E+21,3.60E-12,1.00E-07,1.00E-07,,,1.00E+00,1.00E+00,1.00E+00,,,,
+electrode,,,,,,,-3.9,,,,,,,,,,,,,,,,,1.00E+07,1.00E+07,,,,,,,

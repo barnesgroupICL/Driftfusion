@@ -33,7 +33,7 @@ classdef explore
             errorlog = zeros(length(parval1), length(parval2));
 
             j = 1;
-            parfor i = 1:length(parval1)
+            for i = 1:length(parval1)
                 
                 par = par_base;
                 par = explore.helper(par, str1, parval1(i));
@@ -98,8 +98,8 @@ classdef explore
                         % on the variables being altered.
                         soleq = equilibrate(par);
                         
-                        % Perform JV from 0-1.3 V at 50 mVs-1
-                        JV = doJV(soleq.ion, 50e-3, JVpnts, Int, 1, 0, 1.3, 2);
+                        % Perform JV from 0-1.2 V at 50 mVs-1
+                        JV = doJV(soleq.ion, 50e-3, JVpnts, Int, 1, 0, 1.2, 2);
                         
                         % Get J-V stats
                         stats = dfana.JVstats(JV);
@@ -120,12 +120,14 @@ classdef explore
                         
                         % For steady-state open circuit solution
                         % [sol_Voc, Voc] = findVoc(sol_ini, Int, mobseti, x0, x1, tol, plot)
-                        [sol_Voc, Voc_ss] = findVoc(soleq.ion, 1, 1, stats.Voc_f, stats.Voc_f+0.1, 0.01, JVpnts, 0);
-                        
+                        % [sol_Voc, Voc_ss] = findVoc(soleq.ion, 1, 1, stats.Voc_f, stats.Voc_f+0.1, 0.01, JVpnts, 0);
+                        % sol_Rs = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
+                        sol_Voc = lightonRs(soleq.ion, 1, -10, 1, 1e6, JVpnts);
+
                         % Write steady-state solutions into temporary
                         % variables
-                        Voc_stable(j,:) = dfana.calcVQFL(sol_Voc);
-                        PLint(j,:) = dfana.PLt(sol_Voc);
+                        Voc_stable(j,:) = dfana.calcDeltaQFL(sol_Voc);
+                        PLint(j,:) = dfana.calcPLt(sol_Voc);
                         n_av(j) = mean(sol_Voc.u(end, par.pcum(2):par.pcum(5),1));
                         p_av(j) = mean(sol_Voc.u(end, par.pcum(2):par.pcum(5),2));
 %                         n_f = explore.writevar(n_f, i, j, par.xx, sol_ill.u(end,:,1));
@@ -219,7 +221,7 @@ classdef explore
         
         function plotPL(exsol)
             figure(100)
-            surf(exsol.parval1, exsol.parval2, exsol.stats.PLint(:,:,end));
+            surf(exsol.parval2, exsol.parval1, exsol.stats.PLint(:,:,end));
             ylabel(exsol.parnames(1))
             xlabel(exsol.parnames(2))
             set(gca,'YScale','log');

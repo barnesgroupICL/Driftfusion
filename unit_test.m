@@ -1,4 +1,4 @@
-%UNIT_TEST - Runs various simulations in order to test the functioning of Driftfusion and many other implemented functions
+% UNIT_TEST - Runs various simulations in order to test the functioning of Driftfusion and many other implemented functions
 % For profiling the time spent running each function run 'profile on' before running the tests and
 % 'profile viewer' after.
 % Using Matlab's Coverage Reports, the obsolete and unused code can be easily spotted.
@@ -20,7 +20,7 @@
 % (at your option) any later version.
 
 %------------- BEGIN CODE --------------
-
+% clear all
 % prepare solutions and indirectly test equilibrate and genIntStructs
 % functions
 initialise_df
@@ -32,15 +32,12 @@ input_csv = 'Input_files/3_layer_unit_test.csv';
 
 % par = pc(varargin)
 par = pc(input_csv);
+% Relax VSR tolerance to 10% for test case to avoid warnings
+par.RelTol_vsr = 0.1;
 % soleq = equilibrate(varargin)
 soleq = equilibrate(par);
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.0, 3);
-
-% example taken from Scripts/explore_script
-% exsol = explore2par(par_base, parnames, parvalues, JVpnts)
-exsol = explore.explore2par(par, {'d(1,3)','Int'},...
-    {[400e-7, 800e-7], logspace(-2,0,2)}, 20);
 
 %% Core df no input
 
@@ -273,17 +270,17 @@ dfplot.x2d(JVsol.ill.f, JVsol.ill.f.x, {JVsol.ill.f.u(:,:,1)}, {'test'}, ['-','.
 %% Core build_device
 
 % dev = build_device(par, meshoption)
-dev1 = build_device(par, 'iwhole');
-dev2 = build_device(par, 'ihalf');
+dev1 = build_device(par, 'whole');
+dev2 = build_device(par, 'sub');
 
 %% Core build_property
 
 % devprop = build_property(property, xmesh, par, interface_switch, gradient_property)
 build_property(par.taun, par.xx, par, 'constant', 0);
-build_property(par.EA, par.xx, par, 'lin_graded', 0);
+build_property(par.Phi_EA, par.xx, par, 'lin_graded', 0);
 build_property(par.NA, par.xx, par, 'log_graded', 0);
 build_property(par.g0, par.xx, par, 'zeroed', 0);
-build_property(par.EA, par.xx, par, 'lin_graded', 1);
+build_property(par.Phi_EA, par.xx, par, 'lin_graded', 1);
 build_property(par.Nc, par.xx, par, 'log_graded', 1);
 
 %% Core dfana splitsol
@@ -291,15 +288,10 @@ build_property(par.Nc, par.xx, par, 'log_graded', 1);
 % [u,t,x,par,dev,n,p,a,c,V] = splitsol(sol)
 dfana.splitsol(soleq.ion);
 
-%% Core dfana QFLs
+%% Core dfana calcEnergies
 
-% [Ecb, Evb, Efn, Efp] = QFLs(sol)
-dfana.QFLs(soleq.ion);
-
-%% Core dfana QFL_ihalf
-
-% [Ecb, Evb, Efn, Efp] = QFL_ihalf(sol)
-dfana.QFL_ihalf(soleq.ion);
+% [Ecb, Evb, Efn, Efp] = calcEnergies(sol)
+dfana.calcEnergies(soleq.ion);
 
 %% Core dfana calcJ
 
@@ -313,38 +305,26 @@ dfana.calcg(soleq.ion);
 
 %% Core dfana calcr
 
-% r = calcr(sol)
-dfana.calcr(soleq.ion);
+% r = calcr(sol, mesh_option)
+dfana.calcr(soleq.ion, "whole");
+dfana.calcr(soleq.ion, "sub");
 
-%% Core dfana calcr_ihalf
+%% Core dfana calcJdd
 
-% r = calcr_ihalf(sol)
-dfana.calcr_ihalf(soleq.ion);
-
-%% Core dfana Jddxt
-
-% [jdd, Jdd, xout] = Jddxt(sol)
-dfana.Jddxt(soleq.ion);
+% [Jdd, jdd, xout] = calcJdd(sol)
+dfana.calcJdd(soleq.ion);
 
 %% Core dfana calcF
 
-% [FV, Frho] = calcF(sol)
-dfana.calcF(soleq.ion);
-
-%% Core dfana calcF_ihalf
-
-% [FV, Frho] = calcF_ihalf(sol)
-dfana.calcF_ihalf(soleq.ion);
+% [FV, Frho] = calcF(sol, mesh_option)
+dfana.calcF(soleq.ion, "whole");
+dfana.calcF(soleq.ion, "sub");
 
 %% Core dfana calcrho
 
-% rho = calcrho(sol)
-dfana.calcrho(soleq.ion);
-
-%% Core dfana calcrho_ihalf
-
-% rho = calcrho_ihalf(sol)
-dfana.calcrho_ihalf(soleq.ion);
+% rho = calcrho(sol, mesh_option)
+dfana.calcrho(soleq.ion, "whole");
+dfana.calcrho(soleq.ion, "sub");
 
 %% Core dfana calcVapp
 
@@ -356,15 +336,15 @@ dfana.calcVapp(soleq.ion);
 % stats = JVstats(JVsol)
 dfana.JVstats(JVsol);
 
-%% Core dfana PLt
+%% Core dfana calcPLt
 
-% value = PLt(sol)
-dfana.PLt(soleq.ion);
+% value = calcPLt(sol)
+dfana.calcPLt(soleq.ion);
 
-%% Core dfana calcVQFL
+%% Core dfana calcDeltaQFL
 
-% VQFL = calcVQFL(sol)
-dfana.calcVQFL(soleq.ion);
+% VQFL = calcDeltaQFL(sol)
+dfana.calcDeltaQFL(soleq.ion);
 
 %% Core dfana deltaVt
 
@@ -399,19 +379,19 @@ dfana.pdentrp(false,false,par.xx(123),soleq.ion.u(1,123,1),par.xx(124),soleq.ion
 %% Core ditro_fun nfun
 
 % n = nfun(Nc, Ec, Efn, T, prob_distro_function)
-distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.E0, par.T, par.prob_distro_function);
+distro_fun.nfun(par.dev.Nc, par.dev.Phi_EA, par.dev.EF0, par);
 
 %% Core ditro_fun pfun
 
 % p = pfun(Nv, Ev, Efp, T, prob_distro_function)
-distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.E0, par.T, par.prob_distro_function);
+distro_fun.pfun(par.dev.Nv, par.dev.Phi_IP, par.dev.EF0, par);
 
 %% Core ditro_fun Dn_fd_fun and Dnlook and Efn_fd_fun
 
 Ec = -4.95;
-[~, ~, Efn, ~] = dfana.QFLs(soleq.ion);
-% Dnfd = Dn_fd_fun(Nc, Ec, Efn, mue, T)
-Dnfd = distro_fun.Dn_fd_fun(par.dev.Nc(end), Ec, Efn, par.mue(end), par.T);
+[~, ~, Efn, ~] = dfana.calcEnergies(soleq.ion);
+% Dnfd = Dn_fd_fun(Nc, Ec, Efn, mu_n, T)
+Dnfd = distro_fun.Dn_fd_fun(par.dev.Nc(end), Ec, Efn, par.mu_n(end), par.T);
 
 % Dsol = Dnlook(n, Dnfun, n_fd)
 distro_fun.Dnlook(soleq.ion.u(2,1,end), Dnfd.Dnfun, Dnfd.n_fd);
@@ -421,9 +401,9 @@ distro_fun.Efn_fd_fun(soleq.ion.u(2,1,end), Efn, Dnfd.n_fd);
 
 %% Core ditro_fun Dp_fd_fun and Dplook and Efp_fd_fun
 
-[~, ~, ~, Efp] = dfana.QFLs(soleq.ion);
-% Dpfd = Dp_fd_fun(Nv, Ev, Efp, muh, T)
-Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.IP(1), Efp, par.muh(1), par.T);
+[~, ~, ~, Efp] = dfana.calcEnergies(soleq.ion);
+% Dpfd = Dp_fd_fun(Nv, Ev, Efp, mu_p, T)
+Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.Phi_IP(1), Efp, par.mu_p(1), par.T);
 
 % Dsol = Dplook(p, Dpfun, p_fd)
 distro_fun.Dplook(soleq.ion.u(3,1,1), Dpfd.Dpfun, Dpfd.p_fd);
@@ -441,24 +421,26 @@ fun_gen('sin');
 fun_gen('tri');
 
 %% Core generation
-
 % gx = generation(par, source_type, laserlambda)
-par2 = par;
-par2.OM = ~par.OM;
-generation(par, 'AM15', 470);
-generation(par, 'laser', 470);
-generation(par2, 'AM15', 470);
-generation(par2, 'laser', 470);
+par_om1 = par;
+par_om1.optical_model = 'uniform';
+generation(par_om1, 'AM15', 470);
+generation(par_om1, 'laser', 470);
 
-%% Core getvarihalf
+par_om2 = par;
+par_om2.optical_model = 'Beer-Lambert';
+generation(par_om2, 'AM15', 470);
+generation(par_om2, 'laser', 470);
 
-% varihalf = getvarihalf(var)
-getvarihalf(par.dev.EA);
+%% Core getvar_sub
 
-%% Core getxihalf
+% varsub = getvar_sub(var)
+EA_sub = getvar_sub(par.dev.Phi_EA);
 
-% xsolver = getxihalf(sol)
-getxihalf(soleq.ion);
+%% Core getx_sub
+
+% xsolver = getx_sub(sol)
+getx_sub(soleq.ion);
 
 %% Core import_properties
 
@@ -469,78 +451,47 @@ import_properties(par, {input_csv});
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
 meshgen_t(part);
 
 %% Core meshgen_t 1
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
-part.tmesh_type = 1;
+part.tmesh_type = 'linear';
 meshgen_t(part);
 
 %% Core meshgen_t 2
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
-part.tmesh_type = 2;
+part.tmesh_type = 'log10';
 meshgen_t(part);
 
 %% Core meshgen_t 3
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
-part.tmesh_type = 3;
+part.tmesh_type = 'log10-double';
 meshgen_t(part);
 
 %% Core meshgen_x default
 
 % x = meshgen_x(par)
 parx = par;
-parx.meshx_figon = true;
-meshgen_x(par);
-
-%% Core meshgen_x 1
-
-% x = meshgen_x(par)
-parx = par;
-parx.meshx_figon = true;
-parx.xmesh_type = 1;
 meshgen_x(parx);
-
-% %% Core meshgen_x 2
-%
-% x = meshgen_x(par)
-% parx = par;
-% parx.meshx_figon = true;
-% parx.xmesh_type = 2;
-% meshgen_x(parx);
-% 
-% %% Core meshgen_x 3
-% 
-% % x = meshgen_x(par)
-% parx = par;
-% parx.meshx_figon = true;
-% parx.xmesh_type = 3;
-% meshgen_x(parx);
 
 %% Core meshgen_x 4
 
 % x = meshgen_x(par)
 parx = par;
-parx.meshx_figon = true;
-parx.xmesh_type = 4;
+parx.xmesh_type = 'linear';
 meshgen_x(parx);
 
 %% Core meshgen_x 5
 
 % x = meshgen_x(par)
 parx = par;
-parx.meshx_figon = true;
-parx.xmesh_type = 5;
+parx.xmesh_type = 'erf-linear';
 meshgen_x(parx);
 
 %% Core refresh_device
@@ -553,6 +504,14 @@ refresh_device(par);
 % y = triangle_fun(coeff, t)
 triangle_fun([0.1, 0.2, 1, 3, 5], 0:0.1:10);
 
+%% Analysis
+% sigma_sum_filter = compare_rec_flux(sol_df, RelTol_vsr, AbsTol_vsr, plot_switch)
+sigma_sum_R_flux = compare_rec_flux(JVsol.ill.f, 1e6, 0.05, 1);
+
+%% Analysis
+% [n_ana, p_ana, jn_ana, jp_ana] = compare_carrier_interfaces(sol, tarr, plot_switch)
+[n_ana, p_ana, jn_ana, jp_ana] = compare_carrier_interfaces(JVsol.ill.f, JVsol.ill.f.t(end)*[0, 0.2, 0.4, 0.6], 1);
+
 %% Helper calcJsc, calcR0 and Eg_vs_Voc
 
 % [EgArr, Jsc_vs_Eg] = calcJsc
@@ -560,69 +519,6 @@ triangle_fun([0.1, 0.2, 1, 3, 5], 0:0.1:10);
 
 % [JV_ana, r0, k_rad, Voc, g0] = calcR0(EgArr, Jsc_vs_Eg, par)
 calcR0(EgArr, Jsc_vs_Eg, par);
-
-%% Helper explore plotPL
-
-% plotPL(exsol)
-explore.plotPL(exsol);
-
-%% Helper explore plotsurf
-
-% plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
-explore.plotsurf(exsol, 'Voc_r', true, false, false)
-
-%% Helper explore getJtot
-
-% Jtot = getJtot(sol)
-explore.getJtot(soleq.ion);
-
-%% Helper explore writevar
-
-% var = writevar(var, i, j, xx, arr)
-x=0;
-explore.writevar(x, 1, 1, par.xx, soleq.ion.x);
-
-%% Helper explore helper
-
-% par = helper(par, parname, parvalue)
-explore.helper(par, 'Rs', 1);
-
-%% Helper explore plotstat_2D_parval1
-
-% plotstat_2D_parval1(exsol, yproperty, logx, logy)
-explore.plotstat_2D_parval1(exsol, 'Voc_r', true, false)
-
-%% Helper explore plotstat_2D_parval2
-
-% plotstat_2D_parval2(exsol, yproperty, logx, logy)
-explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
-
-%% Helper explore plotfinalELx
-
-% EXPLORE contains functions that plot the final time point solution but
-% this functionality is currently not working.
-% % plotfinalELx(exsol)
-% explore.plotfinalELx(exsol)
-% 
-% %% Helper explore plotprof_2D
-% 
-% % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
-% explore.plotprof_2D(exsol, 'J_f', [true,true], [true,true], true, true)
-% 
-% %% Helper explore plotU
-% 
-% % plotU(exsol, par1logical, par2logical,logx,logy)
-% explore.plotU(exsol, [true,true], [true,true],false,false)
-% 
-% %% Helper explore plotCE
-% 
-% % plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
-% explore.plotCE(exsol, exsol, false, false, false, "ciaomamma")
-
-%% Helper explore plotJV
-
-% plotJV(exsol, par1logical, par2logical)
-explore.plotJV(exsol, [true,true], [true,true])
 
 %% Helper getpointpos
 
@@ -688,8 +584,8 @@ doTPV(soleq.ion, 1, 10, true, 1e-2, 0.1, 1, 20, 5);
 
 %% Protocols findVocDirect
 
-% [sol_Voc, Voc] = findVocDirect(sol_ini, light_intensity, mobseti)
-findVocDirect(soleq.ion, 1, true);
+% [sol_Voc, Voc] = findVocDirect(sol_ini, light_intensity, mobseti, tpoints)
+findVocDirect(soleq.ion, 1, true, 40);
 
 %% Protocols findVoc
 
@@ -759,13 +655,13 @@ VappFunction(soleq.ion, 'tri', [0, 0.6, -0.1, 3, 5], 15, 60, false);
 
 %% Optical beerlambert
 
-par2 = par;
-par2.side = 3 - par.side;
 % Gentot = beerlambert(par, x, source_type, laserlambda, figson)
-beerlambert(par, par.xx, 'AM15', 0, true);
-beerlambert(par, par.xx, 'laser', 500, true);
-beerlambert(par2, par2.xx, 'AM15', 0, true);
-beerlambert(par2, par2.xx, 'laser', 500, true);
+par_om2.side = 'left';
+beerlambert(par_om2, par_om2.xx, 'AM15', 0, true);
+beerlambert(par_om2, par_om2.xx, 'laser', 500, true);
+par_om2.side = 'right';
+beerlambert(par_om2, par_om2.xx, 'AM15', 0, true);
+beerlambert(par_om2, par_om2.xx, 'laser', 500, true);
 
 %% Optical lightsource
 
@@ -775,7 +671,7 @@ lightsource('AM15', 500);
 %% Optical LoadRefrIndex
 
 % [n_interp, k_interp] = LoadRefrIndex(name,wavelengths)
-LoadRefrIndex(par.stack{1},300:767);
+LoadRefrIndex(par.material{1},300:767);
 
 %% Input_files
 inputs = dir('Input_files');
@@ -795,18 +691,20 @@ for i=1:length(inputs)
         assert(all(el_s == exp_el_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
         assert(~any(isnan(el.u(:))))
         
-        ion = soleq.ion;
-        ion_s = size(ion.u);
-        
-        exp_ion_s = [ion.par.tpoints, xpoints, round(3+par.N_ionic_species)];
-        assert(all(ion_s == exp_ion_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
-        assert(~any(isnan(ion.u(:))))
+        if par.N_ionic_species > 0
+            ion = soleq.ion;
+            ion_s = size(ion.u);
+            
+            exp_ion_s = [ion.par.tpoints, xpoints, round(3+par.N_ionic_species)];
+            assert(all(ion_s == exp_ion_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
+            assert(~any(isnan(ion.u(:))))
+        end
     end
 end
 
 %% Scripts
 inputs = dir('Scripts');
-for i=1:length(inputs)
+for i = 1:length(inputs)
     input = inputs(i).name;
     if ~any(regexp(input,'^\.|^test'))
         
@@ -814,6 +712,71 @@ for i=1:length(inputs)
         run(input);
     end
 end
+
+%%
+exsol = parex_dactive_light;
+%% Helper explore plotPL
+
+% plotPL(exsol)
+explore.plotPL(exsol);
+
+%% Helper explore plotsurf
+
+% plotsurf(exsol, yproperty, xlogon, ylogon, zlogon)
+explore.plotsurf(exsol, 'Voc_r', true, false, false)
+
+%% Helper explore getJtot
+
+% Jtot = getJtot(sol)
+explore.getJtot(soleq.ion);
+
+%% Helper explore writevar
+
+% var = writevar(var, i, j, xx, arr)
+x=0;
+explore.writevar(x, 1, 1, par.xx, 1);
+
+%% Helper explore helper
+
+% par = helper(par, parname, parvalue)
+explore.helper(par, 'Rs', 1);
+
+%% Helper explore plotstat_2D_parval1
+
+% plotstat_2D_parval1(exsol, yproperty, logx, logy)
+explore.plotstat_2D_parval1(exsol, 'Voc_r', true, false)
+
+%% Helper explore plotstat_2D_parval2
+
+% plotstat_2D_parval2(exsol, yproperty, logx, logy)
+explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
+
+%% Helper explore plotfinalELx
+
+% EXPLORE contains functions that plot the final time point solution but
+% this functionality is currently not working.
+% % plotfinalELx(exsol)
+% explore.plotfinalELx(exsol)
+% 
+% %% Helper explore plotprof_2D
+% 
+% % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
+% explore.plotprof_2D(exsol, 'J_f', [true,true], [true,true], true, true)
+% 
+% %% Helper explore plotU
+% 
+% % plotU(exsol, par1logical, par2logical,logx,logy)
+% explore.plotU(exsol, [true,true], [true,true],false,false)
+% 
+% %% Helper explore plotCE
+% 
+% % plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
+% explore.plotCE(exsol, exsol, false, false, false, "ciaomamma")
+
+%% Helper explore plotJV
+
+% plotJV(exsol, par1logical, par2logical)
+explore.plotJV(exsol, [true, true, false, true], [true, false, true])
 
 %------------- END OF CODE --------------
 

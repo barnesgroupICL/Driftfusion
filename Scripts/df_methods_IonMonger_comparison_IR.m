@@ -20,6 +20,8 @@ dfplot.JtotVapp(CV_df_100mVs_im, 0)
 hold on
 dfplot.JtotVapp(CV_df_200mVs_im, 0)
 hold on
+ylim([-10e-3,25e-3])
+xlim([-1.2, 0])
 
 %% Read in base parameters
 par_df_im_mirror = pc('Input_files/IonMonger_default_IR_mirror.csv');
@@ -62,5 +64,6 @@ legend('HTL','interface 1','Active layer','Interface 2','ETL',...
 dfplot.acx(CV_df_100mVs_im, 10*[0, 0.3, 0.6, 0.9])
 xlim([497, 502])
 legend('HTL','interface 1','Active layer','Interface 2','ETL',...
-    'a, 0 V', 'c, 0 V', 'a, 0.3 V', 'c, 0.3 V', 'a, 0.6 V', 'c, 0.6 V',...
-    'a, 0.9 V', 'c, 0.9 V')
+    'a, 0 V', 'c, 0 V', 'Nani, 0 V', 'Ncat, 0 V', 'a, 0.3 V', 'c, 0.3 V', 'Nani, 0.3 V', 'Ncat, 0.3 V',...
+    'a, 0.6 V', 'c, 0.6 V', 'Nani, 0.6 V', 'Ncat, 0.6 V', 'a, 0.9 V', 'c, 0.9 V', 'Nani, 0.9 V', 'Ncat, 0.9 V')
+

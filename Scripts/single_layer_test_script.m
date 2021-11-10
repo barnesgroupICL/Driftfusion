@@ -12,12 +12,19 @@
 % Load parameters
 par = pc('Input_files/1_layer_test.csv');
 
-% Run to equilibrium
+%% Equilibrium oslutions
 soleq = equilibrate(par);
+% Find equilibrium solution with 100 Ohms series resistance in external
+% circuit
+sol_Rs = lightonRs(soleq.el, 0, -1e-3, 0, 100, 20);
 
-% Do JV scn
-JVsol = doJV(soleq.el, 100e-3, 201, 1, 0, 0, 1, 1);
+%% Do JV scans
+JVsol_Rs0 = doJV(soleq.el, 100e-3, 201, 1, 0, 0, 1, 1);
+JVsol_Rs100 = doJV(sol_Rs, 100e-3, 201, 1, 0, 0, 1, 1);
 
-% plot JV scan
-dfplot.JV(JVsol, 1);
+%% plot JV scan
+dfplot.JV(JVsol_Rs0, 1);
+hold on
+dfplot.JV(JVsol_Rs100, 1);
+hold off
 set(gca,'YScale','log')

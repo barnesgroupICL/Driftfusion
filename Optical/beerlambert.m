@@ -28,14 +28,14 @@ c = 2.998e8;
 lambda = 300:767;  % wavelength range - currently limited by database MUST BE IN nm
 
 switch par.side
-    case 1
-        layers = par.stack;
+    case 'left'
+        layers = par.material;
         layer_type = par.layer_type;
         pcum1 = [1,par.pcum+1];
         layer_points = par.layer_points;
-    case 2
-        % Flip properties for side 2
-        layers = fliplr(par.stack);
+    case 'right'
+        % Flip properties for side right
+        layers = fliplr(par.material);
         layer_type = fliplr(par.layer_type);
         x = x(end)-fliplr(par.xx);
         pcum1 = fliplr([1,par.pcum+1]);
@@ -44,7 +44,7 @@ switch par.side
 end
 
 switch source_type
-    case 'AM15'      
+    case 'AM15'
         I0 = lightsource('AM15', lambda);
     case 'laser'
         % Throw up error if LASERLAMBDA is not within the acceptable range
@@ -75,7 +75,7 @@ try
             case {'layer', 'active'}
                 [n_layer, k_layer] = LoadRefrIndex(layers{i},lambda);
                 n(pcum1(i):pcum1(i+1),:) = repmat(n_layer,layer_points(i)+1, 1);
-                k(pcum1(i):pcum1(i+1),:) = repmat(k_layer,layer_points(i)+1, 1);       
+                k(pcum1(i):pcum1(i+1),:) = repmat(k_layer,layer_points(i)+1, 1);
             case {'junction', 'interface'}
                 xprime = x(pcum1(i):pcum1(i+1)) - x(pcum1(i));
                 xprime = xprime';
@@ -83,7 +83,7 @@ try
         end
     end
 catch
-    warning(['Material name ', layers{i} ,' in stack does not match that in the Index of Refraction Library. Please check the names contained in the ''stack'' cell of the parameters object are correct.'])
+    warning(['Material name ', layers{i} ,' in material does not match that in the Index of Refraction Library. Please check the names contained in the ''material'' cell of the parameters object are correct.'])
 end
 
 xcum = par.pcum;
@@ -111,7 +111,7 @@ end
 Gentot = trapz(lambda, Gen, 2);
 
 % Flip profiles if side 2
-if par.side == 2
+if strcmp(par.side,'right')
     I = flipud(I);
     Gen = flipud(Gen);
     Gentot = flipud(Gentot);

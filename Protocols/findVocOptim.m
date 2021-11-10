@@ -1,7 +1,7 @@
 function [struct_voc, Voc] = findVocOptim(struct, approxVoc)
 %FINDVOCOPTIM - Stabilize a solution to the real open circuit voltage using MATLAB's Optimization Toolbox
 % The Voc found is the applied voltage where the current is minimized,
-% starting from the voltage present in the given solution. 
+% starting from the voltage present in the given solution.
 % Requires MATLAB's Optimization Toolbox.
 %
 % Syntax:  [struct_voc, Voc] = findVocOptim(struct)
@@ -38,22 +38,23 @@ function [struct_voc, Voc] = findVocOptim(struct, approxVoc)
 
 
 % set an initial time for stabilization tmax
-if any(struct.par.mucat) && struct.par.mobseti
-    struct.par.tmax = min(5e0, 2^(-log10(max(struct.par.mucat))) / 10 + 2^(-log10(min(struct.par.mue))));
+if any(struct.par.mu_c) && struct.par.mobseti
+    struct.par.tmax = min(5e0, 2^(-log10(max(struct.par.mu_c))) / 10 + 2^(-log10(min(struct.par.mu_n))));
 else
-    struct.par.tmax = min(1e-2, 2^(-log10(min(struct.par.mue))));
+    struct.par.tmax = min(1e-2, 2^(-log10(min(struct.par.mu_n))));
 end
 
+struct.par.tmesh_type = 2;
 struct.par.tpoints = 10;
 struct.par.t0 = struct.par.tmax / 1e6;
 
 % if an approximated Voc is provided, start from that
-if nargin > 1 && struct.par.Vapp ~= approxVoc
-    struct.par.V_fun_arg = [struct.par.Vapp, approxVoc, 10 * struct.par.t0];
+if nargin > 1 && getVend(struct) ~= approxVoc
+    struct.par.V_fun_arg = [getVend(struct), approxVoc, 10 * struct.par.t0];
     % starts at Vstart, linear Vapp decrease for the first points, then constant to Vend
     struct.par.V_fun_type = 'sweepAndStill';
     struct = df(struct, struct.par);
-    
+
     struct.par.V_fun_type = 'constant';
     struct.par.V_fun_arg = approxVoc;
     struct = stabilize(struct); % go to steady state
@@ -62,7 +63,7 @@ end
 % find residual current
 originalCurrent = dfana.calcJ(struct);
 
-disp([mfilename ' - Original voltage: ' num2str(struct.par.Vapp, 8) ' V; original current: ' num2str(originalCurrent.tot(end,end)) ' A/cm2'])
+disp([mfilename ' - Original voltage: ' num2str(getVend(struct), 8) ' V; original current: ' num2str(originalCurrent.tot(end,end)) ' A/cm2'])
 
 %% estimate search range, assuming that a higher voltage causes a more positive current
 
@@ -113,13 +114,13 @@ options = optimoptions(@fmincon, 'StepTolerance', 1e-7, 'FunctionTolerance', 1e-
 % the starting point is the currently present voltage
 % the constraints does not work when using the default interior-point
 % algorithm, no idea why
-Voc = fmincon(fun, struct.par.Vapp, [1; -1], [struct.par.Vapp + dVlimit; -(struct.par.Vapp - dVlimit)], [], [], [], [], [], options);
+Voc = fmincon(fun, getVend(struct), [1; -1], [struct.par.Vapp + dVlimit; -(struct.par.Vapp - dVlimit)], [], [], [], [], [], options);
 
 %% stabilize at the real Voc
 
 struct.par.tpoints = 20;
 
-struct.par.V_fun_arg = [struct.par.Vapp, Voc, 10 * struct.par.t0];
+struct.par.V_fun_arg = [getVend(struct), Voc, 10 * struct.par.t0];
 % starts at Vstart, linear Vapp decrease for the first points, then constant to Vend
 struct.par.V_fun_type = 'sweepAndStill';
 
@@ -144,7 +145,7 @@ function [minimizeMe, current, struct_newVapp] = IgiveCurrentForVoltage(struct, 
 par = struct.par;
 
 Vstart = par.Vapp; % current applied voltage
-Vend = Vapp; % new Voc    
+Vend = Vapp; % new Voc
 % the third parameter is the time point when the change from the old
 % voltage to the new one happens
 par.V_fun_arg = [Vstart, Vend, 10 * par.t0];
@@ -176,7 +177,7 @@ current = J.tot(end,end);
 % set
 minimizeMe = 1e30 * current^2;
 
-disp([mfilename ' - Using with Vapp ' num2str(struct_newVapp.par.Vapp, 8) ' V, a current of ' num2str(current) ' A/cm2 was found'])
+disp([mfilename ' - Using with Vapp ' num2str(getVend(struct_newVapp), 8) ' V, a current of ' num2str(current) ' A/cm2 was found'])
 
 end
 

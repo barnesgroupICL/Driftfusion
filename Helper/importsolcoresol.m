@@ -211,7 +211,7 @@ solstruct.Ec = solM(5,:)-solM(5,1);
 solstruct.Ev = solM(6,:)-solM(5,1);
 solstruct.Efn = solM(7,:)-solM(5,1);
 solstruct.Efp = solM(8,:)-solM(5,1);
-solstruct.EA = solstruct.Ec+solstruct.V;
-solstruct.IP = solstruct.Ev+solstruct.V;
+solstruct.Phi_EA = solstruct.Ec+solstruct.V;
+solstruct.Phi_IP = solstruct.Ev+solstruct.V;
 
 end

@@ -63,9 +63,9 @@ if tmax
     par.tmax = tmax;
 else % if tmax was zero, estimate a good one
     if par.mobseti
-        tmax_temp = min(1, 2^(-log10(par.mucat(par.active_layer(1)))) / 10 + 2^(-log10(par.mue(par.active_layer(1)))));
+        tmax_temp = min(1, 2^(-log10(par.mu_c(par.active_layer(1)))) / 10 + 2^(-log10(par.mu_n(par.active_layer(1)))));
     else
-        tmax_temp = min(1e-3, 2^(-log10(par.mue(par.active_layer(1)))));
+        tmax_temp = min(1e-3, 2^(-log10(par.mu_n(par.active_layer(1)))));
     end
 end
 

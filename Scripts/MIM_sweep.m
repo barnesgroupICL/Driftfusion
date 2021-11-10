@@ -22,7 +22,7 @@ dfplot.Jt(sol_CV, par_mim.dcum(end)/2);
 
 dfplot.JVapp(sol_CV, par_mim.dcum(end)/2);
 % Energy level diagrams at t=0 and max amplitude
-dfplot.ELxnpxacx(sol_CV, 0);
+dfplot.ELnpx(sol_CV, 0);
 
 % Save the workspace- this is commented out as the filepath should lead to
 % a folder on your computer. It is not recommended to store large files in
