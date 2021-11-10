@@ -53,10 +53,10 @@ switch source_type
             error(msg);
         end
         I0 = zeros(length(lambda));
-        I0(laserlambda-lambda(1)) = 1e-3*par.pulsepow;   % convert to wcm-2
+        I0(laserlambda-lambda(1)) = 1e-3*par.pulsepow;   % convert to W cm-2 nm-1
     otherwise
         warning('Light source unknown. Usinng AM1.5 as default')
-        I0 = lightsource('AM15', lambda);
+        I0 = lightsource('AM15', lambda);                % W cm-2 nm-1
 end
 
 Eph = h*c./(lambda*1e-9);    % Photon energy in Joules
