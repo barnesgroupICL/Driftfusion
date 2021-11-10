@@ -612,10 +612,23 @@ genVappStructs(soleq.ion, [0.9,1.1,1.3], true);
 % sol_relax = jumptoV(sol_ini, Vjump, tdwell, mobseti, Int, stabilise, accelerate)
 jumptoV(soleq.ion, 1.2, 1, true, 1, true, true);
 
+%% Protocols jumptoV_fourTrunksSolver
+
+% sol_dwell = jumptoV_fourTrunksSolver(sol_ini, Vjump, tdwell, tjump, maxDepth, debug)
+jumptoV_fourTrunksSolver(soleq.ion, 1, 1e3);
+jumptoV_fourTrunksSolver(soleq.ion, 2, 1, 1e-6);
+
 %% Protocols lightonRs
 
 % sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
 lightonRs(soleq.ion, 1, 10, true, 1e6, 50);
+
+%% Protocols runDfFourTrunks
+
+% sol = runDfFourTrunks(sol_in, par, maxDepth, parentStepID, accumulatedTime, debug, suggestedTimes)
+runDfFourTrunks(soleq.ion, par);
+runDfFourTrunks(soleq.ion, par, 1, '', 0, false, par.tmax/10);
+runDfFourTrunks(soleq.ion, par, Inf, '', 0, true, par.tmax/1000);
 
 %% Protocols stabilize
 
@@ -777,6 +790,11 @@ explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
 
 % plotJV(exsol, par1logical, par2logical)
 explore.plotJV(exsol, [true, true, false, true], [true, false, true])
+
+%% Helper mergeSolutions
+
+% sol = mergeSolutions(varargin)
+mergeSolutions(soleq.ion, soleq.ion);
 
 %------------- END OF CODE --------------
 
