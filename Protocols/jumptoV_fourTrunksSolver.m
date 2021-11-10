@@ -63,20 +63,20 @@ t_cationdiff = (par.d.^2)./(2*par.kB*par.T*par.mu_c);
 t_cationdiff = max(t_cationdiff(isfinite(t_cationdiff)));
 
 if nargin < 4
-    tmax = t_diff;
+    tmax_sweep = t_diff;
 else
-    tmax = tjump;
+    tmax_sweep = tjump;
 end
-par.tmax = tmax;
+par.tmax = tmax_sweep;
 par.tmesh_type = 1;
 par.t0 = 0;
 par.V_fun_type = 'sweep';
 par.V_fun_arg(1) = getVend(sol_ini);
 par.V_fun_arg(2) = Vjump;
-par.V_fun_arg(3) = tmax;
+par.V_fun_arg(3) = tmax_sweep;
 par.tpoints = 100;
 
-disp([mfilename ' - Jump to ' num2str(Vjump) ' V over ' num2str(tjump) ' s'])
+disp([mfilename ' - Jump to ' num2str(Vjump) ' V over ' num2str(tmax_sweep) ' s'])
 sol_jump = df(sol_ini, par);
 if debug
     assignin('base', "sol_jump", sol_jump)
@@ -91,7 +91,7 @@ par.V_fun_type = 'constant';
 par.V_fun_arg = getVend(sol_jump);
 
 par.tmax = tdwell;
-par.t0 = tjump;
+par.t0 = tmax_sweep;
 par.tmesh_type = 2;
 
 %sol_dwell = df(sol_jump, par);
