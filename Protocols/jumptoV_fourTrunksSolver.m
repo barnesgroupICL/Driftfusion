@@ -71,7 +71,7 @@ par.tmax = tmax;
 par.tmesh_type = 1;
 par.t0 = 0;
 par.V_fun_type = 'sweep';
-par.V_fun_arg(1) = par.Vapp;
+par.V_fun_arg(1) = getVend(sol_ini);
 par.V_fun_arg(2) = Vjump;
 par.V_fun_arg(3) = tmax;
 par.tpoints = 100;
@@ -88,7 +88,7 @@ par = sol_jump.par;
 disp([mfilename ' - Jump over ' num2str(par.tmax) ' s completed, starting dwell'])
 
 par.V_fun_type = 'constant';
-par.V_fun_arg = par.Vapp;
+par.V_fun_arg = getVend(sol_jump);
 
 par.tmax = tdwell;
 par.t0 = tjump;
