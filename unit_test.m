@@ -32,6 +32,8 @@ input_csv = 'Input_files/3_layer_unit_test.csv';
 
 % par = pc(varargin)
 par = pc(input_csv);
+% Relax VSR tolerance to 10% for test case to avoid warnings
+par.RelTol_vsr = 0.1;
 % soleq = equilibrate(varargin)
 soleq = equilibrate(par);
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
