@@ -36,12 +36,12 @@ x_sub = par.x_sub;
 
 % Calculate alpha and beta- note these are referenced to the direction of x
 % NOT x_n and x_p
-dVdx = zeros(length(t), length(x_sub));
-for i = 1:length(t)
+dVdx = zeros(size(u,1), length(x_sub));
+for i = 1:size(u,1)
     dVdx(i,:) = (u(i, 2:end, 1) - u(i, 1:end-1, 1))./(x(2:end) - x(1:end-1));
 end
-alpha0 = repmat(dev.alpha0, length(t), 1);
-beta0 = repmat(dev.beta0, length(t), 1);
+alpha0 = repmat(dev.alpha0, size(u,1), 1);
+beta0 = repmat(dev.beta0, size(u,1), 1);
 alpha = par.q.*dVdx./(par.kB*par.T) + alpha0;
 beta = par.q.*-dVdx./(par.kB*par.T) + beta0;
 
@@ -60,11 +60,11 @@ for i = 1:length(par.layer_type)
 end
 loc = find(int_logical); % interface layer locations
 
-ns = zeros(length(t), length(loc));     % Store time array of each ns in new column
-ps = zeros(length(t), length(loc));     % Store time array of each ps in new column
-R_abrupt = zeros(length(t), length(loc));
-R_vsr = zeros(length(t), length(loc));
-sigma = zeros(length(t), length(loc));
+ns = zeros(size(u,1), length(loc));     % Store time array of each ns in new column
+ps = zeros(size(u,1), length(loc));     % Store time array of each ps in new column
+R_abrupt = zeros(size(u,1), length(loc));
+R_vsr = zeros(size(u,1), length(loc));
+sigma = zeros(size(u,1), length(loc));
 legstr_R = cell(2*length(loc) + 1, 1);
 legstr_sigma = cell(length(loc) + 1, 1);
 
@@ -79,7 +79,7 @@ for i = 1:length(loc)
     p_L = pcum1(loc(i)-1);
     p_R = pcum1(loc(i));
     
-    for k = 1:length(t)
+    for k = 1:size(u,1)
         if alpha(k, p_L) <= 0
             ns(k, i) = n(k, p_L);
         elseif alpha(k, p_L) > 0
@@ -147,7 +147,7 @@ end
     
 if plot_switch
     figure(300)
-    semilogy(t, AbsTol_vsr*ones(1, length(t)), 'k--')
+    semilogy(t, AbsTol_vsr*ones(1, size(u,1)), 'k--')
     legstr_R{end} = 'AbsTol';
     legend(legstr_R);
     
