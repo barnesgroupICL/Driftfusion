@@ -556,14 +556,6 @@ classdef pc
             end
         end
         
-        %% Active layer thickness
-        function value = get.d_active(par)
-            value = sum(par.dcell(par.active_layer(1):par.active_layer(end)));
-        end
-    
-        function value = get.d_midactive(par)
-           value = par.dcum(par.active_layer(1)) + par.d_active/2;
-        end
         %% Layer thicknesses [cm]
         function value = get.dcell(par)
             % For backwards comptibility. layer_points and parr arre the now the
@@ -578,6 +570,15 @@ classdef pc
             value = par.layer_points;
         end
 
+        %% Active layer thickness
+        function value = get.d_active(par)
+            value = sum(par.dcell(par.active_layer(1):par.active_layer(end)));
+        end
+    
+        function value = get.d_midactive(par)
+           value = par.dcum0(par.active_layer(1)) + par.d_active/2;
+        end
+        
         %% Band gap energies    [eV]
         function value = get.Eg(par)
             value = par.Phi_EA - par.Phi_IP;
