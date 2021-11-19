@@ -70,19 +70,19 @@ for i = 1:(length(varargin)/3)
     isol = i*3-2;
     legendarr{i} = varargin{isol+1};
     options = varargin{isol+2};
-    plot(varargin{isol}.tdwell_arr, Jtr_time_arr(i,:), options{:})
+    plot(1./varargin{isol}.tdwell_arr, Jtr_time_arr(i,:), options{:})
     ymin = min(ymin, min(Jtr_time_arr(i,ceil(end/2):end)));
     ymax = max(ymax, max(Jtr_time_arr(i,1:ceil(end/2))));
     hold on
 end
-xlabel('t_{dwell} [s]')
+xlabel('1/t_{dwell} [s-1]')
 ylabel('Jtr [Acm-2]')
 ax = gca;
 ax.XScale = 'log'; % for putting the scale in log
 %xlim([2e-8, 1e3])
 range = ymax-ymin;
 ylim([ymin-0.03*range, ymax+0.03*range])
-legend(legendarr)
+legend(legendarr,'Location','southeast')
 legend boxoff
 
 

@@ -447,6 +447,8 @@ if do_graphics % disable all this stuff if under parallelization or if explicitl
         legend(h, legend_array);
         legend boxoff
         clear h
+        
+        
 
     if local_field
 
