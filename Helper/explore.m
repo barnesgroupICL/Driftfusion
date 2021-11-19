@@ -33,7 +33,7 @@ classdef explore
             errorlog = zeros(length(parval1), length(parval2));
 
             j = 1;
-            for i = 1:length(parval1)
+            parfor i = 1:length(parval1)
                 
                 par = par_base;
                 par = explore.helper(par, str1, parval1(i));
@@ -76,7 +76,7 @@ classdef explore
                 Vapp_r = zeros(length(parval2), JVpnts);
                 J_r = zeros(length(parval2), JVpnts);
                 
-                parfor j = 1:length(parval2)
+                for j = 1:length(parval2)
                     try
                         disp(['Run no. ', num2str((i-1)*length(parval2) + j), ', ', str1 ,' = ', num2str(parval1(i)), ' , ',str2,' = ', num2str(parval2(j))]);
                         
