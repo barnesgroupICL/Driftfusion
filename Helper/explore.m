@@ -76,7 +76,7 @@ classdef explore
                 Vapp_r = zeros(length(parval2), JVpnts);
                 J_r = zeros(length(parval2), JVpnts);
                 
-                for j = 1:length(parval2)
+                parfor j = 1:length(parval2)
                     try
                         disp(['Run no. ', num2str((i-1)*length(parval2) + j), ', ', str1 ,' = ', num2str(parval1(i)), ' , ',str2,' = ', num2str(parval2(j))]);
                         
