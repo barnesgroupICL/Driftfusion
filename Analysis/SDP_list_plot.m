@@ -1,9 +1,9 @@
-function SDP_script_plot(Jtr_time, dir_file_name, varargin)
-%SDP_SCRIPT_PLOT - Plots a list of Step-Dwell-Probe (SDP) results with explicit line makeup
+function SDP_list_plot(Jtr_time, dir_file_name, varargin)
+%SDP_LIST_PLOT - Plots a list of Step-Dwell-Probe (SDP) results with explicit line makeup
 % The plots can be saved to files if the dir_file_name option is provided.
 % This is an alternative version of the anasdp.m and SDP_ana.m code.
 %
-% Syntax:  SDP_script_plot(Jtr_time, dir_file_name, varargin)
+% Syntax:  SDP_list_plot(Jtr_time, dir_file_name, varargin)
 %
 % Inputs:
 %   JTR_TIME - float, the time point (during the probe pulse step) that
@@ -24,7 +24,7 @@ function SDP_script_plot(Jtr_time, dir_file_name, varargin)
 %         the plot command (e.g. specifying the color of the line).
 %
 % Example:
-%   SDP_script_plot(1e-7, '20210302_spiro',...
+%   SDP_list_plot(1e-7, '20210302_spiro',...
 %       sdpsol_spiro_lower_1sun, 'lower 1 sun',{':r','LineWidth',3},...
 %       sdpsol_spiro_1sun, '1 sun',{'--r'},...
 %       sdpsol_spiro_higher_1sun, 'higher 1 sun',{'-r'})
