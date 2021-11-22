@@ -31,6 +31,7 @@ dev.mu_p = build_property(par.mu_p, xmesh, par, 'constant', 0);
 dev.Phi_EA = build_property(par.Phi_EA, xmesh, par, 'lin_graded', 0);
 dev.Phi_IP = build_property(par.Phi_IP, xmesh, par, 'lin_graded', 0);
 dev.EF0 = build_property(par.EF0, xmesh, par, 'lin_graded', 0);
+dev.EF0_zerointerface = build_property(par.EF0, xmesh, par, 'zeroed', 0);   % For plotting only
 
 % Exponentially graded properties
 dev.Nc = build_property(par.Nc, xmesh, par, 'exp_graded', 0);

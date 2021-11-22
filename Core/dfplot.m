@@ -622,6 +622,22 @@ classdef dfplot
                 {'--', '--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
         end
 
+        function ELx_uncontacted(varargin)
+            % Energy Level diagram, and charge densities plotter
+            % SOL = the solution structure
+            % TARR = An array containing the times that you wish to plot
+            % XRANGE = 2 element array with [xmin, xmax]
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            Ecb = repmat(dev.Phi_EA, length(t), 1); 
+            Evb = repmat(dev.Phi_IP, length(t), 1);
+            EF0 = repmat(dev.EF0_zerointerface, length(t), 1);
+            
+            figure(22);
+            dfplot.x2d(sol, x, {EF0, Ecb, Evb}, {'E_{F0}', 'E_{CB}', 'E_{VB}'},...
+                {'--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
+        end
+        
         function ELnpx(varargin)
             % Energy Level diagram, and charge densities plotter
             % SOL = the solution structure
