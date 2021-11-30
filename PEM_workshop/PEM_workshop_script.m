@@ -8,8 +8,8 @@
 params_filepath = './PEM_workshop_Input_files/intrinsic_ohmic.csv';     % Filepath to the parameters file
 output_filename = 'intrinsic_ohmic';                                    % Filename for output file
 light_intensity = 0;            % Suns equivalent
-Vmax = 1.2;                     % Maximum voltage for cyclic voltammogram
-Vmin = -1.2;                    % Minimum voltage for cyclic voltammogram
+Vmax = 0.8;                     % Maximum voltage for cyclic voltammogram
+Vmin = -0.8;                    % Minimum voltage for cyclic voltammogram
 scan_rate = 1e-3;               % Current-voltage scan rate [Vs-1] 
 
 %% Load in parameters
