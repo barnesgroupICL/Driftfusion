@@ -26,7 +26,7 @@ par = sol_ini.par;
 
 %% Set light intensity
 if light_intensity > 0
-    sol = lightonRs(sol_ini, light_intensity, -1, 0, 0, 10);
+    sol = lightonRs(sol_ini, light_intensity, 1e-2, 0, 0, 10);
 else
     sol = sol_ini;
 end
