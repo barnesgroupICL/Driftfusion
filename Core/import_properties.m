@@ -20,13 +20,13 @@ T = readtable(filepath{1,1});   % Reads-in in the external .CSV file to a table 
 try
     par.sn = T{:,'sn'}';
 catch
-    warning('No sn value defined in .csv . Using default in PC')
+    %warning('No sn value defined in .csv . Using default in PC')
 end
 
 try
     par.sp = T{:,'sp'}';
 catch
-    warning('No sp value defined in .csv . Using default in PC')
+    %warning('No sp value defined in .csv . Using default in PC')
 end
 
 % Layer tyoe array
