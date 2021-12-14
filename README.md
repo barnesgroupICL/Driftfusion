@@ -13,7 +13,9 @@ Please log bugs through GitHub.
 
 ## QuickStart Guide
 
-To get started do the following:
+The easiest way to get started is to look at and adapt the scripts contained within the `Scripts` folder. Each is designed to test different device architectures and simulation protocols.
+
+Alternatively to get started manually do the following:
  
 1.	If you are new to GitHub it is highly recommended that you download GitHub desktop at: https://desktop.github.com/.
 Alternatively, you can download Driftfusion standalone as a folder but you won’t easily be able to synch to the latest version.
