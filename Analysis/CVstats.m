@@ -7,6 +7,15 @@ function stats = CVstats(sol)
 % At present CVSTATS only works for P-I-N devices. Some adaption still
 % required for N-I-P devices
 
+%% LICENSE
+% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Imperial College London
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published
+% by the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% Authors: Lucy Hart, Philip Calado 2021
+
 % Check number of cycles
 num_cycles = sol.par.V_fun_arg(4);
 % Get the solution in a form of a sweep from V_min to V_max and back again.
