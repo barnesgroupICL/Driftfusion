@@ -147,6 +147,19 @@ classdef dfana
             Evb = dev_ihalf.IP-V;                                 % Valence band potential
         end
 
+        function Pin = calcPin(sol)
+            % Incident optical power density
+            % Note this integrates across the available spectrum 
+            % within AM15.xls 
+            if sol.par.OM == 1
+                AM15_data = xlsread('AM15.xls');
+                Pin = 1e-3*trapz(AM15_data(:,1), AM15_data(:,2));
+            else
+                warning('No incident photon spectrum available, assuming Pin = 0.1 W cm-2')
+                Pin = 0.1;
+            end
+        end
+        
         function [J, j, x] = calcJ(sol)
             % Current, J and flux, j calculation from continuity equations
 

@@ -71,6 +71,10 @@ hold on
 dfplot.Voct(Voc_transient_tc);
 hold off
 
+%% CVstats
+stats_bc = CVstats(sol_CV_bc)
+stats_tc = CVstats(sol_CV_tc)
+
 %% Plot the EL diagrams at 1 ms and 100 sec
 dfplot.ELxnpxacx(Voc_transient_bc, [1e-3, 100])
 % Uncomment to plot EL and carrier density diagrams for Top Cathode device
