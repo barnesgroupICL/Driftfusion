@@ -146,12 +146,12 @@ classdef dfana
             Ecb = dev_ihalf.EA-V;                                 % Conduction band potential
             Evb = dev_ihalf.IP-V;                                 % Valence band potential
         end
-        
+
         function Pin = calcPin(sol)
             % Incident optical power density
-            % Note this integrates across the available spectrum 
-            % within AM15.xls 
-            if strcmp(sol.par.optical_model, 'Beer-Lambert')
+            % Note this integrates across the available spectrum
+            % within AM15.xls
+            if sol.par.OM == 1
                 AM15_data = xlsread('AM15.xls');
                 Pin = 1e-3*trapz(AM15_data(:,1), AM15_data(:,2));
             else
@@ -159,7 +159,7 @@ classdef dfana
                 Pin = 0.1;
             end
         end
-        
+
         function [J, j, x] = calcJ(sol)
             % Current, J and flux, j calculation from continuity equations
 
@@ -268,7 +268,7 @@ classdef dfana
             % Calculate the recombination rate on whole mesh
             % obtain SOL components for easy referencing
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            
+
             int_switch = repmat(dev.int_switch, length(t), 1);
             bulk_switch = abs(int_switch-1);
             for i=1:length(t)
@@ -278,9 +278,9 @@ classdef dfana
             xprime_p = dev.xprime_p;
             alpha_prime = dev.alpha_prime;
             beta_prime = dev.beta_prime;
-            alpha = abs(par.q*dVdx./(par.kB*par.T) + alpha_prime); 
-            beta = abs(par.q*-dVdx./(par.kB*par.T) + beta_prime);    
-            
+            alpha = abs(par.q*dVdx./(par.kB*par.T) + alpha_prime);
+            beta = abs(par.q*-dVdx./(par.kB*par.T) + beta_prime);
+
             % Band-to-band
             r.btb = dev.B.*(n.*p - dev.ni.^2);
             % Bulk SRH
@@ -308,12 +308,12 @@ classdef dfana
             bulk_switch = abs(int_switch-1);
             xprime_n = dev.xprime_n;
             xprime_p = dev.xprime_p;
-            
+
             alpha_prime = dev.alpha_prime;
             beta_prime = dev.beta_prime;
-                       
+
             alpha = abs(par.q*dVdx_ihalf./(par.kB*par.T) + alpha_prime);
-            beta = abs(par.q*-dVdx_ihalf./(par.kB*par.T) + beta_prime); 
+            beta = abs(par.q*-dVdx_ihalf./(par.kB*par.T) + beta_prime);
 
             % Band-to-band
             r.btb = dev.B.*(n_ihalf.*p_ihalf - dev.ni.^2);
