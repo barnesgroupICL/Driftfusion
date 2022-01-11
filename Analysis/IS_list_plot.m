@@ -61,7 +61,7 @@ for i = 1:(length(varargin)/3)
             ax.XScale = 'log'; % for putting the scale in log
             ax.YScale = 'log'; % for putting the scale in log
         case 'impedance_im'
-            h(i) = plot(varargin{isol}.Freq, varargin{isol}.impedance_im, options{:});
+            h(i) = plot(varargin{isol}.Freq, -varargin{isol}.impedance_im, options{:});
             xlabel('Frequency [Hz]');
             ylabel('-Im(Z) [\Omega cm^2]');
             ax = gca;
