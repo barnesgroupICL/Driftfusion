@@ -774,6 +774,11 @@ importsolcoresol();
 % Framefile = makemovie(sol, plotfun, xrange, yrange, movie_name, Vcounter, tcounter)
 makemovie(JVsol.ill.f, @dfplot.ELx, [0,100e-7], 0, 'test_makemovie_delete_me', true, true);
 
+%% Helper mergeSolutions
+
+% sol = mergeSolutions(varargin)
+mergeSolutions(soleq.ion, soleq.ion);
+
 %% Helper verifyStabilization
 
 % all_stable = verifyStabilization(sol_matrix, t_array, time_fraction)
@@ -885,10 +890,23 @@ genVappStructs(soleq.ion, [0.9,1.1,1.3], true);
 % sol_relax = jumptoV(sol_ini, Vjump, tdwell, mobseti, Int, stabilise, accelerate)
 jumptoV(soleq.ion, 1.2, 1, true, 1, true, true);
 
+%% Protocols jumptoV_fourTrunksSolver
+
+% sol_dwell = jumptoV_fourTrunksSolver(sol_ini, Vjump, tdwell, tjump, maxDepth, debug)
+jumptoV_fourTrunksSolver(soleq.ion, 1, 1e3);
+jumptoV_fourTrunksSolver(soleq.ion, 2, 1, 1e-6);
+
 %% Protocols lightonRs
 
 % sol_ill = lightonRs(sol_ini, int1, stable_time, mobseti, Rs, pnts)
 lightonRs(soleq.ion, 1, 10, true, 1e6, 50);
+
+%% Protocols runDfFourTrunks
+
+% sol = runDfFourTrunks(sol_in, par, maxDepth, parentStepID, accumulatedTime, debug, suggestedTimes)
+runDfFourTrunks(soleq.ion, par);
+runDfFourTrunks(soleq.ion, par, 1, '', 0, false, par.tmax/10);
+runDfFourTrunks(soleq.ion, par, Inf, '', 0, true, par.tmax/1000);
 
 %% Protocols stabilize
 
