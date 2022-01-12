@@ -18,7 +18,10 @@ function sol_dwell = jumptoV_fourTrunksSolver(sol_ini, Vjump, tdwell, tjump, max
 %   
 %
 % Outputs:
-%   sol_dwell - a DF solution structure
+%   sol_dwell - a DF solution structure, the number of time points could
+%     be much larger than the requested one in par.tpoints.
+%     If a solution with the requested number of timepoints is needed, the
+%     observables can be interpolated using interp1 function.
 %
 % Example:
 %   soleq_ion_10V_100ks = jumptoV_fourTrunksSolver(soleq.ion, 10, 1e5);

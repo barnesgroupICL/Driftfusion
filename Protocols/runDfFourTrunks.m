@@ -23,7 +23,9 @@ function sol = runDfFourTrunks(sol_in, par, maxDepth, parentStepID, accumulatedT
 %
 % Outputs:
 %   SOL - the complete solution obtained, the number of time points could
-%     be much larger than the requested one in par.tpoints
+%     be much larger than the requested one in par.tpoints.
+%     If a solution with the requested number of timepoints is needed, the
+%     observables can be interpolated using interp1 function.
 %
 % Example:
 %   sol = runDfFourTrunks(sol_in, par)
