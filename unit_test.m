@@ -481,14 +481,6 @@ part.mesht_figon = true;
 part.tmesh_type = 2;
 meshgen_t(part);
 
-%% Core meshgen_t 3
-
-% [t] = meshgen_t(par)
-part = par;
-part.mesht_figon = true;
-part.tmesh_type = 3;
-meshgen_t(part);
-
 %% Core meshgen_t 4
 
 % [t] = meshgen_t(par)
