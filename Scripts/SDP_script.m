@@ -152,7 +152,7 @@ for i = 1:length(tdwell_arr)
         if size(sol_dwell.u,1) == par_dwell.tpoints
             startFromSolJump = false;
         else
-            sol_dwell = runDfFourTrunks(sol_jump, par_dwell, '');
+            sol_dwell = runDfFourTrunks(sol_jump, par_dwell);
             % this block is for saving the dwell solution
 %             [sol_dwell, sol1, sol2, sol3] = runDfFourTrunks(sol_jump, par_dwell, '');
 %             J1 = dfana.calcJ(sol1);
@@ -180,7 +180,19 @@ for i = 1:length(tdwell_arr)
     
     disp('Pulse keep on')
     if solver_split_pulse
-        [~, ~, ~, ~, Jtr(:,i), Jdk(i), t_Jtr(:,i)]= runDfFourTrunks(sol_pulseTurnOn, par_pulseKeepOn, '', sol_dwell);
+        sol_pulseKeepOn = runDfFourTrunks(sol_pulseTurnOn, par_pulseKeepOn);
+        [Jtr_temp, Jdk(i)] = calcJtrJdk(sol_dwell, sol_pulseKeepOn);
+        t_Jtr_temp = sol_pulseKeepOn.t';
+        % runDfFourTrunks can output a solution with more time points than
+        % requested, but anasdp works only on matrices, not on cells with
+        % arrays of different lengths, so the interpolated output is used
+        if all(size(Jtr_temp) == size(Jtr(:,i)))
+            Jtr(:,i) = Jtr_temp;
+            t_Jtr(:,i) = t_Jtr_temp;
+        else
+            t_Jtr(:,i) = meshgen_t(par_pulseKeepOn);
+            Jtr(:,i) = interp1(t_Jtr_temp, Jtr_temp, t_Jtr(:,i), 'spline');
+        end
     else
         sol_pulseKeepOn = runDf(sol_pulseTurnOn, par_pulseKeepOn);
         [Jtr(:,i), Jdk(i)] = calcJtrJdk(sol_dwell, sol_pulseKeepOn);
@@ -297,68 +309,4 @@ function sol_post = runDf(sol_pre, par)
     sol_post.par.AbsTol = originalAbsTol;
 end
 
-function [sol4, sol1, sol2, sol3, Jtr, Jdk, t_Jtr] = runDfFourTrunks(sol_pre, par, extraOutput, sol_dwell)
-        par1 = par;
-        par1.tmax = (par.t0^1.5*par.tmax^0.5)^0.5;
-        disp(['Split solution, part ' extraOutput '1. tmax: ' num2str(par1.tmax) ' s'])
-        par1.tpoints = max(floor(par.tpoints / 4), 10);
-        sol1 = runDf(sol_pre, par1);
-        if size(sol1.u,1) ~= par1.tpoints
-            newExtraOutput = [extraOutput '1.'];
-            [sol_new4, sol_new1, sol_new2, sol_new3] = runDfFourTrunks(sol_pre, par1, newExtraOutput);
-            sol1 = mergeFourSolutions(sol_new1, sol_new2, sol_new3, sol_new4);
-        end
-
-        par2 = par;
-        par2.tmax = (par.t0*par.tmax)^0.5 - par1.tmax;
-        disp(['Split solution, part ' extraOutput '2. tmax: ' num2str(par2.tmax) ' s'])
-        par2.tpoints = max(floor(par.tpoints / 4), 10);
-        par2.t0 = par1.tmax / 10;
-        sol2 = runDf(sol1, par2);
-        if size(sol2.u,1) ~= par2.tpoints
-            newExtraOutput = [extraOutput '2.'];
-            [sol_new4, sol_new1, sol_new2, sol_new3] = runDfFourTrunks(sol1, par2, newExtraOutput);
-            sol2 = mergeFourSolutions(sol_new1, sol_new2, sol_new3, sol_new4);
-        end
-        
-        par3 = par;
-        par3.tmax = (par.t0^0.5*par.tmax^1.5)^0.5 - par1.tmax - par2.tmax;
-        disp(['Split solution, part ' extraOutput '3. tmax: ' num2str(par3.tmax) ' s'])
-        par3.tpoints = max(floor(par.tpoints / 4), 10);
-        par3.t0 = par2.tmax / 10;
-        sol3 = runDf(sol2, par3);
-        if size(sol3.u,1) ~= par3.tpoints
-            newExtraOutput = [extraOutput '3.'];
-            [sol_new4, sol_new1, sol_new2, sol_new3] = runDfFourTrunks(sol2, par3, newExtraOutput);
-            sol3 = mergeFourSolutions(sol_new1, sol_new2, sol_new3, sol_new4);
-        end
-        
-        par4 = par;
-        par4.tmax = par.tmax - par1.tmax - par2.tmax - par3.tmax;
-        disp(['Split solution, part ' extraOutput '4. tmax: ' num2str(par4.tmax) ' s'])
-        par4.tpoints = max(par.tpoints - par1.tpoints - par2.tpoints - par3.tpoints, 10);
-        par4.t0 = par3.tmax / 10;
-        sol4 = runDf(sol3, par4);
-        if size(sol4.u,1) ~= par4.tpoints
-            newExtraOutput = [extraOutput '4.'];
-            [sol_new4, sol_new1, sol_new2, sol_new3] = runDfFourTrunks(sol3, par4, newExtraOutput);
-            sol4 = mergeFourSolutions(sol_new1, sol_new2, sol_new3, sol_new4);
-        end
-        
-        if nargout > 4
-            [Jtr_temp1, Jdk] = calcJtrJdk(sol_dwell, sol1);
-            Jtr_temp2 = calcJtrJdk(sol_dwell, sol2);        
-            Jtr_temp3 = calcJtrJdk(sol_dwell, sol3);
-            Jtr_temp4 = calcJtrJdk(sol_dwell, sol4);
-
-            Jtr = [Jtr_temp1; Jtr_temp2; Jtr_temp3; Jtr_temp4];
-            t_Jtr = [sol1.t'; (sol2.t+par1.tmax)'; (sol3.t+par1.tmax+par2.tmax)'; (sol4.t+par1.tmax+par2.tmax+par3.tmax)'];
-        end
-end
-
-function sol = mergeFourSolutions(sol1, sol2, sol3, sol4)
-    sol.u = [sol1.u; sol2.u; sol3.u; sol4.u];
-    sol.x = sol4.x;
-    sol.par = sol4.par;
-    sol.t = [sol1.t, sol2.t+sol1.t(end), sol3.t+sol1.t(end)+sol2.t(end), sol4.t+sol1.t(end)+sol2.t(end)+sol3.t(end)];
-end
+%------------- END OF CODE --------------
