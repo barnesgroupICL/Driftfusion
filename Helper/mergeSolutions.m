@@ -29,31 +29,41 @@ function sol = mergeSolutions(varargin)
 % (at your option) any later version.
 %
 %------------- BEGIN CODE --------------
-    xPointsNumber = zeros(1, length(varargin));
-    varsNumber = zeros(1, length(varargin));
-    for i = 1:length(varargin)
-        xPointsNumber(i) = size(varargin{i}.u, 2);
-        varsNumber(i) = size(varargin{i}.u, 3);
-    end
-    assert(~range(xPointsNumber), [mfilename ' - The provided solutions does not have the same number of spatial points.']);
-    assert(~range(varsNumber), [mfilename ' - The provided solutions does not have the same number of variables.']);
 
-    sol.u = [];
-    sol.x = varargin{end}.x;
-    sol.par = varargin{end}.par;
-    sol.par.t0 = varargin{1}.par.t0;
-    sol.t = [];
-    start_time = 0;
-    tpoints = 0;
-    for i = 1:length(varargin)
-        sol.u = cat(1, sol.u, varargin{i}.u);
-        tmesh = start_time + varargin{i}.t;
-        sol.t = [sol.t, tmesh];
-        start_time = tmesh(end);
-        tpoints = tpoints + varargin{i}.par.tpoints;
-    end
-    sol.par.tmax = start_time;
-    sol.par.tpoints = tpoints;
+xPointsNumber = zeros(1, length(varargin));
+varsNumber = zeros(1, length(varargin));
+for i = 1:length(varargin)
+    xPointsNumber(i) = size(varargin{i}.u, 2);
+    varsNumber(i) = size(varargin{i}.u, 3);
+end
+assert(~range(xPointsNumber), [mfilename ' - The provided solutions does not have the same number of spatial points.']);
+assert(~range(varsNumber), [mfilename ' - The provided solutions does not have the same number of variables.']);
+
+% use the first time point of the first input for preallocating
+sol.u = varargin{i}.u(1,:,:);
+sol.t = varargin{i}.t(1);
+tpoints = 1;
+
+sol.x = varargin{end}.x;
+sol.par = varargin{end}.par;
+sol.par.t0 = varargin{1}.par.t0;
+start_time = 0;
+
+for i = 1:length(varargin)
+    % discard all the first timepoints for each input: the one from the first
+    % input is already included during the preallocation, while the others
+    % can be discarded as they (should be) just duplicate of the last
+    % timepoint of the previous input
+    sol.u = cat(1, sol.u, varargin{i}.u(2:end,:,:));
+    tmesh = start_time + varargin{i}.t(2:end);
+    sol.t = [sol.t, tmesh];
+    start_time = tmesh(end);
+    % subtract one as we're excluding the first timepoint
+    tpoints = tpoints + varargin{i}.par.tpoints - 1;
+end
+sol.par.tmax = start_time;
+sol.par.tpoints = tpoints;
+
 end
 
 %------------- END OF CODE --------------
