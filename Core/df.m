@@ -68,6 +68,10 @@ T = par.T;
 q = par.q;
 epp0 = par.epp0;
 
+%% Device parameters
+N_variables = par.N_ionic_species + 3;  % Number of variables in this solution (+3 for V, n, and p)
+N_max_variables = par.N_max_variables;  % Maximum number of variables in this version
+
 %% Switches and accelerator coefficients
 mobset = par.mobset;        % Electronic carrier transport switch
 mobseti = par.mobseti;      % Ionic carrier transport switch
@@ -142,6 +146,10 @@ Vapp = 0;
 Vres = 0;
 Jr = 0;
 
+%% Initialise solution arrays
+u_maxvar = zeros(N_max_variables, 1);
+dudx_maxvar = zeros(N_max_variables, 1);
+
 %% Solver options
 % MaxStep = limit maximum time step size during integration
 options = odeset('MaxStep', par.MaxStepFactor*0.1*par.tmax, 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
@@ -162,9 +170,6 @@ int2gx2 = int2*gx2;
 % S_potential prefactor
 q_over_eppmax_epp0 = q/(eppmax*epp0);
 
-% pre-calculation S_potential static charge
-NANDNaniNcat = -NA+ND+Nani-Ncat;
-
 % pre-calculate kB*T
 kBT = kB*T;
 
@@ -180,6 +185,7 @@ g1_fun_type_constant = g1_fun_type == "constant";
 g2_fun_type_constant = g2_fun_type == "constant";
 
 % C: Time-dependence prefactor term
+% NANDNaniNcat: pre-calculation S_potential static charge
 switch N_ionic_species
     case 1
         C_potential = 0;
@@ -187,7 +193,7 @@ switch N_ionic_species
         C_hole = 1;
         C_cation = 1;
         Cpre = [C_potential; C_electron; C_hole; C_cation];
-        N_ionic_species_two = false;
+        NANDNaniNcat = -NA+ND-Ncat;
     case 2
         C_potential = 0;
         C_electron = 1;
@@ -195,13 +201,13 @@ switch N_ionic_species
         C_cation = 1;
         C_anion = 1;
         Cpre = [C_potential; C_electron; C_hole; C_cation; C_anion];
-        N_ionic_species_two = true;
+        NANDNaniNcat = -NA+ND+Nani-Ncat;
     otherwise
         C_potential = 0;
         C_electron = 1;
         C_hole = 1;
         Cpre = [C_potential; C_electron; C_hole];
-        N_ionic_species_two = false;
+        NANDNaniNcat = -NA+ND;
 end
 
 %% Call solver
@@ -237,80 +243,56 @@ function [C,F,S] = dfpde(x,t,u,dudx)
         gxt2 = g2_fun(g2_fun_arg, t)*gx2(i);
     end
 
+    %% Unpack Variables
+    u_maxvar(1:N_variables) = u;
+    dudx_maxvar(1:N_variables) = dudx;
+    
     %% Equation editor
-
+    
+    % F: Flux terms
+    
     % F_potential: Flux term for potential
     % dudx(1) is dVdx gradient of electrostatic potential, electric field
-    F_potential = epp_norm(i)*dudx(1);
-
+    F_potential = epp_norm(i)*dudx_maxvar(1);
     % F_electron: Flux term for electrons
     % u(2) is n, electron concentration
     % dudx(1) is dVdx gradient of electrostatic potential, electric field
     % dudx(2) is dndx, gradient of electrons concentration
-    F_electron = mobset*(mue(i)*u(2)*(-dudx(1) + gradEA(i)) + Dn(i)*(dudx(2) - u(2)*gradNc_over_Nc(i)));
-
+    F_electron = mobset*(mue(i)*u_maxvar(2)*(-dudx_maxvar(1) + gradEA(i)) + Dn(i)*(dudx_maxvar(2) - u_maxvar(2)*gradNc_over_Nc(i)));
     % F_hole: Flux term for holes
     % u(3) is p, holes concentration
     % dudx(1) is dVdx gradient of electrostatic potential, electric field
     % dudx(3) is dpdx, gradient of holes concentration
-    F_hole = mobset*(muh(i)*u(3)*(dudx(1) - gradIP(i)) + Dp(i)*(dudx(3) - u(3)*gradNv_over_Nv(i)));
-
+    F_hole = mobset*(muh(i)*u_maxvar(3)*(dudx_maxvar(1) - gradIP(i)) + Dp(i)*(dudx_maxvar(3) - u_maxvar(3)*gradNv_over_Nv(i)));
+    % F_cation: Flux term for cations
+    % u(4) is mobile cation concentration
+    % dudx(1) is dVdx gradient of electrostatic potential, electric field
+    % dudx(4) is dcdx, gradient of mobile cation concentration
+    F_cation = K_cation*mobseti*mucat(i)*(u_maxvar(4)*dudx_maxvar(1) + kBT*dudx_maxvar(4)*(1 + u_maxvar(4)/(DOScat(i)-u_maxvar(4))));
+    % F_anion: Flux term for anions
+    % u(5) is anion concentration
+    % dudx(1) is dVdx gradient of electrostatic potential, electric field
+    % dudx(5) is dadx, gradient of mobile anion concentration
+    F_anion = K_anion*mobseti*muani(i)*(u_maxvar(5)*-dudx_maxvar(1) + kBT*dudx_maxvar(5)*(1 + u_maxvar(5)/(DOSani(i)-u_maxvar(5))));
+    F = [F_potential; F_electron; F_hole; F_cation; F_anion];
+    
+    % Source terms
+    
+    % S_potential: Source term for potential
+    % u(2) is n, electron concentration; u(3) is p, holes concentration
+    % u(4) is mobile cation concentration; u(5) is mobile anion concentration
+    % NANDNaniNcat is -NA+ND+Nani-Ncat
+    S_potential = q_over_eppmax_epp0*(-u_maxvar(2)+u_maxvar(3)-u_maxvar(5)+u_maxvar(4)+NANDNaniNcat(i));
     % S_electron_hole: Source term for electrons and for holes
     % u(2) is n, electron concentration; u(3) is p, holes concentration
-    S_electron_hole = gxt1 + gxt2 - radset*B(i)*(u(2)*u(3)-ni_squared(i)) - SRHset*(u(2)*u(3)-ni_squared(i))/(taun(i)*(u(3)+pt(i)) + taup(i)*(u(2)+nt(i)));
-
-    if N_ionic_species % Condition for cation and anion terms
-        % F_cation: Flux term for cations
-        % u(4) is mobile cation concentration
-        % dudx(1) is dVdx gradient of electrostatic potential, electric field
-        % dudx(4) is dcdx, gradient of mobile cation concentration
-        F_cation = K_cation*mobseti*mucat(i)*(u(4)*dudx(1) + kBT*dudx(4)*(1 + u(4)/(DOScat(i)-u(4))));
-
-        if N_ionic_species_two % Condition for anion terms
-            % F_anion: Flux term for anions
-            % u(5) is anion concentration
-            % dudx(1) is dVdx gradient of electrostatic potential, electric field
-            % dudx(5) is dadx, gradient of mobile anion concentration
-            F_anion = K_anion*mobseti*muani(i)*(u(5)*-dudx(1) + kBT*dudx(5)*(1 + u(5)/(DOSani(i)-u(5))));
-
-            % F: Flux terms
-            F = [F_potential; F_electron; F_hole; F_cation; F_anion];
-            
-            % S_potential: Source term for potential
-            % u(2) is n, electron concentration; u(3) is p, holes concentration
-            % u(4) is mobile cation concentration; u(5) is mobile anion concentration
-            % NANDNaniNcat is -NA+ND+Nani-Ncat
-            S_potential = q_over_eppmax_epp0*(-u(2)+u(3)-u(5)+u(4)+NANDNaniNcat(i));
-
-            % S: Source terms
-            S = [S_potential; S_electron_hole; S_electron_hole; 0; 0];
-        else
-            % F: Flux terms
-            F = [F_potential; F_electron; F_hole; F_cation];
-
-            % S_potential: Source term for potential
-            % u(2) is n, electron concentration; u(3) is p, holes concentration
-            % u(4) is mobile cation concentration; Nani is fixed anion concentration
-            % Nani(i) is fixed anion, NANDNaniNcat is -NA+ND+Nani-Ncat
-            S_potential = q_over_eppmax_epp0*(-u(2)+u(3)-Nani(i)+u(4)+NANDNaniNcat(i));
-
-            % S: Source terms
-            S = [S_potential; S_electron_hole; S_electron_hole; 0];
-        end
-    else
-        % F: Flux terms
-        F = [F_potential; F_electron; F_hole];
-
-        % S_potential: Source term for potential
-        % Ncat(i) is fixed cation concentration, Nani(i) is fixed anion concentration
-        % NANDNaniNcat is -NA+ND+Nani-Ncat
-        S_potential = q_over_eppmax_epp0*(-u(2)+u(3)-Nani(i)+Ncat(i)+NANDNaniNcat(i));
-
-        % S: Source terms
-        S = [S_potential;S_electron_hole;S_electron_hole];
-        
-        
-    end
+    S_electron_hole = gxt1 + gxt2 - radset*B(i)*(u_maxvar(2)*u_maxvar(3)-ni_squared(i)) - SRHset*(u_maxvar(2)*u_maxvar(3)-ni_squared(i))/(taun(i)*(u_maxvar(3)+pt(i)) + taup(i)*(u_maxvar(2)+nt(i)));
+    S = [S_potential; S_electron_hole; S_electron_hole; 0; 0];
+    
+    % Remove unused variables - faster and tidier than using conditional
+    % statements
+    F = F(1:N_variables);
+    S = S(1:N_variables);
+    
     % increase position index for next iteration
     i = i+1;
 end

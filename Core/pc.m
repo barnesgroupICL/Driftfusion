@@ -90,6 +90,7 @@ classdef pc
         SRHset = 1;
         radset = 1;
         JV = 0;                 % Toggle run JV scan on/off
+        N_max_variables = 5;                % Total number of allowable variables in this version of Driftfusion
         prob_distro_function = 'Boltz';        % 'Fermi' = Fermi-Dirac, % 'Boltz' = Boltzmann statistics
         Fermi_limit = 0.2;      % Max allowable limit for Fermi levels beyond the bands [eV]
         Fermi_Dn_points = 400;  % No. of points in the Fermi-Dirac look-up table
