@@ -108,20 +108,7 @@ end
 legend(h, legendarr, 'Location', 'northeast')
 legend boxoff
 
-valid_name = true;
-try
-    java.io.File(dir_file_name).toPath;
-catch
-    valid_name = false;
-end
-if ~isempty(dir_file_name) && valid_name
-    dirname = fileparts(dir_file_name);
-    if ~isempty(dirname) && 7~=exist(dirname,'dir')
-        mkdir(dirname)
-    end
-    saveas(fig, [char(dir_file_name) char(['-IS_' type '.fig'])])
-    saveas(fig, [char(dir_file_name) char(['-IS_' type '.png'])])
-end
+savefig_todir(fig, dir_file_name, ['-IS_' type]);
 
 end
 

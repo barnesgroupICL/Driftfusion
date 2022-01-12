@@ -85,21 +85,7 @@ ylim([ymin-0.03*range, ymax+0.03*range])
 legend(legendarr,'Location','southeast')
 legend boxoff
 
-
-valid_name = true;
-try
-    java.io.File(dir_file_name).toPath;
-catch
-    valid_name = false;
-end
-if ~isempty(dir_file_name) && valid_name
-    dirname = fileparts(dir_file_name);
-    if ~isempty(dirname) && 7~=exist(dirname,'dir')
-        mkdir(dirname)
-    end
-    saveas(fig, [char(dir_file_name) char('-SDP.fig')])
-    saveas(fig, [char(dir_file_name) char('-SDP.png')])
-end
+savefig_todir(fig, dir_file_name, '-SDP');
 
 end
 

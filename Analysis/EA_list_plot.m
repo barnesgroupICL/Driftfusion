@@ -80,20 +80,7 @@ ylabel('Abs(E_{AC}^2) [V^2/cm^2]');
 legend(legendarr, 'Location', 'southeast')
 legend boxoff
 
-valid_name = true;
-try
-    java.io.File(dir_file_name).toPath;
-catch
-    valid_name = false;
-end
-if ~isempty(dir_file_name) && valid_name
-    dirname = fileparts(dir_file_name);
-    if ~isempty(dirname) && 7~=exist(dirname,'dir')
-        mkdir(dirname)
-    end
-    saveas(fig, [char(dir_file_name) char(['-EA_' type '.fig'])])
-    saveas(fig, [char(dir_file_name) char(['-EA_' type '.png'])])
-end
+savefig_todir(fig, dir_file_name, ['-EA_' type]);
 
 end
 
