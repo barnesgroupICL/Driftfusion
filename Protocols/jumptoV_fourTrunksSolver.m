@@ -58,8 +58,8 @@ if nargin < 6
         maxDepth = Inf;
     end
 end
-t_diff = max((par.d.^2)./(2*par.kB*par.T*min(par.mu_n, par.mu_p)));
-t_cationdiff = (par.d.^2)./(2*par.kB*par.T*par.mu_c);
+t_diff = max((par.d.^2)./(2*par.kB*par.T*min(par.mue, par.muh)));
+t_cationdiff = (par.d.^2)./(2*par.kB*par.T*par.mucat);
 t_cationdiff = max(t_cationdiff(isfinite(t_cationdiff)));
 
 if nargin < 4
