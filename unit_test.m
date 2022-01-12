@@ -504,22 +504,6 @@ parx.meshx_figon = true;
 parx.xmesh_type = 1;
 meshgen_x(parx);
 
-%% Core meshgen_x 2
-
-% x = meshgen_x(par)
-parx = par;
-parx.meshx_figon = true;
-parx.xmesh_type = 2;
-meshgen_x(parx);
-
-%% Core meshgen_x 3
-
-% x = meshgen_x(par)
-parx = par;
-parx.meshx_figon = true;
-parx.xmesh_type = 3;
-meshgen_x(parx);
-
 %% Core meshgen_x 4
 
 % x = meshgen_x(par)
