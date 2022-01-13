@@ -140,6 +140,7 @@ for i = 1:length(tdwell_arr)
     if firstRun || brokenRun
         par_dwell.tmax = tdwell_arr(i);
         sol_dwell = df(sol_jump, par_dwell);
+        firstRun = false;
         if size(sol_dwell.u,1) == par_dwell.tpoints
             brokenRun = false;
         end
