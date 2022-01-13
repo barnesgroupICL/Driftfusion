@@ -806,8 +806,8 @@ doIMVS(soleq.ion, 0.2, 0.2, 1, 10, 50);
 %% Protocols doIS_EA, helper and analysis
 
 % struct_IS = doIS_EA(struct_Int, deltaV, freq, periods, tpoints_per_period, stability_timefraction, RelTol)
-is_ea_10mHz_100mV = doIS_EA(soleq.ion, 0.1, 1e-3, 20, 40, 0.5, 1e-6);
-is_ea_2ions_10mHz_100mV = doIS_EA(soleq_2ions.ion, 0.1, 1e-3, 20, 40, 0.5, 1e-6);
+is_ea_10mHz_100mV = doIS_EA(soleq.ion, 2e-3, 1e-3, 20, 40, 0.5, 1e-4);
+is_ea_2ions_10mHz_100mV = doIS_EA(soleq_2ions.ion, 2e-3, 1e-3, 20, 40, 0.5, 1e-4);
 doIS_EA(soleq.ion, 0.1, 1e-3, 1, 40, 0.5, 1e-6);
 
 % IS_EA_struct_exporter(prefix, struct)
@@ -939,16 +939,16 @@ transient_nid_ana(sol_OC);
 % sol = VappFunction(sol_ini, Vapp_func, Vapp_coeff, tmax, tpoints, logtime)
 
 % coeff(1);
-VappFunction(soleq.ion, 'constant', 0.2, 10, 30, false);
+VappFunction(soleq.ion, 'constant', 0.01, 10, 30, false);
 
 % coeff(1) + (coeff(2)-coeff(1))*t/coeff(3);
-VappFunction(soleq.ion, 'sweep', [0.1, 1, 5], 10, 30, false);
+VappFunction(soleq.ion, 'sweep', [0, 1, 5], 10, 30, false);
 
 % coeff(1) + (coeff(2)-coeff(1))*lt(mod(t,coeff(3))*1/coeff(3),coeff(4)/100);
-VappFunction(soleq.ion, 'square', [0, 0.005, 5, 30], 10, 30, false);
+VappFunction(soleq.ion, 'square', [0, 0.001, 5, 30], 10, 30, false);
 
 % coeff(1) + coeff(2)*(sin(2*pi*coeff(3)*t + coeff(4)));
-VappFunction(soleq.ion, 'sin', [0.01, 1e-2, 1, 0], 10, 30, false);
+VappFunction(soleq.ion, 'sin', [0, 1e-2, 1, 0], 10, 30, false);
 
 % COEFF = [OFFSET, V1, V2, periods, tperiod]
 % triangle_fun(coeff, t);
