@@ -43,7 +43,7 @@ function coeff = EA_ana_plot(struct_IS_EA, do_graphics, local_field, demodulatio
 %     field, each column is a space point
 %
 % Example:
-%   EA_ana_plot(doIS_EA(soleq.ion, 1, 2e-3, 1e6, 20, 40, 0, 1e-4), true, true, true, missing)
+%   EA_ana_plot(doIS_EA(soleq.ion, 2e-3, 1e6, 20, 40, 0.5, 1e-4), true, true, true, missing)
 %     do simulation and plot, do not save images to files
 %   EA_ana_plot(sol_i_eq_SR_ea_800mV_10mHz, true, true, true, ".")
 %     do plot, save images to current directory
