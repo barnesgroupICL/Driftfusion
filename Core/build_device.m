@@ -15,7 +15,7 @@ switch meshoption
     case 'iwhole'
         xmesh = par.xx;
     case 'ihalf'
-        xmesh = getvarihalf(par.xx);
+        xmesh = par.x_ihalf;
 end
 
 % Constant properties

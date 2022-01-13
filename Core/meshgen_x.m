@@ -48,7 +48,8 @@ switch par.xmesh_type
             if any(strcmp(par.layer_type{1,i}, {'layer', 'active'}))
                 parr = -0.5 : (1/p(i)) : 0.5;
                 x_layer = erf(2*pi*xmesh_coeff(i)*parr);
-                x_layer = normalize(x_layer,'range');
+                x_layer = x_layer - x_layer(1);       % Subtract base to get zero
+                x_layer  = x_layer./max(x_layer);   % Normalise the funciton
                 x_layer = dcum0(i) + x_layer * d(i);
                 xcell{i} = x_layer(1:end-1);
             elseif strcmp(par.layer_type{1,i}, 'junction')

@@ -27,7 +27,7 @@ elseif length(varargin) == 1
     % If one input argument then assume it is the Initial Conditions (IC) solution
     icsol = varargin{1, 1}.u;
     icx = varargin{1, 1}.x;
-    par = pc;
+    par = varargin{1, 1}.par;
     dficAnalytical = false;
 elseif length(varargin) == 2
     if max(max(max(varargin{1, 1}.u))) == 0
@@ -152,13 +152,13 @@ dudx_maxvar = zeros(N_max_variables, 1);
 
 %% Solver options
 % MaxStep = limit maximum time step size during integration
-options = odeset('MaxStep', par.MaxStepFactor*0.1*par.tmax, 'RelTol', par.RelTol, 'AbsTol', par.AbsTol, 'NonNegative', [1,1,1,0]);
+options = odeset('MaxStep', par.MaxStepFactor*0.1*par.tmax, 'RelTol', par.RelTol, 'AbsTol', par.AbsTol);
 
 %% Prepare variables for solver
 
 % the index of position i has to be defined outside the loop so that
 % its value does not get destroyed when one iteration is over
-i = 0;
+i = 1;
 
 % normalise epp
 epp_norm = epp/eppmax;
@@ -299,14 +299,14 @@ end
 
 %% Define initial conditions.
     function u0 = dfic(x)
-        
+        % reset position point
+        if x == xmesh(1)
+            i = 1;
+        end
+            
         if dficAnalytical
             
-            % reset position point
-            if x == xmesh(1)
-                i = 1;
-            end
-            
+
             switch N_ionic_species
                 case 0
                     if length(par.dcell) == 1
@@ -352,9 +352,6 @@ end
                             dev.Nani(i);];
                     end
             end
-            
-            % increase position index for next iteration
-            i = i+1;
         else
             switch par.N_ionic_species
                 case 0
@@ -366,6 +363,8 @@ end
                     u0 = interp1(icx,squeeze(icsol(end,:,:)),x)';
             end
         end
+        % increase position index for next iteration
+        i = i+1;
     end
 
 %% Boundary conditions

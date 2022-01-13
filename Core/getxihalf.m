@@ -11,6 +11,7 @@ function xsolver = getxihalf(sol)
 %
 %% Start code
 x = sol.par.xx;
+xsolver = zeros(1, length(x)-1);
 for i = 1:length(x)-1
     xsolver(i) = x(i)+((x(i+1)-x(i))/2);
 end
