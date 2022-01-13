@@ -29,11 +29,19 @@ initialise_df
 %input_csv = 'Input_files/ptpd_mapi_pcbm.csv';
 % a structure written for testing puroposes
 input_csv = 'Input_files/unit_test_ptpd_mapi_pcbm.csv';
+input_csv_2ions = 'Input_files/unit_test_ptpd_mapi_pcbm_2ions.csv';
 
 % par = pc(varargin)
 par = pc(input_csv);
+par_2ions = pc(input_csv_2ions);
+
 % soleq = equilibrate(varargin)
 soleq = equilibrate(par);
+soleq_2ions = equilibrate(par_2ions);
+
+% broken solution
+broken_sol = soleq.ion;
+broken_sol.u = broken_sol.u(1,:,:);
 
 % [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
 structs_sc = genIntStructs(soleq.ion, 1e-2, 1, 2, true);
@@ -623,7 +631,7 @@ IS_list_plot('nyquist', folderName,...
     IS_dark1, 'frozen ions',{'--r'},...
     IS_dark2, 'sequential',{':k','LineWidth',3});
 % non existing type
-IS_list_plot('invalid', folderName,...
+IS_list_plot('Invaaaaalid. Error_expected.', folderName,...
     IS_dark1, 'frozen ions',{'--r'},...
     IS_dark2, 'sequential',{':k','LineWidth',3});
 % savefig_todir(H, dir_file_name, suffix) invalid folder name
@@ -654,7 +662,7 @@ EA_list_plot('1h', folderName,...
 EA_list_plot('phase', folderName,...
     EA_dark1, 'frozen_ions',{':r','LineWidth',3},...
     EA_dark2, 'mobile ions',{'-k'});
-EA_list_plot('invalid', folderName,...
+EA_list_plot('Invaaaaalid. Error_expected.', folderName,...
     EA_dark1, 'frozen_ions',{':r','LineWidth',3},...
     EA_dark2, 'mobile ions',{'-k'});
 EA_list_plot('phase', '!"$%&/()\=\\\?',...
@@ -669,9 +677,9 @@ EA_script_plot_phase(EA_sc, folderName);
 
 %% Scripts SDP and helper
 
-% sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions, solver_split_pulse)
-sdpsol1 = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, true, true);
-sdpsol2 = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, false, false);
+% sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
+sdpsol1 = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, true);
+sdpsol2 = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, false);
 
 % SDP_script_exporter(prefix, varargin)
 SDP_script_exporter('unit_testing_deleteme', sdpsol1, sdpsol2);
@@ -688,9 +696,6 @@ SDP_list_plot(1e-7, 'unit_testing_deleteme',...
 
 % [JV_ana, r0, k_rad, Voc, g0] = calcR0(EgArr, Jsc_vs_Eg, par)
 calcR0(EgArr, Jsc_vs_Eg, par);
-
-% [G0_Arr, k_rad_Arr, R0_Arr, Eg, VocArr, DeltaVoc] = Eg_vs_Voc(EgArr, Jsc_vs_Eg)
-Eg_vs_Voc(EgArr, Jsc_vs_Eg);
 
 %% Helper explore plotPL
 
@@ -802,6 +807,8 @@ doIMVS(soleq.ion, 0.2, 0.2, 1, 10, 50);
 
 % struct_IS = doIS_EA(struct_Int, deltaV, freq, periods, tpoints_per_period, stability_timefraction, RelTol)
 is_ea_10mHz_100mV = doIS_EA(soleq.ion, 0.1, 1e-3, 20, 40, 0.5, 1e-6);
+is_ea_2ions_10mHz_100mV = doIS_EA(soleq_2ions.ion, 0.1, 1e-3, 20, 40, 0.5, 1e-6);
+doIS_EA(soleq.ion, 0.1, 1e-3, 1, 40, 0.5, 1e-6);
 
 % IS_EA_struct_exporter(prefix, struct)
 IS_EA_struct_exporter('unit_testing_deleteme', is_ea_10mHz_100mV);
@@ -809,10 +816,14 @@ IS_EA_struct_exporter('unit_testing_deleteme', is_ea_10mHz_100mV);
 % coeff = EA_ana_plot(struct_IS_EA, do_graphics, local_field, demodulation, savefig_dir)
 EA_ana_plot(is_ea_10mHz_100mV, true, true, true, "unit_testing_deleteme");
 EA_ana_plot(is_ea_10mHz_100mV, false, false, false, missing);
+EA_ana_plot(is_ea_10mHz_100mV, false, true, false, missing);
+EA_ana_plot(broken_sol, false, false, true, missing);
 
 % coeff = IS_ana_plot(s, do_graphics, demodulation)
 IS_ana_plot(is_ea_10mHz_100mV, true, true);
 IS_ana_plot(is_ea_10mHz_100mV, false, false);
+IS_ana_plot(broken_sol, false, true);
+IS_ana_plot(is_ea_2ions_10mHz_100mV, false, true);
 
 J = dfana.calcJ(is_ea_10mHz_100mV).tot(:,end);
 % coeff = IS_EA_ana_demodulation(t, y, fun_type, freq)
@@ -840,8 +851,8 @@ anasdp(sdpsol, 1);
 
 %% Protocols doSDP_alt
 
-% sdp = doSDP_alt(sol_ini, sol_jump_is_given, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions, solver_split_pulse)
-sdpsol = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, true, true);
+% sdp = doSDP_alt(sol_ini, sol_jump_is_given, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
+sdpsol = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, true);
 
 % anasdp(sdpsol, Jtr_time)
 anasdp(sdpsol, 1e-4);
@@ -872,7 +883,12 @@ findVoc(soleq.ion, 1, true, 0.9, 1.3, 1e-5)
 %% Protocols genIntStructs
 
 % [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
-genIntStructs(soleq.ion, 1e-4, 1, 5, true);
+genIntStructs(soleq.ion, 1e-4, 1, 3, true);
+
+%% Protocols genIntStructsVoc
+
+% [structCell, V_array, J_array] = genIntStructs(struct_eq, startInt, endInt, points, include_dark)
+genIntStructsVoc(soleq.ion, 1e-4, 1, 3, true);
 
 %% Protocols genVappStructs
 
