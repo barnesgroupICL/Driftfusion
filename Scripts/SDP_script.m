@@ -117,6 +117,7 @@ else
 end
 par_pulseTurnOn = lightRampUp(par_dwell, pulse_source, pre_pulse_int, pulse_int);
 par_pulseTurnOn.mobseti = 0;
+par_pulseTurnOn.tpoints = 10;
 par_pulseTurnOn.tmesh_type = 1;
 par_pulseTurnOn.tmax = jump_time;
 
@@ -148,11 +149,9 @@ end
 if unique_dwell
     par_dwell.tmax = max(tdwell_arr);
     par_dwell.t0 = min(tdwell_arr)/10;
-    % unexpectedly, the number of tpoints in the dwell stage is important
-    par_dwell.tpoints = 50;
-    % generate tmesh
+    % generate tmesh with tmesh_type 2
     tmesh = meshgen_t(par_dwell);
-    % custom time mesh
+    % custom time mesh with tmesh_type 5
     par_dwell.tmesh_type = 5;
     % add desired points to tmesh
     par_dwell.t = unique([tdwell_arr, tmesh]);
