@@ -360,7 +360,7 @@ if local_field
             % if the profile is identically zero the fit will return an error, anyway this should
             % never happen
             if sum(abs(fit_AC_ExDC_E_i(:, i)))
-                coeff.i_h1(:, i) = IS_EA_ana_fit(fit_t, fit_AC_ExDC_E_i(:, i), s.par.J_E_func);
+                coeff.i_h1(:, i) = IS_EA_ana_fit(fit_t, fit_AC_ExDC_E_i(:, i), s.par.V_fun_type, s.par.V_fun_arg(3));
             else % if the profile is identically zero return amplitudes = zero and phase = not a number
                 coeff.i_h1(:, i) = [0; 0; NaN];
             end

@@ -88,10 +88,6 @@ Vapp_coeff = [Vstart, deltaV, freq, 0];
 
 % functions for fitting
 struct_Int.par.J_E_func = @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + 2 * pi * freq * t);
-%struct_Int.par.J_E_func_tilted = @(coeff, t, tilting, t_middle) struct_Int.par.J_E_func(coeff, t) + tilting * (t - t_middle);
-% double frequency for E squared fitting, useful for Stark spectroscopy
-% (ElectroAbsorption EA) simulation
-%struct_Int.par.E2_func = @(coeff, t) coeff(1) + coeff(2) * sin(-pi/2 + coeff(3) + 4 * pi * freq * t);
 
 %% first run
 disp([mfilename ' - Int: ' num2str(struct_Int.par.int1) '; Vdc: ' num2str(Vapp_arr(end)) ' V; Freq: ' num2str(freq) ' Hz']);

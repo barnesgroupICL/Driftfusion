@@ -226,8 +226,6 @@ classdef pc
         
         %% Impedance parameters
         J_E_func = [];
-        J_E_func_tilted = [];
-        E2_func = [];
     end
 
     %%  Properties whose values depend on other properties (see 'get' methods).
