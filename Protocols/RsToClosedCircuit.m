@@ -14,13 +14,15 @@ function sol_closed = RsToClosedCircuit(sol_Rs)
 par = sol_Rs.par;
 
 % Get QFL splitting at electrode of SOL_RS
-QFLsplit_t = dfana.calcDeltaQFL(sol_Rs);
+QFLsplit_t = dfana.calcVQFL(sol_Rs);
 QFLsplit = QFLsplit_t(end);
 
 par.Rs = 0;
 par.Vapp = QFLsplit;
+par.V_fun_type = 'constant';
+par.V_fun_arg = QFLsplit;
 % Characteristic diffusion time
-t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
+t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mue), min(par.muh)));
 par.tmax = t_diff;
 par.t0 = par.tmax/1e6;
 par.tmesh_type = 2;
