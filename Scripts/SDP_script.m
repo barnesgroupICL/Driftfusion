@@ -1,4 +1,4 @@
-function sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
+function sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, dwell_mode, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
 %SDP_SCRIPT - an alternative script for Step-Dwell-Probe simulations.
 %
 % Syntax:  sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
@@ -13,6 +13,14 @@ function sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, 
 %     before the dwell step, as defined in Optical/beerlambert.m
 %   BIAS_INT - a float, the intensity of the bias illumination. For the AM15
 %     source the 1 is equivalent to 1 sun illumination
+%   DWELL_MODE - a string, when 'separated' each dwell step is calculated
+%     from time zero up to the requested time; when 'sequential' a faster
+%     method is used in which each dwell is an extension of the previous
+%     simulation; when 'unique' all the dwell solutions are extracted from
+%     an unique simulation which includes all the requested dwell times.
+%     Sometimes the three methods could give slightly different results. In
+%     these cases increase the number of points in the time mesh, editing
+%     the code where par_*.tpoints is set.
 %   PULSE_SOURCE - an integer, which illumination source should be turn on 
 %     after the dwell step (the pulse, a.k.a. probe), as defined in Optical/beerlambert.m
 %   PULSE_INT - a float, the intensity of the pulse (a.k.a. probe) illumination. For the AM15
@@ -96,7 +104,8 @@ par_dwell.V_fun_arg = Vjump;
 % thaw ions
 par_dwell.mobseti = 1;
 par_dwell.tmesh_type = 2;
-par_dwell.t0 = jump_time/10;
+% unexpectedly, the number of tpoints in the dwell stage is important
+par_dwell.tpoints = 50;
 
 % usually, two different light sources are used for the bias and the probe,
 % but if this is not the case, the ramp up should start from the already
@@ -125,34 +134,74 @@ Jtr = zeros(par_pulseKeepOn.tpoints, length(tdwell_arr));
 t_Jtr = zeros(par_pulseKeepOn.tpoints, length(tdwell_arr));
 Jdk = zeros(1,length(tdwell_arr));
 
-firstRun = true;
-brokenRun = true;
+switch dwell_mode
+    case 'separated'
+        unique_dwell = false;
+        sequential_dwell = false;
+    case 'sequential'
+        unique_dwell = false;
+        sequential_dwell = true;
+    case 'unique'
+        unique_dwell = true;
+end
+
+if unique_dwell
+    par_dwell.tmax = max(tdwell_arr);
+    par_dwell.t0 = min(tdwell_arr)/10;
+    % unexpectedly, the number of tpoints in the dwell stage is important
+    par_dwell.tpoints = 50;
+    % generate tmesh
+    tmesh = meshgen_t(par_dwell);
+    % custom time mesh
+    par_dwell.tmesh_type = 5;
+    % add desired points to tmesh
+    par_dwell.t = unique([tdwell_arr, tmesh]);
+    par_dwell.tpoints = length(par_dwell.t);
+    sol_dwell_unique = df(sol_jump, par_dwell);
+    sol_dwell.x = sol_dwell_unique.x;
+else
+    firstRun = true;
+    brokenRun = true;
+end
 
 for i = 1:length(tdwell_arr)
-    disp(['SDP tdwell = ' num2str(tdwell_arr(i))])
-    if ~firstRun
-        par_dwell.tmax = tdwell_arr(i) - tdwell_arr(i-1);
-        sol_dwell = df(sol_dwell, par_dwell);
-        if size(sol_dwell.u,1) == par_dwell.tpoints
-            brokenRun = false;
+    if unique_dwell
+        tpoints_before_requested_time = sol_dwell_unique.t <= tdwell_arr(i);
+        sol_dwell.t = sol_dwell_unique.t(tpoints_before_requested_time);
+        sol_dwell.u = sol_dwell_unique.u(tpoints_before_requested_time,:,:);
+        sol_dwell.par = sol_dwell_unique.par;
+        sol_dwell.par.tpoints = length(sol_dwell.t);
+    else
+        disp(['SDP tdwell = ' num2str(tdwell_arr(i)) ' - Dwell'])
+        if ~firstRun && sequential_dwell
+            par_dwell.tmax = tdwell_arr(i) - tdwell_arr(i-1);
+            par_dwell.t0 = par_dwell.tmax / 20;
+            sol_dwell = df(sol_dwell, par_dwell);
+            if size(sol_dwell.u,1) == par_dwell.tpoints
+                brokenRun = false;
+            end
+        end
+        if firstRun || brokenRun || ~sequential_dwell
+            par_dwell.tmax = tdwell_arr(i);
+            % we care just about the final timepoint of the dwell, so a too
+            % large t0 should not be a problem here
+            par_dwell.t0 = par_dwell.tmax / 20;
+            sol_dwell = df(sol_jump, par_dwell);
+            firstRun = false;
+            if size(sol_dwell.u,1) == par_dwell.tpoints
+                brokenRun = false;
+            end
+        end
+        if brokenRun
+            sol_dwell = runDfFourTrunks(sol_jump, par_dwell);
         end
     end
-    if firstRun || brokenRun
-        par_dwell.tmax = tdwell_arr(i);
-        sol_dwell = df(sol_jump, par_dwell);
-        firstRun = false;
-        if size(sol_dwell.u,1) == par_dwell.tpoints
-            brokenRun = false;
-        end
-    end
-    if brokenRun
-        sol_dwell = runDfFourTrunks(sol_jump, par_dwell);
-    end
+
     
-    disp('Pulse turn on')
+    disp(['SDP tdwell = ' num2str(tdwell_arr(i)) ' - Pulse turn on'])
     sol_pulseTurnOn = runDfLoosenTolAndReduceMaxStepFactor(sol_dwell, par_pulseTurnOn);
     
-    disp('Pulse keep on')
+    disp(['SDP tdwell = ' num2str(tdwell_arr(i)) ' - Pulse keep on'])
     sol_pulseKeepOn = df(sol_pulseTurnOn, par_pulseKeepOn);
     if size(sol_pulseKeepOn.u,1) ~= par_pulseKeepOn.tpoints
         sol_pulseKeepOn = runDfFourTrunks(sol_pulseTurnOn, par_pulseKeepOn);
