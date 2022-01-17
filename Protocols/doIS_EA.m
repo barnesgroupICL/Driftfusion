@@ -86,9 +86,6 @@ Vstart = Vapp_arr(end);
 Vapp_func = 'sin';
 Vapp_coeff = [Vstart, deltaV, freq, 0];
 
-% functions for fitting
-struct_Int.par.J_E_func = @(coeff, t) coeff(1) + coeff(2) * sin(coeff(3) + 2 * pi * freq * t);
-
 %% first run
 disp([mfilename ' - Int: ' num2str(struct_Int.par.int1) '; Vdc: ' num2str(Vapp_arr(end)) ' V; Freq: ' num2str(freq) ' Hz']);
 struct_IS = VappFunction(struct_Int, Vapp_func, Vapp_coeff, tmax, tpoints, logtime);

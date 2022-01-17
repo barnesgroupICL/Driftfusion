@@ -408,11 +408,11 @@ if do_graphics % disable all this stuff if under parallelization or if explicitl
         hold off
         h(2) = plot(s.t, AC_ExDC_E_mean, 'b');
         hold on
-        h(3) = plot(fit_t, s.par.J_E_func(coeff.h1_mean, fit_t), 'kx-');
+        h(3) = plot(fit_t, Vapp_func([coeff.h1_mean(1),coeff.h1_mean(2),s.par.V_fun_arg(3),coeff.h1_mean(3)], fit_t), 'kx-');
         legend_array = [legend_array, "Averaged E field", "E field fit"];
 %         if s.par.mucat % if there was ion mobility, E field due to ions have been calculated, plot stuff
 %             h(4) = plot(s.t, AC_ExDC_E_i_mean, 'g-');
-%             h(5) = plot(fit_t, s.par.J_E_func(i_coeff_1h_mean, fit_t), 'kx-');
+%             h(5) = plot(fit_t, Vapp_func([coeff.i_coeff_1h_mean(1),coeff.i_coeff_1h_mean(2),s.par.V_fun_arg(3),coeff.i_coeff_1h_mean(3)], fit_t), 'kx-');
 %             legend_array = [legend_array, "Ionic E field", "Ionic E field fit"];
 %         end
         ylabel('E_{AC} x E_{DC} amplitude [V^2/cm^2]');
@@ -433,7 +433,6 @@ if do_graphics % disable all this stuff if under parallelization or if explicitl
         hold off
         h(2) = plot(s.t, AC_Efield2_mean, 'b');
         hold on
-%        h(3) = plot(fit_t, s.par.E2_func(coeff.h2_mean, fit_t), 'kx-');
         h(3) = plot(fit_t, Vapp_func([coeff.h2_mean(1),coeff.h2_mean(2),2*s.par.V_fun_arg(3),coeff.h2_mean(3)], fit_t), 'kx-');
 
         legend_array = [legend_array, "Averaged E^2 field", "E^2 field fit"];

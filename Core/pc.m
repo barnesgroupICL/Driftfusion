@@ -223,9 +223,6 @@ classdef pc
         MaxStepFactor = 1;      % Multiplier for easy access to maximum time step
         RelTol = 1e-3;
         AbsTol = 1e-6;
-        
-        %% Impedance parameters
-        J_E_func = [];
     end
 
     %%  Properties whose values depend on other properties (see 'get' methods).

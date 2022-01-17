@@ -55,16 +55,6 @@ for i = 1:length(t_array)
     [~, t_index(i)] = min(abs(struct.t - t_array(i))); % Finds the index for the time value given
 end
 
-% % copied from pinana
-% V = struct.u(:,:,1);     % electric potential
-% % Calculate energy levels and chemical potential         
-% V = V - p.EA;                                % Electric potential
-% Ecb = p.EA-V-p.EA;  % Conduction band potential
-% n = struct.u(:,:,2);
-% P = struct.u(:,:,3);
-% Efn = real(-V+p.Ei+(p.kB*p.T/p.q)*log(n/p.ni)); % Electron quasi-Fermi level
-% Efp = real(-V+p.Ei-(p.kB*p.T/p.q)*log(P/p.ni)); % Hole quasi-Fermi level
-
 [Ecb, Evb, Efn, Efp] = dfana.QFLs(struct);
 
 Ecb_Vmax = Ecb(t_index(1), :);
@@ -106,10 +96,11 @@ J_accumulating = -dQ_t * 1000; % mA, row
 
 coeff = IS_ana_plot(struct, false, true);
 cJ = coeff.Jtot;
-% in phase electronic current
-Jn_inphase = p.J_E_func([cJ(1)*cos(cJ(3)), cJ(2)*cos(cJ(3)), 0], struct.t);
+% in phase electronic current. p.V_fun_arg(3) is the applied voltage
+% frequency when p.V_fun_type is sin.
+Jn_inphase = Vapp_fun([cJ(1)*cos(cJ(3)), cJ(2)*cos(cJ(3)), p.V_fun_arg(3), 0], struct.t);
 % out of phase electronic current
-Jn_quadrature = p.J_E_func([cJ(1)*sin(cJ(3)), cJ(2)*sin(cJ(3)), pi/2], struct.t);
+Jn_quadrature = Vapp_fun([cJ(1)*sin(cJ(3)), cJ(2)*sin(cJ(3)), p.V_fun_arg(3), pi/2], struct.t);
 
 % recombination current
 r = dfana.calcr(struct); % mA
@@ -120,26 +111,6 @@ if struct.par.mobseti && any(struct.par.mucat)
     headerCurrentIonic = "ionic";%, "nonionic", "nonionic_inphase", "nonionic_outofphase"];
     headerCurrent = [headerCurrent, headerCurrentIonic];
     unitsCurrent = [unitsCurrent, repelem("mA/cm\+(2)", length(headerCurrentIonic))];
-
-    % block taken from IS_single_analysis
-    % Intrinsic points logical array
-%     itype_points= (struct.x >= p.tp & struct.x <= p.tp + p.ti);
-%     % subtract background ion concentration, for having less noise in trapz
-%     i_matrix = struct.u(:, :, 4) - p.NI;
-%     % calculate electric field due to ions
-%     Efield_i = p.e * cumtrapz(struct.x, i_matrix, 2) / p.eppi;
-%     % an average would be enough if the spatial mesh was homogeneous in the
-%     % intrinsic, indeed I have to use trapz for considering the spatial mesh
-%     Efield_i_mean = trapz(struct.x(itype_points), Efield_i(:, itype_points), 2) / p.ti;
-%     % calculate displacement current due to ions
-%     Ji_disp = -p.eppi * gradient(Efield_i_mean, struct.t) * 1000; % in mA, column
-
-    %J_noionic = Jn - Ji_disp; % in mA, column
-    
-    % in phase electronic current
-    %Jn_noionic_inphase =  p.J_E_func([n_noionic_coeff(1)*cos(n_noionic_coeff(3)), n_noionic_coeff(2)*cos(n_noionic_coeff(3)), 0], struct.t);
-    % out of phase electronic current
-    %Jn_noionic_quadrature = p.J_E_func([n_noionic_coeff(1)*sin(n_noionic_coeff(3)), n_noionic_coeff(2)*sin(n_noionic_coeff(3)), pi/2], struct.t);
     data_current = [data_current, J.c(:,end) + J.a(:,end)];%, J_noionic, 1000*Jn_noionic_inphase', 1000*Jn_noionic_quadrature'];
 end
 
