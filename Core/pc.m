@@ -422,7 +422,7 @@ classdef pc
             %   from 1 to 2, and if so, changes PARAMS.tmesh_type to VALUE.
             %   Otherwise, a warning is shown. Runs automatically whenever
             %   tmesh_type is changed.
-            if any(1:1:4 == value)
+            if any(1:1:5 == value)
                 par.tmesh_type = value;
             else
                 error('PARAMS.tmesh_type should be an integer from 1 to 4 inclusive. MESHGEN_T cannot generate a mesh if this is not the case.')

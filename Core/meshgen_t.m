@@ -28,6 +28,9 @@ switch par.tmesh_type
         t2 = t1(end) + logspace(log10(par.t0),log10(par.tmax/2),round(par.tpoints/2));
         t2(end) = par.tmax;
         t = [t1, t2];
+    case 5
+        % the time mesh is provided from the user and not modified here
+        t = par.t;
 end
 
 if par.mesht_figon == 1
