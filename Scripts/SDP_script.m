@@ -1,7 +1,7 @@
 function sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, dwell_mode, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
 %SDP_SCRIPT - an alternative script for Step-Dwell-Probe simulations.
 %
-% Syntax:  sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
+% Syntax:  sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, dwell_mode, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
 %
 % Inputs:
 %   SOL_INI - a single struct created by DF.
@@ -44,7 +44,7 @@ function sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, 
 %     parameters as supplied in the input arguments.
 %
 % Example:
-%   sdpsol_spiro_01sun = SDP_script(soleq_spiro.ion, [logspace(-8,3,56)], 0.6, 1, 0.1, 2, 5.12, 1e-3, true);
+%   sdpsol_spiro_01sun = SDP_script(soleq_spiro.ion, [logspace(-8,3,56)], 0.6, 1, 0.1, 'unique', 2, 5.12, 1e-3, true);
 %     perform 56 SDP simulations using dwell times from 10 ns to 1000 s,
 %     using a voltage step of 0.6 V, illuminating from the primary light
 %     source (AM15 by default) with intensity of 0.1 sun during the dwell
