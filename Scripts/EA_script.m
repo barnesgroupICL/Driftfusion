@@ -64,9 +64,9 @@ end
 
 % don't display figures until the end of the script, as they steal the focus
 % taken from https://stackoverflow.com/questions/8488758/inhibit-matlab-window-focus-stealing
-if do_graphics
-    set(0, 'DefaultFigureVisible', 'off');
-end
+% if do_graphics
+%     set(0, 'DefaultFigureVisible', 'off');
+% end
 
 % which method to use for extracting phase and amplitude of the current.
 % If false: uses fitting. If true: uses demodulation.
@@ -184,8 +184,8 @@ if do_graphics
 end
 
 % make the figures appear, all at the end of the script
-set(0, 'DefaultFigureVisible', 'on');
-figHandles = findall(groot, 'Type', 'figure');
-set(figHandles(:), 'visible', 'on')
+% set(0, 'DefaultFigureVisible', 'on');
+% figHandles = findall(groot, 'Type', 'figure');
+% set(figHandles(:), 'visible', 'on')
 
 %------------- END OF CODE --------------
