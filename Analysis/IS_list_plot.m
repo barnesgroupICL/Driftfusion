@@ -43,6 +43,24 @@ function IS_list_plot(type, dir_file_name, varargin)
 % (at your option) any later version.
 
 %------------- BEGIN CODE --------------
+switch type
+    case 'impedance_re'
+        fig = figure('Name', 'Real impedance Re(Z)', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+    case 'impedance_im'
+        fig = figure('Name', 'Imaginary impedance -Im(Z)', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+    case 'impedance_abs'
+        fig = figure('Name', 'Absolute impedance magnitude |Z|', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+    case 'capacitance'
+        fig = figure('Name', 'Apparent capacitance from EIS', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+    case 'phase'
+        fig = figure('Name', 'Phase of EIS Bode plot', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+    case 'nyquist'
+        fig = figure('Name', 'Nyquist plot of EIS', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+    otherwise
+        error([mfilename(1) ' - *type* option needed'])
+end
+
+hold off
 
 for i = 1:(length(varargin)/3)
     isol = i*3-2;
@@ -50,8 +68,6 @@ for i = 1:(length(varargin)/3)
     options = varargin{isol+2};
     switch type
         case 'impedance_re'
-            fig = figure('Name', 'Real impedance Re(Z)', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
-            hold off
             h(i) = plot(varargin{isol}.Freq, varargin{isol}.impedance_re, options{:});
             xlabel('Frequency [Hz]');
             ylabel('Re(Z) [\Omega cm^2]');
@@ -59,8 +75,6 @@ for i = 1:(length(varargin)/3)
             ax.XScale = 'log'; % for putting the scale in log
             ax.YScale = 'log'; % for putting the scale in log
         case 'impedance_im'
-            fig = figure('Name', 'Imaginary impedance -Im(Z)', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
-            hold off
             h(i) = plot(varargin{isol}.Freq, -varargin{isol}.impedance_im, options{:});
             xlabel('Frequency [Hz]');
             ylabel('-Im(Z) [\Omega cm^2]');
@@ -68,8 +82,6 @@ for i = 1:(length(varargin)/3)
             ax.XScale = 'log'; % for putting the scale in log
             ax.YScale = 'log'; % for putting the scale in log
         case 'impedance_abs'
-            fig = figure('Name', 'Absolute impedance magnitude |Z|', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
-            hold off
             h(i) = plot(varargin{isol}.Freq, varargin{isol}.impedance_abs, options{:});
             xlabel('Frequency [Hz]');
             ylabel('Abs(Z) [\Omega cm^2]');
@@ -77,8 +89,6 @@ for i = 1:(length(varargin)/3)
             ax.XScale = 'log'; % for putting the scale in log
             ax.YScale = 'log'; % for putting the scale in log
         case 'capacitance'
-            fig = figure('Name', 'Apparent capacitance from EIS', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
-            hold off
             h(i) = plot(varargin{isol}.Freq, varargin{isol}.cap, options{:});
             hold on
             plot(varargin{isol}.Freq, -varargin{isol}.cap, options{:}, 'Marker', 'o', 'MarkerSize', 7)
@@ -88,8 +98,6 @@ for i = 1:(length(varargin)/3)
             ax.XScale = 'log'; % for putting the scale in log
             ax.YScale = 'log'; % for putting the scale in log
         case 'phase'
-            fig = figure('Name', 'Phase of EIS Bode plot', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
-            hold off
             phase_n_deg = rad2deg(varargin{isol}.Jtot_phase);
             h(i) = plot(varargin{isol}.Freq, -phase_n_deg, options{:});
             xlabel('Frequency [Hz]');
@@ -97,19 +105,10 @@ for i = 1:(length(varargin)/3)
             ax = gca;
             ax.XScale = 'log'; % for putting the scale in log
         case 'nyquist'
-            fig = figure('Name', 'Nyquist plot of EIS', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
-            hold off
             h(i) = plot(varargin{isol}.impedance_re, -varargin{isol}.impedance_im, options{:});
             xlabel('Re(Z) [\Omega cm^2]');
             ylabel('-Im(Z) [\Omega cm^2]');
-        otherwise
-            error([mfilename(1) ' - *type* option needed'])
     end
-    %ymin = min(ymin, min());
-    %ymax = max(ymax, max());
-    %range = ymax-ymin;
-    %ylim([ymin-0.03*range, ymax+0.03*range])
-    %xlim([min(min(EA_results.Freq)), max(max(EA_results.Freq))])
     hold on
 end
 

@@ -43,36 +43,32 @@ function EA_list_plot(type, dir_file_name, varargin)
 
 %------------- BEGIN CODE --------------
 
+switch type
+    case '1h'
+        fig = figure('Name', 'Amplitude of EA first harmonic E_{AC}*E_{DC}', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+    case '2h'
+        fig = figure('Name', 'Amplitude of EA second harmonic E_{AC}^2', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+    case 'phase'
+        fig = figure('Name', 'Phase of EA first harmonic', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+    otherwise
+        error([mfilename(1) ' - *type* option needed'])
+end
 
-%ymin = Inf;
-%ymax = -Inf;
+hold off
+
 for i = 1:(length(varargin)/3)
     isol = i*3-2;
     legendarr{i} = varargin{isol+1};
     options = varargin{isol+2};
     switch type
         case '1h'
-            fig = figure('Name', 'Amplitude of EA first harmonic E_{AC}*E_{DC}', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
-            hold off
             plot(varargin{isol}.Freq, varargin{isol}.AC_ExDC_E_amp, options{:})
         case '2h'
-            fig = figure('Name', 'Amplitude of EA second harmonic E_{AC}^2', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
-            hold off
             plot(varargin{isol}.Freq, varargin{isol}.AC_Efield2_amp, options{:})
         case 'phase'
-            fig = figure('Name', 'Phase of EA first harmonic', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
-            hold off
             phase_n_deg = rad2deg(wrapTo2Pi(varargin{isol}.AC_ExDC_E_phase));
             plot(varargin{isol}.Freq, phase_n_deg, options{:})
-        otherwise
-            error([mfilename(1) ' - *type* option needed'])
     end
-    %ymin = min(ymin, min());
-    %ymax = max(ymax, max());
-    %range = ymax-ymin;
-    %ylim([ymin-0.03*range, ymax+0.03*range])
-    %xlim([min(min(EA_results.Freq)), max(max(EA_results.Freq))])
-
     hold on
 end
 
