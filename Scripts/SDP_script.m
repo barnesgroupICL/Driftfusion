@@ -1,5 +1,8 @@
 function sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, dwell_mode, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
-%SDP_SCRIPT - an alternative script for Step-Dwell-Probe simulations.
+%SDP_SCRIPT - an alternative script for Step-Dwell-Probe simulations
+% This script does not use the Protocols/doSDP file, this is a standalone
+% implementation of a SDP experiment on a single starting solution and a
+% single illumination bias condition.
 %
 % Syntax:  sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, dwell_mode, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
 %
@@ -62,7 +65,7 @@ function sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, 
 % See also df, anasdp, SDP_list_plot, SDP_script_exporter, doSDP, runDfFourTrunks.
 
 %% LICENSE
-% Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Copyright (C) 2022  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
 % This program is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Affero General Public License as published
