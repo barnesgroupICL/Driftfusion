@@ -66,9 +66,8 @@ for i = 1:nsolutions
     % residual current
     disp([mfilename ' - finding real Voc for illumination intensity ' num2str(structs_sc{1, i}.par.int1)])
 
-    [struct_Int_Rs, guessVoc] = findVocDirect(struct_Int, struct_Int.par.int1, true);
-    struct_Int_VocDirect = RsToClosedCircuit(struct_Int_Rs);
-    [struct_Int_Voc, VOC] = findVocOptim(struct_Int_VocDirect, guessVoc);
+    [~, guessVoc] = findVocDirect(struct_Int, struct_Int.par.int1, true);
+    [struct_Int_Voc, VOC] = findVocOptim(struct_Int, guessVoc);
     
     % replace the solution at the bad VOC with the new one
     structs_oc{1, i} = struct_Int_Voc;
