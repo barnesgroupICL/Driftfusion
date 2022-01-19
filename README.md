@@ -59,9 +59,16 @@ Good luck!
 
 ### Impedance Spectroscopy on homojunction model, applying an oscillating voltage profile
 
-Submitted [on arXiv on may 2018](https://arxiv.org/abs/1805.06446), published on [Energy & Environmental Science on march 2019](https://pubs.rsc.org/en/content/articlelanding/2019/ee/c8ee02362j).
+Submitted [on arXiv on May 2018](https://arxiv.org/abs/1805.06446), published on [Energy & Environmental Science on march 2019](https://pubs.rsc.org/en/content/articlelanding/2019/ee/c8ee02362j).
 
-Check out the `2018-EIS` branch of this repository or [download directly just this branch](https://github.com/barnesgroupICL/Driftfusion/archive/2018-EIS.zip).
+Check out the [2018-EIS branch](https://github.com/barnesgroupICL/Driftfusion/tree/2018-EIS) of this repository or [download directly just this branch](https://github.com/barnesgroupICL/Driftfusion/archive/2018-EIS.zip).
 
 Then follow the instructions in the branch readme or on this [wiki page](https://github.com/barnesgroupICL/Driftfusion/wiki/2018-Impedance-Spectroscopy-on-homojunction-model).
 
+### ElectroAbsorption, Step-Dwell-Probe and Impedance Spectroscopy on heterojunction model
+
+Submitted [on arXiv on January 2022](https://arxiv.org/abs/2201.02175).
+
+Check out the [2022-EA\_SDP\_EIS branch](https://github.com/barnesgroupICL/Driftfusion/tree/2022-EA_SDP_EIS) of this repository or [download directly just this branch](https://github.com/barnesgroupICL/Driftfusion/archive/2022-EA_SDP_EIS.zip).
+
+Then follow the instructions in the branch readme or on this [wiki page](https://github.com/barnesgroupICL/Driftfusion/wiki/2022-ElectroAbsorbance,-Step-Dwell-Probe-and-EIS-on-heterojunction-model).
