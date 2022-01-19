@@ -43,8 +43,7 @@ function EA_list_plot(type, dir_file_name, varargin)
 
 %------------- BEGIN CODE --------------
 
-fig = figure('Name', 'Amplitude of EA second harmonic E_{AC}^2', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
-hold off
+
 %ymin = Inf;
 %ymax = -Inf;
 for i = 1:(length(varargin)/3)
@@ -53,10 +52,16 @@ for i = 1:(length(varargin)/3)
     options = varargin{isol+2};
     switch type
         case '1h'
+            fig = figure('Name', 'Amplitude of EA first harmonic E_{AC}*E_{DC}', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+            hold off
             plot(varargin{isol}.Freq, varargin{isol}.AC_ExDC_E_amp, options{:})
         case '2h'
+            fig = figure('Name', 'Amplitude of EA second harmonic E_{AC}^2', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+            hold off
             plot(varargin{isol}.Freq, varargin{isol}.AC_Efield2_amp, options{:})
         case 'phase'
+            fig = figure('Name', 'Phase of EA first harmonic', 'NumberTitle', 'off', 'units','normalized', 'outerposition',[0 0 1 1]);
+            hold off
             phase_n_deg = rad2deg(wrapTo2Pi(varargin{isol}.AC_ExDC_E_phase));
             plot(varargin{isol}.Freq, phase_n_deg, options{:})
         otherwise

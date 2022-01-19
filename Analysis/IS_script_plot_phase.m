@@ -71,7 +71,7 @@ phase_i_deg = rad2deg(IS_results.ion_disp_phase);
 phase_U_deg = rad2deg(IS_results.r_phase);
 phase_dQ_deg = rad2deg(IS_results.np_dt_phase);
 
-figure('Name', 'Phase plot of IS. Dashed: ionic; dotted: recombination; dashdotted: stored charge variation', 'NumberTitle', 'off')
+figure('Name', 'Phase of EIS Bode plot. Dashed: ionic; dotted: recombination; dashdotted: stored charge variation', 'NumberTitle', 'off')
     hold off
     for i = 1:length(legend_text)
         h(i) = plot(IS_results.Freq(i, :), -phase_n_deg(i, :)',...

@@ -69,7 +69,7 @@ h = zeros(length(legend_text), 1);
 xlim_array = [min(min(IS_results.Freq))*0.99, max(max(IS_results.Freq)*1.01)];
 
 %% plot apparent capacitance vs frequency
-figure('Name', 'IS at light intensities. Dashed: ionic; dotted: recombination; dashdotted: stored charge variation', 'NumberTitle', 'off');
+figure('Name', 'Apparent capacitance from EIS. Dashed: ionic; dotted: recombination; dashdotted: stored charge variation', 'NumberTitle', 'off');
     hold off
     for i = 1:length(legend_text)
         h(i) = plot(IS_results.Freq(i, :), IS_results.cap(i, :)',...
@@ -106,7 +106,7 @@ figure('Name', 'IS at light intensities. Dashed: ionic; dotted: recombination; d
 %% in case of IS do additional graphics
 if isfield(IS_results, 'Jtot_phase') % just IS have phase output
 
-    figure('Name', 'imaginary impedance at light intensities. Dashed: ionic; dotted: recombination; dashdotted: stored charge variation', 'NumberTitle', 'off');
+    figure('Name', 'Imaginary impedance -Im(Z). Dashed: ionic; dotted: recombination; dashdotted: stored charge variation', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
             h(i) = plot(IS_results.Freq(i, :), -IS_results.impedance_im(i, :)',...
@@ -129,7 +129,7 @@ if isfield(IS_results, 'Jtot_phase') % just IS have phase output
         legend(flipud(h), legend_flip)
         legend boxoff
         
-    figure('Name', 'real impedance at light intensities. Dashed: ionic; dotted: recombination; dashdotted: stored charge variation', 'NumberTitle', 'off');
+    figure('Name', 'Real impedance Re(Z). Dashed: ionic; dotted: recombination; dashdotted: stored charge variation', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
             h(i) = plot(IS_results.Freq(i, :), IS_results.impedance_re(i, :)',...
@@ -152,7 +152,7 @@ if isfield(IS_results, 'Jtot_phase') % just IS have phase output
         legend(flipud(h), legend_flip)
         legend boxoff
        
-    figure('Name', 'abs impedance at light intensities. Dashed: ionic; dotted: recombination; dashdotted: stored charge variation', 'NumberTitle', 'off');
+    figure('Name', 'Absolute impedance magnitude |Z|. Dashed: ionic; dotted: recombination; dashdotted: stored charge variation', 'NumberTitle', 'off');
         hold off
         for i = 1:length(legend_text)
             h(i) = plot(IS_results.Freq(i, :), IS_results.impedance_abs(i, :)',...

@@ -60,7 +60,7 @@ legend_flip(legend_flip=="0 sun") = "dark";
 % preallocate figures handles
 h = zeros(length(legend_text), 1);
 
-figure('Name', 'Nyquist plot of IS at various light intensities', 'NumberTitle', 'off')
+figure('Name', 'Nyquist plot of EIS', 'NumberTitle', 'off')
     hold off
     for i = 1:length(legend_text)
         % find the points of the even decades
