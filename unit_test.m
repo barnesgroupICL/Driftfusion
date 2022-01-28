@@ -677,11 +677,15 @@ EA_script_plot_phase(EA_sc, folderName);
 %     EA_dark1, 'frozen_ions',{':r','LineWidth',3},...
 %     EA_dark2, 'mobile ions',{'-k'});
 
-%% Scripts SDP and helper
+%% Scripts SDP, plotting and helper
 
-% sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
-sdpsol1 = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, true);
-sdpsol2 = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, false);
+% sdpsol = SDP_script(sol_ini, tdwell_arr, Vjump, bias_source, bias_int, dwell_mode, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
+sdpsol1 = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 'unique', 2, 5.12, 1e-3, true);
+sdpsol2 = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 'separated', 2, 5.12, 1e-3, false);
+SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 'sequential', 2, 5.12, 1e-3, true);
+
+% anasdp(sdpsol, Jtr_time)
+anasdp(sdpsol1, 1e-4);
 
 % SDP_script_exporter(prefix, varargin)
 SDP_script_exporter('unit_testing_deleteme', sdpsol1, sdpsol2);
@@ -850,14 +854,6 @@ sdpsol = doSDP(soleq.ion, [1e-3,1], 0.9, 1, 1, 5, 50, 1);
 
 % anasdp(sdpsol, Jtr_time)
 anasdp(sdpsol, 1);
-
-%% Protocols doSDP_alt
-
-% sdp = doSDP_alt(sol_ini, sol_jump_is_given, tdwell_arr, Vjump, bias_source, bias_int, pulse_source, pulse_int, pulse_tmax, pulse_mobile_ions)
-sdpsol = SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 2, 5.12, 1e-3, true);
-
-% anasdp(sdpsol, Jtr_time)
-anasdp(sdpsol, 1e-4);
 
 %% Protocols doSPV and Analysis spvana
 
