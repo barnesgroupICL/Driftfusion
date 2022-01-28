@@ -162,6 +162,7 @@ if unique_dwell
     par_dwell.t = unique([tdwell_arr, tmesh]);
     par_dwell.tpoints = length(par_dwell.t);
     sol_dwell_unique = df(sol_jump, par_dwell);
+    assert(size(sol_dwell_unique.u,1) == par_dwell.tpoints, [mfilename ' - The "unique" dwell_mode failed. Try sequential or separated modes.'])
     sol_dwell.x = sol_dwell_unique.x;
 else
     firstRun = true;
