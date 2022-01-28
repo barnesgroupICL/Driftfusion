@@ -135,8 +135,10 @@ par_pulseKeepOn.tpoints = 100;
 
 % Preallocate memory
 Jtr = zeros(par_pulseKeepOn.tpoints, length(tdwell_arr));
-t_Jtr = zeros(par_pulseKeepOn.tpoints, length(tdwell_arr));
 Jdk = zeros(1,length(tdwell_arr));
+
+% Calculate the time mesh used for all the pulses
+t_Jtr = meshgen_t(par_pulseKeepOn);
 
 switch dwell_mode
     case 'separated'
@@ -209,16 +211,13 @@ for i = 1:length(tdwell_arr)
         sol_pulseKeepOn = runDfFourTrunks(sol_pulseTurnOn, par_pulseKeepOn);
     end
     [Jtr_temp, Jdk(i)] = calcJtrJdk(sol_dwell, sol_pulseKeepOn);
-    t_Jtr_temp = sol_pulseKeepOn.t';
     % runDfFourTrunks can output a solution with more time points than
     % requested, but anasdp works only on matrices, not on cells with
     % arrays of different lengths, so the interpolated output is used
     if all(size(Jtr_temp) == size(Jtr(:,i)))
         Jtr(:,i) = Jtr_temp;
-        t_Jtr(:,i) = t_Jtr_temp;
     else
-        t_Jtr(:,i) = meshgen_t(par_pulseKeepOn);
-        Jtr(:,i) = interp1(t_Jtr_temp, Jtr_temp, t_Jtr(:,i), 'spline');
+        Jtr(:,i) = interp1(sol_pulseKeepOn.t, Jtr_temp, t_Jtr, 'spline');
     end
 end
 
