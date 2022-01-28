@@ -1,23 +1,28 @@
-function SDP_script_exporter(prefix, varargin)
-%EXPORT_SDP_RESULTS - Exports data of a set of Step-Dwell-Probe simulations to text files
+function SDP_script_exporter(Jtr_time, prefix, varargin)
+%SDP_SCRIPT_EXPORTER - Exports data of a set of Step-Dwell-Probe simulations to text files
 % save the main data from a set of SDP_result structs created by
-% doSDP_alt to text files, for easing the import with Origin (from OriginLab).
+% SDP_script to text files, for easing the import with Origin (from OriginLab).
 % 
-% Syntax:  export_SDP_results(prefix, SDP_results1, SDP_results2, SDP_results3)
+% Syntax:  SDP_script_exporter(Jtr_time, prefix, SDP_results1, SDP_results2, SDP_results3)
 %
 % Inputs:
+%   JTR_TIME - float, the time point (during the probe pulse step) that
+%     should be plotted. Ideally should be enough time for the free charges
+%     to reach steady state but not enough time for the ionic (which can
+%     also be frozen in the SDP_script). For getting the last timepoint of
+%     the applied pulse you can use Inf
 %   PREFIX - char array, prefix to be used for the text files names
 %   SDP_RESULTS - a struct containing the most important results of the IS simulation
 %
 % Example:
-%   export_SDP_results('SDP_pedot_06V', sdpsol_pedot_alt_dark, sdpsol_pedot_alt_01sun, sdpsol_pedot_alt_1sun)
+%   SDP_script_exporter(1e-7, 'SDP_pedot_06V', sdpsol_pedot_alt_dark, sdpsol_pedot_alt_01sun, sdpsol_pedot_alt_1sun)
 %     save data from a set of simulations to text files
 %
 % Other m-files required: none
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also doSDP_alt.
+% See also SDP_script.
 
 %% LICENSE
 % Copyright (C) 2021  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
@@ -36,10 +41,21 @@ bias_ints = zeros(length(varargin),1);
 data = zeros(size(varargin{1}.Jtr, 2), 2*length(varargin));
 
 for i = 1:length(varargin)
+    assert(~isfinite(Jtr_time) || varargin{i}.t_Jtr(end) >= Jtr_time,...
+        [mfilename ' - The requested time is over the pulse duration. For using always the last timepoint use Inf'])
+    p1_list = find(varargin{i}.t_Jtr <= Jtr_time);
+    p1(i) = p1_list(end);
+    if i ~= 1
+        if ~ismembertol(varargin{i-1}.t_Jtr(p1(i-1)), varargin{i}.t_Jtr(p1(i)))
+            warning('Solutions are saved at different times!!!!')
+            disp(varargin{i-1}.t_Jtr(p1(i-1)))
+            disp(varargin{i}.t_Jtr(p1(i)))
+        end
+    end
     SDP_result = varargin{i};
     bias_ints(i) = SDP_result.bias_int;
     data(:,i*2-1) = SDP_result.tdwell_arr';
-    data(:,i*2) = SDP_result.Jtr(end,:)';
+    data(:,i*2) = SDP_result.Jtr(p1(i),:)';
 end
 
 % round to two significant digits
