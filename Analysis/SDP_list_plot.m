@@ -9,7 +9,8 @@ function SDP_list_plot(Jtr_time, dir_file_name, varargin)
 %   JTR_TIME - float, the time point (during the probe pulse step) that
 %     should be plotted. Ideally should be enough time for the free charges
 %     to reach steady state but not enough time for the ionic (which can
-%     also be frozen in the SDP_script)
+%     also be frozen in the SDP_script). For getting the last timepoint of
+%     the applied pulse you can use Inf
 %   DIR_FILE_NAME - char array, images with this prefix will be created in
 %     the current directory. A path specifying the destination
 %     subdirectory can also be provided. To avoid the saving, an empty char
@@ -49,8 +50,10 @@ function SDP_list_plot(Jtr_time, dir_file_name, varargin)
 
 for i = 1:(length(varargin)/3)
     isol = round((i*3)-2);
-    p1_list = find(varargin{isol}.t_Jtr >= Jtr_time);
-    p1(i) = p1_list(1);
+    assert(~isfinite(Jtr_time) || varargin{isol}.t_Jtr(end) >= Jtr_time,...
+        [mfilename ' - The requested time is over the pulse duration. For using always the last timepoint use Inf'])
+    p1_list = find(varargin{isol}.t_Jtr <= Jtr_time);
+    p1(i) = p1_list(end);
     Jtr_time_arr(i,:) = varargin{isol}.Jtr(p1(i),:);
     if ~ismembertol(i, 1)
         if ~ismembertol(varargin{isol-3}.t_Jtr(p1(i-1)), varargin{isol}.t_Jtr(p1(i)))
