@@ -86,7 +86,7 @@ disp('Initial stabilised solution')
 sol = df(sol, par);
 disp('Complete')
 
-J = dfana.calcJ(sol);
+J = dfana.calcJ(sol, "sub");
 fx0 = J.tot(end, end);
 
 xrun = x0;
@@ -118,7 +118,7 @@ while abs(fx1) > tol
 
     sol = df(sol, par);
 
-    J = dfana.calcJ(sol);
+    J = dfana.calcJ(sol, "sub");
     fx1 = J.tot(end, end);
 
     % approximation to the gradient

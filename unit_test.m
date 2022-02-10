@@ -43,7 +43,7 @@ JVsol = doJV(soleq.ion, 1e-2, 50, 1, true, 0, 1.0, 3);
 
 % solstruct = df(varargin)
 df();
- 
+
 %% Core df one input
 
 % solstruct = df(varargin)
@@ -295,8 +295,8 @@ dfana.calcEnergies(soleq.ion);
 
 %% Core dfana calcJ
 
-% [J, j, x] = calcJ(sol)
-dfana.calcJ(soleq.ion);
+% [J, j, x] = calcJ(sol, "sub")
+dfana.calcJ(soleq.ion, "sub");
 
 %% Core dfana calcg
 
@@ -683,18 +683,18 @@ for i=1:length(inputs)
         xpoints = round(1 + sum(par.layer_points));
 
         soleq = equilibrate(par);
-        
+
         el = soleq.el;
         el_s = size(el.u);
 
         exp_el_s = [el.par.tpoints, xpoints, 3];
         assert(all(el_s == exp_el_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
         assert(~any(isnan(el.u(:))))
-        
+
         if par.N_ionic_species > 0
             ion = soleq.ion;
             ion_s = size(ion.u);
-            
+
             exp_ion_s = [ion.par.tpoints, xpoints, round(3+par.N_ionic_species)];
             assert(all(ion_s == exp_ion_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
             assert(~any(isnan(ion.u(:))))
@@ -707,7 +707,7 @@ inputs = dir('Scripts');
 for i = 1:length(inputs)
     input = inputs(i).name;
     if ~any(regexp(input,'^\.|^test'))
-        
+
         disp(['### running script ' input]);
         run(input);
     end
@@ -757,19 +757,19 @@ explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
 % this functionality is currently not working.
 % % plotfinalELx(exsol)
 % explore.plotfinalELx(exsol)
-% 
+%
 % %% Helper explore plotprof_2D
-% 
+%
 % % plotprof_2D(exsol, yproperty, par1logical, par2logical, logx,logy)
 % explore.plotprof_2D(exsol, 'J_f', [true,true], [true,true], true, true)
-% 
+%
 % %% Helper explore plotU
-% 
+%
 % % plotU(exsol, par1logical, par2logical,logx,logy)
 % explore.plotU(exsol, [true,true], [true,true],false,false)
-% 
+%
 % %% Helper explore plotCE
-% 
+%
 % % plotCE(exsol_Voc, exsol_eq, xlogon, ylogon, zlogon, normalise)
 % explore.plotCE(exsol, exsol, false, false, false, "ciaomamma")
 
@@ -779,4 +779,3 @@ explore.plotstat_2D_parval2(exsol, 'Voc_r', true, false)
 explore.plotJV(exsol, [true, true, false, true], [true, false, true])
 
 %------------- END OF CODE --------------
-

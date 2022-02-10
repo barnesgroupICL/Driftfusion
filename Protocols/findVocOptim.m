@@ -61,7 +61,7 @@ if nargin > 1 && getVend(struct) ~= approxVoc
 end
 
 % find residual current
-originalCurrent = dfana.calcJ(struct);
+originalCurrent = dfana.calcJ(struct, "sub");
 
 disp([mfilename ' - Original voltage: ' num2str(getVend(struct), 8) ' V; original current: ' num2str(originalCurrent.tot(end,end)) ' A/cm2'])
 
@@ -133,7 +133,7 @@ struct_voc.par.V_fun_arg = Voc;
 
 struct_voc = stabilize(struct_voc); % go to steady state
 
-residualJ = dfana.calcJ(struct_voc);
+residualJ = dfana.calcJ(struct_voc, "sub");
 
 disp([mfilename ' - VOC found at ' num2str(Voc, 10) ' V, residual current ' num2str(residualJ.tot(end,end)) ' A/cm2'])
 
@@ -167,7 +167,7 @@ struct_newVapp.par.V_fun_arg = Vend;
 
 struct_newVapp = stabilize(struct_newVapp);
 
-J = dfana.calcJ(struct_newVapp);
+J = dfana.calcJ(struct_newVapp, "sub");
 
 current = J.tot(end,end);
 % I want the absolute value, but it's nicer to take the squared rather than

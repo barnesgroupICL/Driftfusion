@@ -75,7 +75,7 @@ classdef dfplot
             % XPOS = the readout position
             [~,t,~,~,~,~,~,~,~,~] = dfana.splitsol(sol);
 
-            [J, j, xmesh] = dfana.calcJ(sol);
+            [J, j, xmesh] = dfana.calcJ(sol, "sub");
             ppos = getpointpos(xpos, xmesh);
 
             figure(2);
@@ -95,7 +95,7 @@ classdef dfplot
             % XRANGE = 2 element array with [XMIN, XMAX]
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [J, j, x] = dfana.calcJ(sol);
+            [J, j, x] = dfana.calcJ(sol, "sub");
 
             figure(3);
             dfplot.x2d(sol, x, {J.n, J.p, J.a, J.c, J.disp, J.tot},...
@@ -111,7 +111,7 @@ classdef dfplot
             % XRANGE = 2 element array with [XMIN, XMAX]
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            [J, j, x] = dfana.calcJ(sol);
+            [J, j, x] = dfana.calcJ(sol, "sub");
 
             figure(301);
             dfplot.x2d(sol, par.x_sub, {j.n, j.p, j.a, j.c, j.disp}, {'jn', 'jp', 'ja', 'jc', 'jdisp'},...
@@ -124,9 +124,9 @@ classdef dfplot
             % JV is a structure containing dark and illuminated JVs
 
             if option == 1 || option == 3
-                J.dk.f = dfana.calcJ(JV.dk.f);
+                J.dk.f = dfana.calcJ(JV.dk.f, "sub");
                 Vapp.dk.f = dfana.calcVapp(JV.dk.f);
-                J.dk.r = dfana.calcJ(JV.dk.r);
+                J.dk.r = dfana.calcJ(JV.dk.r, "sub");
                 Vapp.dk.r = dfana.calcVapp(JV.dk.r);
 
                 figure(4)
@@ -136,9 +136,9 @@ classdef dfplot
 
             if option == 2 || option == 3
 
-                J.ill.f = dfana.calcJ(JV.ill.f);
+                J.ill.f = dfana.calcJ(JV.ill.f, "sub");
                 Vapp.ill.f = dfana.calcVapp(JV.ill.f);
-                J.ill.r = dfana.calcJ(JV.ill.r);
+                J.ill.r = dfana.calcJ(JV.ill.r, "sub");
                 Vapp.ill.r = dfana.calcVapp(JV.ill.r);
 
                 figure(4)
@@ -200,7 +200,7 @@ classdef dfplot
             xmesh = sol.x;
             ppos = getpointpos(xpos, xmesh);
 
-            J = dfana.calcJ(sol);
+            J = dfana.calcJ(sol, "sub");
             Vapp = dfana.calcVapp(sol);
 
             figure(9)
@@ -217,7 +217,7 @@ classdef dfplot
             xmesh = sol.x;
             ppos = getpointpos(xpos, xmesh);
 
-            J = dfana.calcJ(sol);
+            J = dfana.calcJ(sol, "sub");
             Vapp = dfana.calcVapp(sol);
 
             figure(91)
@@ -233,7 +233,7 @@ classdef dfplot
             xmesh = sol.x;
             ppos = getpointpos(xpos, xmesh);
 
-            J = dfana.calcJ(sol);
+            J = dfana.calcJ(sol, "sub");
             Vapp = dfana.calcVapp(sol);
 
             figure(91)
@@ -250,7 +250,7 @@ classdef dfplot
             xmesh = sol.x;
             ppos = getpointpos(xpos, xmesh);
 
-            J = dfana.calcJ(sol);
+            J = dfana.calcJ(sol, "sub");
             Vapp = dfana.calcVapp(sol);
 
             figure(10)
@@ -268,7 +268,7 @@ classdef dfplot
             ppos = getpointpos(xpos, xmesh);
 
             t = sol.t;
-            J = dfana.calcJ(sol);
+            J = dfana.calcJ(sol, "sub");
             Vapp = dfana.calcVapp(sol)';
             Jtot=J.tot(:, ppos);
 
@@ -423,9 +423,9 @@ classdef dfplot
             % JV is a structure containing dark and illuminated JVs
 
             if option == 1 || option == 3
-                J.dk.f = dfana.calcJ(JV.dk.f);
+                J.dk.f = dfana.calcJ(JV.dk.f, "sub");
                 Vapp.dk.f = dfana.calcVapp(JV.dk.f);
-                J.dk.r = dfana.calcJ(JV.dk.r);
+                J.dk.r = dfana.calcJ(JV.dk.r, "sub");
                 Vapp.dk.r = dfana.calcVapp(JV.dk.r);
 
                 figure(13)
@@ -439,9 +439,9 @@ classdef dfplot
                 par = solf.par;
                 pcum0 = par.pcum0;
 
-                J.ill.f = dfana.calcJ(JV.ill.f);
+                J.ill.f = dfana.calcJ(JV.ill.f, "sub");
                 Vapp.ill.f = dfana.calcVapp(JV.ill.f);
-                J.ill.r = dfana.calcJ(JV.ill.r);
+                J.ill.r = dfana.calcJ(JV.ill.r, "sub");
                 Vapp.ill.r = dfana.calcVapp(JV.ill.r);
 
                 r_f = dfana.calcr(JV.ill.f, "whole");
@@ -629,15 +629,20 @@ classdef dfplot
             % XRANGE = 2 element array with [xmin, xmax]
             [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
             [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
-            Ecb = repmat(dev.Phi_EA, length(t), 1); 
+
+            int_switchM = repmat(dev.int_switch, length(t), 1);
+            Ecb = repmat(dev.Phi_EA, length(t), 1);
             Evb = repmat(dev.Phi_IP, length(t), 1);
-            EF0 = repmat(dev.EF0_zerointerface, length(t), 1);
-            
+            EF0 = repmat(dev.EF0, length(t), 1);
+            Ecb(int_switchM == 1) = NaN;
+            Evb(int_switchM == 1) = NaN;
+            EF0(int_switchM == 1) = NaN;
+
             figure(22);
             dfplot.x2d(sol, x, {EF0, Ecb, Evb}, {'E_{F0}', 'E_{CB}', 'E_{VB}'},...
                 {'--', '-', '-'}, 'Energy [eV]', tarr, xrange, 0, 0)
         end
-        
+
         function ELnpx(varargin)
             % Energy Level diagram, and charge densities plotter
             % SOL = the solution structure
@@ -695,6 +700,26 @@ classdef dfplot
                 {'-'}, 'Electro. potential [V]', tarr, xrange, 0, 0);
 
             subplot(2,1,2);
+            dfplot.x2d(sol, x, {a,c,Ncat,Nani},{'anion','cation','static cation','static anion'}, {'-','-','--','-.'},...
+                'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
+        end
+
+        function Vxnpxacx(varargin)
+            % Potential and ionic charges as a function of position
+            [sol, tarr, pointtype, xrange] = dfplot.sortarg(varargin);
+            [u,t,x,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            Nani = repmat(dev.Nani, length(t), 1);
+            Ncat = repmat(dev.Ncat, length(t), 1);
+
+            figure(241)
+            subplot(3,1,1);
+            dfplot.x2d(sol, x, {-V}, {'V'},...
+                {'-'}, '-V [V]', tarr, xrange, 0, 0);
+
+            subplot(3,1,2);
+            dfplot.x2d(sol, x, {n, p}, {'electrons, \it{n}', 'holes, \it{p}'}, {'-', '-'}, 'Density [cm-3]', tarr, xrange, 0, 1)
+
+            subplot(3,1,3);
             dfplot.x2d(sol, x, {a,c,Ncat,Nani},{'anion','cation','static cation','static anion'}, {'-','-','--','-.'},...
                 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
         end

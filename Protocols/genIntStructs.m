@@ -79,7 +79,7 @@ for i = 1:length(Int_array)
         changeLight_tmax = max(struct_Int.par.tmax / 5, 1e-8); % time to use for next iteration
     end
 
-    J = dfana.calcJ(struct_Int);
+    J = dfana.calcJ(struct_Int, "sub");
     J_temp = J.tot(:,end);
     V_temp = dfana.calcVapp(struct_Int);
 

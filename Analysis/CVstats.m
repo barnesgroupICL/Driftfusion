@@ -29,12 +29,12 @@ if num_cycles > 1
     Vapp = Vapp(start:start+one_sweep_index)';
     sol.u = sol.u(start:start+one_sweep_index,:,:);
     sol.t = sol.t(start:start+one_sweep_index);
-    J = dfana.calcJ(sol);
+    J = dfana.calcJ(sol, "sub");
     J = J.tot(:,1);
 else
     Vapp = dfana.calcVapp(sol);
     start = find(Vapp == min(Vapp),1);
-    J = dfana.calcJ(sol);
+    J = dfana.calcJ(sol, "sub");
     J = J.tot(:,1);
     J_half = J(start:end);
     J_other_half = J(1:start-1);

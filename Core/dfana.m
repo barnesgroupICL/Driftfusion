@@ -80,26 +80,34 @@ classdef dfana
 
         end
 
-        function [J, j, x] = calcJ(sol)
+        function [J, j, x] = calcJ(sol, mesh_option)
             % Current, J and flux, j calculation from continuity equations
             % obtain SOL components for easy referencing
             [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
-            n_sub = getvar_sub(n);
-            p_sub = getvar_sub(p);
-            a_sub = getvar_sub(a);
-            c_sub = getvar_sub(c);
+            switch mesh_option
+                case "whole"
+                    x = x_whole;
+                    eppM = par.dev.epp;
+                case "sub"
+                    x = par.x_sub;
+                    n = getvar_sub(n);
+                    p = getvar_sub(p);
+                    a = getvar_sub(a);
+                    c = getvar_sub(c);
+                    eppM = par.dev_sub.epp;
+            end
 
             x = par.x_sub;
             [~,~,g] = dfana.calcg(sol);
 
-            [~, dndt] = gradient(n_sub, x, t);
-            [~, dpdt] = gradient(p_sub, x, t);
-            [~, dadt] = gradient(a_sub, x, t);
-            [~, dcdt] = gradient(c_sub, x, t);
+            [~, dndt] = gradient(n, x, t);
+            [~, dpdt] = gradient(p, x, t);
+            [~, dadt] = gradient(a, x, t);
+            [~, dcdt] = gradient(c, x, t);
 
             % Recombination
-            r = dfana.calcr(sol, "sub");
+            r = dfana.calcr(sol, mesh_option);
 
             djndx = -dndt + g - r.tot;
             djpdx = -dpdt + g - r.tot;
@@ -165,10 +173,10 @@ classdef dfana
             j.a = par.mobseti*par.K_a*j.a;
 
             % displacement flux
-            FV_sub = dfana.calcF(sol, "sub");
+            FV = dfana.calcF(sol, "sub");
 
-            [~, FV_sub_dt] = gradient(FV_sub, x, t);
-            j.disp = par.epp0.*par.dev_sub.epp.*FV_sub_dt;
+            [~, FV_dt] = gradient(FV, x, t);
+            j.disp = par.epp0.*eppM.*FV_dt;
 
             J.n = j.n*-par.e;
             J.p = j.p*par.e;
@@ -200,11 +208,11 @@ classdef dfana
             end
             g = g1 + g2;
         end
-        
+
         function Pin = calcPin(sol)
             % Incident optical power density
-            % Note this integrates across the available spectrum 
-            % within AM15.xls 
+            % Note this integrates across the available spectrum
+            % within AM15.xls
             if strcmp(sol.par.optical_model, 'Beer-Lambert')
                 AM15_data = xlsread('AM15.xls');
                 Pin = 1e-3*trapz(AM15_data(:,1), AM15_data(:,2));
@@ -214,7 +222,7 @@ classdef dfana
             end
         end
 
-        
+
         function [r, ns, ps, alpha_xn, beta_xp] = calcr(sol, mesh_option)
             % Calculate the recombination rate on i-half mesh
             % obtain SOL components for easy referencing
@@ -402,7 +410,7 @@ classdef dfana
             end
 
             for i=1:length(t)
-                [~, dVdx(i,:)] = pdeval(0,x_whole,V(i,:),x);
+                [~, dVdx(i,:)] = pdeval(0, x_whole, V(i,:),x);
             end
             FV = -dVdx;
 
@@ -457,7 +465,7 @@ classdef dfana
                 if isfield(JVsol.ill, 'f')
                     Vapp = dfana.calcVapp(JVsol.ill.f);
                     Vapp = Vapp';
-                    J = dfana.calcJ(JVsol.ill.f);
+                    J = dfana.calcJ(JVsol.ill.f, "sub");
                     try
                         stats.Jsc_f = interp1(Vapp, J.tot(:, end), 0);
                     catch
@@ -492,7 +500,7 @@ classdef dfana
                 if isfield(JVsol.ill, 'r')
                     Vapp = dfana.calcVapp(JVsol.ill.r);
                     Vapp = Vapp';
-                    J = dfana.calcJ(JVsol.ill.r);
+                    J = dfana.calcJ(JVsol.ill.r, "sub");
                     try
                         stats.Jsc_r = interp1(Vapp, J.tot(:, end), 0);
                     catch

@@ -65,7 +65,7 @@ alpha = par.q*dVdx./(kB*T) + alpha0;
 beta = par.q*-dVdx./(kB*T) + beta0;
 
 % Fluxes - approximate as on half mesh
-[~, j, ~] = dfana.calcJ(sol);
+[~, j, ~] = dfana.calcJ(sol, "sub");
 jn = j.n;
 jp = j.p;
 
@@ -93,7 +93,7 @@ for m = 1:length(loc)
     ps(:, m) = p(:, p_L);
     jps(:, m) = jp(:, p_L);      % jns and jps always from LH boundary
     r_vsr(:, p_L:p_R) = cumtrapz(x_sub(p_L:p_R), r.vsr(:, p_L:p_R), 2);
-    
+
     for kk = 1:length(tarr)
         k = find(sol.t <= tarr(kk));
         k = k(end);                     % k is the time point
@@ -108,18 +108,18 @@ for m = 1:length(loc)
                             X = exp(alpha(k,i)*xprime(i));
                             n_ana(k,i) = ns(k,m)*X + (jns(k,m)/(alpha(k,i)*mu_n(i)*Vt))*(1 - X)...
                                 - ((jns(k,m)-jn(k,i))/(alpha(k,i)^2*mu_n(i)*Vt*xprime(i)))*(1 - X + alpha(k,i)*xprime(i));
-                            
+
                         elseif alpha(k,i) > 0
                             Xstar = exp(alpha(k,i)*(xprime(i)-dint(k)));
                             n_ana(k,i) = ns(k,m)*Xstar + (jns(k,m)/(alpha(k,i)*mu_n(i)*Vt))*(1 - Xstar)...
                                 - ((jns(k,m)-jn(k,i))/(alpha(k,i)^2*mu_n(i)*Vt*xprime(i)))*(1 + alpha(k,i)*xprime(i) - (1 + alpha(k,i)*dint(k))*Xstar);
                         end
-                        
+
                         if beta(k,i) <= 0
                             Y = exp(beta(k,i)*xprime(i));
                             p_ana(k,i) = ps(k,m)*Y + (jps(k,m)/(beta(k,i)*mu_p(i)*Vt))*(1 - Y)...
                                 - ((jps(k,m)-jp(k,i))/(beta(k,i)^2*mu_p(i)*Vt*xprime(i)))*(1 - Y + beta(k,i)*xprime(i));
-                            
+
                         elseif beta(k,i) > 0
                             Ystar = exp(beta(k,i)*(xprime(i)-dint(k)));
                             p_ana(k,i) = ps(k,m)*Ystar + (jps(k,m)/(beta(k,i)*mu_p(i)*Vt))*(1 - Ystar)...
@@ -130,16 +130,16 @@ for m = 1:length(loc)
                         if alpha(k,i) <0
                             X = exp(alpha(k,i).*xprime(i));
                             n_ana(k,i) = ns(k,m)*X;
-                            
+
                         elseif alpha(k,i) > 0
                             Xstar = exp(alpha(k,i)*(xprime(i)-dint(k)));
                             n_ana(k,i) = ns(k,m)*Xstar;
                         end
-                        
+
                         if beta(k,i) <0
                             Y = exp(beta(k,i)*xprime(i));
                             p_ana(k,i) = ps(k,m)*Y;
-                            
+
                         elseif beta(k,i) >= 0
                             Ystar = exp(beta(k,i)*(xprime(i)-dint(k)));
                             p_ana(k,i) = ps(k,m)*Ystar;
@@ -162,7 +162,7 @@ if plot_switch
             for i = 1:length(tarr)
                 k = find(sol.t <= tarr(i));
                 k = k(end);
-                
+
                 semilogy(x_sub*1e7, n(k, :), x_sub*1e7, p(k, :),...
                     x_sub*1e7, n_ana(k,:), 'k-.', x_sub*1e7, p_ana(k,:), 'k--')
                 hold on
@@ -175,7 +175,7 @@ if plot_switch
             ymin = min(min(min(n(:, pcum1(loc(m)-1):pcum1(loc(m)))), min(p(:, pcum1(loc(m)-1):pcum1(loc(m))))));
             ymax = max(max(max(n(:, pcum1(loc(m)-1):pcum1(loc(m)))), max(p(:, pcum1(loc(m)-1):pcum1(loc(m))))));
             ylim([ymin*0.1, ymax*10])
-            
+
             %% Plot fluxes
             figure(601)
             subplot(1,length(loc),m)
@@ -191,7 +191,7 @@ if plot_switch
             xlabel('Position, x (nm)')
             ylabel('Flux (cm-2s-1)')
             xlim([1e7*par.dcum(loc(m)-1)-0.5,1e7*par.dcum(loc(m))+0.5])
-            
+
         end
     end
 end
