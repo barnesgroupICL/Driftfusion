@@ -22,7 +22,12 @@ clf
 plotfun(sol, sol.t(1))
 
 ax = findobj(gcf,'type','axes');
-pos = cell2mat(get(ax,'position'));
+pos_temp = get(ax,'position');
+if isa(pos_temp, 'cell')
+    pos = cell2mat(pos_temp);
+elseif  isa(pos_temp, 'double')
+    pos = pos_temp;
+end
 nrows = numel(unique(pos(:,2))); % the same Y position means the same row
 ncols = numel(unique(pos(:,1))); % the same X position means the same column
 
