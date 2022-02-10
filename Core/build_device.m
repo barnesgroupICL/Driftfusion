@@ -21,7 +21,6 @@ end
 % Constant properties
 dev.mu_c = build_property(par.mu_c, xmesh, par, 'constant', 0);
 dev.mu_a = build_property(par.mu_a, xmesh, par, 'constant', 0);
-dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
 
 dev.sn = build_property(par.sn, xmesh, par, 'constant', 1);
 dev.sp = build_property(par.sp, xmesh, par, 'constant', 1);
@@ -29,9 +28,10 @@ dev.mu_n = build_property(par.mu_n, xmesh, par, 'constant', 0);
 dev.mu_p = build_property(par.mu_p, xmesh, par, 'constant', 0);
     
 % Linearly graded properties
-dev.EA = build_property(par.EA, xmesh, par, 'lin_graded', 0);
-dev.IP = build_property(par.IP, xmesh, par, 'lin_graded', 0);
-dev.E0 = build_property(par.E0, xmesh, par, 'lin_graded', 0);
+dev.Phi_EA = build_property(par.Phi_EA, xmesh, par, 'lin_graded', 0);
+dev.Phi_IP = build_property(par.Phi_IP, xmesh, par, 'lin_graded', 0);
+dev.EF0 = build_property(par.EF0, xmesh, par, 'lin_graded', 0);
+dev.EF0_zerointerface = build_property(par.EF0, xmesh, par, 'zeroed', 0);   % For plotting only
 
 % Exponentially graded properties
 dev.Nc = build_property(par.Nc, xmesh, par, 'exp_graded', 0);
@@ -42,8 +42,6 @@ dev.Nani = build_property(par.Nani, xmesh, par, 'exp_graded', 0);
 dev.Ncat = build_property(par.Ncat, xmesh, par, 'exp_graded', 0);
 dev.a_max = build_property(par.a_max, xmesh, par, 'exp_graded', 0);
 dev.c_max = build_property(par.c_max, xmesh, par, 'exp_graded', 0);
-dev.taun = build_property(par.taun, xmesh, par, 'exp_graded', 0);
-dev.taup = build_property(par.taup, xmesh, par, 'exp_graded', 0);
 
 % Properties that are zeroed in the interfaces
 dev.g0 = build_property(par.g0, xmesh, par, 'zeroed', 0);
@@ -52,8 +50,8 @@ dev.NA = build_property(par.NA, xmesh, par, 'exp_graded', 0);
 dev.ND = build_property(par.ND, xmesh, par, 'exp_graded', 0);
 
 % Gradient properties
-dev.gradEA = build_property(par.EA, xmesh, par, 'lin_graded', 1);
-dev.gradIP = build_property(par.IP, xmesh, par, 'lin_graded', 1);
+dev.gradEA = build_property(par.Phi_EA, xmesh, par, 'lin_graded', 1);
+dev.gradIP = build_property(par.Phi_IP, xmesh, par, 'lin_graded', 1);
 dev.gradNc = build_property(par.Nc, xmesh, par, 'exp_graded', 1);
 dev.gradNv = build_property(par.Nv, xmesh, par, 'exp_graded', 1);
 
@@ -74,6 +72,11 @@ if par.vsr_mode
     dev.srh_zone = dev.bulk_switch;
     dev.Field_switch = dev.bulk_switch;
     
+    dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
+    dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
+    dev.NA = build_property(par.NA, xmesh, par, 'zeroed', 0);
+    dev.ND = build_property(par.ND, xmesh, par, 'zeroed', 0);
+    dev.epp = build_property(par.epp, xmesh, par, 'constant', 0); 
     dev.ni = build_property(par.ni, xmesh, par, 'constant', 0);
     dev.nt = build_property(par.nt, xmesh, par, 'constant', 0);
     dev.pt = build_property(par.pt, xmesh, par, 'constant', 0);
@@ -82,6 +85,11 @@ else
     dev.srh_zone = ones(1, length(xmesh));
     dev.Field_switch = ones(1, length(xmesh));
     
+    dev.taun = build_property(par.taun, xmesh, par, 'constant', 0);
+    dev.taup = build_property(par.taup, xmesh, par, 'constant', 0);
+    dev.NA = build_property(par.NA, xmesh, par, 'exp_graded', 0);
+    dev.ND = build_property(par.ND, xmesh, par, 'exp_graded', 0);
+    dev.epp = build_property(par.epp, xmesh, par, 'lin_graded', 0);
     dev.ni = build_property(par.ni, xmesh, par, 'exp_graded', 0);
     dev.nt = build_property(par.nt, xmesh, par, 'exp_graded', 0);
     dev.pt = build_property(par.pt, xmesh, par, 'exp_graded', 0);

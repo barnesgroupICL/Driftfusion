@@ -33,7 +33,7 @@ classdef explore
             errorlog = zeros(length(parval1), length(parval2));
 
             j = 1;
-            for i = 1:length(parval1)
+            parfor i = 1:length(parval1)
                 
                 par = par_base;
                 par = explore.helper(par, str1, parval1(i));

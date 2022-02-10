@@ -2,6 +2,7 @@ initialise_df
 
 %% Read in base parameters
 par_df_im_bulk = pc('Input_files/IonMonger_default_bulk.csv');
+par_df_im_bulk.MaxStepFactor = 0.1;
 
 %% Get equilibrium solutions
 soleq_df_im_bulk = equilibrate(par_df_im_bulk);

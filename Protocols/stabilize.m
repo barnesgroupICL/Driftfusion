@@ -26,7 +26,7 @@ function steadystate_struct = stabilize(struct)
 % it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
-% 
+%
 %% Start code
 % Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
 % Institute of Chemical Research of Catalonia (ICIQ)
@@ -94,7 +94,7 @@ while forceStabilization || ~verifyStabilization(steadystate_struct.u, steadysta
         break
     end
 
-    disp([mfilename ' - Stabilizing ' inputname(1) ' over ' num2str(par.tmax) ' s with an applied voltage of ' num2str(par.Vapp) ' V']);
+    disp([mfilename ' - Stabilizing ' inputname(1) ' over ' num2str(par.tmax) ' s with an applied voltage of ' num2str(getVend(struct)) ' V']);
     % every cycle starts from the last timepoint of the previous cycle
     steadystate_struct = df(steadystate_struct, par);
     if size(steadystate_struct.u, 1) ~= steadystate_struct.par.tpoints % simulation failed

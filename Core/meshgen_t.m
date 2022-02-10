@@ -13,14 +13,14 @@ function [t] = meshgen_t(par)
 %
 %% Start code
 switch par.tmesh_type
-    case 1
+    case 'linear'
         t = linspace(0,par.tmax,par.tpoints);     
-    case 2
+    case 'log10'
         t = logspace(log10(par.t0),log10(par.tmax),par.tpoints);
         %To avoid rounding errors
         t(1) = 0;
         t(end) = par.tmax;
-    case 3
+    case 'log10-double'
         % 2 log meshes consecutively
         t1 = logspace(log10(par.t0),log10(par.tmax/2),round(par.tpoints/2));
         t1(1) = 0;
@@ -28,16 +28,6 @@ switch par.tmesh_type
         t2 = t1(end) + logspace(log10(par.t0),log10(par.tmax/2),round(par.tpoints/2));
         t2(end) = par.tmax;
         t = [t1, t2];
-end
-
-if par.mesht_figon == 1
-    
-    ptmir = 1:1:length(t);
-    
-    figure(200);
-    plot(t, ptmir, '.');
-    xlabel('Position');
-    ylabel('Time'); 
 end
 
 end

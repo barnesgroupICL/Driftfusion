@@ -20,7 +20,7 @@
 % (at your option) any later version.
 
 %------------- BEGIN CODE --------------
-
+% clear all
 % prepare solutions and indirectly test equilibrate and genIntStructs
 % functions
 initialise_df
@@ -32,6 +32,8 @@ input_csv = 'Input_files/3_layer_unit_test.csv';
 
 % par = pc(varargin)
 par = pc(input_csv);
+% Relax VSR tolerance to 10% for test case to avoid warnings
+par.RelTol_vsr = 0.1;
 % soleq = equilibrate(varargin)
 soleq = equilibrate(par);
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
@@ -275,10 +277,10 @@ dev2 = build_device(par, 'sub');
 
 % devprop = build_property(property, xmesh, par, interface_switch, gradient_property)
 build_property(par.taun, par.xx, par, 'constant', 0);
-build_property(par.EA, par.xx, par, 'lin_graded', 0);
+build_property(par.Phi_EA, par.xx, par, 'lin_graded', 0);
 build_property(par.NA, par.xx, par, 'log_graded', 0);
 build_property(par.g0, par.xx, par, 'zeroed', 0);
-build_property(par.EA, par.xx, par, 'lin_graded', 1);
+build_property(par.Phi_EA, par.xx, par, 'lin_graded', 1);
 build_property(par.Nc, par.xx, par, 'log_graded', 1);
 
 %% Core dfana splitsol
@@ -377,12 +379,12 @@ dfana.pdentrp(false,false,par.xx(123),soleq.ion.u(1,123,1),par.xx(124),soleq.ion
 %% Core ditro_fun nfun
 
 % n = nfun(Nc, Ec, Efn, T, prob_distro_function)
-distro_fun.nfun(par.dev.Nc, par.dev.EA, par.dev.E0, par);
+distro_fun.nfun(par.dev.Nc, par.dev.Phi_EA, par.dev.EF0, par);
 
 %% Core ditro_fun pfun
 
 % p = pfun(Nv, Ev, Efp, T, prob_distro_function)
-distro_fun.pfun(par.dev.Nv, par.dev.IP, par.dev.E0, par);
+distro_fun.pfun(par.dev.Nv, par.dev.Phi_IP, par.dev.EF0, par);
 
 %% Core ditro_fun Dn_fd_fun and Dnlook and Efn_fd_fun
 
@@ -401,7 +403,7 @@ distro_fun.Efn_fd_fun(soleq.ion.u(2,1,end), Efn, Dnfd.n_fd);
 
 [~, ~, ~, Efp] = dfana.calcEnergies(soleq.ion);
 % Dpfd = Dp_fd_fun(Nv, Ev, Efp, mu_p, T)
-Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.IP(1), Efp, par.mu_p(1), par.T);
+Dpfd = distro_fun.Dp_fd_fun(par.dev.Nv(1), par.Phi_IP(1), Efp, par.mu_p(1), par.T);
 
 % Dsol = Dplook(p, Dpfun, p_fd)
 distro_fun.Dplook(soleq.ion.u(3,1,1), Dpfd.Dpfun, Dpfd.p_fd);
@@ -419,19 +421,21 @@ fun_gen('sin');
 fun_gen('tri');
 
 %% Core generation
-
 % gx = generation(par, source_type, laserlambda)
-par2 = par;
-par2.OM = ~par.OM;
-generation(par, 'AM15', 470);
-generation(par, 'laser', 470);
-generation(par2, 'AM15', 470);
-generation(par2, 'laser', 470);
+par_om1 = par;
+par_om1.optical_model = 'uniform';
+generation(par_om1, 'AM15', 470);
+generation(par_om1, 'laser', 470);
+
+par_om2 = par;
+par_om2.optical_model = 'Beer-Lambert';
+generation(par_om2, 'AM15', 470);
+generation(par_om2, 'laser', 470);
 
 %% Core getvar_sub
 
 % varsub = getvar_sub(var)
-EA_sub = getvar_sub(par.dev.EA);
+EA_sub = getvar_sub(par.dev.Phi_EA);
 
 %% Core getx_sub
 
@@ -447,62 +451,47 @@ import_properties(par, {input_csv});
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
 meshgen_t(part);
 
 %% Core meshgen_t 1
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
-part.tmesh_type = 1;
+part.tmesh_type = 'linear';
 meshgen_t(part);
 
 %% Core meshgen_t 2
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
-part.tmesh_type = 2;
+part.tmesh_type = 'log10';
 meshgen_t(part);
 
 %% Core meshgen_t 3
 
 % [t] = meshgen_t(par)
 part = par;
-part.mesht_figon = true;
-part.tmesh_type = 3;
+part.tmesh_type = 'log10-double';
 meshgen_t(part);
 
 %% Core meshgen_x default
 
 % x = meshgen_x(par)
 parx = par;
-parx.meshx_figon = true;
-meshgen_x(par);
-
-%% Core meshgen_x 1
-
-% x = meshgen_x(par)
-parx = par;
-parx.meshx_figon = true;
-parx.xmesh_type = 1;
 meshgen_x(parx);
 
 %% Core meshgen_x 4
 
 % x = meshgen_x(par)
 parx = par;
-parx.meshx_figon = true;
-parx.xmesh_type = 4;
+parx.xmesh_type = 'linear';
 meshgen_x(parx);
 
 %% Core meshgen_x 5
 
 % x = meshgen_x(par)
 parx = par;
-parx.meshx_figon = true;
-parx.xmesh_type = 5;
+parx.xmesh_type = 'erf-linear';
 meshgen_x(parx);
 
 %% Core refresh_device
@@ -666,13 +655,13 @@ VappFunction(soleq.ion, 'tri', [0, 0.6, -0.1, 3, 5], 15, 60, false);
 
 %% Optical beerlambert
 
-par2 = par;
-par2.side = 3 - par.side;
 % Gentot = beerlambert(par, x, source_type, laserlambda, figson)
-beerlambert(par, par.xx, 'AM15', 0, true);
-beerlambert(par, par.xx, 'laser', 500, true);
-beerlambert(par2, par2.xx, 'AM15', 0, true);
-beerlambert(par2, par2.xx, 'laser', 500, true);
+par_om2.side = 'left';
+beerlambert(par_om2, par_om2.xx, 'AM15', 0, true);
+beerlambert(par_om2, par_om2.xx, 'laser', 500, true);
+par_om2.side = 'right';
+beerlambert(par_om2, par_om2.xx, 'AM15', 0, true);
+beerlambert(par_om2, par_om2.xx, 'laser', 500, true);
 
 %% Optical lightsource
 
@@ -682,7 +671,7 @@ lightsource('AM15', 500);
 %% Optical LoadRefrIndex
 
 % [n_interp, k_interp] = LoadRefrIndex(name,wavelengths)
-LoadRefrIndex(par.stack{1},300:767);
+LoadRefrIndex(par.material{1},300:767);
 
 %% Input_files
 inputs = dir('Input_files');
@@ -702,12 +691,14 @@ for i=1:length(inputs)
         assert(all(el_s == exp_el_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
         assert(~any(isnan(el.u(:))))
         
-        ion = soleq.ion;
-        ion_s = size(ion.u);
-        
-        exp_ion_s = [ion.par.tpoints, xpoints, round(3+par.N_ionic_species)];
-        assert(all(ion_s == exp_ion_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
-        assert(~any(isnan(ion.u(:))))
+        if par.N_ionic_species > 0
+            ion = soleq.ion;
+            ion_s = size(ion.u);
+            
+            exp_ion_s = [ion.par.tpoints, xpoints, round(3+par.N_ionic_species)];
+            assert(all(ion_s == exp_ion_s), [input ': Expected size: %d, %d, %d. Obtained size: %d, %d, %d.'], el_s(1), el_s(2), el_s(3), exp_el_s(1), exp_el_s(2), exp_el_s(3));
+            assert(~any(isnan(ion.u(:))))
+        end
     end
 end
 
