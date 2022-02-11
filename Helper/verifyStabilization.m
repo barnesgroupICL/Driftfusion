@@ -68,7 +68,7 @@ compare_log = [false, true, true, false, false];
 % break they break at the same time
 % using t(end) could get a time out of the solution when the computation broke before reaching the final time
 end_time = t_array(length(sol_matrix(:, 1, 1)));
-time_index = find(t_array <= time_fraction * end_time, 1, 'last'); % get time mesh index at a specified percentage of maximum time reached
+[~, time_index] = min(abs(t_array - time_fraction * end_time)); % get time mesh index at a specified percentage of maximum time reached
 
 % for each component of the solution verify that didn't change significantly over the requested time
 for i = 1:length(sol_matrix(1, 1, :))
