@@ -22,8 +22,9 @@ sol_CV_k0p1 = doCV(soleq_single_carrier.ion, 0, 0, 0.6, -0.6, 1e-1, 4, 401);
 sol_CV_k1 = doCV(soleq_single_carrier.ion, 0, 0, 0.6, -0.6, 1, 4, 401);
 
 %% Plot CV using currents from left-hand boundary (x=0)
-dfplot.JVapp(sol_CV_k0p01, 0);
+dfplot.JtotVapp(sol_CV_k0p01, 0);
 hold on
-dfplot.JVapp(sol_CV_k0p1, 0);
+dfplot.JtotVapp(sol_CV_k0p1, 0);
 hold on
-dfplot.JVapp(sol_CV_k1, 0);
+dfplot.JtotVapp(sol_CV_k1, 0);
+legend('10 mVs-1', '100 mVs-1', '1000 mVs-1')

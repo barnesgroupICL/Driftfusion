@@ -14,7 +14,7 @@ function sol_ic = extract_IC(sol, requested_time)
 % it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
-% 
+%
 % START CODE
 if length(requested_time) == 1
     index = 0;
@@ -33,7 +33,7 @@ sol_ic.u = sol.u(index, :, :);
 
 % Overwrite Vapp
 Vappt = dfana.calcVapp(sol);
-sol_ic.par.Vapp = Vappt(index);
+sol_ic.par.V_fun_arg(1) = Vappt(index(end));
 % Overwrite time array
 sol_ic.t = sol.t(index);
 

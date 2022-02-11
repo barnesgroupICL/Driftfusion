@@ -1,7 +1,7 @@
 function devprop = build_property(property, xmesh, par, interface_switch, gradient_property)
 % Builds the device property - i.e. defines the properties at
 % every x position in the device
-% PROPERTY          - the variable name of the propery e.g. par.EA
+% PROPERTY          - the variable name of the propery e.g. par.Phi_EA
 % XMESH             - as name suggests
 % PAR               - parameters object
 % INTERFACE_SWICTH  -   'zeroed' = set property value to zero for interfaces
@@ -43,7 +43,7 @@ for i=1:length(par.dcum)                % i is the layer index
                 xprime = xmesh(j)-par.dcum0(i);
                 deff = par.d(i);
                 % Gradient coefficient for surface recombination equivalence
-                alpha0 = ((par.EA(i-1) - par.EA(i+1))/(par.kB*par.T) + (log(par.Nc(i+1))-log(par.Nc(i-1))))/deff;
+                alpha0 = ((par.Phi_EA(i-1) - par.Phi_EA(i+1))/(par.kB*par.T) + (log(par.Nc(i+1))-log(par.Nc(i-1))))/deff;
                 if alpha0 < 0
                     xprime_n = xprime;
                     alpha0_xn = alpha0;     % the sign of alpha0 is referenced to the direction of xprime_n
@@ -52,7 +52,7 @@ for i=1:length(par.dcum)                % i is the layer index
                     alpha0_xn = -alpha0;     % the sign of alpha0 is referenced to the direction of xprime_n
                 end
                 % Gradient coefficient for surface recombination equivalence
-                beta0 = ((par.IP(i+1) - par.IP(i-1))/(par.kB*par.T) + (log(par.Nv(i+1))-log(par.Nv(i-1))))/deff;
+                beta0 = ((par.Phi_IP(i+1) - par.Phi_IP(i-1))/(par.kB*par.T) + (log(par.Nv(i+1))-log(par.Nv(i-1))))/deff;
                 if beta0 < 0
                     xprime_p = xprime;
                     beta0_xp = beta0;        % the sign of beta is referenced to the direction of xprime_p
@@ -139,19 +139,19 @@ for i=1:length(par.dcum)                % i is the layer index
                     case 'beta0_xp'
                         devprop(j) = beta0_xp;
                     case 'vsr_zone'
-                        if par.vsr_zone_loc(i) == "L"
+                        if strcmp(par.vsr_zone_loc(i), "L")
                             if xprime <= deff*par.frac_vsr_zone
                                 devprop(j) = 1;
                             else
                                 devprop(j) = 0;
                             end
-                        elseif par.vsr_zone_loc(i) == "R"
+                        elseif strcmp(par.vsr_zone_loc(i), "R")
                             if xprime >= deff*(1 - par.frac_vsr_zone) && xprime <= deff
                                 devprop(j) = 1;
                             else
                                 devprop(j) = 0;
                             end
-                        elseif par.vsr_zone_loc(i) == "C"
+                        elseif strcmp(par.vsr_zone_loc(i), "C")
                             if xprime >= (deff/2)*(1 - par.frac_vsr_zone) && xprime <= (deff/2)*(1 + par.frac_vsr_zone)
                                 devprop(j) = 1;
                             else

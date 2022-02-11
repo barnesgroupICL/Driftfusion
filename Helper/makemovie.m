@@ -17,28 +17,39 @@ function Framefile = makemovie(sol, plotfun, xrange, yrange, movie_name, Vcounte
 %% Start code
 Vapp = dfana.calcVapp(sol);
 
+%% Obtain number of subplots
+clf
+plotfun(sol, sol.t(1))
+
+ax = findobj(gcf,'type','axes');
+pos_temp = get(ax,'position');
+if isa(pos_temp, 'cell')
+    pos = cell2mat(pos_temp);
+elseif  isa(pos_temp, 'double')
+    pos = pos_temp;
+end
+nrows = numel(unique(pos(:,2))); % the same Y position means the same row
+ncols = numel(unique(pos(:,1))); % the same X position means the same column
+
 for i = 1:length(sol.t)
-    %figure(600)
     clf
     plotfun(sol, sol.t(i))
     fig1 = gca;
-    
-%% You can include limits for subplots here
-%     subplot(2,1,1);
-%     ylim([-2, 0.2])
-%     
-%     subplot(2,1,2);
-%     ylim([0, 3.5e16])
-    
-    if xrange ~= 0
-        xlim([xrange(1)*1e7, xrange(2)*1e7])
+
+    for j = 1:nrows*ncols
+        subplot(nrows, ncols, j)
+        
+        if any(any(xrange ~= 0))
+            xlim([xrange(j, 1)*1e7, xrange(j, 2)*1e7])
+        end
+        
+        if any(any(yrange ~= 0))
+            ylim([yrange(j, 1), yrange(j, 2)])
+        end
     end
-    
-    if yrange ~= 0
-        ylim([yrange(1), yrange(2)])
-    end
+
     set(gcf,'color','w');
-    
+
     % Voltage counter
     if Vcounter
         dim = [.2 0 .3 .2];
@@ -49,7 +60,7 @@ for i = 1:length(sol.t)
         T.FontSize = 16;
         drawnow
     end
-    
+
     % Time counter
     if tcounter
         dim = [.2 0 .3 .3];
@@ -60,7 +71,7 @@ for i = 1:length(sol.t)
         T.FontSize = 16;
         drawnow
     end
-    
+
     Framefile(i) = getframe(gcf);
 end
 

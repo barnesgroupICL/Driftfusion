@@ -13,7 +13,9 @@ Please log bugs through GitHub.
 
 ## QuickStart Guide
 
-To get started do the following:
+The easiest way to get started is to look at and adapt the scripts contained within the `Scripts` folder. Each is designed to test different device architectures and simulation protocols.
+
+Alternatively to get started manually do the following:
  
 1.	If you are new to GitHub it is highly recommended that you download GitHub desktop at: https://desktop.github.com/.
 Alternatively, you can download Driftfusion standalone as a folder but you wonâ€™t easily be able to synch to the latest version.
@@ -30,11 +32,11 @@ Alternatively, you can download Driftfusion standalone as a folder but you wonâ€
 
 The  names of properties and their units are given in the commented code in the `pc` class.
 	
-6. 	A better way of defining your device is to use the .csv files contained in the `/Input_files` folder. For example, to create a parameters object with default parameters to simulate an inverted PTPD/perovskite/PCBM stack type:
+6. 	A better way of defining your device is to use the .csv files contained in the `/Input_files` folder. For example, to create a parameters object with default parameters to simulate a Spiro-OMeTAD/MAPI/TiO2 device type:
 
-`par = pc('Input_files/ptpd_mapi_pcbm.csv');`
+`par = pc('Input_files/spiro_mapi_tio2.csv');`
 
-It is recommended to duplicate the existing .csv files to define your own device and use a programme like Excel or Open Office to edit them. Ensure that the material name given in the 'stack' column matches with one of the materials in the `Libraries/Index_of_Refraction_library.xls` if you wish to use the Beer-Lambert optical model.
+It is recommended to duplicate the existing .csv files to define your own device and use a programme like Excel or Open Office to edit them. Ensure that the material name given in the 'material' column matches with one of the materials in the `Libraries/Index_of_Refraction_library.xls` if you wish to use the Beer-Lambert optical model.
 
 7.	Obtain equilibrium solutions for your device by typing:
  
@@ -57,9 +59,16 @@ Good luck!
 
 ### Impedance Spectroscopy on homojunction model, applying an oscillating voltage profile
 
-Submitted [on arXiv on may 2018](https://arxiv.org/abs/1805.06446), published on [Energy & Environmental Science on march 2019](https://pubs.rsc.org/en/content/articlelanding/2019/ee/c8ee02362j).
+Submitted [on arXiv on May 2018](https://arxiv.org/abs/1805.06446), published on [Energy & Environmental Science on march 2019](https://pubs.rsc.org/en/content/articlelanding/2019/ee/c8ee02362j).
 
-Check out the `2018-EIS` branch of this repository or [download directly just this branch](https://github.com/barnesgroupICL/Driftfusion/archive/2018-EIS.zip).
+Check out the [2018-EIS branch](https://github.com/barnesgroupICL/Driftfusion/tree/2018-EIS) of this repository or [download directly just this branch](https://github.com/barnesgroupICL/Driftfusion/archive/2018-EIS.zip).
 
 Then follow the instructions in the branch readme or on this [wiki page](https://github.com/barnesgroupICL/Driftfusion/wiki/2018-Impedance-Spectroscopy-on-homojunction-model).
 
+### ElectroAbsorption, Step-Dwell-Probe and Impedance Spectroscopy on heterojunction model
+
+Submitted [on arXiv on January 2022](https://arxiv.org/abs/2201.02175).
+
+Check out the [2022-EA\_SDP\_EIS branch](https://github.com/barnesgroupICL/Driftfusion/tree/2022-EA_SDP_EIS) of this repository or [download directly just this branch](https://github.com/barnesgroupICL/Driftfusion/archive/2022-EA_SDP_EIS.zip).
+
+Then follow the instructions in the branch readme or on this [wiki page](https://github.com/barnesgroupICL/Driftfusion/wiki/2022-ElectroAbsorbance,-Step-Dwell-Probe-and-EIS-on-heterojunction-model).

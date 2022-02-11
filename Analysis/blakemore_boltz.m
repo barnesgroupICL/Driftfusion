@@ -20,7 +20,7 @@ legend('Blakemore', 'Boltz')
 figure(2)
 semilogy(eta, g_blake, eta, g_boltz)
 xlabel('(Efn - Ecb)/kBT')
-ylabel('g(epsilon)')
+ylabel('Diffusion enhancement G(\eta)')
 legend('Blakemore', 'Boltz')
 
 figure(3)

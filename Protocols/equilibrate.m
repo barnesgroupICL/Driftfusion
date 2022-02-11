@@ -4,7 +4,7 @@ function soleq = equilibrate(varargin)
 %% Input arguments
 % VARARGIN{1,1} = PAR
 % VARARGIN{1,2} = ELECTRONIC_ONLY
-% ELECTRONIC_ONLY: 
+% ELECTRONIC_ONLY:
 % 0 = runs full equilibrate protocol
 % 1 = skips ion equilibration
 %
@@ -47,16 +47,21 @@ par.N_ionic_species = 0;
 par.vsr_check = 0;
 
 %% General initial parameters
-par.tmesh_type = 2;
-par.tpoints = 10;
+% Set applied bias to zero
+par.V_fun_type = 'constant';
+par.V_fun_arg(1) = 0;
 
-par.Vapp = 0;
+% Set light intensities to zero
 par.int1 = 0;
 par.int2 = 0;
 par.g1_fun_type = 'constant';
 par.g2_fun_type = 'constant';
-par.OC = 0;
+
+% Time mesh
 par.tmesh_type = 2;
+par.tpoints = 10;
+
+% Series resistance
 par.Rs = 0;
 
 %% Switch off mobilities
@@ -90,12 +95,12 @@ j = 1;
 
 while any(all_stable) == 0
     disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-    
+
     par.tmax = 10*par.tmax;
     par.t0 = par.tmax/1e6;
-    
+
     sol = df(sol, par);
-    
+
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 end
 
@@ -108,54 +113,54 @@ soleq.el.par.vsr_check = 1;
 
 disp('Electronic carrier equilibration complete')
 
-if electronic_only == 0
+if electronic_only == 0 && par_origin.N_ionic_species > 0
     %% Equilibrium solutions with ion mobility switched on
     par.N_ionic_species = par_origin.N_ionic_species;
-    
+
     % Create temporary solution for appending initial conditions to
     sol = soleq.el;
-    
+
     % Start without SRH or series resistance
     %par.SRHset = 0;
     par.Rs = 0;
-   
+
     disp('Closed circuit equilibrium with ions')
-    
+
     % Take ratio of electron and ion mobilities in the active layer
     rat_anion = par.mu_n(par.active_layer)/par.mu_a(par.active_layer);
     rat_cation = par.mu_n(par.active_layer)/par.mu_c(par.active_layer);
-    
+
     % If the ratio is infinity (ion mobility set to zero) then set the ratio to
     % zero instead
     if isnan(rat_anion) || isinf(rat_anion)
         rat_anion = 0;
     end
-    
+
     if isnan(rat_cation) || isinf(rat_cation)
         rat_cation = 0;
     end
-    
+
     par.mobset = 1;
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
     par.K_a = rat_anion;
     par.K_c = rat_cation;
     par.tmax = 1e4*t_diff;
     par.t0 = par.tmax/1e3;
-    
-    sol = df(sol, par);   
+
+    sol = df(sol, par);
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-    
+
     % loop to check ions have reached stable config- if not accelerate ions by
     % order of mag
     while any(all_stable) == 0
-        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]); 
+        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
         par.tmax = par.tmax*10;
         par.t0 = par.tmax/1e6;
         sol = df(sol, par);
         all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     end
-    
-    % write solution 
+
+    % write solution
     soleq.ion = sol;
     % Manually check solution for VSR self-consitency
     sol_ic = extract_IC(soleq.ion, [soleq.ion.t(end)*0.7, soleq.ion.t(end)]);
@@ -165,7 +170,7 @@ if electronic_only == 0
     soleq.ion.par.mobseti = 1;
     soleq.ion.par.K_a = 1;
     soleq.ion.par.K_c = 1;
-    
+
     disp('Ionic carrier equilibration complete')
 end
 

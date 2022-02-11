@@ -20,7 +20,7 @@ function sol_relax = jumptoV(sol_ini, Vjump, tdwell, mobseti, Int, stabilise, ac
 % it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
-% 
+%
 %% Start code
 if tdwell == 0
     error('tdwell cannot be set to zero- please choose a time step > 0 s')
@@ -38,7 +38,7 @@ par.tmax = 100*t_diff;
 par.tmesh_type = 1;
 par.t0 = 0;
 par.V_fun_type = 'sweep';
-par.V_fun_arg(1) = par.Vapp;
+par.V_fun_arg(1) = getVend(sol_ini);
 par.V_fun_arg(2) = Vjump;
 par.V_fun_arg(3) = 100*t_diff;
 
@@ -54,13 +54,13 @@ if accelerate
     % Take ratio of electron and ion mobilities in the active layer
     rat_anion = par.mu_n(par.active_layer)/par.mu_a(par.active_layer);
     rat_cation = par.mu_n(par.active_layer)/par.mu_c(par.active_layer);
-    
+
     % If the ratio is infinity (ion mobility set to zero) then set the ratio to
     % zero instead
     if isnan(rat_anion) || isinf(rat_anion)
         rat_anion = 0;
     end
-    
+
     if isnan(rat_cation) || isinf(rat_cation)
         rat_cation = 0;
     end
@@ -72,7 +72,7 @@ else
 end
 
 par.V_fun_type = 'constant';
-par.V_fun_arg(1) = par.Vapp;    % For future proof
+par.V_fun_arg(1) = Vjump;
 
 par.g1_fun_type = 'constant';
 par.g1_fun_arg(1) = Int;        % For future proof
@@ -91,15 +91,15 @@ j = 1;
 if stabilise
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     % loop to check ions have reached stable config- if not accelerate ions by
-    while any(all_stable) == 0       
+    while any(all_stable) == 0
         par.tmax = par.tmax*10;
-        
+
         disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-        
+
         par.t0 = par.tmax/1e6;
-        
+
         sol = df(jump1, par);
-        
+
         all_stable = verifyStabilization(sol.u, sol.t, 0.7);
         j = j+1;
     end

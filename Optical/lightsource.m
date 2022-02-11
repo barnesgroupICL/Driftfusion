@@ -13,8 +13,8 @@ function AM15 = lightsource(source_type, lambda)
 %% Start code
 if source_type == 'AM15'
     % Load AM1.5
-    AM15_data=xlsread('AM15.xls');
-    AM15=1e-3*interp1(AM15_data(:,1), AM15_data(:,2), lambda, 'linear', 'extrap');
+    AM15_data = xlsread('AM15.xls');
+    AM15 = 1e-3*interp1(AM15_data(:,1), AM15_data(:,2), lambda, 'linear', 'extrap'); % Converts to W cm-2 nm-1
 end
 
 end
