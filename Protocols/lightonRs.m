@@ -94,7 +94,7 @@ if stable_time < 0
     % loop to check ions have reached stable config- if not accelerate ions by
     % order of mag
     j = 1;
-    while any(all_stable) == 0
+    while any(all_stable) == 0 && j<10
         disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
 
         par.tmax = par.tmax*10;
@@ -103,7 +103,7 @@ if stable_time < 0
         sol = df(sol_Rs, par);
 
         all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-
+        j = j+1;
     end
     warning('on', 'Driftfusion:verifyStabilization');
 end
