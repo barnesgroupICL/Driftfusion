@@ -89,8 +89,8 @@ warning('off', 'Driftfusion:verifyStabilization');
 i=0;
 while forceStabilization || ~verifyStabilization(steadystate_struct.u, steadystate_struct.t, 1e-3) % check stability
     i = i + 1;
-    if i > 10
-        warning('Driftfusion:stabilize', [mfilename ' - not stabile after 10 attempts, giving up.']);
+    if i > 20
+        warning('Driftfusion:stabilize', [mfilename ' - not stabile after 20 attempts, giving up.']);
         break
     end
 
