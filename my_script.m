@@ -22,9 +22,9 @@ sol_CV = doCV(soleq_sio2.ion, 0, 0, 1, -1, k_scan, 2, 201);
 
 %% Plot JV scan
 dfplot.JtotVapp(sol_CV, 0);
-set(gca,'YScale','log')
+%set(gca,'YScale','log')
 
-%%
+%% Plot anion and cation densities
 dfplot.acx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
 % 
 % ylim([-30e-3,10e-3])
