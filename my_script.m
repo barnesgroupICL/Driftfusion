@@ -8,7 +8,8 @@ par_sio2 = pc('C:\Users\Manan Mehta\Documents\GitHub\Driftfusion\Input_files\pog
 soleq_sio2 = equilibrate(par_sio2);
  %% Equilibrium solutions
 JVsol = doJV(soleq_sio2.ion, 100e-3, 201, 1, 0, 0, 1, 1);
-
+%testinggithub
+%misv2test
 % plot JV scan
 dfplot.JV(JVsol, 1);
 set(gca,'YScale','log')
