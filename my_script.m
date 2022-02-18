@@ -5,12 +5,12 @@ initialise_df
 % Filepath Windows
 % par_sio2 = pc('.\Input_files\pog2');
 % Filepath Mac
-par_sio2 = pc('Input_files/pog3.csv');
+par_alox = pc('Input_files/alox.csv');
 %% Equilibrium solutions
-soleq_sio2 = equilibrate(par_sio2);
+soleq_alox = equilibrate(par_alox);
 
 %% Plot equilibrium energy level diagram
-dfplot.ELnpx(soleq_sio2.ion)
+dfplot.ELnpx(soleq_alox.ion)
 
 %% Current-voltage scan
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
@@ -18,7 +18,7 @@ dfplot.ELnpx(soleq_sio2.ion)
 
 % sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
 k_scan = 0.1;
-sol_CV = doCV(soleq_sio2.ion, 0, 0, 1, -1, k_scan, 2, 201);
+sol_CV = doCV(soleq_alox.ion, 0, 0, 1, -1, k_scan, 2, 201);
 
 %% Plot JV scan
 dfplot.JtotVapp(sol_CV, 0);
