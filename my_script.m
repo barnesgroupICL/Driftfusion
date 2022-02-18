@@ -9,6 +9,9 @@ par_sio2 = pc('Input_files/pog2.csv');
 %% Equilibrium solutions
 soleq_sio2 = equilibrate(par_sio2);
 
+%% Plot equilibrium energy level diagram
+dfplot.ELnpx(soleq_sio2.ion)
+
 %% Current-voltage scan
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 % JVsol = doJV(soleq_sio2.ion, 100e-3, 201, 1, 0, 0, 1, 1);
