@@ -32,5 +32,11 @@ dfplot.acx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
 % ylim([-30e-3,10e-3])
 % xlim([-0.2, 1.2])
 
+%% Plot space charge density
+dfplot.rhox(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
+
 %% Plot Vapp vs time
 dfplot.Vappt(sol_CV)
+
+%% Make movie for anions and cations
+makemovie(sol_CV, @dfplot.acx, 0, [0, 1.5e18], 'acx', true, true);
