@@ -43,13 +43,14 @@ dfplot.rhox(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
 
 % Debye length
 L_D = 30e-7;
+N_Debye = 3;
 x_perov_left = 202e-7;
 x = sol_CV.x;
 t = sol_CV.t;
 Vappt = dfana.calcVapp(sol_CV);
 % Get point at which perovskite starts 
-sigma_n_bar = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + 3*L_D), 2);
-sigma_p_bar = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + 3*L_D), 2);
+sigma_n_bar = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
+sigma_p_bar = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 
 %% Plot average conductivity
 figure
