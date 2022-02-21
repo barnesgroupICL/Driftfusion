@@ -46,8 +46,10 @@ Thermal_voltage=25.7;
 e0=8.854E-12; %in cm
 Permittivity_perovskite=24.1.*e0;
 N0=par_alox.Ncat;
+N0_ownvalue=1e25;
 e=par_alox.e;
 Debye_Length = sqrt((Permittivity_perovskite.*25.7)./(e.*N0));
+Debye_Length_own = sqrt((Permittivity_perovskite.*25.7)./(e.*N0_ownvalue));
 %%
 x_perov_left = 202e-7;
 x = sol_CV.x;
