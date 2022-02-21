@@ -19,7 +19,7 @@ dfplot.ELnpx(soleq_alox.ion)
 % JVsol = doJV(soleq_sio2.ion, 100e-3, 201, 1, 0, 0, 1, 1);
 
 % sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
-k_scan = 0.01;
+k_scan = 0.001;
 sol_CV = doCV(soleq_alox.ion, 0, 0, 1, -1, k_scan, 2, 201);
 
 %% Plot JV scan
