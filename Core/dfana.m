@@ -446,6 +446,16 @@ classdef dfana
             % charge density
             rho = -n + p - NA + ND + par.z_a*a + par.z_c*c - par.z_c*Nani - par.z_c*Ncat;
         end
+        
+        function [sigma_n, sigma_p] = calc_conductivity(sol)
+            [u, t, x, par, dev, n, p, a, c ,V] = dfana.splitsol(sol);
+            
+            mu_n_M = repmat(dev.mu_n, length(t), 1);
+            mu_p_M = repmat(dev.mu_p, length(t), 1);
+            
+            sigma_n = par.e.*mu_n_M.*n;
+            sigma_p = par.e.*mu_p_M.*p;
+        end
 
         function Vapp = calcVapp(sol)
             [~,t,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);

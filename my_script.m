@@ -32,8 +32,31 @@ dfplot.acx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
 % ylim([-30e-3,10e-3])
 % xlim([-0.2, 1.2])
 
+%% Plot electron and hole profiles
+dfplot.npx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
+
 %% Plot space charge density
 dfplot.rhox(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
+
+%% Calculate conductivity
+[sigma_n, sigma_p] = dfana.calc_conductivity(sol_CV);
+
+% Debye length
+L_D = 30e-7;
+x_perov_left = 202e-7;
+x = sol_CV.x;
+t = sol_CV.t;
+Vappt = dfana.calcVapp(sol_CV);
+% Get point at which perovskite starts 
+sigma_n_bar = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + 3*L_D), 2);
+sigma_p_bar = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + 3*L_D), 2);
+
+%% Plot average conductivity
+figure
+plot(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
+xlabel('Voltage [V]')
+ylabel('Average conductivity [Siemens]')
+legend('Electron', 'Hole')
 
 %% Plot Vapp vs time
 dfplot.Vappt(sol_CV)
