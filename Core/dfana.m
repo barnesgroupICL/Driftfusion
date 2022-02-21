@@ -462,8 +462,8 @@ classdef dfana
             mu_n_M_peak = repmat(dev.mu_n, 1/(2*k_scan), 1);
             mu_p_M_peak = repmat(dev.mu_p, 1/(2*k_scan), 1);
             
-            sigma_n_peak = par.e.*mu_n_M_peak.*n;
-            sigma_p_peak = par.e.*mu_p_M_peak.*p;
+            sigma_n_bar_peak_positive_voltage = par.e.*mu_n_M_peak.*n;
+            sigma_p_bar_peak_positive_voltage = par.e.*mu_p_M_peak.*p;
         end
         function Vapp = calcVapp(sol)
             [~,t,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
