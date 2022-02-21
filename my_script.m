@@ -51,7 +51,7 @@ Vappt = dfana.calcVapp(sol_CV);
 %sigma_n_bar = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 %sigma_p_bar = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 
-%% Find conductivity for applied bias
+%% Find peak conductivity for applied bias
 sigma_n_bar_peak_positive_voltage = mean(sigma_n_peak(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 sigma_p_bar_peak_positive_voltage = mean(sigma_p_peak(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 
@@ -62,6 +62,11 @@ xlabel('Voltage [V]')
 ylabel('Average conductivity [Siemens]')
 legend('Electron', 'Hole')
 
-
+%% Plot Peak conductivity
+figure
+plot(Vappt, sigma_n_bar_peak_positive_voltage, Vappt, sigma_p_bar_peak_positive_voltage)
+xlabel('Voltage [V]')
+ylabel('Peak conductivity [Siemens]')
+legend('Electron', 'Hole')
 %% Make movie for anions and cations
 %makemovie(sol_CV, @dfplot.acx, 0, [0, 1.5e18], 'acx', true, true);
