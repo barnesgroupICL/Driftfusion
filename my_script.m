@@ -20,7 +20,10 @@ dfplot.ELnpx(soleq_alox.ion)
 
 % sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
 k_scan = 0.001;
-sol_CV = doCV(soleq_alox.ion, 0, 0, 1, -1, k_scan, 2, 201);
+sol_CV = doCV(soleq_alox.ion, 0, 0, 1, 0, k_scan, 1, 201);
+%% Plot Vapp vs time
+dfplot.Vappt(sol_CV)
+
 
 %% Plot JV scan
 dfplot.JtotVapp(sol_CV, 0);
@@ -59,8 +62,6 @@ xlabel('Voltage [V]')
 ylabel('Average conductivity [Siemens]')
 legend('Electron', 'Hole')
 
-%% Plot Vapp vs time
-dfplot.Vappt(sol_CV)
 
 %% Make movie for anions and cations
 %makemovie(sol_CV, @dfplot.acx, 0, [0, 1.5e18], 'acx', true, true);
