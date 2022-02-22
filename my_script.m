@@ -49,10 +49,10 @@ epp_pvsk = e*par.epp0*par.epp(3);       % Perovskite absolute dielectric constan
 N0 = par.Ncat(3);                   
 N0_courtier = 1.6e19;                   % cm-3
 
-L_D = sqrt((epp_pvsk*V_T)/(e*N0));
+L_D = sqrt((epp_pvsk*V_T)/(e*N0));      % Deby width [cm]
 L_D_courtier = sqrt((epp_pvsk*V_T)/(e*N0_courtier));
 
-N_Debye = 3;                        % Number of Debye lengths
+N_Debye = 3;                            % Number of Debye lengths to average electron density over
 %%
 x_perov_left = 202e-7;
 x = sol_CV.x;
