@@ -39,6 +39,7 @@ dfplot.rhox(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
 
 %% Calculate conductivity
 [sigma_n, sigma_p] = dfana.calc_conductivity(sol_CV);
+[sigma_n_bar_peak_positive_voltage, sigma_p_bar_peak_positive_voltage] = dfana.calc_peak_conductivity(sol_CV);
 
 %% Debye length Calculation
 L_D = 30e-7;
