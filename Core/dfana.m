@@ -456,7 +456,15 @@ classdef dfana
             sigma_n = par.e.*mu_n_M.*n;
             sigma_p = par.e.*mu_p_M.*p;
         end
-
+     function [sigma_n_bar_peak_positive_voltage , sigma_p_bar_peak_positive_voltage ] = calc_peak_conductivity(sol)
+            [u, t, x, par, dev, n, p, a, c ,V] = dfana.splitsol(sol);
+            
+            mu_n_M_peak = repmat(dev.mu_n, 1/(2*k_scan), 1);
+            mu_p_M_peak = repmat(dev.mu_p, 1/(2*k_scan), 1);
+            
+            sigma_n_bar_peak_positive_voltage = par.e.*mu_n_M_peak.*n;
+            sigma_p_bar_peak_positive_voltage = par.e.*mu_p_M_peak.*p;
+        end
         function Vapp = calcVapp(sol)
             [~,t,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
             switch par.V_fun_type

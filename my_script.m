@@ -4,8 +4,6 @@
 initialise_df
 
 %% Add parameter file to path 
-% Filepath Windows
-% par_sio2 = pc('.\Input_files\pog2');
 % Filepath Mac
 par_alox = pc('Input_files/alox.csv');
 %% Equilibrium solutions
@@ -19,8 +17,12 @@ dfplot.ELnpx(soleq_alox.ion)
 % JVsol = doJV(soleq_sio2.ion, 100e-3, 201, 1, 0, 0, 1, 1);
 
 % sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
-k_scan = 0.1;
-sol_CV = doCV(soleq_alox.ion, 0, 0, 1, -1, k_scan, 2, 201);
+k_scan = 0.001;
+Vmax=1;
+sol_CV = doCV(soleq_alox.ion, 0, 0, Vmax, 0, k_scan, 1, 201);
+%% Plot Vapp vs time
+dfplot.Vappt(sol_CV)
+
 
 %% Plot JV scan
 dfplot.JtotVapp(sol_CV, 0);
@@ -28,9 +30,6 @@ dfplot.JtotVapp(sol_CV, 0);
 
 %% Plot anion and cation densities
 dfplot.acx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
-% 
-% ylim([-30e-3,10e-3])
-% xlim([-0.2, 1.2])
 
 %% Plot electron and hole profiles
 dfplot.npx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
@@ -40,10 +39,19 @@ dfplot.rhox(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
 
 %% Calculate conductivity
 [sigma_n, sigma_p] = dfana.calc_conductivity(sol_CV);
+[sigma_n_bar_peak_positive_voltage, sigma_p_bar_peak_positive_voltage] = dfana.calc_peak_conductivity(sol_CV);
 
-% Debye length
+%% Debye length Calculation
 L_D = 30e-7;
-N_Debye = 3;
+Thermal_voltage=25.7;
+e0=8.854E-18; %in cm-3
+Permittivity_perovskite=24.1.*e0;
+N0=par_alox.Ncat;
+N0_courtier=1.6e19;%in cm-3
+e=par_alox.e;
+Debye_Length = sqrt((Permittivity_perovskite.*25.7)./(e.*N0));
+Debye_Length_courtier = sqrt((Permittivity_perovskite.*25.7)./(e.*N0_courtier));
+%%
 x_perov_left = 202e-7;
 x = sol_CV.x;
 t = sol_CV.t;
@@ -52,6 +60,10 @@ Vappt = dfana.calcVapp(sol_CV);
 sigma_n_bar = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 sigma_p_bar = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 
+%% Find peak conductivity for applied bias
+sigma_n_peak_positive_voltage = mean( sigma_n_bar_peak_positive_voltage(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
+sigma_p_peak_positive_voltage = mean( sigma_p_bar_peak_positive_voltage(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
+
 %% Plot average conductivity
 figure
 semilogy(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
@@ -59,8 +71,11 @@ xlabel('Voltage [V]')
 ylabel('Average conductivity [Siemens]')
 legend('Electron', 'Hole')
 
-%% Plot Vapp vs time
-dfplot.Vappt(sol_CV)
+ %% Plot Peak conductivity
 
+plot(Vappt, sigma_n_peak_positive_voltage, Vappt, sigma_p_peak_positive_voltage)
+xlabel('Voltage [V]')
+ylabel('Peak conductivity [Siemens]')
+legend('Electron', 'Hole')
 %% Make movie for anions and cations
-makemovie(sol_CV, @dfplot.acx, 0, [0, 1.5e18], 'acx', true, true);
+%makemovie(sol_CV, @dfplot.acx, 0, [0, 1.5e18], 'acx', true, true);
