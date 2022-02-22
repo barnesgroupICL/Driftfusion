@@ -42,15 +42,16 @@ dfplot.rhox(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
 [sigma_n_bar_peak_positive_voltage, sigma_p_bar_peak_positive_voltage] = dfana.calc_peak_conductivity(sol_CV);
 
 %% Debye length Calculation
-L_D = 30e-7;
-Thermal_voltage=25.7;
-e0=8.854E-18; %in cm-3
-Permittivity_perovskite=24.1.*e0;
-N0=par_alox.Ncat;
-N0_courtier=1.6e19;%in cm-3
-e=par_alox.e;
-Debye_Length = sqrt((Permittivity_perovskite.*25.7)./(e.*N0));
-Debye_Length_courtier = sqrt((Permittivity_perovskite.*25.7)./(e.*N0_courtier));
+par = par_alox;
+
+e = par.e;
+V_T = par.kB*par.T;                     % Thermal votlage
+epp_pvsk = e*par.epp0*par.epp(3);       % Perovskite absolute dielectric constant
+N0 = par.Ncat(3);                   
+N0_courtier = 1.6e19;                   % cm-3
+
+Debye_Length = sqrt((epp_pvsk*V_T)/(e*N0));
+Debye_Length_courtier = sqrt((epp_pvsk*V_T)/(e*N0_courtier));
 %%
 x_perov_left = 202e-7;
 x = sol_CV.x;
