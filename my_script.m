@@ -39,7 +39,6 @@ dfplot.rhox(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
 
 %% Calculate conductivity
 [sigma_n, sigma_p] = dfana.calc_conductivity(sol_CV);
-[sigma_n_bar_peak_positive_voltage, sigma_p_bar_peak_positive_voltage] = dfana.calc_peak_conductivity(sol_CV);
 
 %% Debye length Calculation
 par = par_alox;
@@ -50,8 +49,10 @@ epp_pvsk = e*par.epp0*par.epp(3);       % Perovskite absolute dielectric constan
 N0 = par.Ncat(3);                   
 N0_courtier = 1.6e19;                   % cm-3
 
-Debye_Length = sqrt((epp_pvsk*V_T)/(e*N0));
-Debye_Length_courtier = sqrt((epp_pvsk*V_T)/(e*N0_courtier));
+L_D = sqrt((epp_pvsk*V_T)/(e*N0));
+L_D_courtier = sqrt((epp_pvsk*V_T)/(e*N0_courtier));
+
+N_Debye = 3;                        % Number of Debye lengths
 %%
 x_perov_left = 202e-7;
 x = sol_CV.x;
@@ -62,8 +63,11 @@ sigma_n_bar = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D)
 sigma_p_bar = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 
 %% Find peak conductivity for applied bias
-sigma_n_peak_positive_voltage = mean( sigma_n_bar_peak_positive_voltage(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
-sigma_p_peak_positive_voltage = mean( sigma_p_bar_peak_positive_voltage(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
+pp_Vmax = find(Vappt == max(Vappt));      %% pp = point position
+pp_Vmin = find(Vappt == min(Vappt));      %% pp = point position
+
+sigma_n_bar_Vpeak = sigma_n_bar(pp_Vmax);
+sigma_p_bar_Vpeak = sigma_p_bar(pp_Vmax);
 
 %% Plot average conductivity
 figure
@@ -73,10 +77,14 @@ ylabel('Average conductivity [Siemens]')
 legend('Electron', 'Hole')
 
  %% Plot Peak conductivity
+% PC - how do you intend to plot this? The peak voltage only occurs
+% once per voltage cycle so you cannot plot as a function of voltage as you
+% have tried below. 
 
-plot(Vappt, sigma_n_peak_positive_voltage, Vappt, sigma_p_peak_positive_voltage)
-xlabel('Voltage [V]')
-ylabel('Peak conductivity [Siemens]')
-legend('Electron', 'Hole')
+
+% plot(Vappt, sigma_n_peak_positive_voltage, Vappt, sigma_p_peak_positive_voltage)
+% xlabel('Voltage [V]')
+% ylabel('Peak conductivity [Siemens]')
+% legend('Electron', 'Hole')
 %% Make movie for anions and cations
 %makemovie(sol_CV, @dfplot.acx, 0, [0, 1.5e18], 'acx', true, true);
