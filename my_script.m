@@ -54,7 +54,7 @@ sigma_p_bar = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D)
 
 %% Plot average conductivity
 figure
-plot(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
+semilogy(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
 xlabel('Voltage [V]')
 ylabel('Average conductivity [Siemens]')
 legend('Electron', 'Hole')
