@@ -64,8 +64,12 @@ Vappt = dfana.calcVapp(sol_CV);
 sigma_n_bar = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 sigma_p_bar = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 
-sigma_n_bar_bulk = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + 4.00E-05), 2);
-sigma_p_bar_bulk = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + 4.00E-05), 2);
+sigma_n_bar_entire = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + 4.00E-05), 2);
+sigma_p_bar_entire = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + 4.00E-05), 2);
+
+sigma_n_bar_bulk = mean(sigma_n(:, x > x_perov_left + N_Debye*L_D & x < x_perov_left + 4.00E-05), 2);
+sigma_p_bar_bulk = mean(sigma_p(:, x > x_perov_left + N_Debye*L_D & x < x_perov_left + 4.00E-05), 2);
+
 
 
 %% Find peak conductivity for applied bias
@@ -88,14 +92,14 @@ sigma_p_bar_Vpeak = sigma_p_bar(pp_Vmax);
 figure
 semilogy(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
 xlabel('Voltage [V]')
-ylabel('Average conductivity [Semilog]')
+ylabel('Average channel conductivity [Semilog]')
 legend('Electron', 'Hole')
 
 %% Plot average conductivity
 figure
 plot(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
 xlabel('Voltage [V]')
-ylabel('Average conductivity [Linear]')
+ylabel('Average channel conductivity [Linear]')
 legend('Electron', 'Hole')
 
 %%
@@ -111,6 +115,19 @@ figure
 plot(Vappt, sigma_n_bar_bulk, Vappt, sigma_p_bar_bulk)
 xlabel('Voltage [V]')
 ylabel('Average bulk conductivity [Linear]')
+legend('Electron', 'Hole')
+%% Plot average conductivity
+figure
+semilogy(Vappt, sigma_n_bar_entire, Vappt, sigma_p_bar_entire)
+xlabel('Voltage [V]')
+ylabel('Average entire conductivity [Semilog]')
+legend('Electron', 'Hole')
+
+%% Plot average conductivity
+figure
+plot(Vappt, sigma_n_bar_entire, Vappt, sigma_p_bar_entire)
+xlabel('Voltage [V]')
+ylabel('Average entire conductivity [Linear]')
 legend('Electron', 'Hole')
 %% Plot Peak conductivity
 % PC - how do you intend to plot this? The peak voltage only occurs
