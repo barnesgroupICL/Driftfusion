@@ -18,11 +18,11 @@ initialise_df
 par_alox = pc('Input_files/alox.csv');
 no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e17)));
 epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1));%number of different electrode values
-valuestore=zeros(no_of_diff_ion_conc,epoints);%create the matrix
+valuestore=zeros(epoints,no_of_diff_ion_conc);%create the matrix
 row=1; %intialize 
 column=1;
 %% while
-while par_alox.Ncat(1,3)>1e17
+while par_alox.Ncat(1,3)>1e16
 %% Equilibrium solutions 
  
  for electrode_change= par_alox.Phi_left:0.1:par_alox.Phi_right %loop to run for different electrode workfunction
