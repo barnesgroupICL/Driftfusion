@@ -18,9 +18,11 @@ initialise_df
 par_alox = pc('Input_files/alox.csv');
 no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e17)));
 epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1));%number of different electrode values
+row=1; %for matrix created later
+column=1;
 %% Create Matrix
 valuestore=zeros(no_of_diff_ion_conc,epoints);
-row=1; %for matrix created later
+
 %% while
 while par_alox.Ncat(1,3)>1e16
 %% Equilibrium solutions 
@@ -87,12 +89,12 @@ Vappt = dfana.calcVapp(sol_CV);
 %% Get point at which perovskite starts 
 sigma_n_bar = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
 sigma_p_bar = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
-
-sigma_n_bar_entire = mean(sigma_n(:, x > x_perov_left & x < x_perov_right), 2);
-sigma_p_bar_entire = mean(sigma_p(:, x > x_perov_left & x < x_perov_right), 2);
-
-sigma_n_bar_bulk = mean(sigma_n(:, x > x_perov_left + N_Debye*L_D & x < x_perov_right), 2);
-sigma_p_bar_bulk = mean(sigma_p(:, x > x_perov_left + N_Debye*L_D & x < x_perov_right), 2);
+% 
+% sigma_n_bar_entire = mean(sigma_n(:, x > x_perov_left & x < x_perov_right), 2);
+% sigma_p_bar_entire = mean(sigma_p(:, x > x_perov_left & x < x_perov_right), 2);
+% 
+% sigma_n_bar_bulk = mean(sigma_n(:, x > x_perov_left + N_Debye*L_D & x < x_perov_right), 2);
+% sigma_p_bar_bulk = mean(sigma_p(:, x > x_perov_left + N_Debye*L_D & x < x_perov_right), 2);
 
 %% Find peak conductivity for applied bias
 pp_Vmax = find(Vappt == max(Vappt));      %% pp = point position
@@ -102,9 +104,9 @@ pp_Vmin = find(Vappt == min(Vappt));      %% pp = point position
 sigma_n_bar_Vpeak = sigma_n_bar(pp_Vmax);
 sigma_p_bar_Vpeak = sigma_p_bar(pp_Vmax);
 %% Put value inside matrix
- for i = 1:epoints
-    
-      valuestore(row,i)= sigma_n_bar_Vpeak;
+valuestore(row,column)= sigma_n_bar_Vpeak;  
+
+column=column+1;
  end
 
 row=row+1;
@@ -176,6 +178,10 @@ row=row+1;
 
  par_alox.Ncat(1,3)= par_alox.Ncat(1,3)/10;
  end
- end
+
+ %%
+figure
+contour(valuestore)
+%%
 % %% Make movie for anions and cations
 % %makemovie(sol_CV, @dfplot.acx, 0, [0, 1.5e18], 'acx', true, true);
