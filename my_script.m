@@ -16,11 +16,13 @@ initialise_df
 %% Add parameter file to path 
 % Filepath Mac
 par_alox = pc('Input_files/alox.csv');
-no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e10)));
+no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e17)));
 epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1));%number of different electrode values
+%% Create Matrix
+valuestore=zeros(no_of_diff_ion_conc,epoints);
 row=1; %for matrix created later
 %% while
-while par_alox.Ncat(1,3)>1e10
+while par_alox.Ncat(1,3)>1e16
 %% Equilibrium solutions 
  
  for electrode_change= par_alox.Phi_left:0.1:par_alox.Phi_right %loop to run for different electrode workfunction
@@ -37,7 +39,7 @@ while par_alox.Ncat(1,3)>1e10
 %% Current-voltage scan
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 % JVsol = doJV(soleq_sio2.ion, 100e-3, 201, 1, 0, 0, 1, 1);
-k_scan = 0.001;
+k_scan = 0.1;
 Vmax = 15;
 Vmin = -15;
 
@@ -95,8 +97,7 @@ sigma_p_bar_bulk = mean(sigma_p(:, x > x_perov_left + N_Debye*L_D & x < x_perov_
 %% Find peak conductivity for applied bias
 pp_Vmax = find(Vappt == max(Vappt));      %% pp = point position
 pp_Vmin = find(Vappt == min(Vappt));      %% pp = point position
-%% Create Matrix
-valuestore=zeros(no_of_diff_ion_conc,epoints);
+
 %% Max
 sigma_n_bar_Vpeak = sigma_n_bar(pp_Vmax);
 sigma_p_bar_Vpeak = sigma_p_bar(pp_Vmax);
