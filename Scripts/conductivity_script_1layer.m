@@ -16,8 +16,8 @@ dfplot.ELnpx(soleq_alox.ion)
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 % JVsol = doJV(soleq_sio2.ion, 100e-3, 201, 1, 0, 0, 1, 1);
 k_scan = 0.001;
-Vmax = 1.2;
-Vmin = -1.2;
+Vmax = 0.6;
+Vmin = -0.6;
 
 % sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
 sol_CV = doCV(soleq_alox.ion, 0, 0, Vmax, Vmin, k_scan, 1, 241);
@@ -45,8 +45,8 @@ par = par_alox;
 
 e = par.e;
 V_T = par.kB*par.T;                     % Thermal votlage
-epp_pvsk = e*par.epp0*par.epp(3);       % Perovskite absolute dielectric constant
-N0 = par.Ncat(3);                   
+epp_pvsk = e*par.epp0*par.epp(1);       % Perovskite absolute dielectric constant
+N0 = par.Ncat(1);                   
 N0_courtier = 1.6e19;                   % cm-3
 
 L_D = sqrt((epp_pvsk*V_T)/(e*N0));      % Deby width [cm]
@@ -54,8 +54,8 @@ L_D_courtier = sqrt((epp_pvsk*V_T)/(e*N0_courtier));
 
 N_Debye = 3;                            % Number of Debye lengths to average electron density over
 %%
-x_perov_left = sol_CV.par.dcum0(3);
-x_perov_right = sol_CV.par.dcum0(4);
+x_perov_left = sol_CV.par.dcum0(1);
+x_perov_right = sol_CV.par.dcum0(2);
 
 x = sol_CV.x;
 t = sol_CV.t;
