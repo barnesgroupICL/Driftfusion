@@ -18,13 +18,11 @@ initialise_df
 par_alox = pc('Input_files/alox.csv');
 no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e17)));
 epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1));%number of different electrode values
-row=1; %for matrix created later
+valuestore=zeros(no_of_diff_ion_conc,epoints);%create the matrix
+row=1; %intialize 
 column=1;
-%% Create Matrix
-valuestore=zeros(no_of_diff_ion_conc,epoints);
-
 %% while
-while par_alox.Ncat(1,3)>1e16
+while par_alox.Ncat(1,3)>1e17
 %% Equilibrium solutions 
  
  for electrode_change= par_alox.Phi_left:0.1:par_alox.Phi_right %loop to run for different electrode workfunction
@@ -42,8 +40,8 @@ while par_alox.Ncat(1,3)>1e16
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 % JVsol = doJV(soleq_sio2.ion, 100e-3, 201, 1, 0, 0, 1, 1);
 k_scan = 0.1;
-Vmax = 15;
-Vmin = -15;
+Vmax = 1.2;
+Vmin = -1.2;
 
 % sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
 sol_CV = doCV(soleq_alox.ion, 0, 0, Vmax, Vmin, k_scan, 1, 241);
@@ -106,10 +104,10 @@ sigma_p_bar_Vpeak = sigma_p_bar(pp_Vmax);
 %% Put value inside matrix
 valuestore(row,column)= sigma_n_bar_Vpeak;  
 
-column=column+1;
- end
-
 row=row+1;
+ end
+row=1;
+column=column+1;
 % %% Plot the outputs
 % % figure(101)
 % % Ntr = 6;            % Number of voltage transients
