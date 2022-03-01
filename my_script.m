@@ -1,11 +1,21 @@
 %% Conductivity profiles
+% So systematically you could look at the following.
+
+% 1)Electrode workfunctions
+% 2)Ion density 
+% 3)1 ion, opposite charge (i.e. mobile anions)
+% 4)2 ions
+% 5) Different ion densities
+
+% Ideally you would set some of these parameter explorations up as loops and extract peak conductivity then plot 
+% on a contour plot with x = Ion density, y = Electrode workfunctions, z = peak conductivity for example.
 
 %% Initialize driftfusion
 initialise_df
 
 %% Add parameter file to path 
 % Filepath Mac
-par_alox = pc('Input_files/alox_1l.csv');
+par_alox = pc('Input_files/alox.csv');
 %% Equilibrium solutions
 soleq_alox = equilibrate(par_alox);
 
