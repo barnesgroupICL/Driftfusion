@@ -5,7 +5,7 @@ initialise_df
 
 %% Add parameter file to path 
 % Filepath Mac
-par_alox = pc('Input_files/alox.csv');
+par_alox = pc('Input_files/alox_EF0_LR_m4p9eV.csv');
 %% Equilibrium solutions
 soleq_alox = equilibrate(par_alox);
 
