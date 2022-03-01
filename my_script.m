@@ -20,6 +20,7 @@ dfplot.ELnpx(soleq_alox.ion)
 k_scan = 0.001;
 Vmin = -15;
 Vmax = 15;
+soleq_alox.ion.par.MaxStepFactor = 0.1;
 sol_CV = doCV(soleq_alox.ion, 0, 0, Vmax, Vmin, k_scan, 1, 201);
 %% Plot Vapp vs time
 % dfplot.Vappt(sol_CV)
@@ -29,13 +30,13 @@ dfplot.JtotVapp(sol_CV, 0);
 %set(gca,'YScale','log')
 
 %% Plot anion and cation densities
-%dfplot.acx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
+%dfplot.acx(sol_CV, 1/k_scan*[0:Vmax/3:Vmax]);
 
 %% Plot electron and hole profiles
-dfplot.npx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
+dfplot.npx(sol_CV, 1/k_scan*[0:Vmax/3:Vmax]);
 
 %% Plot space charge density
-dfplot.rhox(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
+dfplot.rhox(sol_CV, 1/k_scan*[0:Vmax/3:Vmax]);
 
 %% Calculate conductivity
 [sigma_n, sigma_p] = dfana.calc_conductivity(sol_CV);
@@ -54,7 +55,7 @@ L_D_courtier = sqrt((epp_pvsk*V_T)/(e*N0_courtier));
 
 N_Debye = 3;                            % Number of Debye lengths to average electron density over
 %%
-x_perov_left = dcum0(3);
+x_perov_left = sol_CV.par.dcum0(3);
 
 x = sol_CV.x;
 t = sol_CV.t;
@@ -68,8 +69,6 @@ sigma_p_bar_entire = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + 4.00E
 
 sigma_n_bar_bulk = mean(sigma_n(:, x > x_perov_left + N_Debye*L_D & x < x_perov_left + 4.00E-05), 2);
 sigma_p_bar_bulk = mean(sigma_p(:, x > x_perov_left + N_Debye*L_D & x < x_perov_left + 4.00E-05), 2);
-
-
 
 %% Find peak conductivity for applied bias
 pp_Vmax = find(Vappt == max(Vappt));      %% pp = point position
