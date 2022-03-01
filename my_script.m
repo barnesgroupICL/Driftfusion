@@ -5,7 +5,7 @@ initialise_df
 
 %% Add parameter file to path 
 % Filepath Mac
-par_alox = pc('Input_files/alox_EF0_LR_m4p9eV.csv');
+par_alox = pc('Input_files/alox_2_gates.csv');
 %% Equilibrium solutions
 soleq_alox = equilibrate(par_alox);
 
@@ -18,12 +18,11 @@ dfplot.ELnpx(soleq_alox.ion)
 
 % sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
 k_scan = 0.001;
-Vmin=-15;
-Vmax=15;
+Vmin = -15;
+Vmax = 15;
 sol_CV = doCV(soleq_alox.ion, 0, 0, Vmax, Vmin, k_scan, 1, 201);
 %% Plot Vapp vs time
-dfplot.Vappt(sol_CV)
-
+% dfplot.Vappt(sol_CV)
 
 %% Plot JV scan
 dfplot.JtotVapp(sol_CV, 0);
@@ -33,7 +32,7 @@ dfplot.JtotVapp(sol_CV, 0);
 %dfplot.acx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
 
 %% Plot electron and hole profiles
-%dfplot.npx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
+dfplot.npx(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
 
 %% Plot space charge density
 dfplot.rhox(sol_CV, 1/k_scan*[0, 0.5, 1.0, 2.5, 3.0]);
@@ -55,7 +54,7 @@ L_D_courtier = sqrt((epp_pvsk*V_T)/(e*N0_courtier));
 
 N_Debye = 3;                            % Number of Debye lengths to average electron density over
 %%
-x_perov_left = 202e-7;
+x_perov_left = dcum0(3);
 
 x = sol_CV.x;
 t = sol_CV.t;
@@ -116,6 +115,7 @@ plot(Vappt, sigma_n_bar_bulk, Vappt, sigma_p_bar_bulk)
 xlabel('Voltage [V]')
 ylabel('Average bulk conductivity [Linear]')
 legend('Electron', 'Hole')
+
 %% Plot average conductivity
 figure
 semilogy(Vappt, sigma_n_bar_entire, Vappt, sigma_p_bar_entire)
