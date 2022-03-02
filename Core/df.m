@@ -375,7 +375,7 @@ u = pdepe(par.m,@dfpde,@dfic,@dfbc,x,t,options);
 
                 Ql = [0; 1; 1;];
 
-                Pr = [-ur(1)+Vbi-Vapp-Vres;
+                Pr = [-ur(1) + Vbi - Vapp - Vres;
                     mobset*(sn_r*(ur(2) - nright));
                     mobset*(sp_r*(ur(3) - pright));];
 
