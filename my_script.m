@@ -105,6 +105,7 @@ sigma_p_bar_Vpeak = sigma_p_bar(pp_Vmax);
 valuestore(row,column)= sigma_n_bar_Vpeak;  
 
 row=row+1;
+par_alox.Phi_left=par_alox.Phi_left-0.1;
  end
 row=1;
 column=column+1;
