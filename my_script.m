@@ -19,6 +19,7 @@ par_alox = pc('Input_files/alox.csv');
 no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e17)));
 epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1));%number of different electrode values
 valuestore=zeros(epoints,no_of_diff_ion_conc);%create the matrix
+phi_left_electrode = par_alox.Phi_left;
 row=1; %intialize 
 column=1;
 %% while
@@ -107,8 +108,9 @@ valuestore(row,column)= sigma_n_bar_Vpeak;
 row=row+1;
 par_alox.Phi_left=par_alox.Phi_left-0.1;
  end
-row=1;
-column=column+1;
+row=1; %reset back to row 1
+par_alox.Phi_left=phi_left_electrode; %reset back to original eletrode value
+column=column+1; %move to the next doping value
 % %% Plot the outputs
 % % figure(101)
 % % Ntr = 6;            % Number of voltage transients
