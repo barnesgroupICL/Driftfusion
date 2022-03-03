@@ -30,10 +30,10 @@ par = sol_ini.par;
 %% Set parameters for initial dark solution with Rs on
 par.mobseti = 0;
 par.Int = 0;
-par.tmesh_type = 1;
+par.tmesh_type = 2;
 par.tpoints = 100;
-par.tmax = 1e-3;
-par.t0 = 0;
+par.tmax = 1e-6;
+par.t0 = par.tmax/1e6;
 par.Rs = Rs;
 par.Rs_initial = 1;
 
