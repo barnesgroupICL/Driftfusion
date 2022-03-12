@@ -16,7 +16,7 @@ initialise_df
 %% Add parameter file to path 
 % Filepath Mac
 par_alox = pc('Input_files/alox.csv');
-no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e14)));
+no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e17)));
 epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1))+1;%number of different electrode values
 valuestore_n=zeros(epoints,no_of_diff_ion_conc);%create the matrix for storing n values
 valuestore_p=zeros(epoints,no_of_diff_ion_conc);%create the matrix for storing p values
@@ -26,7 +26,7 @@ column=1;
 electrodeval=zeros(epoints);
 electrodeval_counter=1;
 %% while
-while par_alox.Ncat(1,3)>1e13
+while par_alox.Ncat(1,3)>1e16
 %% Equilibrium solutions 
  
  for electrode_change= par_alox.Phi_left:0.1:par_alox.Phi_right %loop to run for different electrode workfunction
