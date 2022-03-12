@@ -16,15 +16,17 @@ initialise_df
 %% Add parameter file to path 
 % Filepath Mac
 par_alox = pc('Input_files/alox.csv');
-no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e11)));
-epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1));%number of different electrode values
+no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e14)));
+epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1))+1;%number of different electrode values
 valuestore_n=zeros(epoints,no_of_diff_ion_conc);%create the matrix for storing n values
 valuestore_p=zeros(epoints,no_of_diff_ion_conc);%create the matrix for storing p values
 phi_left_electrode = par_alox.Phi_left;
 row=1; %intialize 
 column=1;
+electrodeval=zeros(epoints);
+electrodeval_counter=1;
 %% while
-while par_alox.Ncat(1,3)>1e10
+while par_alox.Ncat(1,3)>1e13
 %% Equilibrium solutions 
  
  for electrode_change= par_alox.Phi_left:0.1:par_alox.Phi_right %loop to run for different electrode workfunction
@@ -41,7 +43,7 @@ while par_alox.Ncat(1,3)>1e10
 %% Current-voltage scan
 % JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
 % JVsol = doJV(soleq_sio2.ion, 100e-3, 201, 1, 0, 0, 1, 1);
-k_scan = 0.1;
+k_scan = 0.001;
 Vmax = 1.2;
 Vmin = -1.2;
 
@@ -107,7 +109,9 @@ sigma_p_bar_Vpeak = sigma_p_bar(pp_Vmax);
 valuestore_n(row,column)= sigma_n_bar_Vpeak;  
 valuestore_p(row,column)= sigma_p_bar_Vpeak;
 row=row+1;
-par_alox.Phi_left=par_alox.Phi_left-0.1;
+electrodeval(electrodeval_counter)=par_alox.Phi_left;
+electrodeval_counter=electrodeval_counter+1;
+par_alox.Phi_left=par_alox.Phi_left+0.1;
  end
 row=1; %reset back to row 1
 par_alox.Phi_left=phi_left_electrode; %reset back to original eletrode value
