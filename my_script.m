@@ -1,32 +1,27 @@
-%% Conductivity profiles
-% So systematically you could look at the following.
 
-% 1)Electrode workfunctions
-% 2)Ion density 
-% 3)1 ion, opposite charge (i.e. mobile anions)
-% 4)2 ions
-% 5)Different ion densities
 
-% Ideally you would set some of these parameter explorations up as loops and extract peak conductivity then plot 
-% on a contour plot with x = Ion density, y = Electrode workfunctions, z = peak conductivity for example.
-
+%% Code pupose
+% Code is supposed to take different values of doping in different columns and different left 
+% electrode workfunction values in the rows and give max conductivity achieved
 %% Initialize driftfusion
 initialise_df
 
 %% Add parameter file to path 
 % Filepath Mac
 par_alox = pc('Input_files/alox.csv');
-no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e17)));
+no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e17)))+1;%number of different ionic values
 epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1))+1;%number of different electrode values
 valuestore_n=zeros(epoints,no_of_diff_ion_conc);%create the matrix for storing n values
 valuestore_p=zeros(epoints,no_of_diff_ion_conc);%create the matrix for storing p values
-phi_left_electrode = par_alox.Phi_left;
+phi_left_electrode = par_alox.Phi_left; %store value in a variable that will change in the loop
 row=1; %intialize 
-column=1;
-electrodeval=zeros(epoints);
-electrodeval_counter=1;
+column=1;%intialize 
+electrodeval=zeros(epoints); %store electrode values
+electrodeval_counter=0;
+ionsval=zeros(no_of_diff_ion_conc);%store ion values
+ionsval_counter=0;
 %% while
-while par_alox.Ncat(1,3)>1e16
+while par_alox.Ncat(1,3)>1e16 %loop to change ionic conce
 %% Equilibrium solutions 
  
  for electrode_change= par_alox.Phi_left:0.1:par_alox.Phi_right %loop to run for different electrode workfunction
@@ -75,10 +70,10 @@ e = par.e;
 V_T = par.kB*par.T;                     % Thermal votlage
 epp_pvsk = e*par.epp0*par.epp(3);       % Perovskite absolute dielectric constant
 N0 = par.Ncat(3);                   
-N0_courtier = 1.6e19;                   % cm-3
+% N0_courtier = 1.6e19;                   % cm-3
 
 L_D = sqrt((epp_pvsk*V_T)/(e*N0));      % Deby width [cm]
-L_D_courtier = sqrt((epp_pvsk*V_T)/(e*N0_courtier));
+% L_D_courtier = sqrt((epp_pvsk*V_T)/(e*N0_courtier));
 
 N_Debye = 3;                            % Number of Debye lengths to average electron density over
 %%
@@ -108,87 +103,102 @@ sigma_p_bar_Vpeak = sigma_p_bar(pp_Vmax);
 %% Put value inside matrix
 valuestore_n(row,column)= sigma_n_bar_Vpeak;  
 valuestore_p(row,column)= sigma_p_bar_Vpeak;
-row=row+1;
-electrodeval(electrodeval_counter)=par_alox.Phi_left;
+row=row+1; %move to next row
 electrodeval_counter=electrodeval_counter+1;
-par_alox.Phi_left=par_alox.Phi_left+0.1;
- end
-row=1; %reset back to row 1
+electrodeval(electrodeval_counter)=par_alox.Phi_left; %store value of the electrode Efo 
+par_alox.Phi_left=par_alox.Phi_left+0.1; %change value of electrode
+ end %loop runs till -5.5 to 4.9
+row=1; %reset back to row 1 after loop ends
 par_alox.Phi_left=phi_left_electrode; %reset back to original eletrode value
-column=column+1; %move to the next doping value
-% %% Plot the outputs
-% % figure(101)
-% % Ntr = 6;            % Number of voltage transients
-% % 
-% % for i = 1:Ntr
-% %     plot(sol_VTROTTR(i).t, DeltaVoc(i,:));
-% %     hold on
-% % end
-% % 
-% % xlabel('Time [s]')
-% % ylabel('DeltaV [V]')
-% % xlim([0, 1e-5])
-% % hold off
-% %%
-% % %% Plot average conductivity
-% % figure
-% % plot(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
-% % axis([-1 1 0 inf])
-% % xlabel('Voltage [V]')
-% % ylabel('Average conductivity [Siemens]')
-% % legend('Electron', 'Hole')
-%  
-% %% Plot average conductivity
-% % figure(200)
-% % semilogy(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
-% % xlabel('Voltage [V]')
-% % ylabel('Average channel conductivity [Semilog]')
-% % legend('Electron', 'Hole')
-% % 
-% % %% Plot average conductivity
-% % % figure(201)
-% % % plot(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
-% % % xlabel('Voltage [V]')
-% % % ylabel('Average channel conductivity [Linear]')
-% % % legend('Electron', 'Hole')
-% % 
-% % %% Plot average conductivity
-% % figure(202)
-% % semilogy(Vappt, sigma_n_bar_bulk, Vappt, sigma_p_bar_bulk)
-% % xlabel('Voltage [V]')
-% % ylabel('Average bulk conductivity [Semilog]')
-% % legend('Electron', 'Hole')
-% % 
-% % %% Plot average conductivity
-% % % figure(203)
-% % % plot(Vappt, sigma_n_bar_bulk, Vappt, sigma_p_bar_bulk)
-% % % xlabel('Voltage [V]')
-% % % ylabel('Average bulk conductivity [Linear]')
-% % % legend('Electron', 'Hole')
-% % 
-% % %% Plot average conductivity
-% % figure(204)
-% % semilogy(Vappt, sigma_n_bar_entire, Vappt, sigma_p_bar_entire)
-% % xlabel('Voltage [V]')
-% % ylabel('Average entire conductivity [Semilog]')
-% % legend('Electron', 'Hole')
-% % 
-% % %% Plot average conductivity
-% % % figure(205)
-% % % plot(Vappt, sigma_n_bar_entire, Vappt, sigma_p_bar_entire)
-% % % xlabel('Voltage [V]')
-% % % ylabel('Average entire conductivity [Linear]')
-% % % legend('Electron', 'Hole')
-% % 
-% % 
 
- par_alox.Ncat(1,3)= par_alox.Ncat(1,3)/10;
+column=column+1; %move to the next doping value
+ionsval_counter=ionsval_counter+1;
+ionsval(:,ionsval_counter)=par_alox.Ncat(1,3);
+
+ par_alox.Ncat(1,3)= par_alox.Ncat(1,3)/10; %change cation value
  end
 
  %%
 figure
 contour(valuestore_n)
 contour(valuestore_p)
+% % Plot the outputs
+% figure(101)
+% Ntr = 6;            % Number of voltage transients
+% 
+% for i = 1:Ntr
+%     plot(sol_VTROTTR(i).t, DeltaVoc(i,:));
+%     hold on
+% end
+% 
+% xlabel('Time [s]')
+% ylabel('DeltaV [V]')
+% xlim([0, 1e-5])
+% hold off
+% %
+% %% Plot average conductivity
+% figure
+% plot(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
+% axis([-1 1 0 inf])
+% xlabel('Voltage [V]')
+% ylabel('Average conductivity [Siemens]')
+% legend('Electron', 'Hole')
+%  
+% % Plot average conductivity
+% figure(200)
+% semilogy(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
+% xlabel('Voltage [V]')
+% ylabel('Average channel conductivity [Semilog]')
+% legend('Electron', 'Hole')
+% 
+% %% Plot average conductivity
+% % figure(201)
+% % plot(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
+% % xlabel('Voltage [V]')
+% % ylabel('Average channel conductivity [Linear]')
+% % legend('Electron', 'Hole')
+% 
+% %% Plot average conductivity
+% figure(202)
+% semilogy(Vappt, sigma_n_bar_bulk, Vappt, sigma_p_bar_bulk)
+% xlabel('Voltage [V]')
+% ylabel('Average bulk conductivity [Semilog]')
+% legend('Electron', 'Hole')
+% 
+% %% Plot average conductivity
+% % figure(203)
+% % plot(Vappt, sigma_n_bar_bulk, Vappt, sigma_p_bar_bulk)
+% % xlabel('Voltage [V]')
+% % ylabel('Average bulk conductivity [Linear]')
+% % legend('Electron', 'Hole')
+% 
+% %% Plot average conductivity
+% figure(204)
+% semilogy(Vappt, sigma_n_bar_entire, Vappt, sigma_p_bar_entire)
+% xlabel('Voltage [V]')
+% ylabel('Average entire conductivity [Semilog]')
+% legend('Electron', 'Hole')
+% 
+% %% Plot average conductivity
+% % figure(205)
+% % plot(Vappt, sigma_n_bar_entire, Vappt, sigma_p_bar_entire)
+% % xlabel('Voltage [V]')
+% % ylabel('Average entire conductivity [Linear]')
+% % legend('Electron', 'Hole')
+% 
+% 
 %%
+
 % %% Make movie for anions and cations
 % %makemovie(sol_CV, @dfplot.acx, 0, [0, 1.5e18], 'acx', true, true);
+%% Conductivity profiles
+% So systematically you could look at the following.
+
+% 1)Electrode workfunctions
+% 2)Ion density 
+% 3)1 ion, opposite charge (i.e. mobile anions)
+% 4)2 ions
+% 5)Different ion densities
+
+% Ideally you would set some of these parameter explorations up as loops and extract peak conductivity then plot 
+% on a contour plot with x = Ion density, y = Electrode workfunctions, z = peak conductivity for example.
