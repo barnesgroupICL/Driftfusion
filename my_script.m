@@ -20,108 +20,96 @@ electrodeval=zeros(epoints); %store electrode values
 electrodeval_counter=0;
 ionsval=zeros(no_of_diff_ion_conc);%store ion values
 ionsval_counter=0;
+
+par = par_alox;     % Create temporary parameters object for overwriting parameters in loop
+
+%% Initialise the parameter arrays
+Ncat_array = logspace(17, 18, 2);
+workfunction_LHS = par.Phi_left:0.1:par.Phi_right;
+
 %% while
-while par_alox.Ncat(1,3)>1e16 %loop to change ionic conce
-%% Equilibrium solutions 
- 
- for electrode_change= par_alox.Phi_left:0.1:par_alox.Phi_right %loop to run for different electrode workfunction
+for i = 1:length(Ncat_array)
+    
+    par.Ncat(:) = Ncat_array(i);
+    disp(['Cation density = ', num2str(Ncat_array(i)), ' cm^-3']);
+    for j = 1:length(workfunction_LHS) %loop to run for different electrode workfunction
+        
+        par.Phi_left = workfunction_LHS(j);
+        disp(['LHS electrode workfunction = ', num2str(workfunction_LHS(j)), ' eV']);
+        par = refresh_device(par);      % This line is required to rebuild various arrays used DF
+        
+        %% Find equilibrium
+        soleq_alox(i, j) = equilibrate(par);
 
- soleq_alox = equilibrate(par_alox);
- 
-%% Plot equilibrium energy level diagram
+        %% Current-voltage scan
+        k_scan = 0.001;
+        Vmax = 1.2;
+        Vmin = -1.2;
+        
+        % sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
+        sol_CV(i, j) = doCV(soleq_alox(i, j).ion, 0, 0, Vmax, Vmin, k_scan, 1, 241);
+        %% Plot Vapp vs time
+        % dfplot.Vappt(sol_CV)
+        
+        %% Plot JV scan
+        %dfplot.JtotVapp(sol_CV, 0);
+        %set(gca,'YScale','log')
+        
+        %% Plot anion and cation densities
+        %dfplot.acx(sol_CV, 1/k_scan*[0:Vmax/3:Vmax]);
+        
+        %% Plot electron and hole profiles
+        %dfplot.npx(sol_CV, 1/k_scan*[0:Vmax/3:Vmax]);
+    end %loop runs till -5.5 to 4.9   
+end
 
-% dfplot.ELnpx(soleq_alox.ion) commented out since many schematics will be
-% formed. Similiar with other plots
+%% Analysis
 
+% Preallocation
+sigma_n_barM = zeros(length(Ncat_array), length(workfunction_LHS), length(sol_CV(1,1).t)); 
+sigma_p_barM = zeros(length(Ncat_array), length(workfunction_LHS), length(sol_CV(1,1).t)); 
+sigma_n_bar_VpeakM = zeros(length(Ncat_array), length(workfunction_LHS)); 
+sigma_p_bar_VpeakM = zeros(length(Ncat_array), length(workfunction_LHS)); 
 
+for i = 1:length(Ncat_array)
+    for j = 1:length(workfunction_LHS)
+        [sigma_n_bar, sigma_p_bar, sigma_n_bar_Vpeak, sigma_p_bar_Vpeak] = sigma_ana(sol_CV(i,j));
+        sigma_n_barM(i,j,:) = sigma_n_bar;
+        sigma_p_barM(i,j,:) = sigma_p_bar;
+        sigma_n_bar_VpeakM(i,j) = sigma_n_bar_Vpeak;
+        sigma_p_bar_VpeakM(i,j) = sigma_p_bar_Vpeak;
+    end
+end
 
-%% Current-voltage scan
-% JVsol = doJV(sol_ini, JVscan_rate, JVscan_pnts, Intensity, mobseti, Vstart, Vend, option)
-% JVsol = doJV(soleq_sio2.ion, 100e-3, 201, 1, 0, 0, 1, 1);
-k_scan = 0.001;
-Vmax = 1.2;
-Vmin = -1.2;
+%% Plots
+for i = 1:length(Ncat_array)
+    figure(100)
+    semilogy(workfunction_LHS, sigma_n_bar_VpeakM(i, :))
+    hold on
+    xlabel('LHS workfunction [eV]')
+    ylabel('Peak electron conductivity [S cm-1]')
+    legstr_n{i} = ['Ncat =', num2str(Ncat_array(i))];
+end  
 
-% sol_CV = doCV(sol_ini, light_intensity, V0, Vmax, Vmin, scan_rate, cycles, tpoints)
-sol_CV = doCV(soleq_alox.ion, 0, 0, Vmax, Vmin, k_scan, 1, 241);
-%% Plot Vapp vs time
-% dfplot.Vappt(sol_CV)
+for i = 1:length(Ncat_array)
+    figure(101)
+    semilogy(workfunction_LHS, sigma_p_bar_VpeakM(i, :))
+    hold on
+    xlabel('LHS workfunction [eV]')
+    ylabel('Peak hole conductivity [S cm-1]')
+    legstr_p{i} = ['Ncat =', num2str(Ncat_array(i))];
+end  
+figure(100)
+legend(legstr_n)
+hold off
+figure(101)
+legend(legstr_p)
+hold off
 
-%% Plot JV scan
-%dfplot.JtotVapp(sol_CV, 0);
-%set(gca,'YScale','log')
-
-%% Plot anion and cation densities
-%dfplot.acx(sol_CV, 1/k_scan*[0:Vmax/3:Vmax]);
-
-%% Plot electron and hole profiles
-%dfplot.npx(sol_CV, 1/k_scan*[0:Vmax/3:Vmax]);
-
-%% Plot space charge density
-%dfplot.rhox(sol_CV, 1/k_scan*[0:Vmax/3:Vmax]);
-
-%% Calculate conductivity
-[sigma_n, sigma_p] = dfana.calc_conductivity(sol_CV);
-
-%% Debye length Calculation
-par = par_alox;
-
-e = par.e;
-V_T = par.kB*par.T;                     % Thermal votlage
-epp_pvsk = e*par.epp0*par.epp(3);       % Perovskite absolute dielectric constant
-N0 = par.Ncat(3);                   
-% N0_courtier = 1.6e19;                   % cm-3
-
-L_D = sqrt((epp_pvsk*V_T)/(e*N0));      % Deby width [cm]
-% L_D_courtier = sqrt((epp_pvsk*V_T)/(e*N0_courtier));
-
-N_Debye = 3;                            % Number of Debye lengths to average electron density over
 %%
-x_perov_left = sol_CV.par.dcum0(3);
-x_perov_right = sol_CV.par.dcum0(4);
-
-x = sol_CV.x;
-t = sol_CV.t;
-Vappt = dfana.calcVapp(sol_CV);
-%% Get point at which perovskite starts 
-sigma_n_bar = mean(sigma_n(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
-sigma_p_bar = mean(sigma_p(:, x > x_perov_left & x < x_perov_left + N_Debye*L_D), 2);
-% 
-% sigma_n_bar_entire = mean(sigma_n(:, x > x_perov_left & x < x_perov_right), 2);
-% sigma_p_bar_entire = mean(sigma_p(:, x > x_perov_left & x < x_perov_right), 2);
-% 
-% sigma_n_bar_bulk = mean(sigma_n(:, x > x_perov_left + N_Debye*L_D & x < x_perov_right), 2);
-% sigma_p_bar_bulk = mean(sigma_p(:, x > x_perov_left + N_Debye*L_D & x < x_perov_right), 2);
-
-%% Find peak conductivity for applied bias
-pp_Vmax = find(Vappt == max(Vappt));      %% pp = point position
-pp_Vmin = find(Vappt == min(Vappt));      %% pp = point position
-
-%% Max
-sigma_n_bar_Vpeak = sigma_n_bar(pp_Vmax);
-sigma_p_bar_Vpeak = sigma_p_bar(pp_Vmax);
-%% Put value inside matrix
-valuestore_n(row,column)= sigma_n_bar_Vpeak;  
-valuestore_p(row,column)= sigma_p_bar_Vpeak;
-row=row+1; %move to next row
-electrodeval_counter=electrodeval_counter+1;
-electrodeval(electrodeval_counter)=par_alox.Phi_left; %store value of the electrode Efo 
-par_alox.Phi_left=par_alox.Phi_left+0.1; %change value of electrode
- end %loop runs till -5.5 to 4.9
-row=1; %reset back to row 1 after loop ends
-par_alox.Phi_left=phi_left_electrode; %reset back to original eletrode value
-
-column=column+1; %move to the next doping value
-ionsval_counter=ionsval_counter+1;
-ionsval(:,ionsval_counter)=par_alox.Ncat(1,3);
-
- par_alox.Ncat(1,3)= par_alox.Ncat(1,3)/10; %change cation value
- end
-
- %%
-figure
-contour(valuestore_n)
-contour(valuestore_p)
+% figure
+% contour(valuestore_n)
+% contour(valuestore_p)
 % % Plot the outputs
 % figure(101)
 % Ntr = 6;            % Number of voltage transients
@@ -136,14 +124,14 @@ contour(valuestore_p)
 % xlim([0, 1e-5])
 % hold off
 % %
-% %% Plot average conductivity
-% figure
-% plot(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
-% axis([-1 1 0 inf])
-% xlabel('Voltage [V]')
-% ylabel('Average conductivity [Siemens]')
-% legend('Electron', 'Hole')
-%  
+%% Plot average conductivity
+figure
+semilogy(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
+%axis([-1 1 0 inf])
+xlabel('Voltage [V]')
+ylabel('Average conductivity [Siemens]')
+legend('Electron', 'Hole')
+%%
 % % Plot average conductivity
 % figure(200)
 % semilogy(Vappt, sigma_n_bar, Vappt, sigma_p_bar)

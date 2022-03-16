@@ -351,7 +351,7 @@ classdef dfplot
             Ncat = repmat(dev.Ncat, length(t), 1);
 
             figure(14)
-            dfplot.x2d(sol, x, {a,c,Ncat,Nani},{'anion','cation','static cation','static anion'}, {'-','-','--','-.'},...
+            dfplot.x2d(sol, x, {a,c,Ncat,Nani},{'anion','cation','static anion','static cation'}, {'-','-','--','-.'},...
                 'Ionic carrier density [cm-3]', tarr, xrange, 0, 0);
         end
 
@@ -683,7 +683,7 @@ classdef dfplot
             dfplot.x2d(sol, x, {n, p}, {'electrons, \it{n}', 'holes, \it{p}'}, {'-', '-'}, 'Density [cm-3]', tarr, xrange, 0, 1)
 
             subplot(3,1,3);
-            dfplot.x2d(sol, x, {a,c,Ncat,Nani},{'anion','cation','static cation','static anion'}, {'-','-','--','-.'},...
+            dfplot.x2d(sol, x, {c,a,Ncat,Nani},{'cation','anion','static anion','static cation'}, {'-','-','--','-.'},...
                 'Density [cm-3]', tarr, xrange, 0, 0);
         end
 
