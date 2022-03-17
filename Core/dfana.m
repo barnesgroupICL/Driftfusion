@@ -448,7 +448,7 @@ classdef dfana
         end
         
         function [sigma_n, sigma_p] = calc_conductivity(sol)
-            [u, t, x, par, dev, n, p, a, c ,V] = dfana.splitsol(sol);
+            [u, t, x, par, dev, n, p, a, c, V] = dfana.splitsol(sol);
             
             mu_n_M = repmat(dev.mu_n, length(t), 1);
             mu_p_M = repmat(dev.mu_p, length(t), 1);

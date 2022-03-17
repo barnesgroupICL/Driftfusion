@@ -25,7 +25,7 @@ par = par_alox;     % Create temporary parameters object for overwriting paramet
 
 %% Initialise the parameter arrays
 Ncat_array = logspace(17, 18, 2);
-workfunction_LHS = par.Phi_left:0.1:par.Phi_right;
+workfunction_LHS = par.Phi_left:0.05:-5.2;%par.Phi_right;
 
 %% while
 for i = 1:length(Ncat_array)
@@ -64,7 +64,7 @@ for i = 1:length(Ncat_array)
 end
 
 %% Analysis
-
+Vappt = dfana.calcVapp(sol_CV(1,1));
 % Preallocation
 sigma_n_barM = zeros(length(Ncat_array), length(workfunction_LHS), length(sol_CV(1,1).t)); 
 sigma_p_barM = zeros(length(Ncat_array), length(workfunction_LHS), length(sol_CV(1,1).t)); 
@@ -125,12 +125,31 @@ hold off
 % hold off
 % %
 %% Plot average conductivity
-figure
-semilogy(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
-%axis([-1 1 0 inf])
+for j = 1:length(workfunction_LHS)
+    figure(201)
+    semilogy(Vappt, squeeze(sigma_n_barM(2, j, :)))
+    legstr_n2{j} = ['\Phi_l =', num2str(workfunction_LHS(j))];
+    hold on
+end
+
+for j = 1:length(workfunction_LHS)
+    figure(202)
+    semilogy(Vappt, squeeze(sigma_p_barM(2, j, :)))
+    legstr_p2{j} = ['\Phi_l =', num2str(workfunction_LHS(j))];
+    hold on
+end
+
+figure(201)
 xlabel('Voltage [V]')
-ylabel('Average conductivity [Siemens]')
-legend('Electron', 'Hole')
+ylabel('Average electron conductivity [Siemens]')
+legend(legstr_n2)
+hold off
+
+figure(202)
+xlabel('Voltage [V]')
+ylabel('Average hole conductivity [Siemens]')
+legend(legstr_p2)
+hold off
 %%
 % % Plot average conductivity
 % figure(200)
