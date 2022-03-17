@@ -9,22 +9,22 @@ initialise_df
 %% Add parameter file to path 
 % Filepath Mac
 par_alox = pc('Input_files/alox.csv');
-no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e17)))+1;%number of different ionic values
-epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1))+1;%number of different electrode values
-valuestore_n=zeros(epoints,no_of_diff_ion_conc);%create the matrix for storing n values
-valuestore_p=zeros(epoints,no_of_diff_ion_conc);%create the matrix for storing p values
-phi_left_electrode = par_alox.Phi_left; %store value in a variable that will change in the loop
-row=1; %intialize 
-column=1;%intialize 
-electrodeval=zeros(epoints); %store electrode values
-electrodeval_counter=0;
-ionsval=zeros(no_of_diff_ion_conc);%store ion values
-ionsval_counter=0;
+% no_of_diff_ion_conc=abs(log10((par_alox.Ncat(1,3)/1e17)))+1;%number of different ionic values
+% epoints=round((par_alox.Phi_left-par_alox.Phi_right)/-(0.1))+1;%number of different electrode values
+% valuestore_n=zeros(epoints,no_of_diff_ion_conc);%create the matrix for storing n values
+% valuestore_p=zeros(epoints,no_of_diff_ion_conc);%create the matrix for storing p values
+% phi_left_electrode = par_alox.Phi_left; %store value in a variable that will change in the loop
+% row=1; %intialize 
+% column=1;%intialize 
+% electrodeval=zeros(epoints); %store electrode values
+% electrodeval_counter=0;
+% ionsval=zeros(no_of_diff_ion_conc);%store ion values
+% ionsval_counter=0;
 
 par = par_alox;     % Create temporary parameters object for overwriting parameters in loop
 
 %% Initialise the parameter arrays
-Ncat_array = logspace(17, 18, 2);
+Ncat_array = logspace(14, 18, 5);
 workfunction_LHS = par.Phi_left:0.05:-5.2;%par.Phi_right;
 
 %% while
@@ -127,14 +127,14 @@ hold off
 %% Plot average conductivity
 for j = 1:length(workfunction_LHS)
     figure(201)
-    semilogy(Vappt, squeeze(sigma_n_barM(2, j, :)))
+    semilogy(Vappt, squeeze(sigma_n_barM(5, j, :)))
     legstr_n2{j} = ['\Phi_l =', num2str(workfunction_LHS(j))];
     hold on
 end
 
 for j = 1:length(workfunction_LHS)
     figure(202)
-    semilogy(Vappt, squeeze(sigma_p_barM(2, j, :)))
+    semilogy(Vappt, squeeze(sigma_p_barM(5, j, :)))
     legstr_p2{j} = ['\Phi_l =', num2str(workfunction_LHS(j))];
     hold on
 end
@@ -150,8 +150,11 @@ xlabel('Voltage [V]')
 ylabel('Average hole conductivity [Siemens]')
 legend(legstr_p2)
 hold off
-%%
-% % Plot average conductivity
+%% Plot individual values
+%dfplot.npx(sol_CV(Ncat_index, Workfunction_index), time_array)
+dfplot.npx(sol_CV(1,4), 1);
+% makemovie(sol_CV, @dfplot.npx, 0, [0, 1.5e18], 'npx', true, true);
+%% Plot average conductivity
 % figure(200)
 % semilogy(Vappt, sigma_n_bar, Vappt, sigma_p_bar)
 % xlabel('Voltage [V]')
