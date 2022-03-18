@@ -156,7 +156,7 @@ classdef dfana
                 % n-type left boundary, p-type right boundary
                 j.n = jn_r + (deltajn-deltajn(:,end));
                 j.p = jp_l + deltajp;
-            elseif par.p0_l >= par.n0_l && par.p0_r >= par.n0_r...
+            else par.p0_l >= par.n0_l && par.p0_r >= par.n0_r...
                     || par.n0_l >= par.p0_l && par.n0_r >= par.p0_r
                 % p-type both boundaries or n-type both boundaries
                 j.n = jn_l + deltajn;

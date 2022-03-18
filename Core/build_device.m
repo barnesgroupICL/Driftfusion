@@ -21,6 +21,8 @@ end
 % Constant properties
 dev.mu_c = build_property(par.mu_c, xmesh, par, 'constant', 0);
 dev.mu_a = build_property(par.mu_a, xmesh, par, 'constant', 0);
+dev.Nani = build_property(par.Nani, xmesh, par, 'constant', 0);
+dev.Ncat = build_property(par.Ncat, xmesh, par, 'constant', 0);
 
 dev.sn = build_property(par.sn, xmesh, par, 'constant', 1);
 dev.sp = build_property(par.sp, xmesh, par, 'constant', 1);
@@ -38,8 +40,7 @@ dev.Nc = build_property(par.Nc, xmesh, par, 'exp_graded', 0);
 dev.Nv = build_property(par.Nv, xmesh, par, 'exp_graded', 0);
 dev.n0 = build_property(par.n0, xmesh, par, 'exp_graded', 0);
 dev.p0 = build_property(par.p0, xmesh, par, 'exp_graded', 0);
-dev.Nani = build_property(par.Nani, xmesh, par, 'exp_graded', 0);
-dev.Ncat = build_property(par.Ncat, xmesh, par, 'exp_graded', 0);
+
 dev.a_max = build_property(par.a_max, xmesh, par, 'exp_graded', 0);
 dev.c_max = build_property(par.c_max, xmesh, par, 'exp_graded', 0);
 
