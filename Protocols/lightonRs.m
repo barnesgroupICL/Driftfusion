@@ -95,8 +95,10 @@ if stable_time < 0
     % order of mag
     j = 1;
     while any(all_stable) == 0
-        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-
+        assert(j < 20, 'Could not reach stability, check the validity of your input');
+        j = j + 1;
+        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10)]);
+        
         par.tmax = par.tmax*10;
         par.t0 = par.tmax/1e6;
 

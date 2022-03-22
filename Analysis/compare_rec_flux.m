@@ -28,7 +28,7 @@ function sigma_sum_filter = compare_rec_flux(sol, RelTol_vsr, AbsTol_vsr, plot_s
 %% Start code
 par = sol.par;
 u = sol.u;
-t = sol.t;
+t = sol.t(1:size(u,1)); % In case of a broken solution, size(u,1) will be less than the requested time array length
 pcum1 = par.pcum + 1;   % Cumulative layer points array
 dev = par.dev_sub;
 x = par.xx;
