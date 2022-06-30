@@ -1,8 +1,25 @@
 function solstruct = df(varargin)
-% Core DRIFTFUSION function- organises properties and inputs for pdepe
-% A routine to test solving the diffusion and drift equations using the
-% matlab pepde solver.
-%
+% Core DRIFTFUSION function- organises properties and inputs for MATLAB's
+% Partial Differential Equation - Parabolic and Elliptic equation
+% solver (PDEPE).
+% VARARGIN (variable arguments in) is dealt with below. The input arguments
+% will be one or more of the following:
+% PAR = A parameters object created using the PC class
+% SOL_IC = An existing solution structure containing the initial conditions
+% (taken from the final time point)
+
+% DF outputs a MATLAB the solution structure SOLSTRUCT containing the following elements:
+% ? The solution matrix u: a three-dimensional matrix for which the dimensions are 
+%   [time, space, variable]. The order of the variables are as follows:
+%   u(1) = V = Electrostatic potential
+%   u(2) = n = Electron density
+%   u(3) = p = uHole density
+%   u(4) = c = Cation density (optional)
+%   u(5) = a = Anion density (optional)
+% ? The spatial mesh x.
+% ? The time mesh t.
+% ? The parameters object par.
+
 %% LICENSE
 % Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
@@ -11,13 +28,7 @@ function solstruct = df(varargin)
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
 %
-% Solution outputs
-% V = u(1) = electrostatic potential
-% n = u(2) = electron density
-% p = u(3) = holes density
-% c = u(4) = cation density (optional)
-% a = u(5) = anion density (optional)
-%
+
 %% Start code
 %% Deal with input arguments
 if length(varargin) == 0
@@ -26,24 +37,30 @@ if length(varargin) == 0
     dficAnalytical = true;
 elseif length(varargin) == 1
     % If one input argument then assume it is the Initial Conditions (IC) solution
-    icsol = varargin{1, 1}.u;
-    icx = varargin{1, 1}.x;
-    par = varargin{1, 1}.par;
+    sol_ic = varargin{1, 1};
+    icsol = sol_ic.u;
+    icx = sol_ic.x;
+    par = sol_ic.par;
     dficAnalytical = false;
 elseif length(varargin) == 2
+    % Two arguments
     if max(max(max(varargin{1, 1}.u))) == 0
+        % If SOL_IC is empty then use PAR and the analytical initial conditions
         par = varargin{2};
         dficAnalytical = true;
-    elseif isa(varargin{2}, 'char') == 1            % Checks to see if argument is a character
-        input_solstruct = varargin{1, 1};
-        par = input_solstruct.par;
-        icsol = input_solstruct.u;
-        icx = input_solstruct.x;
+    elseif isa(varargin{2}, 'char') == 1
+        % If the second argument is any character then use PAR from SOL_IC
+        sol_ic = varargin{1, 1};
+        par = sol_ic.par;
+        icsol = sol_ic.u;
+        icx = sol_ic.x;
         dficAnalytical = false;
     else
-        input_solstruct = varargin{1, 1};
-        icsol = input_solstruct.u;
-        icx = input_solstruct.x;
+        % If the second argument is not a character then read in PAR from
+        % input argument
+        sol_ic = varargin{1, 1};
+        icsol = sol_ic.u;
+        icx = sol_ic.x;
         par = varargin{2};
         dficAnalytical = false;
     end

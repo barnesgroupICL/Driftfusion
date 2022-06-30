@@ -83,7 +83,7 @@ classdef dfana
         function [J, j, x] = calcJ(sol, mesh_option)
             % Current, J and flux, j calculation from continuity equations
             % obtain SOL components for easy referencing
-            [u,t,xmesh,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
+            [u,t,x_whole,par,dev,n,p,a,c,V] = dfana.splitsol(sol);
 
             switch mesh_option
                 case "whole"
