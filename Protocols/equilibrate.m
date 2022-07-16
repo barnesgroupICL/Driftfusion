@@ -64,6 +64,17 @@ par.tpoints = 10;
 % Series resistance
 par.Rs = 0;
 
+%% Switch electronic mobilities to 1
+par.mu_n(par.mu_n > 0) = 1;
+par.mu_p(par.mu_p > 0) = 1;
+par.sn(par.sn > 0) = 1e-10;
+par.sp(par.sp > 0) = 1e-10;
+par.sn_l(par.sn_l > 0) = 1e5;     % electron surface recombination velocity left boundary
+par.sn_r(par.sn_r > 0) = 1e5;     % electron extraction velocity right boundary
+par.sp_l(par.sp_l > 0) = 1e5;     % hole extraction left boundary
+par.sp_r(par.sp_r > 0) = 1e5;     % hole surface recombination velocity right boundary
+par = refresh_device(par);
+
 %% Switch off mobilities
 par.mobset = 0;
 par.mobseti = 0;
@@ -80,7 +91,8 @@ par.SRHset = 1;
 
 % Characteristic diffusion time
 t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
-par.tmax = 100*t_diff;
+t_diff_norm = (par.dcum0(end)^2)/(2*par.kB*par.T);
+par.tmax = 100*t_diff_norm;
 par.t0 = par.tmax/1e6;
 
 %% Solution with mobility switched on
@@ -103,6 +115,23 @@ while any(all_stable) == 0
 
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 end
+
+%% reset mobilities
+par.mu_n = par_origin.mu_n;
+par.mu_p = par_origin.mu_p;
+par.sn = par_origin.sn;
+par.sp = par_origin.sp;
+par.sn_l = par_origin.sn_l;    % electron surface recombination velocity left boundary
+par.sn_r = par_origin.sn_r;     % electron extraction velocity right boundary
+par.sp_l = par_origin.sp_l;     % hole extraction left boundary
+par.sp_r = par_origin.sp_r;     % hole surface recombination velocity right boundary
+par = refresh_device(par);
+
+%% Run final solution with mobilties set back to defined
+par.tmax = 10*t_diff;
+par.t0 = par.tmax/1e6;
+
+sol = df(sol, par);
 
 soleq.el = sol;
 % Manually check final section of solution for VSR self-consitency
@@ -127,25 +156,23 @@ if electronic_only == 0 && par_origin.N_ionic_species > 0
     disp('Closed circuit equilibrium with ions')
 
     % Take ratio of electron and ion mobilities in the active layer
-    rat_anion = par.mu_n(par.active_layer)/par.mu_a(par.active_layer);
-    rat_cation = par.mu_n(par.active_layer)/par.mu_c(par.active_layer);
-
-    % If the ratio is infinity (ion mobility set to zero) then set the ratio to
-    % zero instead
-    if isnan(rat_anion) || isinf(rat_anion)
-        rat_anion = 0;
-    end
-
-    if isnan(rat_cation) || isinf(rat_cation)
-        rat_cation = 0;
-    end
-
+    par.mu_n(par.mu_n > 0) = 1;
+    par.mu_p(par.mu_p > 0) = 1;
+    par.sn(par.sn > 0) = 1e-10;
+    par.sp(par.sp > 0) = 1e-10;
+    par.mu_c(par.mu_c > 0) = 1;
+    par.mu_a(par.mu_a > 0) = 1;
+    par.sn_l(par.sn_l > 0) = 1e5;     % electron surface recombination velocity left boundary
+    par.sn_r(par.sn_r > 0) = 1e5;     % electron extraction velocity right boundary
+    par.sp_l(par.sp_l > 0) = 1e5;     % hole extraction left boundary
+    par.sp_r(par.sp_r > 0) = 1e5;     % hole surface recombination velocity right boundary
+    
+    par = refresh_device(par);
+    
     par.mobset = 1;
     par.mobseti = 1;           % Ions are accelerated to reach equilibrium
-    par.K_a = rat_anion;
-    par.K_c = rat_cation;
-    par.tmax = 1e4*t_diff;
-    par.t0 = par.tmax/1e3;
+    par.tmax = 100*t_diff_norm;
+    par.t0 = par.tmax/1e6;
 
     sol = df(sol, par);
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
@@ -159,7 +186,25 @@ if electronic_only == 0 && par_origin.N_ionic_species > 0
         sol = df(sol, par);
         all_stable = verifyStabilization(sol.u, sol.t, 0.7);
     end
-
+    
+    %% Reset mobilities and boundary coefficients
+    par.mu_n = par_origin.mu_n;
+    par.mu_p = par_origin.mu_p;
+    par.mu_c = par_origin.mu_c;
+    par.mu_a = par_origin.mu_a;
+    par.sn = par_origin.sn;
+    par.sp = par_origin.sp;
+    par.sn_l = par_origin.sn_l;    % electron surface recombination velocity left boundary
+    par.sn_r = par_origin.sn_r;     % electron extraction velocity right boundary
+    par.sp_l = par_origin.sp_l;     % hole extraction left boundary
+    par.sp_r = par_origin.sp_r;     % hole surface recombination velocity right boundary
+    par = refresh_device(par);
+    
+    %% Final solution with parameters set back to defined ones
+    par.tmax = 10*t_diff;
+    par.t0 = par.tmax/1e6;
+    sol = df(sol, par);
+    
     % write solution
     soleq.ion = sol;
     % Manually check solution for VSR self-consitency
