@@ -92,7 +92,8 @@ par.SRHset = 1;
 % Characteristic diffusion time
 t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
 t_diff_norm = (par.dcum0(end)^2)/(2*par.kB*par.T);
-par.tmax = 100*t_diff_norm;
+
+par.tmax = 1000*t_diff_norm;
 par.t0 = par.tmax/1e6;
 
 %% Solution with mobility switched on
