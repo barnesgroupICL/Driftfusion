@@ -4,12 +4,20 @@ An open source drift diffusion code based in MATLAB for simulating solar cells
 ## Info
 Authors: Philip Calado, Piers RF Barnes, Ilario Gelmetti, Mohammed Azzouzi, Benjamin Hilton
 
-Imperial College London, 2019
+Imperial College London, 2019 - 2022
 
 If you use Driftfusion please let us know by emailing:
 p.calado13@imperial.ac.uk
 
 Please log bugs through GitHub.
+
+## Publications about Driftfusion
+
+We warmly recommend to read this publication which describes the software:
+
+Calado, P., Gelmetti, I., Hilton, B. *et al.* Driftfusion: an open source code for simulating ordered semiconductor devices with mixed ionic-electronic conducting materials in one dimension. *J Comput Electron* **21**, 960–991 (2022). https://doi.org/10.1007/s10825-021-01827-z
+
+This publication describes the version [tagged as v1.1.1](https://github.com/barnesgroupICL/Driftfusion/releases/tag/v1.1.1).
 
 ## QuickStart Guide
 
