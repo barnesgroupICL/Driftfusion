@@ -156,7 +156,7 @@ classdef dfana
                 % n-type left boundary, p-type right boundary
                 j.n = jn_r + (deltajn-deltajn(:,end));
                 j.p = jp_l + deltajp;
-            elseif par.p0_l >= par.n0_l && par.p0_r >= par.n0_r...
+            else par.p0_l >= par.n0_l && par.p0_r >= par.n0_r...
                     || par.n0_l >= par.p0_l && par.n0_r >= par.p0_r
                 % p-type both boundaries or n-type both boundaries
                 j.n = jn_l + deltajn;
@@ -446,7 +446,17 @@ classdef dfana
             % charge density
             rho = -n + p - NA + ND + par.z_a*a + par.z_c*c - par.z_c*Nani - par.z_c*Ncat;
         end
-
+        
+        function [sigma_n, sigma_p] = calc_conductivity(sol)
+            [u, t, x, par, dev, n, p, a, c, V] = dfana.splitsol(sol);
+            
+            mu_n_M = repmat(dev.mu_n, length(t), 1);
+            mu_p_M = repmat(dev.mu_p, length(t), 1);
+            
+            sigma_n = par.e.*mu_n_M.*n;
+            sigma_p = par.e.*mu_p_M.*p;
+        end
+        
         function Vapp = calcVapp(sol)
             [~,t,~,par,~,~,~,~,~,~] = dfana.splitsol(sol);
             switch par.V_fun_type
