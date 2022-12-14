@@ -688,7 +688,7 @@ SDP_script(soleq.ion, logspace(-8,3,3), 0.6, 1, 0.1, 'sequential', 2, 5.12, 1e-3
 anasdp(sdpsol1, 1e-4);
 
 % SDP_script_exporter(prefix, varargin)
-SDP_script_exporter('unit_testing_deleteme', sdpsol1, sdpsol2);
+SDP_script_exporter(1e-7, 'unit_testing_deleteme', sdpsol1, sdpsol2);
 
 % SDP_script_plot(Jtr_time, dir_file_name, varargin)
 SDP_list_plot(1e-7, 'unit_testing_deleteme',...
