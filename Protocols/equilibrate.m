@@ -79,15 +79,19 @@ par.radset = 1;
 par.SRHset = 1;
 
 % Characteristic diffusion time
-t_diff = (par.dcum0(end)^2)/(2*par.kB*par.T*min(min(par.mu_n), min(par.mu_p)));
+t_diff = max((par.d.^2)./(2*par.kB*par.T*min(par.mu_n, par.mu_p)));
 par.tmax = 100*t_diff;
 par.t0 = par.tmax/1e6;
 
 %% Solution with mobility switched on
 disp('Solution with mobility switched on')
-sol = df(sol, par);
+sol_mu = df(sol, par);
+% if the simulation broke, try with runDfFourTrunks
+if size(sol_mu.u, 1) ~= par.tpoints
+    sol_mu = runDfFourTrunks(sol, par);
+end
 
-all_stable = verifyStabilization(sol.u, sol.t, 0.7);
+all_stable = verifyStabilization(sol_mu.u, sol_mu.t, 0.7);
 
 % loop to check electrons have reached stable config- if not accelerate ions by
 % order of mag
@@ -99,17 +103,23 @@ while any(all_stable) == 0
     par.tmax = 10*par.tmax;
     par.t0 = par.tmax/1e6;
 
-    sol = df(sol, par);
+    sol_mu = df(sol_mu, par);
+    % if the simulation broke, try with runDfFourTrunks
+    if size(sol_mu.u, 1) ~= par.tpoints
+        sol_mu = runDfFourTrunks(sol_mu, par);
+    end
 
-    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
+    all_stable = verifyStabilization(sol_mu.u, sol_mu.t, 0.7);
 end
 
-soleq.el = sol;
-% Manually check final section of solution for VSR self-consitency
-sol_ic = extract_IC(soleq.el, [soleq.el.t(end)*0.7, soleq.el.t(end)]);
-compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
-% Switch VSR check on for future use
-soleq.el.par.vsr_check = 1;
+soleq.el = sol_mu;
+if par.vsr_mode
+    % Manually check final section of solution for VSR self-consitency
+    sol_ic = extract_IC(soleq.el, [soleq.el.t(end)*0.7, soleq.el.t(end)]);
+    compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
+    % Switch VSR check on for future use
+    soleq.el.par.vsr_check = 1;
+end
 
 disp('Electronic carrier equilibration complete')
 
@@ -147,26 +157,37 @@ if electronic_only == 0 && par_origin.N_ionic_species > 0
     par.tmax = 1e4*t_diff;
     par.t0 = par.tmax/1e3;
 
-    sol = df(sol, par);
-    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
+    sol_ion = df(sol, par);
+    % if the simulation broke, try with runDfFourTrunks
+    if size(sol_ion.u, 1) ~= par.tpoints
+        sol_ion = runDfFourTrunks(sol, par);
+    end
+    all_stable = verifyStabilization(sol_ion.u, sol_ion.t, 0.7);
 
     % loop to check ions have reached stable config- if not accelerate ions by
     % order of mag
     while any(all_stable) == 0
-        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
+        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10)]);
         par.tmax = par.tmax*10;
         par.t0 = par.tmax/1e6;
-        sol = df(sol, par);
-        all_stable = verifyStabilization(sol.u, sol.t, 0.7);
+        sol_ion = df(sol_ion, par);
+        % if the simulation broke, try with runDfFourTrunks
+        if size(sol_ion.u, 1) ~= par.tpoints
+            sol_ion = runDfFourTrunks(sol_ion, par);
+        end
+        all_stable = verifyStabilization(sol_ion.u, sol_ion.t, 0.7);
     end
 
     % write solution
-    soleq.ion = sol;
-    % Manually check solution for VSR self-consitency
-    sol_ic = extract_IC(soleq.ion, [soleq.ion.t(end)*0.7, soleq.ion.t(end)]);
-    compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
+    soleq.ion = sol_ion;
+    if par.vsr_mode
+        % Manually check solution for VSR self-consitency
+        sol_ic = extract_IC(soleq.ion, [soleq.ion.t(end)*0.7, soleq.ion.t(end)]);
+        compare_rec_flux(sol_ic, par.RelTol_vsr, par.AbsTol_vsr, 0);
+        % Switch VSR check on for future use
+        soleq.ion.par.vsr_check = 1;
+    end
     % Reset switches
-    soleq.ion.par.vsr_check = 1;
     soleq.ion.par.mobseti = 1;
     soleq.ion.par.K_a = 1;
     soleq.ion.par.K_c = 1;
