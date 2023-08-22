@@ -90,8 +90,8 @@ sol = df(jump1, par);
 j = 1;
 if stabilise
     all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-    % loop to check ions have reached stable config- if not accelerate ions by
-    while any(all_stable) == 0
+    % loop to check ions have reached stable config
+    while any(all_stable) == 0 && j<10
         par.tmax = par.tmax*10;
 
         disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);

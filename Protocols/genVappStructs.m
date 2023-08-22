@@ -64,18 +64,8 @@ for i = 1:length(Vapp_arr)-1
 
     sol = df(sol, par);
 
-    % Check that the solution is steady-state
-    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-    j = 0;
-    while any(all_stable) == 0
-        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-        par.tmax = par.tmax*10;
-        par.t0 = par.tmax/1e6;
-
-        sol = df(sol, par);
-
-        all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-    end
+    % Ensure that the solution is steady-state
+    sol = stabilize(sol);
 
     % reset ion coeffs before storing
     if mobseti

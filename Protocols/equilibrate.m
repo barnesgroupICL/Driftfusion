@@ -87,22 +87,8 @@ par.t0 = par.tmax/1e6;
 disp('Solution with mobility switched on')
 sol = df(sol, par);
 
-all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-
-% loop to check electrons have reached stable config- if not accelerate ions by
-% order of mag
-j = 1;
-
-while any(all_stable) == 0
-    disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-
-    par.tmax = 10*par.tmax;
-    par.t0 = par.tmax/1e6;
-
-    sol = df(sol, par);
-
-    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-end
+% loop to check electrons have reached stable config
+sol = stabilize(sol);
 
 soleq.el = sol;
 % Manually check final section of solution for VSR self-consitency
@@ -148,17 +134,9 @@ if electronic_only == 0 && par_origin.N_ionic_species > 0
     par.t0 = par.tmax/1e3;
 
     sol = df(sol, par);
-    all_stable = verifyStabilization(sol.u, sol.t, 0.7);
 
-    % loop to check ions have reached stable config- if not accelerate ions by
-    % order of mag
-    while any(all_stable) == 0
-        disp(['increasing equilibration time, tmax = ', num2str(par.tmax*10^j)]);
-        par.tmax = par.tmax*10;
-        par.t0 = par.tmax/1e6;
-        sol = df(sol, par);
-        all_stable = verifyStabilization(sol.u, sol.t, 0.7);
-    end
+    % loop to check ions have reached stable config
+    sol = stabilize(sol);
 
     % write solution
     soleq.ion = sol;

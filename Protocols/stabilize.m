@@ -4,7 +4,7 @@ function steadystate_struct = stabilize(struct)
 % Syntax:  steadystate_struct = stabilize(struct)
 %
 % Inputs:
-%   STRUCT - a solution struct as created by PINDRIFT.
+%   STRUCT - a solution struct as created by DF.
 %
 % Outputs:
 %   STEADYSTATE_STRUCT - a solution struct that reached its steady state
@@ -20,22 +20,13 @@ function steadystate_struct = stabilize(struct)
 % See also df, verifyStabilization.
 %
 %% LICENSE
-% Copyright (C) 2020  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
+% Copyright (C) 2022  Philip Calado, Ilario Gelmetti, and Piers R. F. Barnes
 % Imperial College London
 % This program is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
 %
-%% Start code
-% Author: Ilario Gelmetti, Ph.D. student, perovskite photovoltaics
-% Institute of Chemical Research of Catalonia (ICIQ)
-% Research Group Prof. Emilio Palomares
-% email address: iochesonome@gmail.com
-% Supervised by: Dr. Phil Calado, Dr. Piers Barnes, Prof. Jenny Nelson
-% Imperial College London
-% May 2018; Last revision: May 2018
-
 %------------- BEGIN CODE --------------
 
 % shortcut
@@ -89,8 +80,8 @@ warning('off', 'Driftfusion:verifyStabilization');
 i=0;
 while forceStabilization || ~verifyStabilization(steadystate_struct.u, steadystate_struct.t, 1e-3) % check stability
     i = i + 1;
-    if i > 10
-        warning('Driftfusion:stabilize', [mfilename ' - not stabile after 10 attempts, giving up.']);
+    if i > 20
+        warning('Driftfusion:stabilize', [mfilename ' - not stabile after 20 attempts, giving up.']);
         break
     end
 
